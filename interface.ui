@@ -53,6 +53,10 @@
   <property name="autoFillBackground">
    <bool>false</bool>
   </property>
+  <property name="styleSheet">
+   <string notr="true">
+</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
@@ -63,8 +67,11 @@
       <height>581</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -84,6 +91,9 @@
         <family>Helvetica</family>
        </font>
       </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
       <property name="title">
        <string>DADOS AGENDAMENTO</string>
       </property>
@@ -102,6 +112,9 @@
          <pointsize>11</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
       </widget>
       <widget class="QTimeEdit" name="campo_hora_agendamento">
        <property name="geometry">
@@ -117,6 +130,9 @@
          <family>Helvetica</family>
          <pointsize>11</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
       </widget>
       <widget class="QLineEdit" name="campo_certificado">
@@ -145,7 +161,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>TIPO CERTIFICADO</string>
+        <string>🌟 TIPO CERTIFICADO</string>
        </property>
       </widget>
       <widget class="QLineEdit" name="campo_pedido">
@@ -174,7 +190,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>PEDIDO</string>
+        <string>🌟 PEDIDO</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_4">
@@ -182,12 +198,12 @@
         <rect>
          <x>430</x>
          <y>20</y>
-         <width>131</width>
+         <width>121</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>HORA AGENDAMENTO</string>
+        <string>🌟 HORA AGENDA</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_3">
@@ -195,12 +211,12 @@
         <rect>
          <x>290</x>
          <y>20</y>
-         <width>211</width>
+         <width>131</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-        <string>DATA AGENDAMENTO</string>
+        <string>🌟 DATA AGENDA</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_17">
@@ -213,7 +229,7 @@
         </rect>
        </property>
        <property name="text">
-        <string>STATUS</string>
+        <string>🌟 STATUS</string>
        </property>
       </widget>
       <widget class="QComboBox" name="campo_lista_status">
@@ -231,6 +247,9 @@
          <pointsize>11</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
        <property name="editable">
         <bool>false</bool>
        </property>
@@ -241,12 +260,12 @@
        </item>
        <item>
         <property name="text">
-         <string>Aprovado</string>
+         <string>Aguardando</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Aguardando</string>
+         <string>Aprovado</string>
         </property>
        </item>
        <item>
@@ -259,24 +278,18 @@
        <property name="geometry">
         <rect>
          <x>240</x>
-         <y>40</y>
-         <width>41</width>
-         <height>31</height>
+         <y>50</y>
+         <width>21</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Arial</family>
-         <pointsize>20</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
+         <pointsize>12</pointsize>
         </font>
        </property>
        <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
+        <string>✅</string>
        </property>
       </widget>
      </widget>
@@ -376,6 +389,12 @@
          <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
       </widget>
       <widget class="QLabel" name="label_18">
        <property name="geometry">
@@ -410,6 +429,11 @@
        </property>
        <property name="cursor">
         <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-radius:10px;
+background-color:rgb(73, 218, 107);
+</string>
        </property>
        <property name="text">
         <string>FINALIZAR</string>
@@ -594,6 +618,9 @@
          <bold>false</bold>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
       </widget>
       <widget class="QLabel" name="label_8">
        <property name="geometry">
@@ -766,6 +793,9 @@
          <pointsize>11</pointsize>
         </font>
        </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
       </widget>
       <widget class="QLabel" name="label_19">
        <property name="geometry">
@@ -807,6 +837,9 @@
          <family>Helvetica</family>
          <pointsize>11</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
       </widget>
       <widget class="QPushButton" name="botao_consultar">
@@ -860,6 +893,9 @@
          <family>Helvetica</family>
          <pointsize>11</pointsize>
         </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
        </property>
        <property name="editable">
         <bool>false</bool>
@@ -953,6 +989,11 @@
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;
+background-color:rgb(73, 218, 107);
+</string>
+      </property>
       <property name="text">
        <string>EXPORTAR EXCEL</string>
       </property>
@@ -979,7 +1020,7 @@
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="text">
-       <string>12 resultados</string>
+       <string/>
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -1028,6 +1069,9 @@
   <tabstop>campo_digito_rg</tabstop>
   <tabstop>tabWidget</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="resources_from_qt.qrc"/>
+  <include location="resources_from_qt_rc.qrc"/>
+ </resources>
  <connections/>
 </ui>

@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget
+from PyQt5 import QtCore, QtGui, QtWidgets,Qt
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication
 from PyQt5.QtCore import QDate, QTime,QUrl
 import datetime
 import requests
@@ -8,6 +8,7 @@ import json
 from PyQt5.QtGui import QDesktopServices
 import pandas as pd
 import os
+#import resources_from_qt_rc
 
 def procurar_cnpj():
     cnpj = ui.campo_cnpj.text()
@@ -158,10 +159,12 @@ def limpar_campos():
     data_nula = QDate(2000, 1, 1)  
     hora = QTime.fromString('00:00', "hh:mm")
     ui.campo_data_agendamento.setDate(data_nula)
+    ui.campo_data_nascimento.setDate(data_nula)
     ui.campo_hora_agendamento.setTime(hora)
     ui.tableWidget.setRowCount(0)
     ui.label_quantidade_bd.setText("")
     ui.campo_oab.setText("")
+    ui.campo_cnh.setText("")
 
 def buscar_dados():
     try:
@@ -203,7 +206,6 @@ def buscar_dados():
                     tipo_pedido = req[cliente]['Tipo']
                     hora_agendamento = req[cliente]['Hora']    
                     status_agendamento = req[cliente]['Status']
-
                     dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento)) 
         
         if x > 0:
@@ -300,7 +302,9 @@ def verificar_se_existe():
                 data = QDate.fromString(req[pedido]['Data'], "dd/MM/yyyy")
                 hora = QTime.fromString(req[pedido]['Hora'], "hh:mm")
 
-                ui.campo_novo_noBd.setText("✅")
+                ui.label_img_novo.setVisible(True)
+                ui.label_img_banco_dados.setVisible(False)
+                #ui.campo_novo_noBd.setText("✅")
                 ui.campo_data_agendamento.setDate(data)
                 ui.campo_hora_agendamento.setTime(hora)
                 ui.campo_certificado.setText(req[pedido]['Tipo'])
@@ -311,7 +315,35 @@ def verificar_se_existe():
        
         # Lida com exceções aqui
         pass
-    ui.campo_novo_noBd.setText("")
+    ui.label_img_novo.setVisible(False)
+    ui.label_img_banco_dados.setVisible(True)
+
+def pegar_valor_tabela(event):
+    item = ui.tableWidget.currentItem()  # Obtenha o item selecionado
+    if item is not None:
+        linha = item.row()
+        coluna = item.column()
+        valor = item.text()
+
+        if coluna == 0 :    
+            
+            coluna_data = ui.tableWidget.item(linha, 1).text()
+            coluna_tipo = ui.tableWidget.item(linha, 2).text()
+            coluna_hora = ui.tableWidget.item(linha, 3).text()
+            coluna_status = ui.tableWidget.item(linha, 4).text()
+
+            data = QDate.fromString(coluna_data, "dd/MM/yyyy")
+            hora = QTime.fromString(coluna_hora, "hh:mm")    
+            ui.tabWidget.setCurrentIndex(0)
+            ui.campo_pedido.setText(valor)
+            ui.campo_data_agendamento.setDate(data)
+            ui.campo_certificado.setText(coluna_tipo)
+            ui.campo_hora_agendamento.setTime(hora)
+            ui.campo_lista_status.setCurrentText(coluna_status)
+            ui.campo_pedido.setReadOnly(True)
+            ui.label_img_novo.setVisible(True)
+            ui.label_img_banco_dados.setVisible(False)
+            #ui.campo_novo_noBd.setText("✅")
 
 
 
@@ -347,6 +379,7 @@ if __name__ == "__main__":
     ui.campo_cnpj.editingFinished.connect (formatar_cnpj)
     ui.botao_consulta_cnpj.clicked.connect(procurar_cnpj)
     ui.botao_consulta_cpf.clicked.connect(procurar_cpf)
+    ui.tableWidget.itemDoubleClicked.connect(pegar_valor_tabela)
 
     janela.setWindowTitle("Dados Certificado - Certisign")
     janela.setFixedSize(605, 624)

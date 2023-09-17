@@ -5,9 +5,10 @@ import datetime
 import requests
 from winotify import Notification
 import json
-from PyQt5.QtGui import QDesktopServices,QKeyEvent
+from PyQt5.QtGui import QDesktopServices
 import pandas as pd
 import os
+#import resources_from_qt_rc
 
 def procurar_cnpj():
     cnpj = ui.campo_cnpj.text()
@@ -205,7 +206,6 @@ def buscar_dados():
                     tipo_pedido = req[cliente]['Tipo']
                     hora_agendamento = req[cliente]['Hora']    
                     status_agendamento = req[cliente]['Status']
-
                     dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento)) 
         
         if x > 0:
@@ -340,9 +340,6 @@ def pegar_valor_tabela(event):
             ui.campo_pedido.setReadOnly(True)
             ui.campo_novo_noBd.setText("✅")
 
-            
-
-
 
 class Ui_janela(object):
     def setupUi(self, janela):
@@ -360,10 +357,13 @@ class Ui_janela(object):
         palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Highlight, brush)
         janela.setPalette(palette)
         janela.setAutoFillBackground(False)
+        janela.setStyleSheet("\n"
+"")
         self.centralwidget = QtWidgets.QWidget(janela)
         self.centralwidget.setObjectName("centralwidget")
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setGeometry(QtCore.QRect(10, 0, 581, 581))
+        self.tabWidget.setStyleSheet("")
         self.tabWidget.setObjectName("tabWidget")
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
@@ -372,6 +372,7 @@ class Ui_janela(object):
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         self.groupBox.setFont(font)
+        self.groupBox.setStyleSheet("")
         self.groupBox.setObjectName("groupBox")
         self.campo_data_agendamento = QtWidgets.QDateEdit(self.groupBox)
         self.campo_data_agendamento.setGeometry(QtCore.QRect(289, 41, 131, 31))
@@ -379,6 +380,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_data_agendamento.setFont(font)
+        self.campo_data_agendamento.setStyleSheet("")
         self.campo_data_agendamento.setObjectName("campo_data_agendamento")
         self.campo_hora_agendamento = QtWidgets.QTimeEdit(self.groupBox)
         self.campo_hora_agendamento.setGeometry(QtCore.QRect(430, 40, 111, 31))
@@ -386,6 +388,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_hora_agendamento.setFont(font)
+        self.campo_hora_agendamento.setStyleSheet("")
         self.campo_hora_agendamento.setObjectName("campo_hora_agendamento")
         self.campo_certificado = QtWidgets.QLineEdit(self.groupBox)
         self.campo_certificado.setGeometry(QtCore.QRect(10, 100, 391, 31))
@@ -408,10 +411,10 @@ class Ui_janela(object):
         self.label.setGeometry(QtCore.QRect(10, 20, 81, 16))
         self.label.setObjectName("label")
         self.label_4 = QtWidgets.QLabel(self.groupBox)
-        self.label_4.setGeometry(QtCore.QRect(430, 20, 131, 16))
+        self.label_4.setGeometry(QtCore.QRect(430, 20, 121, 16))
         self.label_4.setObjectName("label_4")
         self.label_3 = QtWidgets.QLabel(self.groupBox)
-        self.label_3.setGeometry(QtCore.QRect(290, 20, 211, 20))
+        self.label_3.setGeometry(QtCore.QRect(290, 20, 131, 20))
         self.label_3.setObjectName("label_3")
         self.label_17 = QtWidgets.QLabel(self.groupBox)
         self.label_17.setGeometry(QtCore.QRect(410, 80, 101, 16))
@@ -422,6 +425,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_lista_status.setFont(font)
+        self.campo_lista_status.setStyleSheet("")
         self.campo_lista_status.setEditable(False)
         self.campo_lista_status.setObjectName("campo_lista_status")
         self.campo_lista_status.addItem("")
@@ -430,15 +434,10 @@ class Ui_janela(object):
         self.campo_lista_status.addItem("")
         self.campo_lista_status.addItem("")
         self.campo_novo_noBd = QtWidgets.QLabel(self.groupBox)
-        self.campo_novo_noBd.setGeometry(QtCore.QRect(240, 40, 41, 31))
+        self.campo_novo_noBd.setGeometry(QtCore.QRect(240, 50, 21, 21))
         font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(20)
-        font.setBold(False)
-        font.setWeight(50)
+        font.setPointSize(12)
         self.campo_novo_noBd.setFont(font)
-        self.campo_novo_noBd.setText("")
-        self.campo_novo_noBd.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_novo_noBd.setObjectName("campo_novo_noBd")
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab_5)
         self.groupBox_2.setGeometry(QtCore.QRect(10, 160, 561, 391))
@@ -478,6 +477,8 @@ class Ui_janela(object):
         font.setBold(False)
         font.setWeight(50)
         self.campo_oab.setFont(font)
+        self.campo_oab.setStyleSheet("")
+        self.campo_oab.setText("")
         self.campo_oab.setObjectName("campo_oab")
         self.label_18 = QtWidgets.QLabel(self.groupBox_2)
         self.label_18.setGeometry(QtCore.QRect(370, 140, 141, 20))
@@ -492,6 +493,9 @@ class Ui_janela(object):
         font.setWeight(75)
         self.botao_terminar.setFont(font)
         self.botao_terminar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_terminar.setStyleSheet("border-radius:10px;\n"
+"background-color:rgb(73, 218, 107);\n"
+"")
         self.botao_terminar.setObjectName("botao_terminar")
         self.label_11 = QtWidgets.QLabel(self.groupBox_2)
         self.label_11.setGeometry(QtCore.QRect(10, 260, 81, 16))
@@ -569,6 +573,7 @@ class Ui_janela(object):
         font.setBold(False)
         font.setWeight(50)
         self.campo_data_nascimento.setFont(font)
+        self.campo_data_nascimento.setStyleSheet("")
         self.campo_data_nascimento.setObjectName("campo_data_nascimento")
         self.label_8 = QtWidgets.QLabel(self.groupBox_2)
         self.label_8.setGeometry(QtCore.QRect(370, 200, 141, 20))
@@ -631,6 +636,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_data_de.setFont(font)
+        self.campo_data_de.setStyleSheet("")
         self.campo_data_de.setObjectName("campo_data_de")
         self.label_19 = QtWidgets.QLabel(self.groupBox_5)
         self.label_19.setGeometry(QtCore.QRect(40, 30, 81, 16))
@@ -644,6 +650,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_data_ate.setFont(font)
+        self.campo_data_ate.setStyleSheet("")
         self.campo_data_ate.setObjectName("campo_data_ate")
         self.botao_consultar = QtWidgets.QPushButton(self.groupBox_5)
         self.botao_consultar.setGeometry(QtCore.QRect(450, 50, 71, 31))
@@ -664,6 +671,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(11)
         self.campo_lista_status_2.setFont(font)
+        self.campo_lista_status_2.setStyleSheet("")
         self.campo_lista_status_2.setEditable(False)
         self.campo_lista_status_2.setObjectName("campo_lista_status_2")
         self.campo_lista_status_2.addItem("")
@@ -697,6 +705,9 @@ class Ui_janela(object):
         font.setWeight(75)
         self.botao_procurar.setFont(font)
         self.botao_procurar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_procurar.setStyleSheet("border-radius:10px;\n"
+"background-color:rgb(73, 218, 107);\n"
+"")
         self.botao_procurar.setObjectName("botao_procurar")
         self.label_quantidade_bd = QtWidgets.QLabel(self.tab_6)
         self.label_quantidade_bd.setGeometry(QtCore.QRect(220, 522, 201, 31))
@@ -706,6 +717,7 @@ class Ui_janela(object):
         self.label_quantidade_bd.setFont(font)
         self.label_quantidade_bd.setCursor(QtGui.QCursor(QtCore.Qt.ArrowCursor))
         self.label_quantidade_bd.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.label_quantidade_bd.setText("")
         self.label_quantidade_bd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_quantidade_bd.setObjectName("label_quantidade_bd")
         self.tabWidget.addTab(self.tab_6, "")
@@ -756,9 +768,10 @@ class Ui_janela(object):
         self.label_4.setText(_translate("janela", "🌟 HORA AGENDA"))
         self.label_3.setText(_translate("janela", "🌟 DATA AGENDA"))
         self.label_17.setText(_translate("janela", "🌟 STATUS"))
-        self.campo_lista_status.setItemText(1, _translate("janela", "Aprovado"))
-        self.campo_lista_status.setItemText(2, _translate("janela", "Aguardando"))
+        self.campo_lista_status.setItemText(1, _translate("janela", "Aguardando"))
+        self.campo_lista_status.setItemText(2, _translate("janela", "Aprovado"))
         self.campo_lista_status.setItemText(3, _translate("janela", "Cancelado"))
+        self.campo_novo_noBd.setText(_translate("janela", ""))
         self.groupBox_2.setTitle(_translate("janela", "DADOS CLIENTE"))
         self.label_7.setText(_translate("janela", "NOME COMPLETO"))
         self.label_14.setText(_translate("janela", "CNPJ"))
@@ -794,8 +807,8 @@ class Ui_janela(object):
         item = self.tableWidget.horizontalHeaderItem(4)
         item.setText(_translate("janela", "STATUS"))
         self.botao_procurar.setText(_translate("janela", "EXPORTAR EXCEL"))
-        self.label_quantidade_bd.setText(_translate("janela", ""))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("janela", "Consulta"))
+
 
 
 if __name__ == "__main__":

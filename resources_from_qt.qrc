@@ -1,9 +1,0 @@
-<RCC>
-  <qresource prefix="icons">
-    <file>icone.ico</file>
-  </qresource>
-  <qresource prefix="images">
-    <file>4c92ccc8320425987b938a8ab79aa84f.gif</file>
-    <file>9367801.png</file>
-  </qresource>
-</RCC>
