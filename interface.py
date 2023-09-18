@@ -8,14 +8,18 @@ import json
 from PyQt5.QtGui import QDesktopServices
 import pandas as pd
 import os
-#import resources_from_qt_rc
+import firebase_admin
+from firebase_admin import db
 
+#configurando banco de dados
+cred_object = firebase_admin.credentials.Certificate('credentials.json')
+firebase_admin.initialize_app(cred_object, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
+ref = db.reference("/")
 
 def procurar_cnh():
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
     QDesktopServices.openUrl(url)
     return
-
 
 def procurar_oab():
     url = QUrl("https://cna.oab.org.br/")
@@ -45,8 +49,6 @@ def procurar_cpf():
         url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}")
         QDesktopServices.openUrl(url)
         return
-
-
 
 def formatar_cpf():
     cpf = ui.campo_cpf.text()
@@ -114,43 +116,61 @@ def formatar_cnpj():
     ui.campo_cnpj.setText(cnpj_formatado)
     
 def gravar_dados():
-
+#USO DO BANCO DE DADOS
     num_pedido = ui.campo_pedido.text()
-    link = "https://bdpedidos-2078f-default-rtdb.firebaseio.com/"
-    requisicao = requests.get(f'{link}.json')
-    req = requisicao.json()
+    req = ref.get()
 
-    for id in req:
-        pedido_servidor = req[id]['Pedido']
-        if num_pedido == pedido_servidor and ui.campo_lista_status.currentText() != "":
-            pedido = ui.campo_pedido.text()
-            tipo = ui.campo_certificado.text()
-            hora  = ui.campo_hora_agendamento.text()
-            data = ui.campo_data_agendamento.text()
-            status = ui.campo_lista_status.currentText()
-            dados_atualizados = {"Pedido":pedido , "Data":data, "Hora":hora, "Tipo":tipo, "Status":status}
-            requests.patch(f'{link}{id}.json',data = json.dumps(dados_atualizados))
-            limpar_campos()
-            notificacao = Notification(app_id="Pedido Atualizado",title="",msg=f"Os dados do pedido {pedido} foram atualizados!")
+    try:
+        for id in req:
+            pedido_servidor = req[id]['Pedido']
+            if num_pedido == pedido_servidor and ui.campo_lista_status.currentText() != "":
+                pedido = ui.campo_pedido.text()
+                tipo = ui.campo_certificado.text()
+                hora  = ui.campo_hora_agendamento.text()
+                data = ui.campo_data_agendamento.text()
+                status = ui.campo_lista_status.currentText()
+                dados_atualizados = {"Pedido":pedido , "Data":data, "Hora":hora, "Tipo":tipo, "Status":status}
+                ref.child(id).update(dados_atualizados)
+                limpar_campos()
+                notificacao = Notification(app_id="Pedido Atualizado",title="",msg=f"Os dados do pedido {pedido} foram atualizados!")
+                notificacao.show()
+                return
+            
+        pedido = ui.campo_pedido.text()
+        tipo = ui.campo_certificado.text()
+        hora = ui.campo_hora_agendamento.text()
+        data = ui.campo_data_agendamento.text()
+        status = ui.campo_lista_status.currentText()
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+
+            notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
-    
-    pedido = ui.campo_pedido.text()
-    tipo = ui.campo_certificado.text()
-    hora = ui.campo_hora_agendamento.text()
-    data = ui.campo_data_agendamento.text()
-    status = ui.campo_lista_status.currentText()
-    if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
-
-        notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
-        notificacao.show()
+        #
+        novos_dados = {"Pedido":pedido , "Data":data, "Hora":hora, "Tipo":tipo, "Status":status}
+        
+        ref.push(novos_dados)
+        limpar_campos()
         return
+        
+    except Exception as e:
+    
+        pedido = ui.campo_pedido.text()
+        tipo = ui.campo_certificado.text()
+        hora = ui.campo_hora_agendamento.text()
+        data = ui.campo_data_agendamento.text()
+        status = ui.campo_lista_status.currentText()
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
 
-    dados = {"Pedido":pedido , "Data":data, "Hora":hora, "Tipo":tipo,"Status":status}
-    requests.post(f'{link}.json',data = json.dumps(dados))
-    notificacao = Notification(app_id="Pedido enviado",title="",msg=f"Os dados do pedido {pedido} foram salvos!")
-    notificacao.show()
-    limpar_campos()   
+            notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
+            notificacao.show()
+            return
+        #
+        novos_dados = {"Pedido":pedido , "Data":data, "Hora":hora, "Tipo":tipo, "Status":status}
+        
+        ref.push(novos_dados)
+        limpar_campos()
+        return
 
 def limpar_campos():
     ui.campo_pedido.setReadOnly(False)
@@ -242,12 +262,13 @@ def buscar_dados():
         pass
 
 def preencher_tabela():
+    #USO DE BANCO DE DADOS
     ui.tableWidget.setRowCount(0)
     try:
         ui.tableWidget.clear()
-        link = "https://bdpedidos-2078f-default-rtdb.firebaseio.com/"
-        requisicao = requests.get(f'{link}.json')
-        req = requisicao.json()
+        
+        
+        req = ref.get()
         
         data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
         numero_inteiro_inicial = data_inicial.toordinal()
@@ -298,12 +319,10 @@ def preencher_tabela():
     ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO", "DATA", "TIPO", "HORA", "STATUS"])
 
 def verificar_se_existe():
-    
+    #USO DE BANCO DE DADOS
     try:   
         num_pedido = ui.campo_pedido.text()
-        link = "https://bdpedidos-2078f-default-rtdb.firebaseio.com/"
-        requisicao = requests.get(f'{link}.json')
-        req = requisicao.json()
+        req = ref.get()
 
 
         for pedido in req:
@@ -351,7 +370,6 @@ def pegar_valor_tabela(event):
             ui.campo_lista_status.setCurrentText(coluna_status)
             ui.campo_pedido.setReadOnly(True)
             ui.campo_novo_noBd.setText("✅")
-
 
 class Ui_janela(object):
     def setupUi(self, janela):
@@ -866,8 +884,6 @@ class Ui_janela(object):
         item.setText(_translate("janela", "STATUS"))
         self.botao_procurar.setText(_translate("janela", "EXPORTAR EXCEL"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("janela", "Consulta"))
-
-
 
 if __name__ == "__main__":
     import sys
