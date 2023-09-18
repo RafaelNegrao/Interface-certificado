@@ -10,31 +10,43 @@ import pandas as pd
 import os
 #import resources_from_qt_rc
 
+
+def procurar_cnh():
+    url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
+    QDesktopServices.openUrl(url)
+    return
+
+
+def procurar_oab():
+    url = QUrl("https://cna.oab.org.br/")
+    QDesktopServices.openUrl(url)
+    return
+
+def procurar_rg():
+    url = QUrl("http://www.teledocumentos.com.br/sistema2/")
+    QDesktopServices.openUrl(url)
+    return
+
 def procurar_cnpj():
     cnpj = ui.campo_cnpj.text()
-    if cnpj == "":
-        notificacao = Notification(app_id="CNPJ",title="",msg=f"Insira o CNPJ do cliente")
-        notificacao.show()
-        return
-
     url = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
     QDesktopServices.openUrl(url)
     return
 
 def procurar_cpf():
+    
     cpf = ui.campo_cpf.text()
     nascimento = ui.campo_data_nascimento.text()
-    if cpf == "" :
-        notificacao = Notification(app_id="CPF ",title="",msg=f"Insira o CPF do cliente")
-        notificacao.show()
+    if not nascimento == "01/01/2000":
+        url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}&Nascimento={nascimento}")
+        QDesktopServices.openUrl(url)
         return
-    elif ui.campo_data_nascimento.text() == "01/01/2000":
-        notificacao = Notification(app_id="Data de nascimento",title="",msg=f"Insira a data de nascimento do cliente")
-        notificacao.show()
+    else:
+        url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}")
+        QDesktopServices.openUrl(url)
         return
-    url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}&Nascimento={nascimento}")
-    QDesktopServices.openUrl(url)
-    return
+
+
 
 def formatar_cpf():
     cpf = ui.campo_cpf.text()
@@ -302,9 +314,7 @@ def verificar_se_existe():
                 data = QDate.fromString(req[pedido]['Data'], "dd/MM/yyyy")
                 hora = QTime.fromString(req[pedido]['Hora'], "hh:mm")
 
-                ui.label_img_novo.setVisible(True)
-                ui.label_img_banco_dados.setVisible(False)
-                #ui.campo_novo_noBd.setText("✅")
+                ui.campo_novo_noBd.setText("✅")
                 ui.campo_data_agendamento.setDate(data)
                 ui.campo_hora_agendamento.setTime(hora)
                 ui.campo_certificado.setText(req[pedido]['Tipo'])
@@ -315,8 +325,7 @@ def verificar_se_existe():
        
         # Lida com exceções aqui
         pass
-    ui.label_img_novo.setVisible(False)
-    ui.label_img_banco_dados.setVisible(True)
+    ui.campo_novo_noBd.setText("")
 
 def pegar_valor_tabela(event):
     item = ui.tableWidget.currentItem()  # Obtenha o item selecionado
@@ -341,10 +350,7 @@ def pegar_valor_tabela(event):
             ui.campo_hora_agendamento.setTime(hora)
             ui.campo_lista_status.setCurrentText(coluna_status)
             ui.campo_pedido.setReadOnly(True)
-            ui.label_img_novo.setVisible(True)
-            ui.label_img_banco_dados.setVisible(False)
-            #ui.campo_novo_noBd.setText("✅")
-
+            ui.campo_novo_noBd.setText("✅")
 
 
 
@@ -379,10 +385,14 @@ if __name__ == "__main__":
     ui.campo_cnpj.editingFinished.connect (formatar_cnpj)
     ui.botao_consulta_cnpj.clicked.connect(procurar_cnpj)
     ui.botao_consulta_cpf.clicked.connect(procurar_cpf)
+    ui.botao_consulta_cnh.clicked.connect(procurar_cnh)
+    ui.botao_consulta_oab.clicked.connect(procurar_oab)
+    ui.botao_consulta_rg.clicked.connect(procurar_rg)
     ui.tableWidget.itemDoubleClicked.connect(pegar_valor_tabela)
+    
 
     janela.setWindowTitle("Dados Certificado - Certisign")
-    janela.setFixedSize(605, 624)
+    janela.setFixedSize(599, 693)
     janela.show()
     sys.exit(app.exec_())
 
