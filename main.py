@@ -9,6 +9,7 @@ import os
 import firebase_admin
 from firebase_admin import db
 
+
 #configurando banco de dados
 cred_object = firebase_admin.credentials.Certificate('credentials.json')
 firebase_admin.initialize_app(cred_object, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
