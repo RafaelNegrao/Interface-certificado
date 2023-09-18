@@ -2,9 +2,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication
 from PyQt5.QtCore import QDate, QTime,QUrl
 import datetime
-import requests
 from winotify import Notification
-import json
 from PyQt5.QtGui import QDesktopServices
 import pandas as pd
 import os
@@ -200,9 +198,8 @@ def limpar_campos():
 
 def buscar_dados():
     try:
-        link = "https://bdpedidos-2078f-default-rtdb.firebaseio.com/"
-        requisicao = requests.get(f'{link}.json')
-        req = requisicao.json()
+  
+        req =ref.get()
         
         data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
         numero_inteiro_inicial = data_inicial.toordinal()
