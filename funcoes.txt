@@ -399,3 +399,4 @@ if __name__ == "__main__":
 
     #comando cmd
     #pyuic5 -x interface.ui -o interface2.py
+    #pyinstaller --onefile -w -i icone.ico main.py

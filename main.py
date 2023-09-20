@@ -1,5 +1,5 @@
-from PyQt5 import QtCore, QtGui, QtWidgets,Qt
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication
+from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget
 from PyQt5.QtCore import QDate, QTime,QUrl
 import datetime
 from winotify import Notification
@@ -8,12 +8,20 @@ import pandas as pd
 import os
 import firebase_admin
 from firebase_admin import db
+import tkinter as tk
+from tkinter import filedialog
 
 
-#configurando banco de dados
-cred_object = firebase_admin.credentials.Certificate('credentials.json')
-firebase_admin.initialize_app(cred_object, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
+
+#configurando banco de dados#####################################################################################
+
+
+
+acoes = firebase_admin.credentials.Certificate("credentials.json")
+firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
 ref = db.reference("/")
+
+################################################################################################################
 
 def procurar_cnh():
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -199,6 +207,11 @@ def limpar_campos():
 
 def buscar_dados():
     try:
+        root = tk.Tk()
+        root.withdraw()
+
+# Abra a caixa de diálogo para selecionar um arquivo    
+        caminho_arquivo = filedialog.askdirectory()
   
         req =ref.get()
         
@@ -229,6 +242,7 @@ def buscar_dados():
                     dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento))   
 
                 elif status_filtro == "":
+
                     x += 1
 
                     pedido = req[cliente]['Pedido']
@@ -243,7 +257,7 @@ def buscar_dados():
             data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
             data_final = ui.campo_data_ate.text()
             data_inicial = ui.campo_data_de.text()
-            pasta_desktop = os.path.expanduser("~\\Desktop")
+            pasta_desktop = os.path.expanduser(f"{caminho_arquivo}")
             nome_arquivo = os.path.join(pasta_desktop, f"Certificados-emitidos-de {data_inicial.replace('/', '-')} a {data_final.replace('/', '-')}-gerado em{data_agora.replace('/','-')} .xlsx")
             df.to_excel(nome_arquivo, index=False)
             notificacao = Notification(app_id="Arquivo salvo",title="",msg=f"Arquivo excel salvo na área de trabalho!")
@@ -254,7 +268,7 @@ def buscar_dados():
 
     except Exception as e:
         print(e)
-        notificacao = Notification(app_id="Arquivo não salvo",title="",msg=f"Arquivo não gerado!")
+        notificacao = Notification(app_id=f"Arquivo não salvo  motivo:{e}",title="",msg=f"Arquivo não gerado!")
         notificacao.show()
         # Lida com exceções aqui
         pass
