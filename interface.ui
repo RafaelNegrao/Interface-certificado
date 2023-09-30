@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>599</width>
-    <height>693</height>
+    <width>611</width>
+    <height>533</height>
    </rect>
   </property>
   <property name="palette">
@@ -62,8 +62,8 @@
      <rect>
       <x>10</x>
       <y>0</y>
-      <width>581</width>
-      <height>651</height>
+      <width>591</width>
+      <height>491</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -76,213 +76,264 @@
      <attribute name="title">
       <string>Dados</string>
      </attribute>
-     <widget class="QGroupBox" name="groupBox">
+     <widget class="QComboBox" name="campo_lista_status">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>10</y>
-        <width>561</width>
-        <height>151</height>
+        <x>390</x>
+        <y>110</y>
+        <width>181</width>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
+        <pointsize>12</pointsize>
        </font>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
-      <property name="title">
-       <string>DADOS AGENDAMENTO</string>
+      <property name="editable">
+       <bool>false</bool>
       </property>
-      <widget class="QDateEdit" name="campo_data_agendamento">
-       <property name="geometry">
-        <rect>
-         <x>279</x>
-         <y>41</y>
-         <width>141</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-      </widget>
-      <widget class="QTimeEdit" name="campo_hora_agendamento">
-       <property name="geometry">
-        <rect>
-         <x>430</x>
-         <y>40</y>
-         <width>111</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_certificado">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>331</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_2">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>241</width>
-         <height>16</height>
-        </rect>
-       </property>
+      <item>
        <property name="text">
-        <string>🌟 TIPO CERTIFICADO</string>
+        <string>AGUARDANDO</string>
        </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_pedido">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>40</y>
-         <width>221</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>20</y>
-         <width>81</width>
-         <height>16</height>
-        </rect>
-       </property>
+      </item>
+      <item>
        <property name="text">
-        <string>🌟 PEDIDO</string>
+        <string>APROVADO</string>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_4">
-       <property name="geometry">
-        <rect>
-         <x>430</x>
-         <y>20</y>
-         <width>121</width>
-         <height>16</height>
-        </rect>
-       </property>
+      </item>
+      <item>
        <property name="text">
-        <string>🌟 HORA AGENDA</string>
+        <string>CANCELADO</string>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_3">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>20</y>
-         <width>131</width>
-         <height>20</height>
-        </rect>
-       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>10</y>
+        <width>81</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 PEDIDO</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_2">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>50</y>
+        <width>241</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 TIPO CERTIFICADO</string>
+      </property>
+     </widget>
+     <widget class="QDateEdit" name="campo_data_agendamento">
+      <property name="geometry">
+       <rect>
+        <x>310</x>
+        <y>30</y>
+        <width>141</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_17">
+      <property name="geometry">
+       <rect>
+        <x>390</x>
+        <y>90</y>
+        <width>101</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 STATUS</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_certificado">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>70</y>
+        <width>561</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_pedido">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>221</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+     </widget>
+     <widget class="QTimeEdit" name="campo_hora_agendamento">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>30</y>
+        <width>111</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_4">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>10</y>
+        <width>111</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 HORA AGENDA</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_3">
+      <property name="geometry">
+       <rect>
+        <x>301</x>
+        <y>9</y>
+        <width>131</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 DATA AGENDA</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="campo_novo_noBd">
+      <property name="geometry">
+       <rect>
+        <x>240</x>
+        <y>20</y>
+        <width>31</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_lista_status_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>110</y>
+        <width>151</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
        <property name="text">
-        <string>🌟 DATA AGENDA</string>
+        <string>NAO</string>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_17">
-       <property name="geometry">
-        <rect>
-         <x>360</x>
-         <y>80</y>
-         <width>101</width>
-         <height>16</height>
-        </rect>
-       </property>
+      </item>
+      <item>
        <property name="text">
-        <string>🌟 STATUS</string>
+        <string>SIM</string>
        </property>
-      </widget>
-      <widget class="QComboBox" name="campo_lista_status">
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_22">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>151</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>🌟 VENDIDO POR VOCÊ?</string>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>561</width>
+        <height>321</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>DADOS PESSOAIS</string>
+      </property>
+      <widget class="QLineEdit" name="campo_digito_ano">
        <property name="geometry">
         <rect>
-         <x>360</x>
-         <y>100</y>
-         <width>181</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="editable">
-        <bool>false</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string/>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Aguardando</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Aprovado</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>Cancelado</string>
-        </property>
-       </item>
-      </widget>
-      <widget class="QLabel" name="campo_novo_noBd">
-       <property name="geometry">
-        <rect>
-         <x>240</x>
-         <y>50</y>
-         <width>21</width>
+         <x>170</x>
+         <y>280</y>
+         <width>91</width>
          <height>21</height>
         </rect>
        </property>
@@ -290,30 +341,142 @@
         <font>
          <family>Helvetica</family>
          <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_nome">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>541</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
         </font>
        </property>
        <property name="text">
         <string/>
        </property>
       </widget>
-     </widget>
-     <widget class="QGroupBox" name="groupBox_2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>160</y>
-        <width>561</width>
-        <height>451</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-       </font>
-      </property>
-      <property name="title">
-       <string>DADOS CLIENTE</string>
-      </property>
+      <widget class="QLabel" name="label_10">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>rg</string>
+       </property>
+      </widget>
+      <widget class="QDateEdit" name="campo_data_nascimento">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>151</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_11">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>220</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>e-MAIL</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_email">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>240</y>
+         <width>541</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_cnh">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>160</y>
+         <width>271</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_cpf">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>120</y>
+         <width>311</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+      </widget>
       <widget class="QLabel" name="label_7">
        <property name="geometry">
         <rect>
@@ -324,16 +487,16 @@
         </rect>
        </property>
        <property name="text">
-        <string>NOME COMPLETO</string>
+        <string>nome completo:</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="campo_nome">
+      <widget class="QLineEdit" name="campo_rg">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
-         <width>531</width>
-         <height>31</height>
+         <y>80</y>
+         <width>311</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
@@ -343,49 +506,41 @@
          <weight>50</weight>
          <bold>false</bold>
         </font>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_6">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>100</y>
+         <width>81</width>
+         <height>16</height>
+        </rect>
        </property>
        <property name="text">
-        <string/>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_cnpj">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>280</y>
-         <width>491</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
+        <string>cpf</string>
        </property>
       </widget>
       <widget class="QLabel" name="label_14">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>180</y>
          <width>171</width>
          <height>16</height>
         </rect>
        </property>
        <property name="text">
-        <string>CNPJ</string>
+        <string>cnpj</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="campo_oab">
+      <widget class="QLineEdit" name="campo_cnpj">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>220</y>
-         <width>171</width>
-         <height>31</height>
+         <x>10</x>
+         <y>200</y>
+         <width>501</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
@@ -396,33 +551,53 @@
          <bold>false</bold>
         </font>
        </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
       </widget>
-      <widget class="QLabel" name="label_18">
+      <widget class="QLabel" name="label_13">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>200</y>
-         <width>141</width>
+         <x>170</x>
+         <y>260</y>
+         <width>61</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>díg ANO</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_12">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>260</y>
+         <width>191</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>nascimento</string>
+       </property>
+      </widget>
+      <widget class="QLabel" name="label_15">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>140</y>
+         <width>61</width>
          <height>20</height>
         </rect>
        </property>
        <property name="text">
-        <string>OAB</string>
+        <string>cnh</string>
        </property>
       </widget>
       <widget class="QPushButton" name="botao_terminar">
        <property name="geometry">
         <rect>
-         <x>410</x>
-         <y>400</y>
+         <x>420</x>
+         <y>280</y>
          <width>131</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
@@ -446,197 +621,11 @@ background-color:rgb(73, 218, 107);
         <string>FINALIZAR</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_11">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>320</y>
-         <width>81</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>e-MAIL</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_6">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>140</y>
-         <width>81</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>CPF</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_digito_rg">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>100</y>
-         <width>171</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_rg">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>311</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_12">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>380</y>
-         <width>191</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>DATA NASCIMENTO</string>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_digito_cpf">
-       <property name="geometry">
-        <rect>
-         <x>330</x>
-         <y>160</y>
-         <width>171</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_cpf">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>160</y>
-         <width>311</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_digito_ano">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>400</y>
-         <width>91</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignCenter</set>
-       </property>
-      </widget>
-      <widget class="QLineEdit" name="campo_email">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>340</y>
-         <width>531</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-      <widget class="QDateEdit" name="campo_data_nascimento">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>400</y>
-         <width>201</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_8">
        <property name="geometry">
         <rect>
          <x>330</x>
-         <y>140</y>
+         <y>100</y>
          <width>141</width>
          <height>20</height>
         </rect>
@@ -645,58 +634,19 @@ background-color:rgb(73, 218, 107);
         <string>últimos 2 dígitos - CPF</string>
        </property>
       </widget>
-      <widget class="QLabel" name="label_9">
+      <widget class="QPushButton" name="botao_consulta_oab">
        <property name="geometry">
         <rect>
-         <x>330</x>
-         <y>80</y>
-         <width>61</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string> dígito - RG</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_10">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>80</y>
-         <width>81</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>RG</string>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_13">
-       <property name="geometry">
-        <rect>
-         <x>220</x>
-         <y>380</y>
-         <width>61</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>díg ANO</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="botao_consulta_cpf">
-       <property name="geometry">
-        <rect>
-         <x>510</x>
+         <x>520</x>
          <y>160</y>
          <width>31</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>16</pointsize>
+         <pointsize>9</pointsize>
          <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
@@ -712,16 +662,16 @@ background-color:rgb(73, 218, 107);
       <widget class="QPushButton" name="botao_consulta_cnpj">
        <property name="geometry">
         <rect>
-         <x>510</x>
-         <y>280</y>
+         <x>520</x>
+         <y>200</y>
          <width>31</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>16</pointsize>
+         <pointsize>9</pointsize>
          <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
@@ -734,50 +684,53 @@ background-color:rgb(73, 218, 107);
         <string>🔍</string>
        </property>
       </widget>
-      <widget class="QLineEdit" name="campo_cnh">
+      <widget class="QLabel" name="label_9">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>220</y>
-         <width>271</width>
-         <height>31</height>
+         <x>330</x>
+         <y>60</y>
+         <width>61</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string> dígito - RG</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_digito_cpf">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>120</y>
+         <width>181</width>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Helvetica</family>
          <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
+         <weight>75</weight>
+         <bold>true</bold>
         </font>
        </property>
-      </widget>
-      <widget class="QLabel" name="label_15">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>200</y>
-         <width>61</width>
-         <height>20</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>CNH</string>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
        </property>
       </widget>
       <widget class="QPushButton" name="botao_consulta_cnh">
        <property name="geometry">
         <rect>
          <x>290</x>
-         <y>220</y>
+         <y>160</y>
          <width>31</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>16</pointsize>
+         <pointsize>9</pointsize>
          <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
@@ -793,16 +746,16 @@ background-color:rgb(73, 218, 107);
       <widget class="QPushButton" name="botao_consulta_rg">
        <property name="geometry">
         <rect>
-         <x>510</x>
-         <y>100</y>
+         <x>520</x>
+         <y>80</y>
          <width>31</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>16</pointsize>
+         <pointsize>9</pointsize>
          <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
@@ -815,19 +768,80 @@ background-color:rgb(73, 218, 107);
         <string>🔍</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="botao_consulta_oab">
+      <widget class="QLabel" name="label_18">
        <property name="geometry">
         <rect>
-         <x>510</x>
-         <y>220</y>
+         <x>330</x>
+         <y>140</y>
+         <width>141</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>OAB</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_digito_rg">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>80</y>
+         <width>181</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_oab">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>160</y>
+         <width>181</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="botao_consulta_cpf">
+       <property name="geometry">
+        <rect>
+         <x>520</x>
+         <y>120</y>
          <width>31</width>
-         <height>31</height>
+         <height>21</height>
         </rect>
        </property>
        <property name="font">
         <font>
          <family>Arial</family>
-         <pointsize>16</pointsize>
+         <pointsize>9</pointsize>
          <weight>50</weight>
          <italic>false</italic>
          <bold>false</bold>
@@ -838,6 +852,37 @@ background-color:rgb(73, 218, 107);
        </property>
        <property name="text">
         <string>🔍</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="botao_salvar">
+       <property name="geometry">
+        <rect>
+         <x>330</x>
+         <y>280</y>
+         <width>81</width>
+         <height>21</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <italic>false</italic>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true">border-radius:10px;
+background-color:rgb(73, 130, 255);
+
+</string>
+       </property>
+       <property name="text">
+        <string>SALVAR</string>
        </property>
       </widget>
      </widget>
@@ -995,17 +1040,17 @@ background-color:rgb(73, 218, 107);
        </item>
        <item>
         <property name="text">
-         <string>Aguardando</string>
+         <string>AGUARDANDO</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Aprovado</string>
+         <string>APROVADO</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>Cancelado</string>
+         <string>CANCELADO</string>
         </property>
        </item>
       </widget>
@@ -1016,7 +1061,7 @@ background-color:rgb(73, 218, 107);
         <x>10</x>
         <y>110</y>
         <width>561</width>
-        <height>471</height>
+        <height>311</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1030,6 +1075,15 @@ background-color:rgb(73, 218, 107);
         <width>561</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="autoScrollMargin">
+       <number>16</number>
       </property>
       <column>
        <property name="text">
@@ -1056,12 +1110,17 @@ background-color:rgb(73, 218, 107);
         <string>STATUS</string>
        </property>
       </column>
+      <column>
+       <property name="text">
+        <string>VENDA</string>
+       </property>
+      </column>
      </widget>
      <widget class="QPushButton" name="botao_procurar">
       <property name="geometry">
        <rect>
         <x>440</x>
-        <y>590</y>
+        <y>430</y>
         <width>131</width>
         <height>31</height>
        </rect>
@@ -1090,7 +1149,7 @@ background-color:rgb(73, 218, 107);
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>590</y>
+        <y>430</y>
         <width>221</width>
         <height>31</height>
        </rect>
@@ -1122,7 +1181,7 @@ background-color:rgb(73, 218, 107);
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>599</width>
+     <width>611</width>
      <height>21</height>
     </rect>
    </property>
@@ -1134,6 +1193,7 @@ background-color:rgb(73, 218, 107);
   <tabstop>campo_data_agendamento</tabstop>
   <tabstop>campo_hora_agendamento</tabstop>
   <tabstop>campo_certificado</tabstop>
+  <tabstop>campo_lista_status_3</tabstop>
   <tabstop>campo_lista_status</tabstop>
   <tabstop>campo_nome</tabstop>
   <tabstop>campo_rg</tabstop>
@@ -1146,7 +1206,6 @@ background-color:rgb(73, 218, 107);
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
   <tabstop>campo_lista_status_2</tabstop>
-  <tabstop>botao_consulta_cpf</tabstop>
   <tabstop>botao_consulta_cnpj</tabstop>
   <tabstop>botao_terminar</tabstop>
   <tabstop>botao_consulta_cnh</tabstop>
@@ -1159,6 +1218,8 @@ background-color:rgb(73, 218, 107);
   <tabstop>campo_digito_cpf</tabstop>
   <tabstop>campo_digito_ano</tabstop>
   <tabstop>tableWidget</tabstop>
+  <tabstop>botao_salvar</tabstop>
+  <tabstop>botao_consulta_cpf</tabstop>
  </tabstops>
  <resources>
   <include location="resources_from_qt_rc.qrc"/>
