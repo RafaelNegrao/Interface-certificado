@@ -34,9 +34,20 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 ref = db.reference("/")
 
 ################################################################################################################
+def criar_pasta_cliente():
+    nome_pasta = ui.campo_nome.text()
+
+    # Abrir uma janela de diálogo para selecionar o diretório
+    diretorio = filedialog.askdirectory()
+
+    if diretorio:
+        # Criar a pasta com o nome da variável no diretório selecionado
+        nova_pasta = os.path.join(diretorio, nome_pasta)
+        os.mkdir(nova_pasta)
 
 def limpar_campos():
     ui.campo_pedido.setReadOnly(False)
+    ui.campo_seguranca_cnh.setText("")
     ui.campo_certificado.setReadOnly(False)
     ui.campo_nome.setText("")
     ui.campo_cpf.setText("") 
@@ -51,7 +62,9 @@ def limpar_campos():
     ui.campo_oab.setText("")
     ui.campo_novo_noBd.setText("")
     ui.campo_lista_status.setCurrentText("AGUARDANDO")
-    data_nula = QDate(2000, 1, 1)  
+    ui.campo_lista_status_3.setCurrentText("NAO")
+    ui.campo_lista_status_4.setCurrentText("")
+    data_nula = QDate(2000, 1, 1)
     hora = QTime.fromString('00:00', "hh:mm")
     ui.campo_data_agendamento.setDate(data_nula)
     ui.campo_data_nascimento.setDate(data_nula)
@@ -97,17 +110,19 @@ def procurar_cpf():
 
 def formatar_cpf():
     cpf = ui.campo_cpf.text()
-    if len(cpf) == 11:
-        a = cpf[:3]
-        b = cpf[3:6]
-        c = cpf[6:9]
-        d = cpf[9:11]
+    novo_cpf = cpf.replace(".","").replace("-","")
+    if len(novo_cpf) == 11:
+        a = novo_cpf[:3]
+        b = novo_cpf[3:6]
+        c = novo_cpf[6:9]
+        d = novo_cpf[9:11]
         cpf_formatado = f"{a}.{b}.{c}-{d}"
         ui.campo_cpf.clear()
         ui.campo_cpf.setText(cpf_formatado)
         ui.campo_digito_cpf.setText(cpf_formatado[-2:])
+    
 #digito_cpf =  cpf[-2:]
-    elif len(cpf) <= 11 and len(cpf) > 0:
+    elif len(novo_cpf) <= 11 and len(cpf) > 0:
         cpf_formatado = cpf.zfill(11)
         a = cpf_formatado[:3]
         b = cpf_formatado[3:6]
@@ -117,27 +132,32 @@ def formatar_cpf():
         ui.campo_cpf.setText("")
         ui.campo_cpf.setText(cpf_formatado)
         ui.campo_digito_cpf.setText(cpf_formatado[-2:])
-    elif len(cpf)== "":
+    elif len(novo_cpf)== "":
         return
 
 def formatar_rg():
     rg = ui.campo_rg.text()
-    if len(rg) == 8:
-        rg_formatado = rg.zfill(9)
-        a = rg_formatado[:2]
-        b = rg_formatado[2:5]
-        c = rg_formatado[5:8]
-        d = rg_formatado[8:9]
+    rg_novo = rg.replace(".","").replace("-","")
+    if len(rg_novo) <= 7:
+        ui.campo_rg.setText(rg_novo)
+        pass
+
+    elif  len(rg_novo) == 9:
+        a = rg_novo[:2]
+        b = rg_novo[2:5]
+        c = rg_novo[5:8]
+        d = rg_novo[8:9]
         rg_formatado = f"{a}.{b}.{c}-{d}"
         ui.campo_rg.setText("")
         ui.campo_rg.setText(rg_formatado)
         ui.campo_digito_rg.setText(rg_formatado[-1:])
 
-    elif len(rg) == 9:
-        a = rg[:2]
-        b = rg[2:5]
-        c = rg[5:8]
-        d = rg[8:9]
+    elif len(rg_novo) == 8:
+        rg_novo = rg.zfill(9)
+        a = rg_novo[:2]
+        b = rg_novo[2:5]
+        c = rg_novo[5:8]
+        d = rg_novo[8:9]
         rg_formatado = f"{a}.{b}.{c}-{d}"
         ui.campo_rg.setText("")
         ui.campo_rg.setText(rg_formatado)
@@ -145,22 +165,24 @@ def formatar_rg():
 
 def formatar_data_nascimento():
     nascimento = ui.campo_data_nascimento.text()
-    ui.campo_digito_ano.setText(nascimento[6:10])
-
+    if not nascimento == "01/01/2000":
+        ui.campo_digito_ano.setText(nascimento[6:10])
+        
 def formatar_cnpj():
     cnpj = ui.campo_cnpj.text()
-    if len(cnpj) == 14:
-        a = cnpj[:2]
-        b = cnpj[2:5]
-        c = cnpj[5:8]
-        d = cnpj[8:12]
-        e = cnpj[12:14]
+    cnpj_sp = cnpj.replace(".","").replace("/","").replace("-","")
+    if len(cnpj_sp) == 14:
+        a = cnpj_sp[:2]
+        b = cnpj_sp[2:5]
+        c = cnpj_sp[5:8]
+        d = cnpj_sp[8:12]
+        e = cnpj_sp[12:14]
         cnpj_formatado = f"{a}.{b}.{c}/{d}-{e}"
         ui.campo_cnpj.setText("")
         ui.campo_cnpj.setText(cnpj_formatado)
-    else:
-        ui.campo_cnpj.setText("") 
-
+    elif len(cnpj_sp) == 18:
+        pass
+    
 def salvar():
     num_pedido = ui.campo_pedido.text()
     req = ref.get()
@@ -175,7 +197,8 @@ def salvar():
                 hora  = ui.campo_hora_agendamento.text()
                 data = ui.campo_data_agendamento.text()
                 status = ui.campo_lista_status.currentText()
-
+                vendido = ui.campo_lista_status_3.currentText()
+                modalidade = ui.campo_lista_status_4.currentText()
                 nome = ""
                 cpf = ""
                 rg = ""
@@ -188,14 +211,14 @@ def salvar():
                 dig_rg = ""
                 dig_ano = ""
                 data_nascimento = ""
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
-                notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
                 return
@@ -218,14 +241,15 @@ def salvar():
                 dig_ano = ui.campo_digito_ano.text()
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+                modalidade = ui.campo_lista_status_4.currentText()
+                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
-                notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
                 return
@@ -239,6 +263,8 @@ def salvar():
         hora  = ui.campo_hora_agendamento.text()
         data = ui.campo_data_agendamento.text()
         status = ui.campo_lista_status.currentText()
+        vendido = ui.campo_lista_status_3.currentText()
+        modalidade = ui.campo_lista_status_4.currentText()
         nome = ""
         cpf = ""
         rg = ""
@@ -252,14 +278,14 @@ def salvar():
         dig_ano = ""
         data_nascimento = ""
         vendido = ui.campo_lista_status_3.currentText()
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
-        notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+        notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
         return
@@ -282,15 +308,16 @@ def salvar():
         dig_ano = ui.campo_digito_ano.text()
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+        modalidade = ui.campo_lista_status_4.currentText()
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
         
-        notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
+        notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
 
         ref.push(novos_dados)
@@ -311,6 +338,8 @@ def gravar_dados():
                 hora  = ui.campo_hora_agendamento.text()
                 data = ui.campo_data_agendamento.text()
                 status = ui.campo_lista_status.currentText()
+                vendido = ui.campo_lista_status_3.currentText()
+                modalidade = ui.campo_lista_status_4.currentText()
                 nome = ""
                 cpf = ""
                 rg = ""
@@ -323,13 +352,13 @@ def gravar_dados():
                 dig_rg = ""
                 dig_ano = ""
                 data_nascimento = ""
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -354,13 +383,14 @@ def gravar_dados():
                 dig_ano = ui.campo_digito_ano.text()
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+                modalidade = ui.campo_lista_status_4.currentText()
+                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -376,6 +406,8 @@ def gravar_dados():
         hora  = ui.campo_hora_agendamento.text()
         data = ui.campo_data_agendamento.text()
         status = ui.campo_lista_status.currentText()
+        vendido = ui.campo_lista_status_3.currentText()
+        modalidade = ui.campo_lista_status_4.currentText()
         nome = ""
         cpf = ""
         rg = ""
@@ -388,13 +420,13 @@ def gravar_dados():
         dig_rg = ""
         dig_ano = ""
         data_nascimento = ""
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
@@ -419,13 +451,14 @@ def gravar_dados():
         dig_ano = ui.campo_digito_ano.text()
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "":
+        modalidade = ui.campo_lista_status_4.currentText()
+        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
@@ -462,8 +495,9 @@ def exportar_excel():
                     hora_agendamento = req[cliente]['HORA']    
                     status_agendamento = req[cliente]['STATUS']
                     vendido = req[cliente]['VENDIDO POR MIM?']
+                    modalidade = req[cliente]['MODALIDADE']
 
-                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido))   
+                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade))   
 
                 elif status_filtro == "":
 
@@ -475,13 +509,14 @@ def exportar_excel():
                     hora_agendamento = req[cliente]['HORA']    
                     status_agendamento = req[cliente]['STATUS']
                     vendido = req[cliente]['VENDIDO POR MIM?']
-                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido)) 
+                    modalidade = req[cliente]['MODALIDADE']
+                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade)) 
         
         if x > 0:
             root = tk.Tk()
             root.withdraw()
             caminho_arquivo = filedialog.askdirectory()
-            df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Tipo de certificado','hora','Status Pedido','Vendido por mim?'])
+            df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
             data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
             data_final = ui.campo_data_ate.text()
             data_inicial = ui.campo_data_de.text()
@@ -506,9 +541,10 @@ def preencher_tabela():
     try:
         ui.tableWidget.clear()
         
-        
         req = ref.get()
-        
+        # Ordene a lista de acordo com a data em ordem decrescente
+        req = sorted(req.values(), key=lambda x: datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), reverse=True)
+
         data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
         numero_inteiro_inicial = data_inicial.toordinal()
         data_final = datetime.datetime.strptime(ui.campo_data_ate.text(), "%d/%m/%Y")
@@ -516,51 +552,37 @@ def preencher_tabela():
         status_filtro = ui.campo_lista_status_2.currentText()
 
         x = 0
-        for cliente in req:
-
-            data_bd = datetime.datetime.strptime(req[cliente]['DATA'], "%d/%m/%Y")
+        for pedido_info in req:
+            data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%d/%m/%Y")
             numero_inteiro_bd = data_bd.toordinal()
-            status_filtro = ui.campo_lista_status_2.currentText()
-            status_servidor = req[cliente]['STATUS']
+            status_servidor = pedido_info['STATUS']
             
             if (numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final) :
 
-                if status_filtro == status_servidor:
+                if status_filtro == status_servidor or status_filtro == "":
                 
                     x += 1
                 
                     row_position = ui.tableWidget.rowCount()
                     ui.tableWidget.insertRow(row_position)
 
-                    ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(req[cliente]['PEDIDO']))
-                    ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(req[cliente]['DATA']))
-                    ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(req[cliente]['TIPO']))
-                    ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(req[cliente]['HORA']))
-                    ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(req[cliente]['STATUS']))
-                    ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(req[cliente]['VENDIDO POR MIM?']))
-                    ui.label_quantidade_bd.setText(f"{x} registro(s)")
-                elif status_filtro == "":
-                    x += 1
-                
-                    row_position = ui.tableWidget.rowCount()
-                    ui.tableWidget.insertRow(row_position)
+                    ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['PEDIDO']))
+                    ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['DATA']))
+                    ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['HORA']))
+                    ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['MODALIDADE']))
+                    ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['STATUS']))
+                    ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VENDIDO POR MIM?']))
+                    ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['TIPO']))
+        
+        ui.label_quantidade_bd.setText(f"{x} registro(s)")
+        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO"])
 
-                    ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(req[cliente]['PEDIDO']))
-                    ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(req[cliente]['DATA']))
-                    ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(req[cliente]['TIPO']))
-                    ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(req[cliente]['HORA']))
-                    ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(req[cliente]['STATUS']))
-                    ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(req[cliente]['VENDIDO POR MIM?']))
-                    ui.label_quantidade_bd.setText(f"{x} registro(s)")
-
-                
     except Exception as e:
-        pass
-    ui.label_quantidade_bd.setText(f"{x} registro(s)")
-    ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO", "DATA", "TIPO", "HORA", "STATUS"])
+            pass
 
 def carregar_dados():
     #USO DE BANCO DE DADOS
+    #Carrega os dados nos campos da aba 'Dados' ao dar double click
     try:   
         num_pedido = ui.campo_pedido.text()
         req = ref.get()
@@ -593,6 +615,7 @@ def carregar_dados():
                 ui.campo_digito_rg.setText(req[pedido]['DIGITO RG'])
                 ui.campo_lista_status_3.setCurrentText("NAO")
                 ui.campo_lista_status_3.setCurrentText(req[pedido]['VENDIDO POR MIM?'])
+                ui.campo_lista_status_4.setCurrentText(req[pedido]['MODALIDADE'])
                 return
                 
     except Exception as e:
@@ -638,6 +661,7 @@ def pegar_valor_tabela(event):
                         ui.campo_digito_rg.setText(req[id]["DIGITO RG"])
                         ui.campo_lista_status_3.setCurrentText("NAO")
                         ui.campo_lista_status_3.setCurrentText(req[id]['VENDIDO POR MIM?'])
+                        ui.campo_lista_status_4.setCurrentText(req[id]['MODALIDADE'])
                         ui.campo_pedido.setReadOnly(True)
                         ui.campo_novo_noBd.setText("✅")
                         return
@@ -646,16 +670,12 @@ def pegar_valor_tabela(event):
         pass
 
 
-
-
-
 #############################################################################################################################################################################
 
 
 
 
-
-
+✅
 
 class TelaLogin(QWidget):
     def __init__(self):
@@ -718,7 +738,6 @@ if __name__ == "__main__":
     
     tela_login.show()
     
-
     ui.botao_consultar.clicked.connect(preencher_tabela)
     ui.botao_terminar.clicked.connect(gravar_dados)
     ui.botao_procurar.clicked.connect(exportar_excel)
@@ -739,15 +758,9 @@ if __name__ == "__main__":
     ui.tableWidget.itemDoubleClicked.connect(pegar_valor_tabela)
     ui.botao_salvar.clicked.connect(salvar)
     
-    
 
     janela.setWindowTitle("Dados Certificado - Certisign")
     janela.setFixedSize(607, 533)
-
-
-
-
-
     
     sys.exit(app.exec_())
 
@@ -778,7 +791,7 @@ if __name__ == "__main__":
 
     #comando cmd
     #pyuic5 -x interface.ui -o interface2.py
-    #pyinstaller --onefile -w -i icone.ico main.py
+    #pyinstaller --onefile -w -i icone.ico Auxiliar.py
 
 
 
