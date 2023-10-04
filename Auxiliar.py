@@ -71,7 +71,6 @@ def criar_pasta_cliente():
 
 def limpar_campos():
     ui.campo_pedido.setReadOnly(False)
-    ui.campo_seguranca_cnh.setText("")
     ui.campo_certificado.setReadOnly(False)
     ui.campo_nome.setText("")
     ui.campo_cpf.setText("") 
@@ -97,6 +96,7 @@ def limpar_campos():
     ui.label_quantidade_bd.setText("")
     ui.campo_oab.setText("")
     ui.campo_cnh.setText("")
+    ui.campo_seguranca_cnh.setText("")
 
 def procurar_cnh():
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -235,13 +235,14 @@ def salvar():
                 dig_rg = ""
                 dig_ano = ""
                 data_nascimento = ""
+                cod_seg_cnh = ""
                 if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -266,13 +267,15 @@ def salvar():
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
                 modalidade = ui.campo_lista_status_4.currentText()
+                cod_seg_cnh = ui.campo_seguranca_cnh.text()
+
                 if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -301,6 +304,7 @@ def salvar():
         dig_rg = ""
         dig_ano = ""
         data_nascimento = ""
+        cod_seg_cnh = ""
         vendido = ui.campo_lista_status_3.currentText()
         if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
@@ -308,7 +312,7 @@ def salvar():
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
@@ -333,20 +337,21 @@ def salvar():
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
         modalidade = ui.campo_lista_status_4.currentText()
+        cod_seg_cnh = ui.campo_seguranca_cnh.text()
         if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
 
         ref.push(novos_dados)
         return
-  
+
 def gravar_dados():
 #USO DO BANCO DE DADOS
     num_pedido = ui.campo_pedido.text()
@@ -376,13 +381,15 @@ def gravar_dados():
                 dig_rg = ""
                 dig_ano = ""
                 data_nascimento = ""
+                cod_seg_cnh = ""
+
                 if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -408,13 +415,15 @@ def gravar_dados():
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
                 modalidade = ui.campo_lista_status_4.currentText()
+                cod_seg_cnh = ui.campo_seguranca_cnh.text()
+
                 if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -444,13 +453,15 @@ def gravar_dados():
         dig_rg = ""
         dig_ano = ""
         data_nascimento = ""
+        cod_seg_cnh = ""
+
         if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
@@ -476,13 +487,15 @@ def gravar_dados():
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
         modalidade = ui.campo_lista_status_4.currentText()
+        cod_seg_cnh = ui.campo_seguranca_cnh.text()
+
         if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
@@ -640,6 +653,7 @@ def carregar_dados():
                 ui.campo_lista_status_3.setCurrentText("NAO")
                 ui.campo_lista_status_3.setCurrentText(req[pedido]['VENDIDO POR MIM?'])
                 ui.campo_lista_status_4.setCurrentText(req[pedido]['MODALIDADE'])
+                ui.campo_seguranca_cnh.setText(req[pedido]['CODIGO DE SEG CNH'])
                 return
                 
     except Exception as e:
@@ -649,7 +663,8 @@ def carregar_dados():
     ui.campo_novo_noBd.setText("")
 
 def pegar_valor_tabela(event):
-   
+   #evento disparado ao dar double click
+
     req = ref.get()
     item = ui.tableWidget.currentItem()  # Obtenha o item selecionado
     try:
@@ -687,6 +702,7 @@ def pegar_valor_tabela(event):
                         ui.campo_lista_status_3.setCurrentText(req[id]['VENDIDO POR MIM?'])
                         ui.campo_lista_status_4.setCurrentText(req[id]['MODALIDADE'])
                         ui.campo_pedido.setReadOnly(True)
+                        ui.campo_seguranca_cnh.setText(req[id]['CODIGO DE SEG CNH'])
                         ui.campo_novo_noBd.setText("✅")
                         return
                         
