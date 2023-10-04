@@ -10,6 +10,10 @@ import firebase_admin
 from firebase_admin import db
 import tkinter as tk
 from tkinter import filedialog
+import PyPDF2
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 
 #configurando banco de dados#####################################################################################
@@ -34,6 +38,7 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 ref = db.reference("/")
 
 ################################################################################################################
+
 def criar_pasta_cliente():
     try:
         nome_pasta = ui.campo_nome.text()
@@ -59,12 +64,10 @@ def criar_pasta_cliente():
                 notificacao = Notification(app_id="Pasta existente", title="", msg=f"Pasta do cliente {nome_pasta} já existe no diretório!")
                 notificacao.show()
         else:
-            notificacao = Notification(app_id="Pasta não criada", title="", msg="")
-            notificacao.show()
+            return
     except Exception as e:
         notificacao = Notification(app_id="Pasta não criada", title="", msg="")
         notificacao.show()
-
 
 def limpar_campos():
     ui.campo_pedido.setReadOnly(False)
@@ -275,7 +278,7 @@ def salvar():
                 ref.child(id).update(novos_dados)
                 return
    
-    if ui.campo_lista_status.currentText() != "A":
+    if ui.campo_lista_status.currentText() == "Aprovado":
         #aqui o pedido não existe e será gravado
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
@@ -418,7 +421,7 @@ def gravar_dados():
                 limpar_campos()
                 return
    
-    if ui.campo_lista_status.currentText() != "A":
+    if ui.campo_lista_status.currentText() != "AGUARDANDO":
         #aqui o pedido não existe e será gravado
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
@@ -690,7 +693,90 @@ def pegar_valor_tabela(event):
     except Exception as e:
         pass
 
+def mesclar_pdf():
+    # Abrir o explorador de arquivos para selecionar os arquivos PDF
+    file_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")],title="Agrupar PDF")
+    
+    # Verificar se o usuário selecionou arquivos
+    if not file_paths:
+        return
+    
+    # Criar um objeto PdfMerger para mesclar os PDFs
+    pdf_merger = PyPDF2.PdfMerger()
+    
+    # Adicionar cada arquivo PDF à PdfMerger
+    for path in file_paths:
+        pdf_merger.append(path)
+    
+    # Abrir o explorador de arquivos para selecionar o local de salvamento
+    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],title="Local de download")
+    
+    # Verificar se o usuário selecionou um local de salvamento
+    if not save_path:
+        return
+    
+    # Salvar o arquivo mesclado no local especificado
+    with open(save_path, 'wb') as merged_pdf:
+        pdf_merger.write(merged_pdf)
+    
+    # Informar ao usuário que a mesclagem foi concluída
+    notificacao = Notification(app_id="Concluído",title="",msg=f"Os arquivos PDF foram mesclados com sucesso!")
+    notificacao.show()
 
+def converter_jpg_pdf():
+    # Abrir o explorador de arquivos para selecionar a imagem
+    image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp *.gif")],title="Converter JPG > PDF")
+    
+    # Verificar se o usuário selecionou um arquivo de imagem
+    if not image_path:
+        return
+    
+    # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
+    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],title="Local de download")
+    
+    # Verificar se o usuário selecionou um local de salvamento
+    if not save_path:
+        return
+    
+    # Criar um arquivo PDF e adicionar a imagem a ele
+    c = canvas.Canvas(save_path, pagesize=letter)
+    c.drawImage(image_path, 0, 0, width=letter[0], height=letter[1])
+    c.save()
+    
+
+    notificacao = Notification(app_id="Concluído",title="",msg=f"A imagem foi convertida em PDF com sucesso!")
+    notificacao.show()
+  
+def texto_para_pdf():
+    # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
+    
+    texto = ui.campo_link_video.text()
+    default_file_name = "LINK VIDEO"
+    # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
+    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],initialfile=default_file_name,title="Local de download")
+    
+    # Verificar se o usuário selecionou um local de salvamento
+    if not save_path:
+        return
+    
+    # Criar um arquivo PDF
+    c = canvas.Canvas(save_path, pagesize=letter)
+    
+    # Definir o tamanho da fonte e a posição para começar a escrever o texto
+    font_size = 14
+    x, y = 20, 680  # Posição inicial
+    
+    # Adicionar o texto ao PDF
+    c.setFont("Helvetica", font_size)
+    for line in texto.split('\n'):
+        c.drawString(x, y, line)
+        y -= 15  # Espaçamento entre as linhas
+    
+    # Salvar o arquivo PDF
+    c.save()
+    notificacao = Notification(app_id="Concluído",title="",msg=f"Texto salvo com sucesso!")
+    notificacao.show()
+    
 class Ui_janela(object):
     def setupUi(self, janela):
         janela.setObjectName("janela")
@@ -828,8 +914,7 @@ class Ui_janela(object):
         self.botao_terminar.setFont(font)
         self.botao_terminar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_terminar.setStyleSheet("border-radius:10px;\n"
-"background-color:rgb(73, 218, 107);\n"
-"")
+"background-color:rgb(73, 218, 107);")
         self.botao_terminar.setObjectName("botao_terminar")
         self.label_12 = QtWidgets.QLabel(self.tab_5)
         self.label_12.setGeometry(QtCore.QRect(10, 480, 131, 16))
@@ -883,9 +968,7 @@ class Ui_janela(object):
         self.botao_salvar.setFont(font)
         self.botao_salvar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_salvar.setStyleSheet("border-radius:10px;\n"
-"background-color:rgb(73, 130, 255);\n"
-"\n"
-"")
+"background-color:rgb(73, 218, 107);")
         self.botao_salvar.setObjectName("botao_salvar")
         self.campo_seguranca_cnh = QtWidgets.QLineEdit(self.tab_5)
         self.campo_seguranca_cnh.setGeometry(QtCore.QRect(330, 400, 241, 31))
@@ -1229,6 +1312,58 @@ class Ui_janela(object):
         self.label_quantidade_bd.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTrailing|QtCore.Qt.AlignVCenter)
         self.label_quantidade_bd.setObjectName("label_quantidade_bd")
         self.tabWidget.addTab(self.tab_6, "")
+        self.tab = QtWidgets.QWidget()
+        self.tab.setObjectName("tab")
+        self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 30, 571, 121))
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.label_7 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_7.setGeometry(QtCore.QRect(10, 20, 181, 16))
+        self.label_7.setObjectName("label_7")
+        self.botao_transf_link_PDF = QtWidgets.QPushButton(self.groupBox_3)
+        self.botao_transf_link_PDF.setGeometry(QtCore.QRect(380, 80, 181, 31))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.botao_transf_link_PDF.setFont(font)
+        self.botao_transf_link_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_transf_link_PDF.setObjectName("botao_transf_link_PDF")
+        self.campo_link_video = QtWidgets.QLineEdit(self.groupBox_3)
+        self.campo_link_video.setGeometry(QtCore.QRect(10, 40, 551, 31))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setWeight(50)
+        self.campo_link_video.setFont(font)
+        self.campo_link_video.setText("")
+        self.campo_link_video.setPlaceholderText("")
+        self.campo_link_video.setObjectName("campo_link_video")
+        self.botao_agrupar_PDF = QtWidgets.QPushButton(self.tab)
+        self.botao_agrupar_PDF.setGeometry(QtCore.QRect(130, 330, 301, 71))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(16)
+        font.setBold(False)
+        font.setWeight(50)
+        self.botao_agrupar_PDF.setFont(font)
+        self.botao_agrupar_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_agrupar_PDF.setStyleSheet("")
+        self.botao_agrupar_PDF.setObjectName("botao_agrupar_PDF")
+        self.botao_converter_jpgPDF = QtWidgets.QPushButton(self.tab)
+        self.botao_converter_jpgPDF.setGeometry(QtCore.QRect(130, 250, 301, 71))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(16)
+        font.setBold(False)
+        font.setWeight(50)
+        self.botao_converter_jpgPDF.setFont(font)
+        self.botao_converter_jpgPDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_converter_jpgPDF.setStyleSheet("")
+        self.botao_converter_jpgPDF.setObjectName("botao_converter_jpgPDF")
+        self.tabWidget.addTab(self.tab, "")
         janela.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(janela)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 611, 21))
@@ -1336,8 +1471,12 @@ class Ui_janela(object):
         item.setText(_translate("janela", "TIPO"))
         self.botao_procurar.setText(_translate("janela", "EXPORTAR EXCEL"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_6), _translate("janela", "Consulta"))
-
-
+        self.groupBox_3.setTitle(_translate("janela", "TRANSFORMAR  LINK DA VÍDEO-CONFERÊNCIA  EM   PDF"))
+        self.label_7.setText(_translate("janela", "TEXTO"))
+        self.botao_transf_link_PDF.setText(_translate("janela", "TRANSFORMAR EM PDF"))
+        self.botao_agrupar_PDF.setText(_translate("janela", "AGRUPAR PDF"))
+        self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER JPEG  >  PDF"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "PDF"))
 
 class TelaLogin(QWidget):
     def __init__(self):
@@ -1419,8 +1558,15 @@ if __name__ == "__main__":
     ui.botao_consulta_rg.clicked.connect(procurar_rg)
     ui.tableWidget.itemDoubleClicked.connect(pegar_valor_tabela)
     ui.botao_salvar.clicked.connect(salvar)
+    ui.botao_agrupar_PDF.clicked.connect(mesclar_pdf)
+    ui.botao_converter_jpgPDF.clicked.connect(converter_jpg_pdf)
+    ui.botao_transf_link_PDF.clicked.connect(texto_para_pdf)
     ui.botao_pasta_cliente.clicked.connect(criar_pasta_cliente)
-    
+    ui.campo_data_de.setDate(QDate.currentDate().addDays(1 - QDate.currentDate().day()))
+    ui.campo_data_ate.setDate(QDate(QDate.currentDate().year(), QDate.currentDate().month(), QDate.currentDate().daysInMonth()))
+
+
+
 
     janela.setWindowTitle("Dados Certificado - Certisign")
     janela.setFixedSize(611, 612)

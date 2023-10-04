@@ -363,7 +363,7 @@
       </item>
       <item>
        <property name="text">
-        <string>VIDEO-CONFERÊNCIA</string>
+        <string>VIDEO</string>
        </property>
       </item>
       <item>
@@ -395,8 +395,7 @@
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);
-</string>
+background-color:rgb(73, 218, 107);</string>
       </property>
       <property name="text">
        <string>FINALIZAR</string>
@@ -534,9 +533,7 @@ background-color:rgb(73, 218, 107);
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
-background-color:rgb(73, 130, 255);
-
-</string>
+background-color:rgb(73, 218, 107);</string>
       </property>
       <property name="text">
        <string>SALVAR</string>
@@ -1340,6 +1337,139 @@ background-color:rgb(73, 218, 107);
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>PDF</string>
+     </attribute>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>571</width>
+        <height>121</height>
+       </rect>
+      </property>
+      <property name="title">
+       <string>TRANSFORMAR  LINK DA VÍDEO-CONFERÊNCIA  EM   PDF</string>
+      </property>
+      <widget class="QLabel" name="label_7">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>20</y>
+         <width>181</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>TEXTO</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="botao_transf_link_PDF">
+       <property name="geometry">
+        <rect>
+         <x>380</x>
+         <y>80</y>
+         <width>181</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>10</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string>TRANSFORMAR EM PDF</string>
+       </property>
+      </widget>
+      <widget class="QLineEdit" name="campo_link_video">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>551</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QPushButton" name="botao_agrupar_PDF">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>330</y>
+        <width>301</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>AGRUPAR PDF</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_converter_jpgPDF">
+      <property name="geometry">
+       <rect>
+        <x>130</x>
+        <y>250</y>
+        <width>301</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>CONVERTER JPEG  &gt;  PDF</string>
       </property>
      </widget>
     </widget>
