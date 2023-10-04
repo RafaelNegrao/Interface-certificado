@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, 
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 import datetime
 from winotify import Notification
-from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtGui import QDesktopServices,QPixmap,QImage
 import pandas as pd
 import os
 import firebase_admin
@@ -13,6 +13,9 @@ from tkinter import filedialog
 import PyPDF2
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+import fitz
+
+
 
 
 
@@ -39,6 +42,49 @@ ref = db.reference("/")
 
 ################################################################################################################
 
+
+
+def carregar_pdf_na_label():
+    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+    options = {}
+    options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
+    options['multiple'] = True
+
+    file_paths = filedialog.askopenfilenames(**options)
+
+    if file_paths:
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+
+        for i, pdf_path in enumerate(file_paths):
+            if i < len(labels):
+                pdf_document = fitz.open(pdf_path)
+                pdf_page = pdf_document.load_page(0)
+                pdf_image = pdf_page.get_pixmap()
+
+                # Redimensiona a imagem para caber no tamanho da label
+                image = QImage(pdf_image.samples, pdf_image.width, pdf_image.height, pdf_image.stride, QImage.Format_RGB888)
+                pixmap = QPixmap.fromImage(image.scaled(labels[i].width(), labels[i].height(), Qt.KeepAspectRatio))
+
+                # Exibe a imagem na label
+                labels[i].setPixmap(pixmap)
+
+                # Armazena o caminho do PDF na label
+                labels[i].pdf_path = pdf_path
+                
+
+def limpar_label_pdf():
+    ui.label_PDF1.clear()
+    ui.label_PDF2.clear()
+    ui.label_PDF3.clear()
+    ui.label_PDF4.clear()
+    ui.label_PDF5.clear()
+    ui.label_PDF1.pdf_path = None
+    ui.label_PDF2.pdf_path = None
+    ui.label_PDF3.pdf_path = None
+    ui.label_PDF4.pdf_path = None
+    ui.label_PDF5.pdf_path = None
+
+    
 def criar_pasta_cliente():
     try:
         nome_pasta = ui.campo_nome.text()
@@ -97,6 +143,8 @@ def limpar_campos():
     ui.campo_oab.setText("")
     ui.campo_cnh.setText("")
     ui.campo_seguranca_cnh.setText("")
+    ui.campo_link_video.setText("")
+    limpar_label_pdf()
 
 def procurar_cnh():
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -710,34 +758,54 @@ def pegar_valor_tabela(event):
         pass
 
 def mesclar_pdf():
-    # Abrir o explorador de arquivos para selecionar os arquivos PDF
-    file_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")],title="Agrupar PDF")
-    
-    # Verificar se o usuário selecionou arquivos
-    if not file_paths:
-        return
-    
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+
+
+        quantidade_labels_com_imagem = 0
+
+# Verifique cada label na lista
+        for label in labels:
+            # Obtenha o pixmap da label
+            pixmap = label.pixmap()
+            
+            # Verifique se a label tem um pixmap e se o pixmap não é nulo (ou seja, se a label tem uma imagem)
+            if pixmap is not None and not pixmap.isNull():
+                quantidade_labels_com_imagem += 1
+
+        # Agora, 'quantidade_labels_com_imagem' contém o número de labels com imagem
+        
+        if quantidade_labels_com_imagem == 0:
+            notificacao = Notification(app_id="Arquivo não gerado",title="",msg=f"Selecione os arquivos!")
+            notificacao.show()
+            return
+
     # Criar um objeto PdfMerger para mesclar os PDFs
-    pdf_merger = PyPDF2.PdfMerger()
-    
-    # Adicionar cada arquivo PDF à PdfMerger
-    for path in file_paths:
-        pdf_merger.append(path)
-    
-    # Abrir o explorador de arquivos para selecionar o local de salvamento
-    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],title="Local de download")
-    
-    # Verificar se o usuário selecionou um local de salvamento
-    if not save_path:
-        return
-    
-    # Salvar o arquivo mesclado no local especificado
-    with open(save_path, 'wb') as merged_pdf:
-        pdf_merger.write(merged_pdf)
-    
-    # Informar ao usuário que a mesclagem foi concluída
-    notificacao = Notification(app_id="Concluído",title="",msg=f"Os arquivos PDF foram mesclados com sucesso!")
-    notificacao.show()
+        pdf_merger = PyPDF2.PdfMerger()
+
+    # Lista de caminhos dos PDFs armazenados nas labels
+        file_paths = [label.pdf_path for label in labels if hasattr(label, 'pdf_path')]
+
+        # Verificar se há caminhos de PDF válidos na lista antes de adicionar ao PdfMerger
+        for path in file_paths:
+            if path:
+                pdf_merger.append(path)
+
+        # Abrir o explorador de arquivos para selecionar o local de salvamento
+        save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")], title="Local de download")
+
+        # Verificar se o usuário selecionou um local de salvamento
+        if not save_path:
+            return
+
+        # Salvar o arquivo mesclado no local especificado
+        with open(save_path, 'wb') as merged_pdf:
+            pdf_merger.write(merged_pdf)
+        
+        # Informar ao usuário que a mesclagem foi concluída
+        limpar_label_pdf()
+
+        notificacao = Notification(app_id="Concluído",title="",msg=f"Os arquivos PDF foram mesclados com sucesso!")
+        notificacao.show()
 
 def converter_jpg_pdf():
     # Abrir o explorador de arquivos para selecionar a imagem
@@ -765,34 +833,39 @@ def converter_jpg_pdf():
   
 def texto_para_pdf():
     # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
-    
-    texto = ui.campo_link_video.text()
-    default_file_name = "LINK VIDEO"
-    # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
-    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],initialfile=default_file_name,title="Local de download")
-    
-    # Verificar se o usuário selecionou um local de salvamento
-    if not save_path:
-        return
-    
-    # Criar um arquivo PDF
-    c = canvas.Canvas(save_path, pagesize=letter)
-    
-    # Definir o tamanho da fonte e a posição para começar a escrever o texto
-    font_size = 14
-    x, y = 20, 680  # Posição inicial
-    
-    # Adicionar o texto ao PDF
-    c.setFont("Helvetica", font_size)
-    for line in texto.split('\n'):
-        c.drawString(x, y, line)
-        y -= 15  # Espaçamento entre as linhas
-    
-    # Salvar o arquivo PDF
-    c.save()
-    notificacao = Notification(app_id="Concluído",title="",msg=f"Texto salvo com sucesso!")
-    notificacao.show()
-    
+    try:
+        texto = ui.campo_link_video.text()
+        default_file_name = "LINK VIDEO"
+        # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
+        save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],initialfile=default_file_name,title="Local de download")
+        
+        # Verificar se o usuário selecionou um local de salvamento
+        if not save_path:
+            return
+        
+        # Criar um arquivo PDF
+        c = canvas.Canvas(save_path, pagesize=letter)
+        
+        # Definir o tamanho da fonte e a posição para começar a escrever o texto
+        font_size = 14
+        x, y = 20, 680  # Posição inicial
+        
+        # Adicionar o texto ao PDF
+        c.setFont("Helvetica", font_size)
+        for line in texto.split('\n'):
+            c.drawString(x, y, line)
+            y -= 15  # Espaçamento entre as linhas
+        
+        # Salvar o arquivo PDF
+        c.save()
+        ui.campo_link_video.setText("")
+        notificacao = Notification(app_id="Concluído",title="",msg=f"Texto salvo com sucesso!")
+        notificacao.show()
+    except Exception as e:
+        notificacao = Notification(app_id="Erro",title="",msg=f"Feche o arquivo PDF!")
+        notificacao.show()
+
+
 class Ui_janela(object):
     def setupUi(self, janela):
         janela.setObjectName("janela")
@@ -945,7 +1018,7 @@ class Ui_janela(object):
         self.campo_cnh.setFont(font)
         self.campo_cnh.setObjectName("campo_cnh")
         self.label_10 = QtWidgets.QLabel(self.tab_5)
-        self.label_10.setGeometry(QtCore.QRect(20, 230, 81, 16))
+        self.label_10.setGeometry(QtCore.QRect(10, 230, 81, 16))
         self.label_10.setObjectName("label_10")
         self.botao_consulta_cnh = QtWidgets.QPushButton(self.tab_5)
         self.botao_consulta_cnh.setGeometry(QtCore.QRect(290, 400, 31, 31))
@@ -1093,7 +1166,7 @@ class Ui_janela(object):
         self.botao_consulta_cnpj.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_cnpj.setObjectName("botao_consulta_cnpj")
         self.label_9 = QtWidgets.QLabel(self.tab_5)
-        self.label_9.setGeometry(QtCore.QRect(340, 230, 61, 20))
+        self.label_9.setGeometry(QtCore.QRect(330, 230, 61, 20))
         self.label_9.setObjectName("label_9")
         self.campo_cpf = QtWidgets.QLineEdit(self.tab_5)
         self.campo_cpf.setGeometry(QtCore.QRect(10, 300, 311, 31))
@@ -1331,7 +1404,7 @@ class Ui_janela(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 30, 571, 121))
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 10, 571, 121))
         self.groupBox_3.setObjectName("groupBox_3")
         self.label_7 = QtWidgets.QLabel(self.groupBox_3)
         self.label_7.setGeometry(QtCore.QRect(10, 20, 181, 16))
@@ -1357,24 +1430,77 @@ class Ui_janela(object):
         self.campo_link_video.setText("")
         self.campo_link_video.setPlaceholderText("")
         self.campo_link_video.setObjectName("campo_link_video")
-        self.botao_agrupar_PDF = QtWidgets.QPushButton(self.tab)
-        self.botao_agrupar_PDF.setGeometry(QtCore.QRect(130, 330, 301, 71))
+        self.groupBox = QtWidgets.QGroupBox(self.tab)
+        self.groupBox.setGeometry(QtCore.QRect(10, 150, 571, 301))
+        self.groupBox.setObjectName("groupBox")
+        self.botao_agrupar_PDF = QtWidgets.QPushButton(self.groupBox)
+        self.botao_agrupar_PDF.setGeometry(QtCore.QRect(210, 50, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
-        font.setPointSize(16)
-        font.setBold(False)
-        font.setWeight(50)
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.botao_agrupar_PDF.setFont(font)
         self.botao_agrupar_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_agrupar_PDF.setStyleSheet("")
         self.botao_agrupar_PDF.setObjectName("botao_agrupar_PDF")
-        self.botao_converter_jpgPDF = QtWidgets.QPushButton(self.tab)
-        self.botao_converter_jpgPDF.setGeometry(QtCore.QRect(130, 250, 301, 71))
+        self.label_PDF1 = QtWidgets.QLabel(self.groupBox)
+        self.label_PDF1.setGeometry(QtCore.QRect(10, 120, 101, 141))
+        self.label_PDF1.setStyleSheet("")
+        self.label_PDF1.setText("")
+        self.label_PDF1.setObjectName("label_PDF1")
+        self.label_PDF3 = QtWidgets.QLabel(self.groupBox)
+        self.label_PDF3.setGeometry(QtCore.QRect(230, 120, 101, 141))
+        self.label_PDF3.setStyleSheet("")
+        self.label_PDF3.setText("")
+        self.label_PDF3.setObjectName("label_PDF3")
+        self.label_PDF2 = QtWidgets.QLabel(self.groupBox)
+        self.label_PDF2.setGeometry(QtCore.QRect(120, 120, 101, 141))
+        self.label_PDF2.setStyleSheet("")
+        self.label_PDF2.setText("")
+        self.label_PDF2.setObjectName("label_PDF2")
+        self.label_PDF5 = QtWidgets.QLabel(self.groupBox)
+        self.label_PDF5.setGeometry(QtCore.QRect(450, 120, 101, 141))
+        self.label_PDF5.setStyleSheet("")
+        self.label_PDF5.setText("")
+        self.label_PDF5.setObjectName("label_PDF5")
+        self.label_PDF4 = QtWidgets.QLabel(self.groupBox)
+        self.label_PDF4.setGeometry(QtCore.QRect(340, 120, 101, 141))
+        self.label_PDF4.setStyleSheet("")
+        self.label_PDF4.setText("")
+        self.label_PDF4.setObjectName("label_PDF4")
+        self.botao_selecionar_arquivos_mesclar = QtWidgets.QPushButton(self.groupBox)
+        self.botao_selecionar_arquivos_mesclar.setGeometry(QtCore.QRect(10, 50, 191, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
-        font.setPointSize(16)
-        font.setBold(False)
-        font.setWeight(50)
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.botao_selecionar_arquivos_mesclar.setFont(font)
+        self.botao_selecionar_arquivos_mesclar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_selecionar_arquivos_mesclar.setStyleSheet("")
+        self.botao_selecionar_arquivos_mesclar.setObjectName("botao_selecionar_arquivos_mesclar")
+        self.botao_limpar_PDF = QtWidgets.QPushButton(self.groupBox)
+        self.botao_limpar_PDF.setGeometry(QtCore.QRect(400, 50, 161, 31))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
+        self.botao_limpar_PDF.setFont(font)
+        self.botao_limpar_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_limpar_PDF.setStyleSheet("")
+        self.botao_limpar_PDF.setObjectName("botao_limpar_PDF")
+        self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_2.setGeometry(QtCore.QRect(10, 470, 571, 61))
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.botao_converter_jpgPDF = QtWidgets.QPushButton(self.groupBox_2)
+        self.botao_converter_jpgPDF.setGeometry(QtCore.QRect(370, 20, 191, 31))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(10)
+        font.setBold(True)
+        font.setWeight(75)
         self.botao_converter_jpgPDF.setFont(font)
         self.botao_converter_jpgPDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_converter_jpgPDF.setStyleSheet("")
@@ -1490,9 +1616,15 @@ class Ui_janela(object):
         self.groupBox_3.setTitle(_translate("janela", "TRANSFORMAR  LINK DA VÍDEO-CONFERÊNCIA  EM   PDF"))
         self.label_7.setText(_translate("janela", "TEXTO"))
         self.botao_transf_link_PDF.setText(_translate("janela", "TRANSFORMAR EM PDF"))
-        self.botao_agrupar_PDF.setText(_translate("janela", "AGRUPAR PDF"))
+        self.groupBox.setTitle(_translate("janela", "MESCLAR PDF - MAX 5 ARQUIVOS"))
+        self.botao_agrupar_PDF.setText(_translate("janela", "MESCLAR PDF"))
+        self.botao_selecionar_arquivos_mesclar.setText(_translate("janela", "SELECIONAR ARQUIVOS"))
+        self.botao_limpar_PDF.setText(_translate("janela", "LIMPAR"))
+        self.groupBox_2.setTitle(_translate("janela", "CONVERTER JPEG PARA PDF"))
         self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER JPEG  >  PDF"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "PDF"))
+
+
 
 class TelaLogin(QWidget):
     def __init__(self):
@@ -1580,7 +1712,8 @@ if __name__ == "__main__":
     ui.botao_pasta_cliente.clicked.connect(criar_pasta_cliente)
     ui.campo_data_de.setDate(QDate.currentDate().addDays(1 - QDate.currentDate().day()))
     ui.campo_data_ate.setDate(QDate(QDate.currentDate().year(), QDate.currentDate().month(), QDate.currentDate().daysInMonth()))
-
+    ui.botao_selecionar_arquivos_mesclar.clicked.connect(carregar_pdf_na_label)
+    ui.botao_limpar_PDF.clicked.connect(limpar_label_pdf)
 
 
 
