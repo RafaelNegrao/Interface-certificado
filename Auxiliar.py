@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,QApplication
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 import datetime
 from winotify import Notification
@@ -14,10 +14,8 @@ import PyPDF2
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 import fitz
-
-
-
-
+from PIL import Image
+import time
 
 #configurando banco de dados#####################################################################################
 
@@ -41,8 +39,6 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 ref = db.reference("/")
 
 ################################################################################################################
-
-
 
 def carregar_pdf_na_label():
     labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
@@ -71,7 +67,6 @@ def carregar_pdf_na_label():
                 # Armazena o caminho do PDF na label
                 labels[i].pdf_path = pdf_path
                 
-
 def limpar_label_pdf():
     ui.label_PDF1.clear()
     ui.label_PDF2.clear()
@@ -83,8 +78,7 @@ def limpar_label_pdf():
     ui.label_PDF3.pdf_path = None
     ui.label_PDF4.pdf_path = None
     ui.label_PDF5.pdf_path = None
-
-    
+ 
 def criar_pasta_cliente():
     try:
         nome_pasta = ui.campo_nome.text()
@@ -667,17 +661,19 @@ def preencher_tabela():
 
 def carregar_dados():
     #USO DE BANCO DE DADOS
-    #Carrega os dados nos campos da aba 'Dados' ao dar double click
-    try:   
+    #Verifica se o pedido existe no servidor quando um novo pedido é digitado no campo PEDIDO
+    try:
         num_pedido = ui.campo_pedido.text()
         req = ref.get()
-
+        num_pedidos_total = len(req)
+        num_pedidos_processados = 0
 
         for pedido in req:
+            ui.barra_progresso_pedido.setVisible(True)
             pedido_servidor = req[pedido]['PEDIDO']
             if num_pedido == pedido_servidor:
                 ui.campo_pedido.setReadOnly(True)
-                #traga os dados
+                # Traga os dados
                 data = QDate.fromString(req[pedido]['DATA'], "dd/MM/yyyy")
                 hora = QTime.fromString(req[pedido]['HORA'], "hh:mm")
 
@@ -702,14 +698,19 @@ def carregar_dados():
                 ui.campo_lista_status_3.setCurrentText(req[pedido]['VENDIDO POR MIM?'])
                 ui.campo_lista_status_4.setCurrentText(req[pedido]['MODALIDADE'])
                 ui.campo_seguranca_cnh.setText(req[pedido]['CODIGO DE SEG CNH'])
-                return
-                
-    except Exception as e:
-       
-        # Lida com exceções aqui
-        return
-    ui.campo_novo_noBd.setText("")
 
+            # Atualize a barra de progresso
+            num_pedidos_processados += 1
+            progresso = int((num_pedidos_processados / num_pedidos_total) * 100)
+            ui.barra_progresso_pedido.setValue(progresso)
+            QApplication.processEvents()
+            ui.barra_progresso_pedido.setVisible(False)
+
+    except Exception as e:
+        ui.barra_progresso_pedido.setVisible(False)
+        ui.campo_novo_noBd.setText("")
+        return
+        
 def pegar_valor_tabela(event):
    #evento disparado ao dar double click
 
@@ -758,31 +759,31 @@ def pegar_valor_tabela(event):
         pass
 
 def mesclar_pdf():
+    try:
         labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
-
 
         quantidade_labels_com_imagem = 0
 
-# Verifique cada label na lista
+        # Verifique cada label na lista
         for label in labels:
             # Obtenha o pixmap da label
             pixmap = label.pixmap()
-            
+
             # Verifique se a label tem um pixmap e se o pixmap não é nulo (ou seja, se a label tem uma imagem)
             if pixmap is not None and not pixmap.isNull():
                 quantidade_labels_com_imagem += 1
 
         # Agora, 'quantidade_labels_com_imagem' contém o número de labels com imagem
-        
+
         if quantidade_labels_com_imagem == 0:
-            notificacao = Notification(app_id="Arquivo não gerado",title="",msg=f"Selecione os arquivos!")
+            notificacao = Notification(app_id="Arquivo não gerado", title="", msg="Selecione os arquivos!")
             notificacao.show()
             return
 
-    # Criar um objeto PdfMerger para mesclar os PDFs
+        # Criar um objeto PdfMerger para mesclar os PDFs
         pdf_merger = PyPDF2.PdfMerger()
 
-    # Lista de caminhos dos PDFs armazenados nas labels
+        # Lista de caminhos dos PDFs armazenados nas labels
         file_paths = [label.pdf_path for label in labels if hasattr(label, 'pdf_path')]
 
         # Verificar se há caminhos de PDF válidos na lista antes de adicionar ao PdfMerger
@@ -791,46 +792,105 @@ def mesclar_pdf():
                 pdf_merger.append(path)
 
         # Abrir o explorador de arquivos para selecionar o local de salvamento
+        save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],
+                                                title="Local de download")
+
+        # Verificar se o usuário selecionou um local de salvamento
+        if not save_path:
+            return
+
+        # Configurar a barra de progresso
+        ui.barra_progresso_mesclar.setMaximum(len(file_paths))
+        ui.barra_progresso_mesclar.setValue(0)
+        ui.barra_progresso_mesclar.setVisible(True)
+
+        # Mesclar os arquivos PDF
+        for i, path in enumerate(file_paths):
+            # Atualizar a barra de progresso
+            ui.barra_progresso_mesclar.setValue(i + 1)
+            time.sleep(0.1)
+            QApplication.processEvents()
+
+        # Salvar o arquivo mesclado no local especificado
+        with open(save_path, 'wb') as merged_pdf:
+            pdf_merger.write(merged_pdf)
+
+        # Informar ao usuário que a mesclagem foi concluída
+        ui.barra_progresso_mesclar.setVisible(False)
+        limpar_label_pdf()
+        notificacao = Notification(app_id="Concluído", title="", msg="Os arquivos PDF foram mesclados com sucesso!")
+        notificacao.show()
+    except:
+        limpar_label_pdf()
+        ui.barra_progresso_mesclar.setVisible(False)
+        return
+
+
+def converter_jpg_pdf():
+  
+    try:
+        image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp *.gif")], title="Converter JPG > PDF")
+
+        # Verificar se o usuário selecionou um arquivo de imagem
+        if not image_path:
+            return
+
+        # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
         save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")], title="Local de download")
 
         # Verificar se o usuário selecionou um local de salvamento
         if not save_path:
             return
 
-        # Salvar o arquivo mesclado no local especificado
-        with open(save_path, 'wb') as merged_pdf:
-            pdf_merger.write(merged_pdf)
-        
-        # Informar ao usuário que a mesclagem foi concluída
-        limpar_label_pdf()
+        # Carregar a imagem
+        with Image.open(image_path) as img:
+            # Definir o tamanho padrão
+            target_width, target_height = 1920, 1080
 
-        notificacao = Notification(app_id="Concluído",title="",msg=f"Os arquivos PDF foram mesclados com sucesso!")
+            # Calcular as dimensões da imagem mantendo o aspect ratio
+            aspect_ratio = img.width / img.height
+            if aspect_ratio > 1:
+                new_width = target_width
+                new_height = int(target_width / aspect_ratio)
+            else:
+                new_width = int(target_height * aspect_ratio)
+                new_height = target_height
+
+            # Criar um arquivo PDF com as dimensões calculadas
+            c = canvas.Canvas(save_path, pagesize=(new_width, new_height))
+
+            # Desenhar a imagem no PDF mantendo o aspect ratio
+            c.drawImage(image_path, 0, 0, width=new_width, height=new_height)
+
+            c.save()
+
+        ui.barra_progresso_jpg.setVisible(True)
+        tempo_total = 1
+        num_incrementos = 100  # Você pode ajustar isso para obter uma carga mais uniforme
+
+        # Calcule o tempo de espera entre os incrementos
+        tempo_espera = tempo_total / num_incrementos
+        for i in range(num_incrementos):
+            # Atualize a barra de progresso para o valor percentual
+            ui.barra_progresso_jpg.setValue(i + 1)
+            QApplication.processEvents()  # Atualize a interface gráfica
+            time.sleep(tempo_espera)
+        ui.barra_progresso_jpg.setValue(100)
+
+        # Limpar as variáveis que contêm o PDF e a imagem
+        del img
+        del c
+
+        #limpar aqui
+
+        ui.barra_progresso_jpg.setVisible(False)
+
+        notificacao = Notification(app_id="Concluído", title="", msg="A imagem foi convertida em PDF com sucesso!")
         notificacao.show()
-
-def converter_jpg_pdf():
-    # Abrir o explorador de arquivos para selecionar a imagem
-    image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp *.gif")],title="Converter JPG > PDF")
-    
-    # Verificar se o usuário selecionou um arquivo de imagem
-    if not image_path:
+    except:
+        ui.barra_progresso_jpg.setVisible(False)
         return
-    
-    # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
-    save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],title="Local de download")
-    
-    # Verificar se o usuário selecionou um local de salvamento
-    if not save_path:
-        return
-    
-    # Criar um arquivo PDF e adicionar a imagem a ele
-    c = canvas.Canvas(save_path, pagesize=letter)
-    c.drawImage(image_path, 0, 0, width=letter[0], height=letter[1])
-    c.save()
-    
 
-    notificacao = Notification(app_id="Concluído",title="",msg=f"A imagem foi convertida em PDF com sucesso!")
-    notificacao.show()
-  
 def texto_para_pdf():
     # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
     try:
@@ -864,7 +924,6 @@ def texto_para_pdf():
     except Exception as e:
         notificacao = Notification(app_id="Erro",title="",msg=f"Feche o arquivo PDF!")
         notificacao.show()
-
 
 class Ui_janela(object):
     def setupUi(self, janela):
@@ -910,7 +969,7 @@ class Ui_janela(object):
         self.label_2.setGeometry(QtCore.QRect(10, 60, 241, 16))
         self.label_2.setObjectName("label_2")
         self.campo_data_agendamento = QtWidgets.QDateEdit(self.tab_5)
-        self.campo_data_agendamento.setGeometry(QtCore.QRect(300, 30, 151, 31))
+        self.campo_data_agendamento.setGeometry(QtCore.QRect(310, 30, 141, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -935,6 +994,7 @@ class Ui_janela(object):
         font.setFamily("Helvetica")
         font.setPointSize(12)
         self.campo_pedido.setFont(font)
+        self.campo_pedido.setText("")
         self.campo_pedido.setObjectName("campo_pedido")
         self.campo_hora_agendamento = QtWidgets.QTimeEdit(self.tab_5)
         self.campo_hora_agendamento.setGeometry(QtCore.QRect(460, 30, 111, 31))
@@ -950,7 +1010,7 @@ class Ui_janela(object):
         self.label_4.setGeometry(QtCore.QRect(460, 10, 111, 16))
         self.label_4.setObjectName("label_4")
         self.label_3 = QtWidgets.QLabel(self.tab_5)
-        self.label_3.setGeometry(QtCore.QRect(300, 10, 131, 20))
+        self.label_3.setGeometry(QtCore.QRect(330, 10, 131, 20))
         self.label_3.setObjectName("label_3")
         self.campo_novo_noBd = QtWidgets.QLabel(self.tab_5)
         self.campo_novo_noBd.setGeometry(QtCore.QRect(240, 30, 31, 31))
@@ -1244,6 +1304,12 @@ class Ui_janela(object):
         self.botao_pasta_cliente.setFont(font)
         self.botao_pasta_cliente.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_pasta_cliente.setObjectName("botao_pasta_cliente")
+        self.barra_progresso_pedido = QtWidgets.QProgressBar(self.tab_5)
+        self.barra_progresso_pedido.setGeometry(QtCore.QRect(10, 30, 221, 5))
+        self.barra_progresso_pedido.setProperty("value", 0)
+        self.barra_progresso_pedido.setAlignment(QtCore.Qt.AlignCenter)
+        self.barra_progresso_pedido.setFormat("")
+        self.barra_progresso_pedido.setObjectName("barra_progresso_pedido")
         self.campo_lista_status.raise_()
         self.campo_data_agendamento.raise_()
         self.label_17.raise_()
@@ -1291,6 +1357,7 @@ class Ui_janela(object):
         self.label_9.raise_()
         self.label_13.raise_()
         self.botao_pasta_cliente.raise_()
+        self.barra_progresso_pedido.raise_()
         self.tabWidget.addTab(self.tab_5, "")
         self.tab_6 = QtWidgets.QWidget()
         self.tab_6.setObjectName("tab_6")
@@ -1404,13 +1471,13 @@ class Ui_janela(object):
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
         self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
-        self.groupBox_3.setGeometry(QtCore.QRect(10, 10, 571, 121))
+        self.groupBox_3.setGeometry(QtCore.QRect(10, 20, 571, 91))
         self.groupBox_3.setObjectName("groupBox_3")
         self.label_7 = QtWidgets.QLabel(self.groupBox_3)
-        self.label_7.setGeometry(QtCore.QRect(10, 20, 181, 16))
+        self.label_7.setGeometry(QtCore.QRect(10, 30, 181, 16))
         self.label_7.setObjectName("label_7")
         self.botao_transf_link_PDF = QtWidgets.QPushButton(self.groupBox_3)
-        self.botao_transf_link_PDF.setGeometry(QtCore.QRect(380, 80, 181, 31))
+        self.botao_transf_link_PDF.setGeometry(QtCore.QRect(380, 10, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1420,7 +1487,7 @@ class Ui_janela(object):
         self.botao_transf_link_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_transf_link_PDF.setObjectName("botao_transf_link_PDF")
         self.campo_link_video = QtWidgets.QLineEdit(self.groupBox_3)
-        self.campo_link_video.setGeometry(QtCore.QRect(10, 40, 551, 31))
+        self.campo_link_video.setGeometry(QtCore.QRect(10, 50, 551, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1431,10 +1498,10 @@ class Ui_janela(object):
         self.campo_link_video.setPlaceholderText("")
         self.campo_link_video.setObjectName("campo_link_video")
         self.groupBox = QtWidgets.QGroupBox(self.tab)
-        self.groupBox.setGeometry(QtCore.QRect(10, 150, 571, 301))
+        self.groupBox.setGeometry(QtCore.QRect(10, 140, 571, 301))
         self.groupBox.setObjectName("groupBox")
         self.botao_agrupar_PDF = QtWidgets.QPushButton(self.groupBox)
-        self.botao_agrupar_PDF.setGeometry(QtCore.QRect(210, 50, 181, 31))
+        self.botao_agrupar_PDF.setGeometry(QtCore.QRect(210, 40, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1445,32 +1512,32 @@ class Ui_janela(object):
         self.botao_agrupar_PDF.setStyleSheet("")
         self.botao_agrupar_PDF.setObjectName("botao_agrupar_PDF")
         self.label_PDF1 = QtWidgets.QLabel(self.groupBox)
-        self.label_PDF1.setGeometry(QtCore.QRect(10, 120, 101, 141))
+        self.label_PDF1.setGeometry(QtCore.QRect(10, 120, 101, 121))
         self.label_PDF1.setStyleSheet("")
         self.label_PDF1.setText("")
         self.label_PDF1.setObjectName("label_PDF1")
         self.label_PDF3 = QtWidgets.QLabel(self.groupBox)
-        self.label_PDF3.setGeometry(QtCore.QRect(230, 120, 101, 141))
+        self.label_PDF3.setGeometry(QtCore.QRect(230, 120, 101, 121))
         self.label_PDF3.setStyleSheet("")
         self.label_PDF3.setText("")
         self.label_PDF3.setObjectName("label_PDF3")
         self.label_PDF2 = QtWidgets.QLabel(self.groupBox)
-        self.label_PDF2.setGeometry(QtCore.QRect(120, 120, 101, 141))
+        self.label_PDF2.setGeometry(QtCore.QRect(120, 120, 101, 121))
         self.label_PDF2.setStyleSheet("")
         self.label_PDF2.setText("")
         self.label_PDF2.setObjectName("label_PDF2")
         self.label_PDF5 = QtWidgets.QLabel(self.groupBox)
-        self.label_PDF5.setGeometry(QtCore.QRect(450, 120, 101, 141))
+        self.label_PDF5.setGeometry(QtCore.QRect(450, 120, 101, 121))
         self.label_PDF5.setStyleSheet("")
         self.label_PDF5.setText("")
         self.label_PDF5.setObjectName("label_PDF5")
         self.label_PDF4 = QtWidgets.QLabel(self.groupBox)
-        self.label_PDF4.setGeometry(QtCore.QRect(340, 120, 101, 141))
+        self.label_PDF4.setGeometry(QtCore.QRect(340, 120, 101, 121))
         self.label_PDF4.setStyleSheet("")
         self.label_PDF4.setText("")
         self.label_PDF4.setObjectName("label_PDF4")
         self.botao_selecionar_arquivos_mesclar = QtWidgets.QPushButton(self.groupBox)
-        self.botao_selecionar_arquivos_mesclar.setGeometry(QtCore.QRect(10, 50, 191, 31))
+        self.botao_selecionar_arquivos_mesclar.setGeometry(QtCore.QRect(10, 40, 191, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1481,7 +1548,7 @@ class Ui_janela(object):
         self.botao_selecionar_arquivos_mesclar.setStyleSheet("")
         self.botao_selecionar_arquivos_mesclar.setObjectName("botao_selecionar_arquivos_mesclar")
         self.botao_limpar_PDF = QtWidgets.QPushButton(self.groupBox)
-        self.botao_limpar_PDF.setGeometry(QtCore.QRect(400, 50, 161, 31))
+        self.botao_limpar_PDF.setGeometry(QtCore.QRect(400, 40, 161, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1491,11 +1558,20 @@ class Ui_janela(object):
         self.botao_limpar_PDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_limpar_PDF.setStyleSheet("")
         self.botao_limpar_PDF.setObjectName("botao_limpar_PDF")
+        self.barra_progresso_mesclar = QtWidgets.QProgressBar(self.groupBox)
+        self.barra_progresso_mesclar.setGeometry(QtCore.QRect(10, 280, 551, 8))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.barra_progresso_mesclar.setFont(font)
+        self.barra_progresso_mesclar.setProperty("value", 0)
+        self.barra_progresso_mesclar.setAlignment(QtCore.Qt.AlignCenter)
+        self.barra_progresso_mesclar.setFormat("")
+        self.barra_progresso_mesclar.setObjectName("barra_progresso_mesclar")
         self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
-        self.groupBox_2.setGeometry(QtCore.QRect(10, 470, 571, 61))
+        self.groupBox_2.setGeometry(QtCore.QRect(10, 460, 571, 81))
         self.groupBox_2.setObjectName("groupBox_2")
         self.botao_converter_jpgPDF = QtWidgets.QPushButton(self.groupBox_2)
-        self.botao_converter_jpgPDF.setGeometry(QtCore.QRect(370, 20, 191, 31))
+        self.botao_converter_jpgPDF.setGeometry(QtCore.QRect(190, 20, 191, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1505,6 +1581,15 @@ class Ui_janela(object):
         self.botao_converter_jpgPDF.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_converter_jpgPDF.setStyleSheet("")
         self.botao_converter_jpgPDF.setObjectName("botao_converter_jpgPDF")
+        self.barra_progresso_jpg = QtWidgets.QProgressBar(self.groupBox_2)
+        self.barra_progresso_jpg.setGeometry(QtCore.QRect(10, 60, 551, 8))
+        font = QtGui.QFont()
+        font.setPointSize(11)
+        self.barra_progresso_jpg.setFont(font)
+        self.barra_progresso_jpg.setProperty("value", 0)
+        self.barra_progresso_jpg.setAlignment(QtCore.Qt.AlignCenter)
+        self.barra_progresso_jpg.setFormat("")
+        self.barra_progresso_jpg.setObjectName("barra_progresso_jpg")
         self.tabWidget.addTab(self.tab, "")
         janela.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(janela)
@@ -1621,10 +1706,8 @@ class Ui_janela(object):
         self.botao_selecionar_arquivos_mesclar.setText(_translate("janela", "SELECIONAR ARQUIVOS"))
         self.botao_limpar_PDF.setText(_translate("janela", "LIMPAR"))
         self.groupBox_2.setTitle(_translate("janela", "CONVERTER JPEG PARA PDF"))
-        self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER JPEG  >  PDF"))
+        self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER IMG > PDF"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "PDF"))
-
-
 
 class TelaLogin(QWidget):
     def __init__(self):
@@ -1714,6 +1797,9 @@ if __name__ == "__main__":
     ui.campo_data_ate.setDate(QDate(QDate.currentDate().year(), QDate.currentDate().month(), QDate.currentDate().daysInMonth()))
     ui.botao_selecionar_arquivos_mesclar.clicked.connect(carregar_pdf_na_label)
     ui.botao_limpar_PDF.clicked.connect(limpar_label_pdf)
+    ui.barra_progresso_jpg.setVisible(False)
+    ui.barra_progresso_mesclar.setVisible(False)
+    ui.barra_progresso_pedido.setVisible(False)
 
 
 
@@ -1721,3 +1807,4 @@ if __name__ == "__main__":
     janela.setFixedSize(611, 612)
     
     sys.exit(app.exec_())
+

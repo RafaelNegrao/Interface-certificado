@@ -70,7 +70,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -142,9 +142,9 @@
      <widget class="QDateEdit" name="campo_data_agendamento">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>310</x>
         <y>30</y>
-        <width>151</width>
+        <width>141</width>
         <height>31</height>
        </rect>
       </property>
@@ -204,6 +204,9 @@
         <pointsize>12</pointsize>
        </font>
       </property>
+      <property name="text">
+       <string/>
+      </property>
      </widget>
      <widget class="QTimeEdit" name="campo_hora_agendamento">
       <property name="geometry">
@@ -242,7 +245,7 @@
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>300</x>
+        <x>330</x>
         <y>10</y>
         <width>131</width>
         <height>20</height>
@@ -1000,6 +1003,25 @@ background-color:rgb(73, 218, 107);</string>
        <string>🗂</string>
       </property>
      </widget>
+     <widget class="QProgressBar" name="barra_progresso_pedido">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>221</width>
+        <height>5</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="format">
+       <string/>
+      </property>
+     </widget>
      <zorder>campo_lista_status</zorder>
      <zorder>campo_data_agendamento</zorder>
      <zorder>label_17</zorder>
@@ -1047,6 +1069,7 @@ background-color:rgb(73, 218, 107);</string>
      <zorder>label_9</zorder>
      <zorder>label_13</zorder>
      <zorder>botao_pasta_cliente</zorder>
+     <zorder>barra_progresso_pedido</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -1348,9 +1371,9 @@ background-color:rgb(73, 218, 107);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>10</y>
+        <y>20</y>
         <width>571</width>
-        <height>121</height>
+        <height>91</height>
        </rect>
       </property>
       <property name="title">
@@ -1360,7 +1383,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>20</y>
+         <y>30</y>
          <width>181</width>
          <height>16</height>
         </rect>
@@ -1373,7 +1396,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>380</x>
-         <y>80</y>
+         <y>10</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -1397,7 +1420,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>40</y>
+         <y>50</y>
          <width>551</width>
          <height>31</height>
         </rect>
@@ -1422,7 +1445,7 @@ background-color:rgb(73, 218, 107);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>150</y>
+        <y>140</y>
         <width>571</width>
         <height>301</height>
        </rect>
@@ -1434,7 +1457,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>210</x>
-         <y>50</y>
+         <y>40</y>
          <width>181</width>
          <height>31</height>
         </rect>
@@ -1463,7 +1486,7 @@ background-color:rgb(73, 218, 107);
          <x>10</x>
          <y>120</y>
          <width>101</width>
-         <height>141</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1479,7 +1502,7 @@ background-color:rgb(73, 218, 107);
          <x>230</x>
          <y>120</y>
          <width>101</width>
-         <height>141</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1495,7 +1518,7 @@ background-color:rgb(73, 218, 107);
          <x>120</x>
          <y>120</y>
          <width>101</width>
-         <height>141</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1511,7 +1534,7 @@ background-color:rgb(73, 218, 107);
          <x>450</x>
          <y>120</y>
          <width>101</width>
-         <height>141</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1527,7 +1550,7 @@ background-color:rgb(73, 218, 107);
          <x>340</x>
          <y>120</y>
          <width>101</width>
-         <height>141</height>
+         <height>121</height>
         </rect>
        </property>
        <property name="styleSheet">
@@ -1541,7 +1564,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>50</y>
+         <y>40</y>
          <width>191</width>
          <height>31</height>
         </rect>
@@ -1568,7 +1591,7 @@ background-color:rgb(73, 218, 107);
        <property name="geometry">
         <rect>
          <x>400</x>
-         <y>50</y>
+         <y>40</y>
          <width>161</width>
          <height>31</height>
         </rect>
@@ -1591,14 +1614,38 @@ background-color:rgb(73, 218, 107);
         <string>LIMPAR</string>
        </property>
       </widget>
+      <widget class="QProgressBar" name="barra_progresso_mesclar">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>280</y>
+         <width>551</width>
+         <height>8</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="format">
+        <string/>
+       </property>
+      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>470</y>
+        <y>460</y>
         <width>571</width>
-        <height>61</height>
+        <height>81</height>
        </rect>
       </property>
       <property name="title">
@@ -1607,7 +1654,7 @@ background-color:rgb(73, 218, 107);
       <widget class="QPushButton" name="botao_converter_jpgPDF">
        <property name="geometry">
         <rect>
-         <x>370</x>
+         <x>190</x>
          <y>20</y>
          <width>191</width>
          <height>31</height>
@@ -1628,7 +1675,31 @@ background-color:rgb(73, 218, 107);
         <string notr="true"/>
        </property>
        <property name="text">
-        <string>CONVERTER JPEG  &gt;  PDF</string>
+        <string>CONVERTER IMG &gt; PDF</string>
+       </property>
+      </widget>
+      <widget class="QProgressBar" name="barra_progresso_jpg">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>70</y>
+         <width>551</width>
+         <height>8</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="format">
+        <string/>
        </property>
       </widget>
      </widget>
