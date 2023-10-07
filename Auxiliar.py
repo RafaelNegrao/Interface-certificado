@@ -151,13 +151,15 @@ def procurar_oab():
     return
 
 def procurar_rg():
-    url = QUrl("http://www.teledocumentos.com.br/sistema2/")
+    url = QUrl("https://acertid.net.br/acertid/")
     QDesktopServices.openUrl(url)
     return
 
 def procurar_cnpj():
     cnpj = ui.campo_cnpj.text()
     url = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
+    QDesktopServices.openUrl(url)
+    url = QUrl("https://www.jucesponline.sp.gov.br/")
     QDesktopServices.openUrl(url)
     return
 
@@ -595,15 +597,18 @@ def exportar_excel():
             root = tk.Tk()
             root.withdraw()
             caminho_arquivo = filedialog.askdirectory()
-            df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
-            data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
-            data_final = ui.campo_data_ate.text()
-            data_inicial = ui.campo_data_de.text()
-            pasta_desktop = os.path.expanduser(f"{caminho_arquivo}")
-            nome_arquivo = os.path.join(pasta_desktop, f"Certificados-emitidos-de {data_inicial.replace('/', '-')} a {data_final.replace('/', '-')}-gerado em{data_agora.replace('/','-')} .xlsx")
-            df.to_excel(nome_arquivo, index=False)
-            notificacao = Notification(app_id="Arquivo salvo",title="",msg=f"Arquivo excel gerado!")
-            notificacao.show()
+            if caminho_arquivo:
+                df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
+                data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
+                data_final = ui.campo_data_ate.text()
+                data_inicial = ui.campo_data_de.text()
+                pasta_desktop = os.path.expanduser(f"{caminho_arquivo}")
+                nome_arquivo = os.path.join(pasta_desktop, f"Certificados-emitidos-de {data_inicial.replace('/', '-')} a {data_final.replace('/', '-')}-gerado em{data_agora.replace('/','-')} .xlsx")
+                df.to_excel(nome_arquivo, index=False)
+                notificacao = Notification(app_id="Arquivo salvo",title="",msg=f"Arquivo excel gerado!")
+                notificacao.show()
+            else:
+                return
         else:
             notificacao = Notification(app_id="Sem dados",title="",msg=f"Sem dados para o período!")
             notificacao.show()
@@ -631,7 +636,12 @@ def preencher_tabela():
         status_filtro = ui.campo_lista_status_2.currentText()
 
         x = 0
+        ui.barra_progresso_consulta.setVisible(True)
+        ui.barra_progresso_consulta.setValue(0)
+        total_pedidos = len(req)
+        y = 0
         for pedido_info in req:
+            
             data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%d/%m/%Y")
             numero_inteiro_bd = data_bd.toordinal()
             status_servidor = pedido_info['STATUS']
@@ -652,11 +662,25 @@ def preencher_tabela():
                     ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['STATUS']))
                     ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VENDIDO POR MIM?']))
                     ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['TIPO']))
+                    y += 1
+                    porcentagem = (y/total_pedidos)*100
+                    ui.barra_progresso_consulta.setValue(int(porcentagem))
+                    QApplication.processEvents()
+                    
         
+        total = 100
+        while porcentagem <= total:
+            ui.barra_progresso_consulta.setValue(int(porcentagem))
+            porcentagem +=1
+            QApplication.processEvents()
+            
+        
+        ui.barra_progresso_consulta.setValue(100)
         ui.label_quantidade_bd.setText(f"{x} registro(s)")
         ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO"])
-
+        ui.barra_progresso_consulta.setVisible(False)
     except Exception as e:
+            ui.barra_progresso_consulta.setVisible(False)
             pass
 
 def carregar_dados():
@@ -825,10 +849,11 @@ def mesclar_pdf():
         ui.barra_progresso_mesclar.setVisible(False)
         return
 
-
 def converter_jpg_pdf():
   
     try:
+        #Abre o explorer para selecionar o arquivo
+       
         image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp *.gif")], title="Converter JPG > PDF")
 
         # Verificar se o usuário selecionou um arquivo de imagem
@@ -924,6 +949,7 @@ def texto_para_pdf():
     except Exception as e:
         notificacao = Notification(app_id="Erro",title="",msg=f"Feche o arquivo PDF!")
         notificacao.show()
+
 
 class Ui_janela(object):
     def setupUi(self, janela):
@@ -1069,7 +1095,7 @@ class Ui_janela(object):
         self.label_12.setGeometry(QtCore.QRect(10, 480, 131, 16))
         self.label_12.setObjectName("label_12")
         self.campo_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cnh.setGeometry(QtCore.QRect(10, 400, 271, 31))
+        self.campo_cnh.setGeometry(QtCore.QRect(10, 400, 251, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1081,7 +1107,7 @@ class Ui_janela(object):
         self.label_10.setGeometry(QtCore.QRect(10, 230, 81, 16))
         self.label_10.setObjectName("label_10")
         self.botao_consulta_cnh = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cnh.setGeometry(QtCore.QRect(290, 400, 31, 31))
+        self.botao_consulta_cnh.setGeometry(QtCore.QRect(270, 400, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1117,10 +1143,10 @@ class Ui_janela(object):
         self.botao_salvar.setFont(font)
         self.botao_salvar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_salvar.setStyleSheet("border-radius:10px;\n"
-"background-color:rgb(73, 218, 107);")
+"background-color:rgb(0, 180, 210);")
         self.botao_salvar.setObjectName("botao_salvar")
         self.campo_seguranca_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(330, 400, 241, 31))
+        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(320, 400, 251, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1215,7 +1241,7 @@ class Ui_janela(object):
         self.campo_digito_cpf.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_digito_cpf.setObjectName("campo_digito_cpf")
         self.botao_consulta_cnpj = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cnpj.setGeometry(QtCore.QRect(290, 450, 31, 31))
+        self.botao_consulta_cnpj.setGeometry(QtCore.QRect(270, 450, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1240,7 +1266,7 @@ class Ui_janela(object):
         self.campo_cpf.setPlaceholderText("")
         self.campo_cpf.setObjectName("campo_cpf")
         self.campo_oab = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_oab.setGeometry(QtCore.QRect(330, 450, 201, 31))
+        self.campo_oab.setGeometry(QtCore.QRect(320, 450, 211, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1262,20 +1288,21 @@ class Ui_janela(object):
         self.botao_consulta_cpf.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_cpf.setObjectName("botao_consulta_cpf")
         self.campo_cnpj = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cnpj.setGeometry(QtCore.QRect(10, 450, 271, 31))
+        self.campo_cnpj.setGeometry(QtCore.QRect(10, 450, 251, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnpj.setFont(font)
+        self.campo_cnpj.setText("")
         self.campo_cnpj.setPlaceholderText("")
         self.campo_cnpj.setObjectName("campo_cnpj")
         self.label_14 = QtWidgets.QLabel(self.tab_5)
         self.label_14.setGeometry(QtCore.QRect(10, 430, 171, 16))
         self.label_14.setObjectName("label_14")
         self.label_18 = QtWidgets.QLabel(self.tab_5)
-        self.label_18.setGeometry(QtCore.QRect(330, 430, 141, 20))
+        self.label_18.setGeometry(QtCore.QRect(320, 430, 141, 20))
         self.label_18.setObjectName("label_18")
         self.campo_data_nascimento = QtWidgets.QDateEdit(self.tab_5)
         self.campo_data_nascimento.setGeometry(QtCore.QRect(10, 500, 151, 31))
@@ -1288,7 +1315,7 @@ class Ui_janela(object):
         self.campo_data_nascimento.setStyleSheet("")
         self.campo_data_nascimento.setObjectName("campo_data_nascimento")
         self.label_16 = QtWidgets.QLabel(self.tab_5)
-        self.label_16.setGeometry(QtCore.QRect(330, 380, 201, 20))
+        self.label_16.setGeometry(QtCore.QRect(320, 380, 201, 20))
         self.label_16.setObjectName("label_16")
         self.label_24 = QtWidgets.QLabel(self.tab_5)
         self.label_24.setGeometry(QtCore.QRect(10, 180, 201, 16))
@@ -1297,15 +1324,16 @@ class Ui_janela(object):
         self.botao_pasta_cliente.setGeometry(QtCore.QRect(540, 200, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
-        font.setPointSize(14)
+        font.setPointSize(16)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
         self.botao_pasta_cliente.setFont(font)
         self.botao_pasta_cliente.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_pasta_cliente.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.botao_pasta_cliente.setObjectName("botao_pasta_cliente")
         self.barra_progresso_pedido = QtWidgets.QProgressBar(self.tab_5)
-        self.barra_progresso_pedido.setGeometry(QtCore.QRect(10, 30, 221, 5))
+        self.barra_progresso_pedido.setGeometry(QtCore.QRect(10, 30, 221, 6))
         self.barra_progresso_pedido.setProperty("value", 0)
         self.barra_progresso_pedido.setAlignment(QtCore.Qt.AlignCenter)
         self.barra_progresso_pedido.setFormat("")
@@ -1362,13 +1390,13 @@ class Ui_janela(object):
         self.tab_6 = QtWidgets.QWidget()
         self.tab_6.setObjectName("tab_6")
         self.groupBox_5 = QtWidgets.QGroupBox(self.tab_6)
-        self.groupBox_5.setGeometry(QtCore.QRect(10, 10, 561, 91))
+        self.groupBox_5.setGeometry(QtCore.QRect(10, 10, 561, 101))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         self.groupBox_5.setFont(font)
         self.groupBox_5.setObjectName("groupBox_5")
         self.campo_data_de = QtWidgets.QDateEdit(self.groupBox_5)
-        self.campo_data_de.setGeometry(QtCore.QRect(20, 40, 131, 31))
+        self.campo_data_de.setGeometry(QtCore.QRect(10, 40, 131, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1376,7 +1404,7 @@ class Ui_janela(object):
         self.campo_data_de.setStyleSheet("")
         self.campo_data_de.setObjectName("campo_data_de")
         self.label_19 = QtWidgets.QLabel(self.groupBox_5)
-        self.label_19.setGeometry(QtCore.QRect(30, 20, 81, 16))
+        self.label_19.setGeometry(QtCore.QRect(20, 20, 81, 16))
         self.label_19.setObjectName("label_19")
         self.label_20 = QtWidgets.QLabel(self.groupBox_5)
         self.label_20.setGeometry(QtCore.QRect(170, 20, 81, 16))
@@ -1389,19 +1417,8 @@ class Ui_janela(object):
         self.campo_data_ate.setFont(font)
         self.campo_data_ate.setStyleSheet("")
         self.campo_data_ate.setObjectName("campo_data_ate")
-        self.botao_consultar = QtWidgets.QPushButton(self.groupBox_5)
-        self.botao_consultar.setGeometry(QtCore.QRect(480, 40, 71, 31))
-        font = QtGui.QFont()
-        font.setFamily("Helvetica")
-        font.setPointSize(16)
-        font.setBold(False)
-        font.setWeight(50)
-        self.botao_consultar.setFont(font)
-        self.botao_consultar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_consultar.setStyleSheet("")
-        self.botao_consultar.setObjectName("botao_consultar")
         self.label_21 = QtWidgets.QLabel(self.groupBox_5)
-        self.label_21.setGeometry(QtCore.QRect(300, 20, 81, 16))
+        self.label_21.setGeometry(QtCore.QRect(310, 20, 81, 16))
         self.label_21.setObjectName("label_21")
         self.campo_lista_status_2 = QtWidgets.QComboBox(self.groupBox_5)
         self.campo_lista_status_2.setGeometry(QtCore.QRect(300, 40, 171, 31))
@@ -1417,13 +1434,34 @@ class Ui_janela(object):
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
+        self.botao_consultar = QtWidgets.QPushButton(self.groupBox_5)
+        self.botao_consultar.setGeometry(QtCore.QRect(480, 40, 71, 31))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(16)
+        font.setBold(False)
+        font.setWeight(50)
+        self.botao_consultar.setFont(font)
+        self.botao_consultar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_consultar.setStyleSheet("")
+        self.botao_consultar.setObjectName("botao_consultar")
+        self.barra_progresso_consulta = QtWidgets.QProgressBar(self.groupBox_5)
+        self.barra_progresso_consulta.setGeometry(QtCore.QRect(10, 81, 541, 8))
+        font = QtGui.QFont()
+        font.setFamily("Helvetica")
+        font.setPointSize(11)
+        self.barra_progresso_consulta.setFont(font)
+        self.barra_progresso_consulta.setProperty("value", 0)
+        self.barra_progresso_consulta.setAlignment(QtCore.Qt.AlignCenter)
+        self.barra_progresso_consulta.setFormat("")
+        self.barra_progresso_consulta.setObjectName("barra_progresso_consulta")
         self.tableWidget = QtWidgets.QTableWidget(self.tab_6)
-        self.tableWidget.setGeometry(QtCore.QRect(10, 110, 561, 391))
+        self.tableWidget.setGeometry(QtCore.QRect(10, 120, 561, 381))
         self.tableWidget.setMinimumSize(QtCore.QSize(561, 0))
         self.tableWidget.setMaximumSize(QtCore.QSize(750, 16777215))
         font = QtGui.QFont()
-        font.setFamily("Helvetica")
-        font.setPointSize(10)
+        font.setFamily("Arial")
+        font.setPointSize(9)
         self.tableWidget.setFont(font)
         self.tableWidget.setAutoScrollMargin(16)
         self.tableWidget.setObjectName("tableWidget")
@@ -1582,7 +1620,7 @@ class Ui_janela(object):
         self.botao_converter_jpgPDF.setStyleSheet("")
         self.botao_converter_jpgPDF.setObjectName("botao_converter_jpgPDF")
         self.barra_progresso_jpg = QtWidgets.QProgressBar(self.groupBox_2)
-        self.barra_progresso_jpg.setGeometry(QtCore.QRect(10, 60, 551, 8))
+        self.barra_progresso_jpg.setGeometry(QtCore.QRect(10, 70, 551, 8))
         font = QtGui.QFont()
         font.setPointSize(11)
         self.barra_progresso_jpg.setFont(font)
@@ -1621,9 +1659,8 @@ class Ui_janela(object):
         janela.setTabOrder(self.campo_data_nascimento, self.campo_data_de)
         janela.setTabOrder(self.campo_data_de, self.campo_data_ate)
         janela.setTabOrder(self.campo_data_ate, self.campo_lista_status_2)
-        janela.setTabOrder(self.campo_lista_status_2, self.botao_consulta_cnh)
-        janela.setTabOrder(self.botao_consulta_cnh, self.botao_consulta_rg)
-        janela.setTabOrder(self.botao_consulta_rg, self.botao_consulta_oab)
+        janela.setTabOrder(self.campo_lista_status_2, self.campo_link_video)
+        janela.setTabOrder(self.campo_link_video, self.botao_consulta_oab)
         janela.setTabOrder(self.botao_consulta_oab, self.botao_consultar)
         janela.setTabOrder(self.botao_consultar, self.botao_procurar)
         janela.setTabOrder(self.botao_procurar, self.campo_digito_rg)
@@ -1635,6 +1672,14 @@ class Ui_janela(object):
         janela.setTabOrder(self.botao_salvar, self.botao_consulta_cpf)
         janela.setTabOrder(self.botao_consulta_cpf, self.botao_consulta_cnpj)
         janela.setTabOrder(self.botao_consulta_cnpj, self.botao_terminar)
+        janela.setTabOrder(self.botao_terminar, self.botao_pasta_cliente)
+        janela.setTabOrder(self.botao_pasta_cliente, self.botao_transf_link_PDF)
+        janela.setTabOrder(self.botao_transf_link_PDF, self.botao_consulta_rg)
+        janela.setTabOrder(self.botao_consulta_rg, self.botao_agrupar_PDF)
+        janela.setTabOrder(self.botao_agrupar_PDF, self.botao_selecionar_arquivos_mesclar)
+        janela.setTabOrder(self.botao_selecionar_arquivos_mesclar, self.botao_limpar_PDF)
+        janela.setTabOrder(self.botao_limpar_PDF, self.botao_converter_jpgPDF)
+        janela.setTabOrder(self.botao_converter_jpgPDF, self.botao_consulta_cnh)
 
     def retranslateUi(self, janela):
         _translate = QtCore.QCoreApplication.translate
@@ -1672,16 +1717,16 @@ class Ui_janela(object):
         self.label_18.setText(_translate("janela", "OAB"))
         self.label_16.setText(_translate("janela", "código de segurança - CNH"))
         self.label_24.setText(_translate("janela", "NOME COMPLETO"))
-        self.botao_pasta_cliente.setText(_translate("janela", "🗂"))
+        self.botao_pasta_cliente.setText(_translate("janela", "📂"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("janela", "Dados"))
         self.groupBox_5.setTitle(_translate("janela", "BUSCA"))
         self.label_19.setText(_translate("janela", "DE:"))
         self.label_20.setText(_translate("janela", "ATÉ:"))
-        self.botao_consultar.setText(_translate("janela", "🔍"))
         self.label_21.setText(_translate("janela", "STATUS"))
         self.campo_lista_status_2.setItemText(1, _translate("janela", "AGUARDANDO"))
         self.campo_lista_status_2.setItemText(2, _translate("janela", "APROVADO"))
         self.campo_lista_status_2.setItemText(3, _translate("janela", "CANCELADO"))
+        self.botao_consultar.setText(_translate("janela", "🔍"))
         item = self.tableWidget.horizontalHeaderItem(0)
         item.setText(_translate("janela", "PEDIDO"))
         item = self.tableWidget.horizontalHeaderItem(1)
@@ -1708,6 +1753,8 @@ class Ui_janela(object):
         self.groupBox_2.setTitle(_translate("janela", "CONVERTER JPEG PARA PDF"))
         self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER IMG > PDF"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "PDF"))
+
+
 
 class TelaLogin(QWidget):
     def __init__(self):
@@ -1800,11 +1847,11 @@ if __name__ == "__main__":
     ui.barra_progresso_jpg.setVisible(False)
     ui.barra_progresso_mesclar.setVisible(False)
     ui.barra_progresso_pedido.setVisible(False)
+    ui.barra_progresso_consulta.setVisible(False)
 
 
 
-    janela.setWindowTitle("Dados Certificado - Certisign")
+    janela.setWindowTitle("Auxiliar Certificados")
     janela.setFixedSize(611, 612)
     
     sys.exit(app.exec_())
-

@@ -70,7 +70,7 @@
      <string notr="true"/>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_5">
      <attribute name="title">
@@ -422,7 +422,7 @@ background-color:rgb(73, 218, 107);</string>
        <rect>
         <x>10</x>
         <y>400</y>
-        <width>271</width>
+        <width>251</width>
         <height>31</height>
        </rect>
       </property>
@@ -451,7 +451,7 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QPushButton" name="botao_consulta_cnh">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>270</x>
         <y>400</y>
         <width>31</width>
         <height>31</height>
@@ -536,7 +536,7 @@ background-color:rgb(73, 218, 107);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);</string>
+background-color:rgb(0, 180, 210);</string>
       </property>
       <property name="text">
        <string>SALVAR</string>
@@ -545,9 +545,9 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QLineEdit" name="campo_seguranca_cnh">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>320</x>
         <y>400</y>
-        <width>241</width>
+        <width>251</width>
         <height>31</height>
        </rect>
       </property>
@@ -776,7 +776,7 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QPushButton" name="botao_consulta_cnpj">
       <property name="geometry">
        <rect>
-        <x>290</x>
+        <x>270</x>
         <y>450</y>
         <width>31</width>
         <height>31</height>
@@ -838,9 +838,9 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QLineEdit" name="campo_oab">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>320</x>
         <y>450</y>
-        <width>201</width>
+        <width>211</width>
         <height>31</height>
        </rect>
       </property>
@@ -889,7 +889,7 @@ background-color:rgb(73, 218, 107);</string>
        <rect>
         <x>10</x>
         <y>450</y>
-        <width>271</width>
+        <width>251</width>
         <height>31</height>
        </rect>
       </property>
@@ -900,6 +900,9 @@ background-color:rgb(73, 218, 107);</string>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="text">
+       <string/>
       </property>
       <property name="placeholderText">
        <string/>
@@ -921,7 +924,7 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QLabel" name="label_18">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>320</x>
         <y>430</y>
         <width>141</width>
         <height>20</height>
@@ -955,7 +958,7 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QLabel" name="label_16">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>320</x>
         <y>380</y>
         <width>201</width>
         <height>20</height>
@@ -990,7 +993,7 @@ background-color:rgb(73, 218, 107);</string>
       <property name="font">
        <font>
         <family>Arial</family>
-        <pointsize>14</pointsize>
+        <pointsize>16</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -999,8 +1002,11 @@ background-color:rgb(73, 218, 107);</string>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
       <property name="text">
-       <string>🗂</string>
+       <string>📂</string>
       </property>
      </widget>
      <widget class="QProgressBar" name="barra_progresso_pedido">
@@ -1009,7 +1015,7 @@ background-color:rgb(73, 218, 107);</string>
         <x>10</x>
         <y>30</y>
         <width>221</width>
-        <height>5</height>
+        <height>6</height>
        </rect>
       </property>
       <property name="value">
@@ -1081,7 +1087,7 @@ background-color:rgb(73, 218, 107);</string>
         <x>10</x>
         <y>10</y>
         <width>561</width>
-        <height>91</height>
+        <height>101</height>
        </rect>
       </property>
       <property name="font">
@@ -1095,7 +1101,7 @@ background-color:rgb(73, 218, 107);</string>
       <widget class="QDateEdit" name="campo_data_de">
        <property name="geometry">
         <rect>
-         <x>20</x>
+         <x>10</x>
          <y>40</y>
          <width>131</width>
          <height>31</height>
@@ -1114,7 +1120,7 @@ background-color:rgb(73, 218, 107);</string>
       <widget class="QLabel" name="label_19">
        <property name="geometry">
         <rect>
-         <x>30</x>
+         <x>20</x>
          <y>20</y>
          <width>81</width>
          <height>16</height>
@@ -1156,37 +1162,10 @@ background-color:rgb(73, 218, 107);</string>
         <string notr="true"/>
        </property>
       </widget>
-      <widget class="QPushButton" name="botao_consultar">
-       <property name="geometry">
-        <rect>
-         <x>480</x>
-         <y>40</y>
-         <width>71</width>
-         <height>31</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>16</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="cursor">
-        <cursorShape>PointingHandCursor</cursorShape>
-       </property>
-       <property name="styleSheet">
-        <string notr="true"/>
-       </property>
-       <property name="text">
-        <string>🔍</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="label_21">
        <property name="geometry">
         <rect>
-         <x>300</x>
+         <x>310</x>
          <y>20</y>
          <width>81</width>
          <height>16</height>
@@ -1238,14 +1217,66 @@ background-color:rgb(73, 218, 107);</string>
         </property>
        </item>
       </widget>
+      <widget class="QPushButton" name="botao_consultar">
+       <property name="geometry">
+        <rect>
+         <x>480</x>
+         <y>40</y>
+         <width>71</width>
+         <height>31</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>16</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+       </property>
+       <property name="styleSheet">
+        <string notr="true"/>
+       </property>
+       <property name="text">
+        <string>🔍</string>
+       </property>
+      </widget>
+      <widget class="QProgressBar" name="barra_progresso_consulta">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>81</y>
+         <width>541</width>
+         <height>8</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+        </font>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
+       <property name="format">
+        <string/>
+       </property>
+      </widget>
      </widget>
      <widget class="QTableWidget" name="tableWidget">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>110</y>
+        <y>120</y>
         <width>561</width>
-        <height>391</height>
+        <height>381</height>
        </rect>
       </property>
       <property name="minimumSize">
@@ -1262,8 +1293,8 @@ background-color:rgb(73, 218, 107);</string>
       </property>
       <property name="font">
        <font>
-        <family>Helvetica</family>
-        <pointsize>10</pointsize>
+        <family>Arial</family>
+        <pointsize>9</pointsize>
        </font>
       </property>
       <property name="autoScrollMargin">
@@ -1738,8 +1769,7 @@ background-color:rgb(73, 218, 107);
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
   <tabstop>campo_lista_status_2</tabstop>
-  <tabstop>botao_consulta_cnh</tabstop>
-  <tabstop>botao_consulta_rg</tabstop>
+  <tabstop>campo_link_video</tabstop>
   <tabstop>botao_consulta_oab</tabstop>
   <tabstop>botao_consultar</tabstop>
   <tabstop>botao_procurar</tabstop>
@@ -1752,6 +1782,14 @@ background-color:rgb(73, 218, 107);
   <tabstop>botao_consulta_cpf</tabstop>
   <tabstop>botao_consulta_cnpj</tabstop>
   <tabstop>botao_terminar</tabstop>
+  <tabstop>botao_pasta_cliente</tabstop>
+  <tabstop>botao_transf_link_PDF</tabstop>
+  <tabstop>botao_consulta_rg</tabstop>
+  <tabstop>botao_agrupar_PDF</tabstop>
+  <tabstop>botao_selecionar_arquivos_mesclar</tabstop>
+  <tabstop>botao_limpar_PDF</tabstop>
+  <tabstop>botao_converter_jpgPDF</tabstop>
+  <tabstop>botao_consulta_cnh</tabstop>
  </tabstops>
  <resources>
   <include location="resources_from_qt_rc.qrc"/>
