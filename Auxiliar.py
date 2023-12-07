@@ -1,5 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,QApplication
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, QLabel, QLineEdit, QPushButton,QApplication,QMessageBox
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 import datetime
 from winotify import Notification
@@ -16,6 +16,7 @@ from reportlab.pdfgen import canvas
 import fitz
 from PIL import Image
 import time
+
 
 #configurando banco de dados#####################################################################################
 
@@ -40,45 +41,8 @@ ref = db.reference("/")
 
 ################################################################################################################
 
-def carregar_pdf_na_label():
-    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
-    options = {}
-    options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
-    options['multiple'] = True
 
-    file_paths = filedialog.askopenfilenames(**options)
 
-    if file_paths:
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
-
-        for i, pdf_path in enumerate(file_paths):
-            if i < len(labels):
-                pdf_document = fitz.open(pdf_path)
-                pdf_page = pdf_document.load_page(0)
-                pdf_image = pdf_page.get_pixmap()
-
-                # Redimensiona a imagem para caber no tamanho da label
-                image = QImage(pdf_image.samples, pdf_image.width, pdf_image.height, pdf_image.stride, QImage.Format_RGB888)
-                pixmap = QPixmap.fromImage(image.scaled(labels[i].width(), labels[i].height(), Qt.KeepAspectRatio))
-
-                # Exibe a imagem na label
-                labels[i].setPixmap(pixmap)
-
-                # Armazena o caminho do PDF na label
-                labels[i].pdf_path = pdf_path
-                
-def limpar_label_pdf():
-    ui.label_PDF1.clear()
-    ui.label_PDF2.clear()
-    ui.label_PDF3.clear()
-    ui.label_PDF4.clear()
-    ui.label_PDF5.clear()
-    ui.label_PDF1.pdf_path = None
-    ui.label_PDF2.pdf_path = None
-    ui.label_PDF3.pdf_path = None
-    ui.label_PDF4.pdf_path = None
-    ui.label_PDF5.pdf_path = None
- 
 def criar_pasta_cliente():
     try:
         nome_pasta = ui.campo_nome.text()
@@ -122,7 +86,7 @@ def limpar_campos():
     ui.campo_digito_cpf.setText("")
     ui.campo_digito_rg.setText("")
     ui.campo_pedido.setText("")
-    ui.campo_oab.setText("")
+    ui.campo_nome_mae.setText("")
     ui.campo_novo_noBd.setText("")
     ui.campo_lista_status.setCurrentText("AGUARDANDO")
     ui.campo_lista_status_3.setCurrentText("NAO")
@@ -134,7 +98,7 @@ def limpar_campos():
     ui.campo_hora_agendamento.setTime(hora)
     ui.tableWidget.setRowCount(0)
     ui.label_quantidade_bd.setText("")
-    ui.campo_oab.setText("")
+    ui.campo_nome_mae.setText("")
     ui.campo_cnh.setText("")
     ui.campo_seguranca_cnh.setText("")
     ui.campo_link_video.setText("")
@@ -252,6 +216,7 @@ def formatar_cnpj():
         pass
     
 def salvar():
+
     num_pedido = ui.campo_pedido.text()
     req = ref.get()
     for id in req:
@@ -272,7 +237,7 @@ def salvar():
                 rg = ""
                 cpf = ""
                 cnh = ""
-                oab = ""
+                mae = ""
                 cnpj = ""
                 email = ""
                 dig_cpf = ""
@@ -280,13 +245,13 @@ def salvar():
                 dig_ano = ""
                 data_nascimento = ""
                 cod_seg_cnh = ""
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -302,7 +267,7 @@ def salvar():
                 rg = ui.campo_rg.text()
                 cpf = ui.campo_cpf.text()
                 cnh = ui.campo_cnh.text()
-                oab = ui.campo_oab.text()
+                mae = ui.campo_nome_mae.text()
                 cnpj = ui.campo_cnpj.text()
                 email = ui.campo_email.text()
                 dig_cpf = ui.campo_digito_cpf.text()
@@ -313,13 +278,13 @@ def salvar():
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
 
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -341,7 +306,7 @@ def salvar():
         rg = ""
         cpf = ""
         cnh = ""
-        oab = ""
+        mae = ""
         cnpj = ""
         email = ""
         dig_cpf = ""
@@ -350,13 +315,13 @@ def salvar():
         data_nascimento = ""
         cod_seg_cnh = ""
         vendido = ui.campo_lista_status_3.currentText()
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
@@ -372,7 +337,7 @@ def salvar():
         rg = ui.campo_rg.text()
         cpf = ui.campo_cpf.text()
         cnh = ui.campo_cnh.text()
-        oab = ui.campo_oab.text()
+        mae = ui.campo_nome_mae.text()
         cnpj = ui.campo_cnpj.text()
         email = ui.campo_email.text()
         dig_cpf = ui.campo_digito_cpf.text()
@@ -382,13 +347,13 @@ def salvar():
         vendido = ui.campo_lista_status_3.currentText()
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!")
         notificacao.show()
@@ -418,7 +383,7 @@ def gravar_dados():
                 rg = ""
                 cpf = ""
                 cnh = ""
-                oab = ""
+                mae = ""
                 cnpj = ""
                 email = ""
                 dig_cpf = ""
@@ -427,13 +392,13 @@ def gravar_dados():
                 data_nascimento = ""
                 cod_seg_cnh = ""
 
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -450,7 +415,7 @@ def gravar_dados():
                 rg = ui.campo_rg.text()
                 cpf = ui.campo_cpf.text()
                 cnh = ui.campo_cnh.text()
-                oab = ui.campo_oab.text()
+                mae = ui.campo_nome_mae.text()
                 cnpj = ui.campo_cnpj.text()
                 email = ui.campo_email.text()
                 dig_cpf = ui.campo_digito_cpf.text()
@@ -461,13 +426,13 @@ def gravar_dados():
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
 
-                if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -490,7 +455,7 @@ def gravar_dados():
         rg = ""
         cpf = ""
         cnh = ""
-        oab = ""
+        mae = ""
         cnpj = ""
         email = ""
         dig_cpf = ""
@@ -499,13 +464,13 @@ def gravar_dados():
         data_nascimento = ""
         cod_seg_cnh = ""
 
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
         ref.push(novos_dados)
@@ -522,7 +487,7 @@ def gravar_dados():
         rg = ui.campo_rg.text()
         cpf = ui.campo_cpf.text()
         cnh = ui.campo_cnh.text()
-        oab = ui.campo_oab.text()
+        mae = ui.campo_nome_mae.text()
         cnpj = ui.campo_cnpj.text()
         email = ui.campo_email.text()
         dig_cpf = ui.campo_digito_cpf.text()
@@ -533,13 +498,13 @@ def gravar_dados():
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
 
-        if pedido == "" or tipo == "" or hora == "" or data == "" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!")
             notificacao.show()
             return
         #
-        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"OAB":oab ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"DIGITO CPF":dig_cpf,"DIGITO RG":dig_rg,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!")
         notificacao.show()
@@ -711,7 +676,7 @@ def carregar_dados():
                 ui.campo_rg.setText(req[pedido]['RG'])
                 ui.campo_cpf.setText(req[pedido]['CPF'])
                 ui.campo_cnh.setText(req[pedido]['CNH'])
-                ui.campo_oab.setText(req[pedido]['OAB'])
+                ui.campo_nome_mae.setText(req[pedido]['MAE'])
                 ui.campo_cnpj.setText(req[pedido]['CNPJ'])
                 ui.campo_email.setText(req[pedido]['EMAIL'])
                 ui.campo_data_nascimento.setDate(QDate.fromString(req[pedido]['NASCIMENTO'], "dd/MM/yyyy"))
@@ -761,7 +726,6 @@ def pegar_valor_tabela(event):
                         ui.campo_rg.setText(req[id]["RG"])   
                         ui.campo_cpf.setText(req[id]["CPF"])   
                         ui.campo_cnh.setText(req[id]["CNH"])  
-                        ui.campo_oab.setText(req[id]["OAB"])  
                         ui.campo_cnpj.setText(req[id]["CNPJ"])  
                         ui.campo_email.setText(req[id]["EMAIL"])  
                         ui.campo_data_nascimento.setDate(QDate.fromString(req[id]["NASCIMENTO"], "dd/MM/yyyy"))  
@@ -776,6 +740,7 @@ def pegar_valor_tabela(event):
                         ui.campo_lista_status_4.setCurrentText(req[id]['MODALIDADE'])
                         ui.campo_pedido.setReadOnly(True)
                         ui.campo_seguranca_cnh.setText(req[id]['CODIGO DE SEG CNH'])
+                        ui.campo_nome_mae.setText(req[id]['MAE'])
                         ui.campo_novo_noBd.setText("✅")
                         return
                         
@@ -839,6 +804,17 @@ def mesclar_pdf():
         with open(save_path, 'wb') as merged_pdf:
             pdf_merger.write(merged_pdf)
 
+        pdf_merger.close()
+
+        for label in labels:
+            if hasattr(label, 'setPixmap'):
+                label.setPixmap(QtGui.QPixmap())  # Define o pixmap como nulo
+
+        del save_path
+        del labels
+        del file_paths
+
+
         # Informar ao usuário que a mesclagem foi concluída
         ui.barra_progresso_mesclar.setVisible(False)
         limpar_label_pdf()
@@ -850,70 +826,69 @@ def mesclar_pdf():
         return
 
 def converter_jpg_pdf():
-  
     try:
-        #Abre o explorer para selecionar o arquivo
-       
-        image_path = filedialog.askopenfilename(filetypes=[("Image Files", "*.jpg *.jpeg *.png *.bmp *.gif")], title="Converter JPG > PDF")
+        # Abre o explorer para selecionar múltiplos arquivos
+        image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
 
-        # Verificar se o usuário selecionou um arquivo de imagem
-        if not image_path:
+        # Verificar se o usuário selecionou algum arquivo de imagem
+        if not image_paths:
             return
 
-        # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
-        save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")], title="Local de download")
+        # Iterar sobre cada caminho de imagem selecionado
+        for image_path in image_paths:
+            # Extrair o nome do arquivo (sem a extensão) do caminho
+            nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
 
-        # Verificar se o usuário selecionou um local de salvamento
-        if not save_path:
-            return
+            # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
+            save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")], initialfile=nome_do_arquivo, title="Local de download")
 
-        # Carregar a imagem
-        with Image.open(image_path) as img:
-            # Definir o tamanho padrão
-            target_width, target_height = 1920, 1080
+            # Verificar se o usuário selecionou um local de salvamento
+            if not save_path:
+                continue  # Continue para o próximo arquivo se o usuário não selecionar um local
 
-            # Calcular as dimensões da imagem mantendo o aspect ratio
-            aspect_ratio = img.width / img.height
-            if aspect_ratio > 1:
-                new_width = target_width
-                new_height = int(target_width / aspect_ratio)
-            else:
-                new_width = int(target_height * aspect_ratio)
-                new_height = target_height
+            # Carregar a imagem
+            with Image.open(image_path) as img:
+                # Definir o tamanho padrão
+                target_width, target_height = 1920, 1080
 
-            # Criar um arquivo PDF com as dimensões calculadas
-            c = canvas.Canvas(save_path, pagesize=(new_width, new_height))
+                # Calcular as dimensões da imagem mantendo o aspect ratio
+                aspect_ratio = img.width / img.height
+                if aspect_ratio > 1:
+                    new_width = target_width
+                    new_height = int(target_width / aspect_ratio)
+                else:
+                    new_width = int(target_height * aspect_ratio)
+                    new_height = target_height
 
-            # Desenhar a imagem no PDF mantendo o aspect ratio
-            c.drawImage(image_path, 0, 0, width=new_width, height=new_height)
+                # Criar um arquivo PDF com as dimensões calculadas
+                c = canvas.Canvas(save_path, pagesize=(new_width, new_height))
 
-            c.save()
+                # Desenhar a imagem no PDF mantendo o aspect ratio
+                c.drawImage(image_path, 0, 0, width=new_width, height=new_height)
 
+                c.save()
+
+            # Limpar as variáveis que contêm o PDF e a imagem
+            del img
+            del c
+
+        # Atualizar a barra de progresso para refletir a conclusão do processo
         ui.barra_progresso_jpg.setVisible(True)
-        tempo_total = 1
-        num_incrementos = 100  # Você pode ajustar isso para obter uma carga mais uniforme
-
-        # Calcule o tempo de espera entre os incrementos
-        tempo_espera = tempo_total / num_incrementos
-        for i in range(num_incrementos):
-            # Atualize a barra de progresso para o valor percentual
-            ui.barra_progresso_jpg.setValue(i + 1)
-            QApplication.processEvents()  # Atualize a interface gráfica
-            time.sleep(tempo_espera)
         ui.barra_progresso_jpg.setValue(100)
+        QApplication.processEvents()
 
-        # Limpar as variáveis que contêm o PDF e a imagem
-        del img
-        del c
+        # Aguardar um curto período para a barra de progresso ser exibida antes de ocultá-la
+        
 
-        #limpar aqui
-
+        # Limpar a barra de progresso e exibir a notificação de conclusão
         ui.barra_progresso_jpg.setVisible(False)
-
-        notificacao = Notification(app_id="Concluído", title="", msg="A imagem foi convertida em PDF com sucesso!")
+        notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
         notificacao.show()
-    except:
+
+    except Exception as e:
+        # Em caso de exceção, lidar com o erro apropriado
         ui.barra_progresso_jpg.setVisible(False)
+        print(f"Erro: {e}")
         return
 
 def texto_para_pdf():
@@ -949,6 +924,53 @@ def texto_para_pdf():
     except Exception as e:
         notificacao = Notification(app_id="Erro",title="",msg=f"Feche o arquivo PDF!")
         notificacao.show()
+
+def carregar_pdf_na_label():
+    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+    options = {}
+    options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
+    options['multiple'] = True
+
+    file_paths = filedialog.askopenfilenames(**options)
+
+    if file_paths:
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+
+        for i, pdf_path in enumerate(file_paths):
+            if i < len(labels):
+                pdf_document = fitz.open(pdf_path)
+                pdf_page = pdf_document.load_page(0)
+                pdf_image = pdf_page.get_pixmap()
+
+                # Redimensiona a imagem para caber no tamanho da label
+                image = QImage(pdf_image.samples, pdf_image.width, pdf_image.height, pdf_image.stride, QImage.Format_RGB888)
+                pixmap = QPixmap.fromImage(image.scaled(labels[i].width(), labels[i].height(), Qt.KeepAspectRatio))
+
+                # Exibe a imagem na label
+                labels[i].setPixmap(pixmap)
+
+                # Armazena o caminho do PDF na label
+                labels[i].pdf_path = pdf_path
+
+def limpar_label_pdf():
+    ui.label_PDF1.clear()
+    ui.label_PDF2.clear()
+    ui.label_PDF3.clear()
+    ui.label_PDF4.clear()
+    ui.label_PDF5.clear()
+    ui.label_PDF1.pdf_path = None
+    ui.label_PDF2.pdf_path = None
+    ui.label_PDF3.pdf_path = None
+    ui.label_PDF4.pdf_path = None
+    ui.label_PDF5.pdf_path = None
+
+
+def on_close_event(event):
+    result = QMessageBox.question(janela, "Confirmação", "Você realmente deseja sair?", QMessageBox.Yes | QMessageBox.No)
+    if result == QMessageBox.Yes:
+        event.accept()  # Aceita o evento de fechamento
+    else:
+        event.ignore()  # Ignora o evento de fechamento
 
 
 class Ui_janela(object):
@@ -1079,7 +1101,7 @@ class Ui_janela(object):
         self.campo_lista_status_4.addItem("")
         self.campo_lista_status_4.addItem("")
         self.botao_terminar = QtWidgets.QPushButton(self.tab_5)
-        self.botao_terminar.setGeometry(QtCore.QRect(440, 500, 131, 31))
+        self.botao_terminar.setGeometry(QtCore.QRect(470, 500, 101, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1095,19 +1117,20 @@ class Ui_janela(object):
         self.label_12.setGeometry(QtCore.QRect(10, 480, 131, 16))
         self.label_12.setObjectName("label_12")
         self.campo_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cnh.setGeometry(QtCore.QRect(10, 400, 251, 31))
+        self.campo_cnh.setGeometry(QtCore.QRect(10, 400, 181, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnh.setFont(font)
+        self.campo_cnh.setText("")
         self.campo_cnh.setObjectName("campo_cnh")
         self.label_10 = QtWidgets.QLabel(self.tab_5)
-        self.label_10.setGeometry(QtCore.QRect(10, 230, 81, 16))
+        self.label_10.setGeometry(QtCore.QRect(10, 280, 81, 16))
         self.label_10.setObjectName("label_10")
         self.botao_consulta_cnh = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cnh.setGeometry(QtCore.QRect(270, 400, 31, 31))
+        self.botao_consulta_cnh.setGeometry(QtCore.QRect(200, 400, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1118,10 +1141,10 @@ class Ui_janela(object):
         self.botao_consulta_cnh.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_cnh.setObjectName("botao_consulta_cnh")
         self.label_13 = QtWidgets.QLabel(self.tab_5)
-        self.label_13.setGeometry(QtCore.QRect(170, 480, 61, 16))
+        self.label_13.setGeometry(QtCore.QRect(140, 480, 61, 16))
         self.label_13.setObjectName("label_13")
         self.campo_email = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_email.setGeometry(QtCore.QRect(10, 350, 561, 31))
+        self.campo_email.setGeometry(QtCore.QRect(10, 250, 561, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1133,7 +1156,7 @@ class Ui_janela(object):
         self.campo_email.setPlaceholderText("")
         self.campo_email.setObjectName("campo_email")
         self.botao_salvar = QtWidgets.QPushButton(self.tab_5)
-        self.botao_salvar.setGeometry(QtCore.QRect(350, 500, 81, 31))
+        self.botao_salvar.setGeometry(QtCore.QRect(380, 500, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(10)
@@ -1146,7 +1169,7 @@ class Ui_janela(object):
 "background-color:rgb(0, 180, 210);")
         self.botao_salvar.setObjectName("botao_salvar")
         self.campo_seguranca_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(320, 400, 251, 31))
+        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(10, 450, 221, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1155,7 +1178,7 @@ class Ui_janela(object):
         self.campo_seguranca_cnh.setFont(font)
         self.campo_seguranca_cnh.setObjectName("campo_seguranca_cnh")
         self.botao_consulta_rg = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_rg.setGeometry(QtCore.QRect(540, 250, 31, 31))
+        self.botao_consulta_rg.setGeometry(QtCore.QRect(540, 300, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1166,13 +1189,13 @@ class Ui_janela(object):
         self.botao_consulta_rg.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_rg.setObjectName("botao_consulta_rg")
         self.label_6 = QtWidgets.QLabel(self.tab_5)
-        self.label_6.setGeometry(QtCore.QRect(10, 280, 81, 16))
+        self.label_6.setGeometry(QtCore.QRect(10, 330, 81, 16))
         self.label_6.setObjectName("label_6")
         self.label_15 = QtWidgets.QLabel(self.tab_5)
         self.label_15.setGeometry(QtCore.QRect(10, 380, 61, 20))
         self.label_15.setObjectName("label_15")
         self.campo_digito_rg = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_digito_rg.setGeometry(QtCore.QRect(330, 250, 201, 31))
+        self.campo_digito_rg.setGeometry(QtCore.QRect(330, 300, 201, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1193,19 +1216,8 @@ class Ui_janela(object):
         self.campo_nome.setText("")
         self.campo_nome.setPlaceholderText("")
         self.campo_nome.setObjectName("campo_nome")
-        self.botao_consulta_oab = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_oab.setGeometry(QtCore.QRect(540, 450, 31, 31))
-        font = QtGui.QFont()
-        font.setFamily("Arial")
-        font.setPointSize(14)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.botao_consulta_oab.setFont(font)
-        self.botao_consulta_oab.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_consulta_oab.setObjectName("botao_consulta_oab")
         self.campo_digito_ano = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_digito_ano.setGeometry(QtCore.QRect(170, 500, 91, 31))
+        self.campo_digito_ano.setGeometry(QtCore.QRect(140, 500, 91, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1215,10 +1227,10 @@ class Ui_janela(object):
         self.campo_digito_ano.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_digito_ano.setObjectName("campo_digito_ano")
         self.label_11 = QtWidgets.QLabel(self.tab_5)
-        self.label_11.setGeometry(QtCore.QRect(10, 330, 81, 16))
+        self.label_11.setGeometry(QtCore.QRect(10, 230, 81, 16))
         self.label_11.setObjectName("label_11")
         self.campo_rg = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_rg.setGeometry(QtCore.QRect(10, 250, 311, 31))
+        self.campo_rg.setGeometry(QtCore.QRect(10, 300, 311, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1228,10 +1240,10 @@ class Ui_janela(object):
         self.campo_rg.setPlaceholderText("")
         self.campo_rg.setObjectName("campo_rg")
         self.label_8 = QtWidgets.QLabel(self.tab_5)
-        self.label_8.setGeometry(QtCore.QRect(330, 280, 141, 20))
+        self.label_8.setGeometry(QtCore.QRect(330, 330, 141, 20))
         self.label_8.setObjectName("label_8")
         self.campo_digito_cpf = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_digito_cpf.setGeometry(QtCore.QRect(330, 300, 201, 31))
+        self.campo_digito_cpf.setGeometry(QtCore.QRect(330, 350, 201, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1241,7 +1253,7 @@ class Ui_janela(object):
         self.campo_digito_cpf.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_digito_cpf.setObjectName("campo_digito_cpf")
         self.botao_consulta_cnpj = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cnpj.setGeometry(QtCore.QRect(270, 450, 31, 31))
+        self.botao_consulta_cnpj.setGeometry(QtCore.QRect(540, 450, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1252,10 +1264,10 @@ class Ui_janela(object):
         self.botao_consulta_cnpj.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_cnpj.setObjectName("botao_consulta_cnpj")
         self.label_9 = QtWidgets.QLabel(self.tab_5)
-        self.label_9.setGeometry(QtCore.QRect(330, 230, 61, 20))
+        self.label_9.setGeometry(QtCore.QRect(330, 280, 61, 20))
         self.label_9.setObjectName("label_9")
         self.campo_cpf = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cpf.setGeometry(QtCore.QRect(10, 300, 311, 31))
+        self.campo_cpf.setGeometry(QtCore.QRect(10, 350, 311, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1265,19 +1277,19 @@ class Ui_janela(object):
         self.campo_cpf.setText("")
         self.campo_cpf.setPlaceholderText("")
         self.campo_cpf.setObjectName("campo_cpf")
-        self.campo_oab = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_oab.setGeometry(QtCore.QRect(320, 450, 211, 31))
+        self.campo_nome_mae = QtWidgets.QLineEdit(self.tab_5)
+        self.campo_nome_mae.setGeometry(QtCore.QRect(240, 400, 331, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
         font.setBold(False)
         font.setWeight(50)
-        self.campo_oab.setFont(font)
-        self.campo_oab.setStyleSheet("")
-        self.campo_oab.setText("")
-        self.campo_oab.setObjectName("campo_oab")
+        self.campo_nome_mae.setFont(font)
+        self.campo_nome_mae.setStyleSheet("")
+        self.campo_nome_mae.setText("")
+        self.campo_nome_mae.setObjectName("campo_nome_mae")
         self.botao_consulta_cpf = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cpf.setGeometry(QtCore.QRect(540, 300, 31, 31))
+        self.botao_consulta_cpf.setGeometry(QtCore.QRect(540, 350, 31, 31))
         font = QtGui.QFont()
         font.setFamily("Arial")
         font.setPointSize(14)
@@ -1288,7 +1300,7 @@ class Ui_janela(object):
         self.botao_consulta_cpf.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_consulta_cpf.setObjectName("botao_consulta_cpf")
         self.campo_cnpj = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cnpj.setGeometry(QtCore.QRect(10, 450, 251, 31))
+        self.campo_cnpj.setGeometry(QtCore.QRect(240, 450, 291, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1299,13 +1311,13 @@ class Ui_janela(object):
         self.campo_cnpj.setPlaceholderText("")
         self.campo_cnpj.setObjectName("campo_cnpj")
         self.label_14 = QtWidgets.QLabel(self.tab_5)
-        self.label_14.setGeometry(QtCore.QRect(10, 430, 171, 16))
+        self.label_14.setGeometry(QtCore.QRect(240, 430, 171, 16))
         self.label_14.setObjectName("label_14")
         self.label_18 = QtWidgets.QLabel(self.tab_5)
-        self.label_18.setGeometry(QtCore.QRect(320, 430, 141, 20))
+        self.label_18.setGeometry(QtCore.QRect(240, 380, 141, 20))
         self.label_18.setObjectName("label_18")
         self.campo_data_nascimento = QtWidgets.QDateEdit(self.tab_5)
-        self.campo_data_nascimento.setGeometry(QtCore.QRect(10, 500, 151, 31))
+        self.campo_data_nascimento.setGeometry(QtCore.QRect(10, 500, 121, 31))
         font = QtGui.QFont()
         font.setFamily("Helvetica")
         font.setPointSize(12)
@@ -1315,7 +1327,7 @@ class Ui_janela(object):
         self.campo_data_nascimento.setStyleSheet("")
         self.campo_data_nascimento.setObjectName("campo_data_nascimento")
         self.label_16 = QtWidgets.QLabel(self.tab_5)
-        self.label_16.setGeometry(QtCore.QRect(320, 380, 201, 20))
+        self.label_16.setGeometry(QtCore.QRect(10, 430, 201, 20))
         self.label_16.setObjectName("label_16")
         self.label_24 = QtWidgets.QLabel(self.tab_5)
         self.label_24.setGeometry(QtCore.QRect(10, 180, 201, 16))
@@ -1359,13 +1371,12 @@ class Ui_janela(object):
         self.botao_consulta_rg.raise_()
         self.campo_digito_rg.raise_()
         self.campo_nome.raise_()
-        self.botao_consulta_oab.raise_()
         self.campo_digito_ano.raise_()
         self.campo_rg.raise_()
         self.campo_digito_cpf.raise_()
         self.botao_consulta_cnpj.raise_()
         self.campo_cpf.raise_()
-        self.campo_oab.raise_()
+        self.campo_nome_mae.raise_()
         self.botao_consulta_cpf.raise_()
         self.campo_cnpj.raise_()
         self.campo_data_nascimento.raise_()
@@ -1648,20 +1659,19 @@ class Ui_janela(object):
         janela.setTabOrder(self.campo_lista_status_3, self.campo_lista_status_4)
         janela.setTabOrder(self.campo_lista_status_4, self.campo_lista_status)
         janela.setTabOrder(self.campo_lista_status, self.campo_nome)
-        janela.setTabOrder(self.campo_nome, self.campo_rg)
+        janela.setTabOrder(self.campo_nome, self.campo_email)
+        janela.setTabOrder(self.campo_email, self.campo_rg)
         janela.setTabOrder(self.campo_rg, self.campo_cpf)
-        janela.setTabOrder(self.campo_cpf, self.campo_email)
-        janela.setTabOrder(self.campo_email, self.campo_cnh)
-        janela.setTabOrder(self.campo_cnh, self.campo_seguranca_cnh)
+        janela.setTabOrder(self.campo_cpf, self.campo_cnh)
+        janela.setTabOrder(self.campo_cnh, self.campo_nome_mae)
+        janela.setTabOrder(self.campo_nome_mae, self.campo_seguranca_cnh)
         janela.setTabOrder(self.campo_seguranca_cnh, self.campo_cnpj)
-        janela.setTabOrder(self.campo_cnpj, self.campo_oab)
-        janela.setTabOrder(self.campo_oab, self.campo_data_nascimento)
+        janela.setTabOrder(self.campo_cnpj, self.campo_data_nascimento)
         janela.setTabOrder(self.campo_data_nascimento, self.campo_data_de)
         janela.setTabOrder(self.campo_data_de, self.campo_data_ate)
         janela.setTabOrder(self.campo_data_ate, self.campo_lista_status_2)
         janela.setTabOrder(self.campo_lista_status_2, self.campo_link_video)
-        janela.setTabOrder(self.campo_link_video, self.botao_consulta_oab)
-        janela.setTabOrder(self.botao_consulta_oab, self.botao_consultar)
+        janela.setTabOrder(self.campo_link_video, self.botao_consultar)
         janela.setTabOrder(self.botao_consultar, self.botao_procurar)
         janela.setTabOrder(self.botao_procurar, self.campo_digito_rg)
         janela.setTabOrder(self.campo_digito_rg, self.tabWidget)
@@ -1707,15 +1717,14 @@ class Ui_janela(object):
         self.botao_consulta_rg.setText(_translate("janela", "🔍"))
         self.label_6.setText(_translate("janela", "CPF"))
         self.label_15.setText(_translate("janela", "CNH"))
-        self.botao_consulta_oab.setText(_translate("janela", "🔍"))
         self.label_11.setText(_translate("janela", "e-MAIL"))
         self.label_8.setText(_translate("janela", "últimos 2 dígitos - CPF"))
         self.botao_consulta_cnpj.setText(_translate("janela", "🔍"))
         self.label_9.setText(_translate("janela", " dígito - RG"))
         self.botao_consulta_cpf.setText(_translate("janela", "🔍"))
         self.label_14.setText(_translate("janela", "CNPJ"))
-        self.label_18.setText(_translate("janela", "OAB"))
-        self.label_16.setText(_translate("janela", "código de segurança - CNH"))
+        self.label_18.setText(_translate("janela", "NOME DA MÃE"))
+        self.label_16.setText(_translate("janela", "CÓDIGO DE SEGURANÇA - CNH"))
         self.label_24.setText(_translate("janela", "NOME COMPLETO"))
         self.botao_pasta_cliente.setText(_translate("janela", "📂"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_5), _translate("janela", "Dados"))
@@ -1753,7 +1762,6 @@ class Ui_janela(object):
         self.groupBox_2.setTitle(_translate("janela", "CONVERTER JPEG PARA PDF"))
         self.botao_converter_jpgPDF.setText(_translate("janela", "CONVERTER IMG > PDF"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "PDF"))
-
 
 
 class TelaLogin(QWidget):
@@ -1810,12 +1818,12 @@ if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
     janela = QtWidgets.QMainWindow()
-    login = QtWidgets.QMainWindow()
+    #login = QtWidgets.QMainWindow()
     ui = Ui_janela()
     ui.setupUi(janela)
-    tela_login = TelaLogin()
+    #tela_login = TelaLogin()
     
-    tela_login.show()
+    #tela_login.show()
     
     ui.botao_consultar.clicked.connect(preencher_tabela)
     ui.botao_terminar.clicked.connect(gravar_dados)
@@ -1832,7 +1840,6 @@ if __name__ == "__main__":
     ui.botao_consulta_cnpj.clicked.connect(procurar_cnpj)
     ui.botao_consulta_cpf.clicked.connect(procurar_cpf)
     ui.botao_consulta_cnh.clicked.connect(procurar_cnh)
-    ui.botao_consulta_oab.clicked.connect(procurar_oab)
     ui.botao_consulta_rg.clicked.connect(procurar_rg)
     ui.tableWidget.itemDoubleClicked.connect(pegar_valor_tabela)
     ui.botao_salvar.clicked.connect(salvar)
@@ -1848,10 +1855,13 @@ if __name__ == "__main__":
     ui.barra_progresso_mesclar.setVisible(False)
     ui.barra_progresso_pedido.setVisible(False)
     ui.barra_progresso_consulta.setVisible(False)
-
+    janela.closeEvent = on_close_event
+    
 
 
     janela.setWindowTitle("Auxiliar Certificados")
     janela.setFixedSize(611, 612)
+    janela.show()
     
+
     sys.exit(app.exec_())
