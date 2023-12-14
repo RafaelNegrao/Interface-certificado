@@ -193,6 +193,9 @@
         <pointsize>12</pointsize>
        </font>
       </property>
+      <property name="text">
+       <string/>
+      </property>
      </widget>
      <widget class="QLineEdit" name="campo_pedido">
       <property name="geometry">
@@ -208,6 +211,9 @@
         <family>Helvetica</family>
         <pointsize>12</pointsize>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
        <string/>
@@ -563,6 +569,9 @@ background-color:rgb(0, 180, 210);</string>
         <bold>false</bold>
        </font>
       </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -599,6 +608,9 @@ background-color:rgb(0, 180, 210);</string>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
        <string/>
@@ -670,6 +682,9 @@ background-color:rgb(0, 180, 210);</string>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="text">
        <string/>
@@ -758,6 +773,9 @@ background-color:rgb(0, 180, 210);</string>
         <bold>false</bold>
        </font>
       </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
       <property name="text">
        <string/>
       </property>
@@ -799,6 +817,9 @@ background-color:rgb(0, 180, 210);</string>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
@@ -930,6 +951,9 @@ background-color:rgb(0, 180, 210);</string>
         <bold>false</bold>
        </font>
       </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
       <property name="placeholderText">
        <string/>
       </property>
@@ -963,6 +987,9 @@ background-color:rgb(0, 180, 210);</string>
         <weight>50</weight>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
      </widget>
      <widget class="QLineEdit" name="campo_diretorio_pasta">
@@ -1362,6 +1389,19 @@ background-color:rgb(73, 218, 107);
       </property>
       <property name="alignment">
        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_5">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>520</y>
+        <width>131</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Backed by Firebase</string>
       </property>
      </widget>
     </widget>
