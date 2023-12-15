@@ -82,7 +82,6 @@ def limpar_campos(ui):
     ui.campo_email.setText("")
     ui.campo_certificado.setText("")
     ui.campo_cnpj.setText("")
-    ui.campo_digito_ano.setText("")
     ui.campo_pedido.setText("")
     ui.campo_nome_mae.setText("")
     ui.campo_novo_noBd.setText("")
@@ -94,13 +93,15 @@ def limpar_campos(ui):
     ui.campo_data_agendamento.setDate(data_nula)
     ui.campo_data_nascimento.setDate(data_nula)
     ui.campo_hora_agendamento.setTime(hora)
-    #ui.tableWidget.setRowCount(0)
+    ui.tableWidget.setRowCount(0)
     ui.label_quantidade_bd.setText("")
     ui.campo_nome_mae.setText("")
     ui.campo_cnh.setText("")
     ui.campo_seguranca_cnh.setText("")
     ui.campo_link_video.setText("")
     ui.campo_diretorio_pasta.setText("")
+    ui.campo_cnpj_municipio.setText("")
+    ui.campo_cnpj_uf.setText("")
     limpar_label_pdf(ui)
 
 def procurar_cnh(ui):
@@ -139,23 +140,13 @@ def dados_cnpj(ui):
         data = resposta.json()
 
         if resposta.status_code == 200:
-    # Remove os caracteres '{' e '[' dos dicionários aninhados
-            data = {chave: valor if not isinstance(valor, dict) else {k: v.replace('[', '').replace('{', '').replace(']', '').replace('}', '') if isinstance(v, str) else v for k, v in valor.items()} for chave, valor in data.items()}
+   
+            ui.campo_cnpj_municipio.setText(data['municipio'])
+            ui.campo_cnpj_uf.setText(data['uf'])
 
-            # Ajusta a formatação da chave 'Qsa'
-            if 'qsa' in data and isinstance(data['qsa'], list):
-                qsa_formatado = "    ".join([f"{k}: {v}" for item in data['qsa'] for k, v in item.items()])
-                data['qsa'] = qsa_formatado
-
-            chaves_desejadas = ['abertura', 'situacao', 'tipo', 'nome', 'fantasia', 'natureza_juridica', 'qsa', 'municipio', 'uf', 'capital_social', 'email']
-
-            dados_filtrados = {chave: valor for chave, valor in data.items() if chave in chaves_desejadas}
-
-            texto_formatado = "\n".join([f"{chave.capitalize()}: {valor}" for chave, valor in dados_filtrados.items()])
-
+            
             # Atualiza a variável global
-            tela_cnpj = TelaCNPJ(texto_formatado)
-            tela_cnpj.show()
+        
 
         else:
             exibir_mensagem_erro(f"Erro na requisição: {data.get('message', 'N/A')}")
@@ -204,11 +195,6 @@ def formatar_cpf(ui):
         
     elif len(novo_cpf)== "":
         return   
-       
-def formatar_data_nascimento(ui):
-    nascimento = ui.campo_data_nascimento.text()
-    if not nascimento == "01/01/2000":
-        ui.campo_digito_ano.setText(nascimento[6:10])
         
 def formatar_cnpj(ui):
     cnpj = ui.campo_cnpj.text()
@@ -254,6 +240,10 @@ def salvar(ui):
                 data_nascimento = ""
                 cod_seg_cnh = ""
                 diretorio = ""
+                municipio = ""
+                uf = ""
+                municipio = ""
+                uf = ""
 
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -264,7 +254,7 @@ def salvar(ui):
                 
             
                 #
-                novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -289,12 +279,13 @@ def salvar(ui):
                 mae = ui.campo_nome_mae.text()
                 cnpj = ui.campo_cnpj.text()
                 email = ui.campo_email.text()
-                dig_ano = ui.campo_digito_ano.text()
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
-                diretorio = ui.campo_diretorio_pasta.text()
+                diretorio = ui.campo_diretorio_pasta.toPlainText()
+                municipio = ui.campo_cnpj_uf.text()
+                uf = ui.campo_cnpj_uf.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -302,7 +293,7 @@ def salvar(ui):
                     notificacao.show()
                     return
                 #
-                novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -335,6 +326,8 @@ def salvar(ui):
         cod_seg_cnh = ""
         vendido = ui.campo_lista_status_3.currentText()
         diretorio = ""
+        municipio = ""
+        uf = ""
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -344,7 +337,7 @@ def salvar(ui):
         
         
         #
-        novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
         ref.push(novos_dados)
@@ -363,12 +356,13 @@ def salvar(ui):
         mae = ui.campo_nome_mae.text()
         cnpj = ui.campo_cnpj.text()
         email = ui.campo_email.text()
-        dig_ano = ui.campo_digito_ano.text()
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
-        diretorio = ui.campo_diretorio_pasta.text()
+        diretorio = ui.campo_diretorio_pasta.toPlainText()
+        municipio = ui.campo_cnpj_uf.text()
+        uf = ui.campo_cnpj_uf.text()
     
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -376,7 +370,7 @@ def salvar(ui):
             notificacao.show()
             return
         #
-        novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -413,6 +407,8 @@ def gravar_dados(ui):
                 data_nascimento = ""
                 cod_seg_cnh = ""
                 diretorio = ""
+                municipio = ""
+                uf = ""
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -422,7 +418,7 @@ def gravar_dados(ui):
                 
 
                 #
-                novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -445,12 +441,13 @@ def gravar_dados(ui):
                 mae = ui.campo_nome_mae.text()
                 cnpj = ui.campo_cnpj.text()
                 email = ui.campo_email.text()
-                dig_ano = ui.campo_digito_ano.text()
                 data_nascimento = ui.campo_data_nascimento.text()
                 vendido = ui.campo_lista_status_3.currentText()
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
-                diretorio = ui.campo_diretorio_pasta.text()
+                diretorio = ui.campo_diretorio_pasta.toPlainText()
+                municipio = ui.campo_cnpj_uf.text()
+                uf = ui.campo_cnpj_uf.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -458,7 +455,7 @@ def gravar_dados(ui):
                     notificacao.show()
                     return
                 #
-                novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -488,6 +485,8 @@ def gravar_dados(ui):
         data_nascimento = ""
         cod_seg_cnh = ""
         diretorio = ""
+        municipio = ""
+        uf = ""
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -496,7 +495,7 @@ def gravar_dados(ui):
             return
         
 
-        novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
         ref.push(novos_dados)
@@ -516,12 +515,13 @@ def gravar_dados(ui):
         mae = ui.campo_nome_mae.text()
         cnpj = ui.campo_cnpj.text()
         email = ui.campo_email.text()
-        dig_ano = ui.campo_digito_ano.text()
         data_nascimento = ui.campo_data_nascimento.text()
         vendido = ui.campo_lista_status_3.currentText()
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
-        diretorio = ui.campo_diretorio_pasta.text()
+        diretorio = ui.campo_diretorio_pasta.toPlainText()
+        municipio = ui.campo_cnpj_uf.text()
+        uf = ui.campo_cnpj_uf.text()
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -529,7 +529,7 @@ def gravar_dados(ui):
             notificacao.show()
             return
         #
-        novos_dados = {"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"DIGITO ANO":dig_ano,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -653,6 +653,10 @@ def preencher_tabela(ui):
                     ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['STATUS']))
                     ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['VENDIDO POR MIM?']))
                     ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['TIPO']))
+                    try:
+                        ui.tableWidget.setItem(row_position, 8, QTableWidgetItem(pedido_info['DIRETORIO']))
+                    except:
+                        pass
                     y += 1
                     porcentagem = (y/total_pedidos)*100
                     ui.barra_progresso_consulta.setValue(int(porcentagem))
@@ -668,9 +672,11 @@ def preencher_tabela(ui):
         
         ui.barra_progresso_consulta.setValue(100)
         ui.label_quantidade_bd.setText(f"{x} registro(s)")
-        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO"])
+        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVACOES"])
         ui.barra_progresso_consulta.setVisible(False)
     except Exception as e:
+            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVACOES"])
+            ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
             pass
 
@@ -706,12 +712,13 @@ def carregar_dados(ui):
                 ui.campo_cnpj.setText(req[pedido]['CNPJ'])
                 ui.campo_email.setText(req[pedido]['EMAIL'])
                 ui.campo_data_nascimento.setDate(QDate.fromString(req[pedido]['NASCIMENTO'], "dd/MM/yyyy"))
-                ui.campo_digito_ano.setText(req[pedido]['DIGITO ANO'])
                 ui.campo_lista_status_3.setCurrentText("NAO")
                 ui.campo_lista_status_3.setCurrentText(req[pedido]['VENDIDO POR MIM?'])
                 ui.campo_lista_status_4.setCurrentText(req[pedido]['MODALIDADE'])
                 ui.campo_seguranca_cnh.setText(req[pedido]['CODIGO DE SEG CNH'])
                 ui.campo_diretorio_pasta.setText(req[pedido]['DIRETORIO'])
+                ui.campo_cnpj_municipio.setText(req[pedido]['MUNICIPIO'])
+                ui.campo_cnpj_uf.setText(req[pedido]['UF'])
 
             # Atualize a barra de progresso
             num_pedidos_processados += 1
@@ -758,7 +765,6 @@ def pegar_valor_tabela(event):
                         ui.campo_pedido.setText(req[id]["PEDIDO"]) 
                         ui.campo_data_agendamento.setDate(QDate.fromString(req[id]["DATA"], "dd/MM/yyyy"))
                         ui.campo_hora_agendamento.setTime(QTime.fromString(req[id]["HORA"], "hh:mm"))
-                        ui.campo_digito_ano.setText(req[id]["DIGITO ANO"])
                         ui.campo_lista_status_3.setCurrentText("NAO")
                         ui.campo_lista_status_3.setCurrentText(req[id]['VENDIDO POR MIM?'])
                         ui.campo_lista_status_4.setCurrentText(req[id]['MODALIDADE'])
@@ -767,6 +773,8 @@ def pegar_valor_tabela(event):
                         ui.campo_nome_mae.setText(req[id]['MAE'])
                         ui.campo_novo_noBd.setText("✅")
                         ui.campo_diretorio_pasta.setText(req[id]['DIRETORIO'])
+                        ui.campo_cnpj_municipio.setText(req[id]['MUNICIPIO'])
+                        ui.campo_cnpj_uf.setText(req[id]['UF'])
                         return
                         
     except Exception as e:
@@ -1008,70 +1016,78 @@ def copiar_campo(nome_campo):
         case 'campo_cnh':
             try:
                 QApplication.clipboard().setText(ui.campo_cnh.text())
+                ui.campo_cnh.selectAll()
             except:
                 pass
         case'campo_cnpj':
             try:
                 QApplication.clipboard().setText(ui.campo_cnpj.text().replace('.','').replace('-','').replace('/',''))
+                ui.campo_cnpj.selectAll()
             except:
                 pass
         case'campo_pedido':
             try:
                 QApplication.clipboard().setText(ui.campo_pedido.text())
+                ui.campo_pedido.selectAll()
             except:
                 pass
         case'campo_cpf':
             try:
                 QApplication.clipboard().setText(ui.campo_cpf.text().replace('.','').replace('-',''))
+                ui.campo_cpf.selectAll()
             except:
                 pass
         case'campo_seguranca_cnh':
             try:
                 QApplication.clipboard().setText(ui.campo_seguranca_cnh.text())
+                ui.campo_seguranca_cnh.selectAll()
             except:
                 pass
         case'campo_rg':
             try:
                 QApplication.clipboard().setText(ui.campo_rg.text())
+                ui.campo_rg.selectAll()
             except:
                 pass
         case'campo_nome_mae':
             try:
                 QApplication.clipboard().setText(ui.campo_nome_mae.text())
+                ui.campo_nome_mae.selectAll()
             except:
                 pass
         case'campo_nome':
             try:
                 QApplication.clipboard().setText(ui.campo_nome.text())
+                ui.campo_nome.selectAll()
             except:
                 pass
 
-class TelaCNPJ(QWidget):
-    def __init__(self, dados_formatados):
-        super().__init__()
+# class TelaCNPJ(QWidget):
+#     def __init__(self, dados_formatados):
+#         super().__init__()
 
-        self.setWindowTitle("Dados CNPJ")
-        self.setGeometry(150, 150, 500, 400)  # Ajusta para 200x300
+#         self.setWindowTitle("Dados CNPJ")
+#         self.setGeometry(150, 150, 500, 400)  # Ajusta para 200x300
 
-        layout = QVBoxLayout()
+#         layout = QVBoxLayout()
 
-        self.label_usuario = QLabel("")
-        self.input_usuario = QTextEdit(self)
-        self.input_usuario.setPlainText(dados_formatados)  # Preenche o QTextEdit com os dados formatados
-        self.input_usuario.setReadOnly(True)  # Desativa a edição
+#         self.label_usuario = QLabel("")
+#         self.input_usuario = QTextEdit(self)
+#         self.input_usuario.setPlainText(dados_formatados)  # Preenche o QTextEdit com os dados formatados
+#         self.input_usuario.setReadOnly(True)  # Desativa a edição
 
-        layout.addWidget(self.label_usuario)
-        layout.addWidget(self.input_usuario)
+#         layout.addWidget(self.label_usuario)
+#         layout.addWidget(self.input_usuario)
 
-        self.setLayout(layout)
+#         self.setLayout(layout)
 
-        # Configuração da fonte para o QTextEdit
-        fonte = QFont("Calibri", 12)  # Substitua "Calibri" pela fonte desejada
-        self.input_usuario.setFont(fonte)
+#         # Configuração da fonte para o QTextEdit
+#         fonte = QFont("Calibri", 12)  # Substitua "Calibri" pela fonte desejada
+#         self.input_usuario.setFont(fonte)
 
-        self.show()
+#         self.show()
                  
-tela_cnpj = None
+# tela_cnpj = None
 
 
 import sys
@@ -1086,9 +1102,7 @@ ui.botao_terminar.clicked.connect(lambda:gravar_dados(ui))
 ui.botao_procurar.clicked.connect(lambda:exportar_excel(ui))
 ui.campo_cpf.editingFinished.connect(lambda:formatar_cpf(ui))
 ui.campo_pedido.editingFinished.connect(lambda:carregar_dados(ui))
-ui.campo_digito_ano.setReadOnly(True)
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
-ui.campo_data_nascimento.editingFinished.connect(lambda:formatar_data_nascimento(ui))
 ui.campo_cnpj.editingFinished.connect (lambda:formatar_cnpj(ui))
 ui.botao_consulta_cnpj.clicked.connect(lambda:procurar_cnpj(ui))
 ui.botao_consulta_cpf.clicked.connect(lambda:procurar_cpf(ui))
@@ -1123,7 +1137,7 @@ ui.campo_nome.mousePressEvent = lambda event: copiar_campo("campo_nome")
 
 
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(611, 590)
+janela.setFixedSize(611, 630)
 janela.show()
 
 
