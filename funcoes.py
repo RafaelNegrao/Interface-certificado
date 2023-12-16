@@ -1,4 +1,3 @@
-
 import datetime
 import pandas as pd
 import tkinter as tk
@@ -7,18 +6,18 @@ import time
 import requests
 import PyPDF2
 import fitz
+import firebase_admin
 from winotify import Notification
-from PyQt5.QtGui import QDesktopServices,QPixmap,QImage,QFont
+from PyQt5.QtGui import QDesktopServices,QPixmap,QImage
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QWidget, QVBoxLayout, QLabel,QApplication,QMessageBox,QTextEdit
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 from Interface import Ui_janela
 from data_base import *
-import firebase_admin
 from firebase_admin import db
 
 
@@ -39,8 +38,6 @@ credenciais = {
 acoes = firebase_admin.credentials.Certificate(credenciais)
 firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
 ref = db.reference("/")
-
-
 
 
 def criar_pasta_cliente(ui):
@@ -93,7 +90,7 @@ def limpar_campos(ui):
     ui.campo_data_agendamento.setDate(data_nula)
     ui.campo_data_nascimento.setDate(data_nula)
     ui.campo_hora_agendamento.setTime(hora)
-    ui.tableWidget.setRowCount(0)
+    #ui.tableWidget.setRowCount(0)
     ui.label_quantidade_bd.setText("")
     ui.campo_nome_mae.setText("")
     ui.campo_cnh.setText("")
@@ -120,41 +117,61 @@ def procurar_rg(ui):
     return
 
 def procurar_cnpj(ui):
-    cnpj = ui.campo_cnpj.text()
-    url = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
-    QDesktopServices.openUrl(url)
-    url = QUrl("https://www.jucesponline.sp.gov.br/")
-    QDesktopServices.openUrl(url)
-    return
+    
+    if  ui.campo_cnpj_uf.text() == 'SP✅':
+        
+        cnpj = ui.campo_cnpj.text()
+        url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
+        QDesktopServices.openUrl(url_receita)
+        url_jucesp = QUrl("https://www.jucesponline.sp.gov.br/")
+        QDesktopServices.openUrl(url_jucesp)
+
+    elif ui.campo_cnpj_uf.text() != 'SP✅' and ui.campo_cnpj_uf.text() != "---" and ui.campo_cnpj_uf.text() != "":
+        
+        cnpj = ui.campo_cnpj.text()
+        url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}") 
+        QDesktopServices.openUrl(url_receita)
+
+    elif ui.campo_cnpj_uf.text() == "---" or ui.campo_cnpj_uf.text() == "":
+        pass
 
 def dados_cnpj(ui):
-    global tela_cnpj  # Utiliza a variável global para garantir o acesso fora da função
+    ui.campo_cnpj_municipio.setText("")
+    ui.campo_cnpj_uf.setText("")  
     cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
     if cnpj == '':
         return
     
     url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
-
+    
     try:
         resposta = requests.get(url)
         data = resposta.json()
 
         if resposta.status_code == 200:
-   
             ui.campo_cnpj_municipio.setText(data['municipio'])
-            ui.campo_cnpj_uf.setText(data['uf'])
-
             
-            # Atualiza a variável global
-        
+            uf = data['uf']
+            
+            if uf != "SP":
+                ui.campo_cnpj_uf.setText(str(uf + "⚠"))
+                
+            else:
+                ui.campo_cnpj_uf.setText(str(uf + "✅"))
 
         else:
-            exibir_mensagem_erro(f"Erro na requisição: {data.get('message', 'N/A')}")
+            ui.campo_cnpj_municipio.setText("")
+            ui.campo_cnpj_uf.setText("") 
     except Exception as e:
-        exibir_mensagem_erro(f"Erro na requisição: {str(e)}")
-
-def exibir_mensagem_erro(mensagem):
-    QMessageBox.warning(None, "Erro", mensagem)
+        if resposta.status_code == 429:
+            ui.campo_cnpj_municipio.setText("")
+            ui.campo_cnpj_uf.setText("")
+            notificacao = Notification(app_id="ACESSO BLOQUEADO",title="",msg="Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!",duration="short")
+            notificacao.show()
+            
+        else:
+            ui.campo_cnpj_municipio.setText('CNPJ INVÁLIDO')
+            ui.campo_cnpj_uf.setText('---')    
 
 def procurar_cpf(ui):
     
@@ -210,6 +227,9 @@ def formatar_cnpj(ui):
         ui.campo_cnpj.setText(cnpj_formatado)
     elif len(cnpj_sp) == 18:
         pass
+    else:
+        ui.campo_cnpj_municipio.setText('')
+        ui.campo_cnpj_uf.setText('')
 
 def salvar(ui):
 
@@ -242,8 +262,7 @@ def salvar(ui):
                 diretorio = ""
                 municipio = ""
                 uf = ""
-                municipio = ""
-                uf = ""
+
 
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -284,7 +303,7 @@ def salvar(ui):
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
                 diretorio = ui.campo_diretorio_pasta.toPlainText()
-                municipio = ui.campo_cnpj_uf.text()
+                municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -361,7 +380,7 @@ def salvar(ui):
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
         diretorio = ui.campo_diretorio_pasta.toPlainText()
-        municipio = ui.campo_cnpj_uf.text()
+        municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
     
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -403,7 +422,6 @@ def gravar_dados(ui):
                 mae = ""
                 cnpj = ""
                 email = ""
-                dig_ano = ""
                 data_nascimento = ""
                 cod_seg_cnh = ""
                 diretorio = ""
@@ -446,7 +464,7 @@ def gravar_dados(ui):
                 modalidade = ui.campo_lista_status_4.currentText()
                 cod_seg_cnh = ui.campo_seguranca_cnh.text()
                 diretorio = ui.campo_diretorio_pasta.toPlainText()
-                municipio = ui.campo_cnpj_uf.text()
+                municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -481,7 +499,6 @@ def gravar_dados(ui):
         mae = ""
         cnpj = ""
         email = ""
-        dig_ano = ""
         data_nascimento = ""
         cod_seg_cnh = ""
         diretorio = ""
@@ -520,7 +537,7 @@ def gravar_dados(ui):
         modalidade = ui.campo_lista_status_4.currentText()
         cod_seg_cnh = ui.campo_seguranca_cnh.text()
         diretorio = ui.campo_diretorio_pasta.toPlainText()
-        municipio = ui.campo_cnpj_uf.text()
+        municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -610,6 +627,7 @@ def exportar_excel(ui):
         pass
 
 def preencher_tabela(ui):
+
     #USO DE BANCO DE DADOS
     ui.tableWidget.setRowCount(0)
     try:
@@ -672,10 +690,10 @@ def preencher_tabela(ui):
         
         ui.barra_progresso_consulta.setValue(100)
         ui.label_quantidade_bd.setText(f"{x} registro(s)")
-        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVACOES"])
+        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
         ui.barra_progresso_consulta.setVisible(False)
     except Exception as e:
-            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVACOES"])
+            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
             pass
@@ -731,7 +749,23 @@ def carregar_dados(ui):
         ui.barra_progresso_pedido.setVisible(False)
         ui.campo_novo_noBd.setText("")
         return
-        
+
+def copiar_pedido_tabela(event):
+    # Obtém a célula atualmente selecionada na tabela
+    item = ui.tableWidget.currentItem()
+    coluna = item.column()
+    # Verifica se há um item selecionado
+    if item is not None and coluna == 0:
+        # Obtém o texto da célula
+        valor_celula = item.text()
+
+        # Copia o valor da célula para a área de transferência
+        clipboard = QApplication.clipboard()
+        clipboard.setText(valor_celula)
+        ui.label_msg_copiado.setText("COPIADO!")
+    else:
+        ui.label_msg_copiado.setText("")
+    
 def pegar_valor_tabela(event):
    #evento disparado ao dar double click
 
@@ -782,7 +816,7 @@ def pegar_valor_tabela(event):
 
 def mesclar_pdf(ui):
     try:
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
 
         quantidade_labels_com_imagem = 0
 
@@ -857,67 +891,82 @@ def mesclar_pdf(ui):
 
 def converter_jpg_pdf(ui):
     try:
-        # Abre o explorer para selecionar múltiplos arquivos
-        image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
+        if ui.jpg_para_pdf.isChecked():
+        # Pede ao usuário para selecionar múltiplos arquivos
+            image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
 
-        # Verificar se o usuário selecionou algum arquivo de imagem
-        if not image_paths:
-            return
+            # Verificar se o usuário selecionou algum arquivo de imagem
+            if not image_paths:
+                return
 
-        # Iterar sobre cada caminho de imagem selecionado
-        for image_path in image_paths:
-            # Extrair o nome do arquivo (sem a extensão) do caminho
-            nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
+            # Exibir a barra de progresso antes do loop
+            ui.barra_progresso_jpg.setVisible(True)
 
-            # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
-            save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")], initialfile=nome_do_arquivo, title="Local de download")
+            # Iterar sobre cada caminho de imagem selecionado
+            for idx, image_path in enumerate(image_paths):
+                # Extrair o nome do arquivo (sem a extensão) do caminho
+                nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
 
-            # Verificar se o usuário selecionou um local de salvamento
-            if not save_path:
-                continue  # Continue para o próximo arquivo se o usuário não selecionar um local
+                # Abrir a imagem
+                imagem = Image.open(image_path)
 
-            # Carregar a imagem
-            with Image.open(image_path) as img:
-                # Definir o tamanho padrão
-                target_width, target_height = 1920, 1080
+                # Salvar a imagem como PDF no mesmo local
+                imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
 
-                # Calcular as dimensões da imagem mantendo o aspect ratio
-                aspect_ratio = img.width / img.height
-                if aspect_ratio > 1:
-                    new_width = target_width
-                    new_height = int(target_width / aspect_ratio)
-                else:
-                    new_width = int(target_height * aspect_ratio)
-                    new_height = target_height
+                # Calcular a porcentagem concluída e atualizar a barra de progresso
+                porcentagem = (idx + 1) / len(image_paths) * 100
+                ui.barra_progresso_jpg.setValue(int(porcentagem))
+                QApplication.processEvents()
 
-                # Criar um arquivo PDF com as dimensões calculadas
-                c = canvas.Canvas(save_path, pagesize=(new_width, new_height))
+            # Ocultar a barra de progresso quando o loop terminar
+            ui.barra_progresso_jpg.setVisible(False)
 
-                # Desenhar a imagem no PDF mantendo o aspect ratio
-                c.drawImage(image_path, 0, 0, width=new_width, height=new_height)
+            # Exibir a notificação de conclusão
+            notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
+            notificacao.show()
+        elif ui.pdf_para_jpg.isChecked():
+            # Pede ao usuário para selecionar múltiplos arquivos PDF
+            pdf_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")], title="Converter PDF > img")
 
-                c.save()
+            # Verificar se o usuário selecionou algum arquivo PDF
+            if not pdf_paths:
+                return
 
-            # Limpar as variáveis que contêm o PDF e a imagem
-            del img
-            del c
+            # Exibir a barra de progresso antes do loop
+            ui.barra_progresso_jpg.setVisible(True)
 
-        # Atualizar a barra de progresso para refletir a conclusão do processo
-        ui.barra_progresso_jpg.setVisible(True)
-        ui.barra_progresso_jpg.setValue(100)
-        QApplication.processEvents()
+            # Iterar sobre cada caminho de PDF selecionado
+            for idx, pdf_path in enumerate(pdf_paths):
+                # Extrair o nome do arquivo (sem a extensão) do caminho
+                nome_do_arquivo, _ = os.path.splitext(os.path.basename(pdf_path))
 
-        # Aguardar um curto período para a barra de progresso ser exibida antes de ocultá-la
-        
+                # Abrir o PDF com PyMuPDF
+                pdf_document = fitz.open(pdf_path)
 
-        # Limpar a barra de progresso e exibir a notificação de conclusão
-        ui.barra_progresso_jpg.setVisible(False)
-        notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
-        notificacao.show()
+                # Extrair a primeira página como imagem
+                primeira_pagina = pdf_document.load_page(0)
+                imagem = primeira_pagina.get_pixmap()
+
+                # Converter a imagem para modo RGB
+                imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
+
+                # Salvar a imagem como JPG no mesmo local
+                imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
+
+                # Calcular a porcentagem concluída e atualizar a barra de progresso
+                porcentagem = (idx + 1) / len(pdf_paths) * 100
+                ui.barra_progresso_jpg.setValue(int(porcentagem))
+                QApplication.processEvents()
+
+            # Ocultar a barra de progresso quando o loop terminar
+            ui.barra_progresso_jpg.setVisible(False)
+
+            # Exibir a notificação de conclusão
+            notificacao = Notification(app_id="Concluído", title="", msg="Os PDFs foram convertidos em JPG com sucesso!")
+            notificacao.show()
 
     except Exception as e:
         # Em caso de exceção, lidar com o erro apropriado
-        ui.barra_progresso_jpg.setVisible(False)
         print(f"Erro: {e}")
         return
 
@@ -956,7 +1005,7 @@ def texto_para_pdf(ui):
         notificacao.show()
 
 def carregar_pdf_na_label(ui):
-    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
     options = {}
     options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
     options['multiple'] = True
@@ -964,7 +1013,7 @@ def carregar_pdf_na_label(ui):
     file_paths = filedialog.askopenfilenames(**options)
 
     if file_paths:
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5]
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
 
         for i, pdf_path in enumerate(file_paths):
             if i < len(labels):
@@ -988,11 +1037,26 @@ def limpar_label_pdf(ui):
     ui.label_PDF3.clear()
     ui.label_PDF4.clear()
     ui.label_PDF5.clear()
+    ui.label_PDF6.clear()
+    ui.label_PDF7.clear()
+    ui.label_PDF8.clear()
+    ui.label_PDF9.clear()
+    ui.label_PDF10.clear()
+    ui.label_PDF11.clear()
+    ui.label_PDF12.clear()
+
     ui.label_PDF1.pdf_path = None
     ui.label_PDF2.pdf_path = None
     ui.label_PDF3.pdf_path = None
     ui.label_PDF4.pdf_path = None
     ui.label_PDF5.pdf_path = None
+    ui.label_PDF6.pdf_path = None
+    ui.label_PDF7.pdf_path = None
+    ui.label_PDF8.pdf_path = None
+    ui.label_PDF9.pdf_path = None
+    ui.label_PDF10.pdf_path = None
+    ui.label_PDF11.pdf_path = None
+    ui.label_PDF12.pdf_path = None
 
 def on_close_event(event):
 
@@ -1001,13 +1065,11 @@ def on_close_event(event):
     
     if result == QMessageBox.Yes:
         try:
-            tela_cnpj.close()
-            event.accept()  # Aceita o evento de fechamento
+            event.accept()  
         except:
             event.accept()  
-            
     else:
-        event.ignore()  # Ignora o evento de fechamento
+        event.ignore() 
 
 def copiar_campo(nome_campo):
     
@@ -1062,33 +1124,6 @@ def copiar_campo(nome_campo):
             except:
                 pass
 
-# class TelaCNPJ(QWidget):
-#     def __init__(self, dados_formatados):
-#         super().__init__()
-
-#         self.setWindowTitle("Dados CNPJ")
-#         self.setGeometry(150, 150, 500, 400)  # Ajusta para 200x300
-
-#         layout = QVBoxLayout()
-
-#         self.label_usuario = QLabel("")
-#         self.input_usuario = QTextEdit(self)
-#         self.input_usuario.setPlainText(dados_formatados)  # Preenche o QTextEdit com os dados formatados
-#         self.input_usuario.setReadOnly(True)  # Desativa a edição
-
-#         layout.addWidget(self.label_usuario)
-#         layout.addWidget(self.input_usuario)
-
-#         self.setLayout(layout)
-
-#         # Configuração da fonte para o QTextEdit
-#         fonte = QFont("Calibri", 12)  # Substitua "Calibri" pela fonte desejada
-#         self.input_usuario.setFont(fonte)
-
-#         self.show()
-                 
-# tela_cnpj = None
-
 
 import sys
 app = QtWidgets.QApplication(sys.argv)
@@ -1109,9 +1144,9 @@ ui.botao_consulta_cpf.clicked.connect(lambda:procurar_cpf(ui))
 ui.botao_consulta_cnh.clicked.connect(lambda:procurar_cnh(ui))
 ui.botao_consulta_rg.clicked.connect(lambda:procurar_rg(ui))
 ui.tableWidget.itemDoubleClicked.connect(lambda:pegar_valor_tabela(ui))
+ui.tableWidget.itemClicked.connect(lambda:copiar_pedido_tabela(ui))
 ui.botao_salvar.clicked.connect(lambda:salvar(ui))
 ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
-ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
 ui.botao_converter_jpgPDF.clicked.connect(lambda:converter_jpg_pdf(ui))
 ui.botao_transf_link_PDF.clicked.connect(lambda:texto_para_pdf(ui))
 ui.botao_pasta_cliente.clicked.connect(lambda:criar_pasta_cliente(ui))
@@ -1132,12 +1167,16 @@ ui.campo_seguranca_cnh.mousePressEvent = lambda event: copiar_campo("campo_segur
 ui.campo_rg.mousePressEvent = lambda event: copiar_campo("campo_rg")
 ui.campo_nome_mae.mousePressEvent = lambda event: copiar_campo("campo_nome_mae")
 ui.campo_nome.mousePressEvent = lambda event: copiar_campo("campo_nome")
-
+ui.campo_cnpj_municipio.setReadOnly(True)
+ui.campo_cnpj_uf.setReadOnly(True)
+ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
+ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
 
 
 
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(611, 630)
+janela.setFixedSize(472, 620)
+                    
 janela.show()
 
 
