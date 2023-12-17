@@ -3,6 +3,8 @@ import pandas as pd
 import tkinter as tk
 import os
 import time
+import shutil
+import psutil
 import requests
 import PyPDF2
 import fitz
@@ -14,7 +16,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 from Interface import Ui_janela
 from data_base import *
@@ -40,6 +42,40 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 ref = db.reference("/")
 
 
+def force_close_files_and_delete_folder(folder_path):
+    for _ in range(3):  # Tentar até três vezes
+        try:
+            shutil.rmtree(folder_path)
+            notificacao = Notification(app_id="Pasta excluída com sucesso", title="", msg="")
+            notificacao.show()
+            break
+        except PermissionError as e:
+            # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
+            close_files_in_use(folder_path)
+        except Exception as e:
+            if not os.path.exists(folder_path):  # Verifica se a pasta não existe
+                break
+            
+            notificacao = Notification(app_id="Erro ao excluir pasta do cliente", title="", msg="")
+            notificacao.show()
+            break
+        
+def close_files_in_use(folder_path):
+    processes = psutil.process_iter(['pid', 'name', 'open_files'])
+    for process in processes:
+        try:
+            open_files = process.info.get('open_files')
+            if open_files:
+                for file_info in open_files:
+                    if folder_path in file_info.path:
+                        
+                        # Força o fechamento do processo
+                        psutil.Process(process.info['pid']).terminate()
+                        
+                        
+        except (psutil.AccessDenied, psutil.NoSuchProcess, psutil.ZombieProcess):
+            continue
+
 def criar_pasta_cliente(ui):
     #Tente criar a pasta 
     #caso não consiga,vá para o except
@@ -60,6 +96,9 @@ def criar_pasta_cliente(ui):
                 # Crie a pasta com o nome da variável no diretório selecionado
                 nova_pasta = os.path.join(diretorio, nome_pasta)
                 os.mkdir(nova_pasta)
+                nova_pasta = nova_pasta.replace("/","\\")
+                ui.caminho_pasta.setText(nova_pasta)
+                
                 notificacao = Notification(app_id="Pasta Criada", title="", msg=f"Pasta do cliente {nome_pasta} criada com sucesso!")
                 notificacao.show()
             else:
@@ -91,7 +130,7 @@ def limpar_campos(ui):
     ui.campo_data_agendamento.setDate(data_nula)
     ui.campo_data_nascimento.setDate(data_nula)
     ui.campo_hora_agendamento.setTime(hora)
-    #ui.tableWidget.setRowCount(0)
+    ui.tableWidget.setRowCount(0)
     ui.label_quantidade_bd.setText("")
     ui.campo_nome_mae.setText("")
     ui.campo_cnh.setText("")
@@ -100,6 +139,8 @@ def limpar_campos(ui):
     ui.campo_diretorio_pasta.setText("")
     ui.campo_cnpj_municipio.setText("")
     ui.campo_cnpj_uf.setText("")
+    ui.caminho_pasta.setText("")
+    ui.campo_lista_nome_doc.setCurrentText("")
     limpar_label_pdf(ui)
 
 def procurar_cnh(ui):
@@ -257,13 +298,12 @@ def salvar(ui):
                 mae = ""
                 cnpj = ""
                 email = ""
-                dig_ano = ""
                 data_nascimento = ""
                 cod_seg_cnh = ""
                 diretorio = ""
                 municipio = ""
                 uf = ""
-
+                caminho_pasta = ""
 
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
@@ -274,7 +314,14 @@ def salvar(ui):
                 
             
                 #
-                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                ##############################################################################################################################
+                
+                
+                folder_to_delete = ui.caminho_pasta.text()
+                folder_to_delete_raw = r"{}".format(folder_to_delete)
+                force_close_files_and_delete_folder(folder_to_delete_raw)
+                
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -306,6 +353,7 @@ def salvar(ui):
                 diretorio = ui.campo_diretorio_pasta.toPlainText()
                 municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
+                caminho_pasta = ui.caminho_pasta.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -313,7 +361,7 @@ def salvar(ui):
                     notificacao.show()
                     return
                 #
-                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -341,13 +389,13 @@ def salvar(ui):
         mae = ""
         cnpj = ""
         email = ""
-        dig_ano = ""
         data_nascimento = ""
         cod_seg_cnh = ""
         vendido = ui.campo_lista_status_3.currentText()
         diretorio = ""
         municipio = ""
         uf = ""
+        caminho_pasta = ""
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -357,7 +405,13 @@ def salvar(ui):
         
         
         #
-        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        ##############################################################################################################################
+       
+        folder_to_delete = ui.caminho_pasta.text()
+        folder_to_delete_raw = r"{}".format(folder_to_delete)
+        force_close_files_and_delete_folder(folder_to_delete_raw)
+        
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
         ref.push(novos_dados)
@@ -383,6 +437,7 @@ def salvar(ui):
         diretorio = ui.campo_diretorio_pasta.toPlainText()
         municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
+        caminho_pasta = ui.caminho_pasta.text()
     
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -390,7 +445,7 @@ def salvar(ui):
             notificacao.show()
             return
         #
-        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -428,6 +483,7 @@ def gravar_dados(ui):
                 diretorio = ""
                 municipio = ""
                 uf = ""
+                caminho_pasta = ""
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -437,7 +493,13 @@ def gravar_dados(ui):
                 
 
                 #
-                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                ##############################################################################################################################
+                
+                folder_to_delete = ui.caminho_pasta.text()
+                folder_to_delete_raw = r"{}".format(folder_to_delete)
+                force_close_files_and_delete_folder(folder_to_delete_raw)
+                
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -467,6 +529,7 @@ def gravar_dados(ui):
                 diretorio = ui.campo_diretorio_pasta.toPlainText()
                 municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
+                caminho_pasta = ui.caminho_pasta.text()
 
                 if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -474,7 +537,7 @@ def gravar_dados(ui):
                     notificacao.show()
                     return
                 #
-                novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -505,6 +568,7 @@ def gravar_dados(ui):
         diretorio = ""
         municipio = ""
         uf = ""
+        caminho_pasta = ""
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -513,8 +577,15 @@ def gravar_dados(ui):
             return
         
 
-        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
+        
+        ##############################################################################################################################
+        
+        folder_to_delete = ui.caminho_pasta.text()
+        folder_to_delete_raw = r"{}".format(folder_to_delete)
+        force_close_files_and_delete_folder(folder_to_delete_raw)
+        
         notificacao.show()
         ref.push(novos_dados)
         limpar_campos(ui)
@@ -540,6 +611,7 @@ def gravar_dados(ui):
         diretorio = ui.campo_diretorio_pasta.toPlainText()
         municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
+        caminho_pasta = ui.caminho_pasta.text()
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
@@ -547,7 +619,7 @@ def gravar_dados(ui):
             notificacao.show()
             return
         #
-        novos_dados = {"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -738,6 +810,7 @@ def carregar_dados(ui):
                 ui.campo_diretorio_pasta.setText(req[pedido]['DIRETORIO'])
                 ui.campo_cnpj_municipio.setText(req[pedido]['MUNICIPIO'])
                 ui.campo_cnpj_uf.setText(req[pedido]['UF'])
+                ui.caminho_pasta.setText(req[pedido]['PASTA'])
 
             # Atualize a barra de progresso
             num_pedidos_processados += 1
@@ -817,6 +890,17 @@ def pegar_valor_tabela(event):
 
 def mesclar_pdf(ui):
     try:
+
+        if ui.campo_lista_nome_doc.currentText() == "":
+            nome_documento = ""
+        elif ui.campo_lista_nome_doc.currentText() == "CNH COMPLETA":
+            nome_documento = "CNH COMPLETA"
+        elif ui.campo_lista_nome_doc.currentText() == "":
+            nome_documento = "DOC COMPLETO"
+        elif ui.campo_lista_nome_doc.currentText() == "":
+            nome_documento = "RG COMPLETO"
+
+
         labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
 
         quantidade_labels_com_imagem = 0
@@ -850,7 +934,7 @@ def mesclar_pdf(ui):
 
         # Abrir o explorador de arquivos para selecionar o local de salvamento
         save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],
-                                                title="Local de download")
+                                                title="Local de download",initialfile=nome_documento)
 
         # Verificar se o usuário selecionou um local de salvamento
         if not save_path:
@@ -882,7 +966,7 @@ def mesclar_pdf(ui):
 
         # Informar ao usuário que a mesclagem foi concluída
         ui.barra_progresso_mesclar.setVisible(False)
-        limpar_label_pdf()
+        limpar_label_pdf(ui)
         notificacao = Notification(app_id="Concluído", title="", msg="Os arquivos PDF foram mesclados com sucesso!")
         notificacao.show()
     except:
@@ -1124,11 +1208,37 @@ def copiar_campo(nome_campo):
                 ui.campo_nome.selectAll()
             except:
                 pass
+        case'campo_msg1':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg1.toPlainText())
+            except:
+                pass
+        case'campo_msg2':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg2.toPlainText())
+            except:
+                pass
+        case'campo_msg3':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
+            except:
+                pass
+        case'campo_msg4':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg4.toPlainText())
+            except:
+                pass
+        case'campo_msg5':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg5.toPlainText())
+            except:
+                pass
 
 
 import sys
 app = QtWidgets.QApplication(sys.argv)
 janela = QtWidgets.QMainWindow()
+desktop = QDesktopWidget()
 ui = Ui_janela()
 ui.setupUi(janela)
 
@@ -1168,13 +1278,29 @@ ui.campo_seguranca_cnh.mousePressEvent = lambda event: copiar_campo("campo_segur
 ui.campo_rg.mousePressEvent = lambda event: copiar_campo("campo_rg")
 ui.campo_nome_mae.mousePressEvent = lambda event: copiar_campo("campo_nome_mae")
 ui.campo_nome.mousePressEvent = lambda event: copiar_campo("campo_nome")
+ui.campo_msg1.mousePressEvent = lambda event: copiar_campo("campo_msg1")
+ui.campo_msg2.mousePressEvent = lambda event: copiar_campo("campo_msg2")
+ui.campo_msg3.mousePressEvent = lambda event: copiar_campo("campo_msg3")
+ui.campo_msg4.mousePressEvent = lambda event: copiar_campo("campo_msg4")
+ui.campo_msg5.mousePressEvent = lambda event: copiar_campo("campo_msg5")
 ui.campo_cnpj_municipio.setReadOnly(True)
+ui.campo_msg1.setReadOnly(True)
+ui.campo_msg2.setReadOnly(True)
+ui.campo_msg3.setReadOnly(True)
+ui.campo_msg4.setReadOnly(True)
+ui.campo_msg5.setReadOnly(True)
+
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
+screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
+x = screen_rect.width() - janela.width() - 20
+y = (screen_rect.height() - janela.height()) // 2
+
+janela.move(x, y)
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(475, 600)                
+janela.setFixedSize(475, 600)            
 janela.show()
 
 sys.exit(app.exec_())

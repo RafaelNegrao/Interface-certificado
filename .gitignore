@@ -6,6 +6,8 @@ iconeP.ico
 interface.ui
 Auxiliar.spec
 data_base.py
+exclusao_de_pasta.py
+config.py
 
 
 
