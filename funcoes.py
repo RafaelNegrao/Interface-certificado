@@ -41,13 +41,14 @@ ref = db.reference("/")
 
 
 def criar_pasta_cliente(ui):
+    #Tente criar a pasta 
+    #caso não consiga,vá para o except
     try:
         nome_pasta = ui.campo_nome.text()
         if nome_pasta == '':
             notificacao = Notification(app_id="Pasta não criada", title="", msg="Preencha o NOME do cliente.")
             notificacao.show()
             return
-
         # Obtenha o diretório selecionado
         diretorio = filedialog.askdirectory()
 
@@ -1172,13 +1173,9 @@ ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
 
-
-
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(472, 620)
-                    
+janela.setFixedSize(475, 600)                
 janela.show()
-
 
 sys.exit(app.exec_())
 
