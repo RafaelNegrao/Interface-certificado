@@ -15,12 +15,15 @@ from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
-from PyQt5 import QtGui, QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget
+from PyQt5 import QtGui, QtWidgets,QtCore
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
 from Interface import Ui_janela
 from data_base import *
 from firebase_admin import db
+from PyQt5.QtWidgets import QApplication
+import requests
+
 
 
 credenciais = {
@@ -42,25 +45,25 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 ref = db.reference("/")
 
 
-def force_close_files_and_delete_folder(folder_path):
+def forcar_fechamento_de_arquivo_e_deletar_pasta(folder_path):
     for _ in range(3):  # Tentar até três vezes
         try:
             shutil.rmtree(folder_path)
-            notificacao = Notification(app_id="Pasta excluída com sucesso", title="", msg="")
+            notificacao = Notification(app_id="Pasta excluída com sucesso")
             notificacao.show()
             break
         except PermissionError as e:
             # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
-            close_files_in_use(folder_path)
+            fechar_arquivo_em_uso(folder_path)
         except Exception as e:
             if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                 break
             
-            notificacao = Notification(app_id="Erro ao excluir pasta do cliente", title="", msg="")
+            notificacao = Notification(app_id="Erro ao excluir pasta do cliente")
             notificacao.show()
             break
         
-def close_files_in_use(folder_path):
+def fechar_arquivo_em_uso(folder_path):
     processes = psutil.process_iter(['pid', 'name', 'open_files'])
     for process in processes:
         try:
@@ -77,6 +80,16 @@ def close_files_in_use(folder_path):
             continue
 
 def criar_pasta_cliente(ui):
+    pedido = ui.campo_pedido.text()
+    tipo = ui.campo_certificado.text()
+    hora  = ui.campo_hora_agendamento.text()
+    data = ui.campo_data_agendamento.text()
+    status = ui.campo_lista_status.currentText()
+    modalidade = ui.campo_lista_status_4.currentText()
+    if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+        notificacao = Notification(app_id="Pasta não criada",title="",msg="Adicione os itens com 🌟 para criar a pasta do cliente!",duration="short")
+        notificacao.show()
+        return
     #Tente criar a pasta 
     #caso não consiga,vá para o except
     try:
@@ -98,11 +111,12 @@ def criar_pasta_cliente(ui):
                 os.mkdir(nova_pasta)
                 nova_pasta = nova_pasta.replace("/","\\")
                 ui.caminho_pasta.setText(nova_pasta)
+                salvar(ui)
                 
-                notificacao = Notification(app_id="Pasta Criada", title="", msg=f"Pasta do cliente {nome_pasta} criada com sucesso!")
+                notificacao = Notification(app_id="Pasta Criada", title="", msg=f"Pasta do cliente {nome_pasta} criada com sucesso!",duration="short")
                 notificacao.show()
             else:
-                notificacao = Notification(app_id="Pasta existente", title="", msg=f"Pasta do cliente {nome_pasta} já existe no diretório!")
+                notificacao = Notification(app_id="Pasta existente", title="", msg=f"Pasta do cliente {nome_pasta} já existe no diretório!",duration="short")
                 notificacao.show()
         else:
             return
@@ -141,6 +155,7 @@ def limpar_campos(ui):
     ui.campo_cnpj_uf.setText("")
     ui.caminho_pasta.setText("")
     ui.campo_lista_nome_doc.setCurrentText("")
+    ui.campo_lista_junta_comercial.setCurrentText("")
     limpar_label_pdf(ui)
 
 def procurar_cnh(ui):
@@ -177,6 +192,71 @@ def procurar_cnpj(ui):
     elif ui.campo_cnpj_uf.text() == "---" or ui.campo_cnpj_uf.text() == "":
         pass
 
+def procurar_junta(ui):
+    
+    estado = ui.campo_lista_junta_comercial.currentText()
+
+    match  estado:
+        case "":
+            return
+        case 'AC':
+            link_consulta  = "https://integrar.ac.gov.br/Portal/pages/imagemProcesso/viaUnica.jsf"
+        case 'AL':
+            link_consulta  = "https://servicos.juceal.al.gov.br/autenticidade/"
+        case 'AM':
+            link_consulta  = "https://portalservicos.jucea.am.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf?numProtocolo=220176086"
+        case 'AP':
+            link_consulta  = "https://portalservicos.jucap.ap.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf#:~:text=O%20documento%20%C3%A9%20assinado%20digitalmente,documentos%20enviados%20para%20a%20JUCAP."
+        case 'BA':
+            link_consulta  = "https://regin.juceb.ba.gov.br/AUTENTICACAODOCUMENTOS/AUTENTICACAO.aspx"
+        case 'CE':
+            link_consulta  = "https://portalservicos.jucec.ce.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf"
+        case 'DF':
+            link_consulta  = "https://portalservicos.jucis.df.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf?"
+        case 'ES':
+            link_consulta  = "https://jucees.es.gov.br/autenticidade"
+        case 'GO':
+            link_consulta  = "http://servicos.juceg.go.gov.br/validardocumento/"
+        case 'MA':
+            link_consulta  = "http://portal.jucema.ma.gov.br/certidoes/f/pages/consulta/consulta.xhtml"
+        case 'MT':
+            link_consulta  = "https://portalservicos.jucemat.mt.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf?"
+        case 'MS':
+            link_consulta  = "https://portalservicos.jucems.ms.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf?"
+        case 'MG':
+            link_consulta  = "https://portalservicos.jucemg.mg.gov.br/Portal/pages/imagemProcesso/viaUnica.jsf;jsessionid=tjYHrIwsaxQnbhw-190v0xASyL5s8qfaaI70o8U9.portalexterno-prod-5b844544c8-blwcb"
+        case 'PA':
+            link_consulta  = "https://regin.jucepa.pa.gov.br/autenticacaodocumentos/AUTENTICACAO.aspx"
+        case 'PB':
+            link_consulta  = "https://www.redesim.pb.gov.br/"
+        case 'PR':
+            link_consulta  = "https://www.empresafacil.pr.gov.br/"
+        case 'PE':
+            link_consulta  = "https://redesim.jucepe.pe.gov.br/autenticacaodocumentos/autenticacao.aspx"
+        case 'PI':
+            link_consulta  = "https://www.piauidigital.pi.gov.br/home/"
+        case 'RJ':
+            link_consulta  = "https://www.jucerja.rj.gov.br/Servicos/ChancelaDigital"
+        case 'RS':
+            link_consulta  = "https://portalservicos.jucisrs.rs.gov.br/Portal/pages/imagemProcesso/viaUnica.jsf;jsessionid=NB08GoM1hOr-usaegdPmtpFixQD7JdMmbT1Mn18Q.portalexterno-prod-7c665c8897-8sltz"
+        case 'RS':
+            link_consulta  = "https://projetointegrar.jucerr.rr.gov.br/Portal/pages/imagemProcesso/validacaoDownloadViaUnica.jsf?numProtocolo=210032316#:~:text=Validar%20Documento,-*N%C3%BAmero%20do%20Protocolo&text=O%20novo%20formato%20de%20documento,op%C3%A7%C3%A3o%20'Validar%20por%20Upload'."
+        case 'RR':
+            link_consulta  = "https://regin.jucesc.sc.gov.br/autenticacaoDocumentos/AUTENTICACAO.aspx"
+        case 'SC':
+            link_consulta  = "https://regin.jucesc.sc.gov.br/autenticacaoDocumentos/AUTENTICACAO.aspx"
+        case 'SE':
+            link_consulta  = "https://www.agiliza.se.gov.br/"
+        case 'TO':
+            link_consulta  = "https://www.simplifica.to.gov.br/"
+        case 'RO':
+            link_consulta  = "https://www.empresafacil.ro.gov.br/"
+        case 'RN':
+            link_consulta  = "https://www.redesim.rn.gov.br/"
+
+    url_junta = QUrl(link_consulta)
+    QDesktopServices.openUrl(url_junta)
+
 def dados_cnpj(ui):
     ui.campo_cnpj_municipio.setText("")
     ui.campo_cnpj_uf.setText("")  
@@ -197,6 +277,7 @@ def dados_cnpj(ui):
             
             if uf != "SP":
                 ui.campo_cnpj_uf.setText(str(uf + "⚠"))
+                ui.campo_lista_junta_comercial.setCurrentText(uf)
                 
             else:
                 ui.campo_cnpj_uf.setText(str(uf + "✅"))
@@ -320,11 +401,12 @@ def salvar(ui):
                 
                 folder_to_delete = ui.caminho_pasta.text()
                 folder_to_delete_raw = r"{}".format(folder_to_delete)
-                force_close_files_and_delete_folder(folder_to_delete_raw)
+                forcar_fechamento_de_arquivo_e_deletar_pasta(folder_to_delete_raw)
                 
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
+                limpar_campos(ui)
                 return
             
             
@@ -410,11 +492,12 @@ def salvar(ui):
        
         folder_to_delete = ui.caminho_pasta.text()
         folder_to_delete_raw = r"{}".format(folder_to_delete)
-        force_close_files_and_delete_folder(folder_to_delete_raw)
+        forcar_fechamento_de_arquivo_e_deletar_pasta(folder_to_delete_raw)
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
         ref.push(novos_dados)
+        limpar_campos(ui)
         return
     else:
         pedido = ui.campo_pedido.text()
@@ -498,7 +581,7 @@ def gravar_dados(ui):
                 
                 folder_to_delete = ui.caminho_pasta.text()
                 folder_to_delete_raw = r"{}".format(folder_to_delete)
-                force_close_files_and_delete_folder(folder_to_delete_raw)
+                forcar_fechamento_de_arquivo_e_deletar_pasta(folder_to_delete_raw)
                 
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
@@ -584,7 +667,7 @@ def gravar_dados(ui):
         
         folder_to_delete = ui.caminho_pasta.text()
         folder_to_delete_raw = r"{}".format(folder_to_delete)
-        force_close_files_and_delete_folder(folder_to_delete_raw)
+        forcar_fechamento_de_arquivo_e_deletar_pasta(folder_to_delete_raw)
         
         notificacao.show()
         ref.push(novos_dados)
@@ -708,7 +791,7 @@ def preencher_tabela(ui):
         
         req = ref.get()
         # Ordene a lista de acordo com a data em ordem decrescente
-        req = sorted(req.values(), key=lambda x: datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), reverse=True)
+        req = sorted(req.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
 
         data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
         numero_inteiro_inicial = data_inicial.toordinal()
@@ -890,16 +973,17 @@ def pegar_valor_tabela(event):
 
 def mesclar_pdf(ui):
     try:
-
         if ui.campo_lista_nome_doc.currentText() == "":
-            nome_documento = ""
+            nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:")
+
         elif ui.campo_lista_nome_doc.currentText() == "CNH COMPLETA":
             nome_documento = "CNH COMPLETA"
-        elif ui.campo_lista_nome_doc.currentText() == "":
+        elif ui.campo_lista_nome_doc.currentText() == "DOC COMPLETO":
             nome_documento = "DOC COMPLETO"
-        elif ui.campo_lista_nome_doc.currentText() == "":
+        elif ui.campo_lista_nome_doc.currentText() == "RG COMPLETO":
             nome_documento = "RG COMPLETO"
-
+        elif ui.campo_lista_nome_doc.currentText() == "DOC ADICIONAL":
+            nome_documento = "DOC ADICIONAL"
 
         labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
 
@@ -932,13 +1016,11 @@ def mesclar_pdf(ui):
             if path:
                 pdf_merger.append(path)
 
-        # Abrir o explorador de arquivos para selecionar o local de salvamento
-        save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],
-                                                title="Local de download",initialfile=nome_documento)
+        # Usar o caminho da pasta da primeira label como diretório padrão
+        save_dir = os.path.dirname(file_paths[0]) if file_paths and os.path.dirname(file_paths[0]) else os.path.expanduser("~")
 
-        # Verificar se o usuário selecionou um local de salvamento
-        if not save_path:
-            return
+        # Construir o caminho completo para o arquivo a ser salvo
+        save_path = os.path.join(save_dir, f"{nome_documento}.pdf")
 
         # Configurar a barra de progresso
         ui.barra_progresso_mesclar.setMaximum(len(file_paths))
@@ -952,7 +1034,7 @@ def mesclar_pdf(ui):
             time.sleep(0.1)
             QApplication.processEvents()
 
-        # Salvar o arquivo mesclado no local especificado
+        # Salvar o arquivo mesclado diretamente na pasta especificada
         with open(save_path, 'wb') as merged_pdf:
             pdf_merger.write(merged_pdf)
 
@@ -963,13 +1045,15 @@ def mesclar_pdf(ui):
         del file_paths
         del save_path
         pdf_merger.close()
+        del pdf_merger
 
         # Informar ao usuário que a mesclagem foi concluída
         ui.barra_progresso_mesclar.setVisible(False)
         limpar_label_pdf(ui)
         notificacao = Notification(app_id="Concluído", title="", msg="Os arquivos PDF foram mesclados com sucesso!")
         notificacao.show()
-    except:
+    except Exception as e:
+        print(f"Erro: {e}")
         limpar_label_pdf(ui)
         ui.barra_progresso_mesclar.setVisible(False)
         return
@@ -1142,7 +1226,7 @@ def limpar_label_pdf(ui):
     ui.label_PDF10.pdf_path = None
     ui.label_PDF11.pdf_path = None
     ui.label_PDF12.pdf_path = None
-
+    
 def on_close_event(event):
 
     
@@ -1233,7 +1317,50 @@ def copiar_campo(nome_campo):
                 QApplication.clipboard().setText(ui.campo_msg5.toPlainText())
             except:
                 pass
+        case'campo_msg6':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg6.toPlainText())
+            except:
+                pass
+        case'campo_msg7':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg7.toPlainText())
+            except:
+                pass
 
+def verificar_atualizacao():
+    # URL do arquivo da versão mais recente
+    url_nova_versao = 'https://github.com/RafaelNegrao/Interface-certificado/raw/main/versao.txt'
+   
+    response = requests.get(url_nova_versao)
+    data = response.json()
+    nova_versao = data['tag_name']
+    print(data)
+
+class JanelaOcultaHelper:
+    def __init__(self, parent):
+        self.parent = parent
+
+    def enterEvent(self, event):
+        
+        self.parent.setFixedSize(473, 595)
+
+    def leaveEvent(self, event):
+        cursor_pos = QtGui.QCursor.pos()
+        window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
+        window_rect = QtCore.QRect(window_pos, self.parent.size())
+
+        # Verifica se o mouse está dentro da janela
+        mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+
+        if mouse_dentro_da_janela:
+            pass
+        else:
+            self.parent.setFixedSize(250, 23)
+        
+
+    def mousePressEvent(self, event):
+        self.parent.setFixedSize(473, 595)
 
 import sys
 app = QtWidgets.QApplication(sys.argv)
@@ -1243,6 +1370,10 @@ ui = Ui_janela()
 ui.setupUi(janela)
 
 
+helper = JanelaOcultaHelper(janela)
+janela.enterEvent = helper.enterEvent
+janela.leaveEvent = helper.leaveEvent
+janela.mousePressEvent = helper.mousePressEvent
 ui.botao_consultar.clicked.connect(lambda:preencher_tabela(ui))
 ui.botao_terminar.clicked.connect(lambda:gravar_dados(ui))
 ui.botao_procurar.clicked.connect(lambda:exportar_excel(ui))
@@ -1257,12 +1388,13 @@ ui.botao_consulta_rg.clicked.connect(lambda:procurar_rg(ui))
 ui.tableWidget.itemDoubleClicked.connect(lambda:pegar_valor_tabela(ui))
 ui.tableWidget.itemClicked.connect(lambda:copiar_pedido_tabela(ui))
 ui.botao_salvar.clicked.connect(lambda:salvar(ui))
+ui.botao_junta.clicked.connect(lambda:procurar_junta(ui))
 ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
 ui.botao_converter_jpgPDF.clicked.connect(lambda:converter_jpg_pdf(ui))
 ui.botao_transf_link_PDF.clicked.connect(lambda:texto_para_pdf(ui))
 ui.botao_pasta_cliente.clicked.connect(lambda:criar_pasta_cliente(ui))
-ui.campo_data_de.setDate(QDate.currentDate().addDays(1 - QDate.currentDate().day()))
-ui.campo_data_ate.setDate(QDate(QDate.currentDate().year(), QDate.currentDate().month(), QDate.currentDate().daysInMonth()))
+ui.campo_data_de.setDate(QDate.currentDate())
+ui.campo_data_ate.setDate(QDate.currentDate())
 ui.botao_selecionar_arquivos_mesclar.clicked.connect(lambda:carregar_pdf_na_label(ui))
 ui.botao_limpar_PDF.clicked.connect(lambda:limpar_label_pdf(ui))
 ui.barra_progresso_jpg.setVisible(False)
@@ -1283,12 +1415,20 @@ ui.campo_msg2.mousePressEvent = lambda event: copiar_campo("campo_msg2")
 ui.campo_msg3.mousePressEvent = lambda event: copiar_campo("campo_msg3")
 ui.campo_msg4.mousePressEvent = lambda event: copiar_campo("campo_msg4")
 ui.campo_msg5.mousePressEvent = lambda event: copiar_campo("campo_msg5")
+ui.campo_msg6.mousePressEvent = lambda event: copiar_campo("campo_msg6")
+ui.campo_msg7.mousePressEvent = lambda event: copiar_campo("campo_msg7")
 ui.campo_cnpj_municipio.setReadOnly(True)
 ui.campo_msg1.setReadOnly(True)
 ui.campo_msg2.setReadOnly(True)
 ui.campo_msg3.setReadOnly(True)
 ui.campo_msg4.setReadOnly(True)
 ui.campo_msg5.setReadOnly(True)
+ui.campo_msg6.setReadOnly(True)
+ui.campo_msg7.setReadOnly(True)
+
+
+
+
 
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
@@ -1296,12 +1436,14 @@ ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
 x = screen_rect.width() - janela.width() - 20
-y = (screen_rect.height() - janela.height()) // 2
-
+y = (screen_rect.height() - janela.height()) // 6
+verificar_atualizacao(ui)
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(475, 600)            
+janela.setFixedSize(250, 25)           
 janela.show()
+
+
 
 sys.exit(app.exec_())
 

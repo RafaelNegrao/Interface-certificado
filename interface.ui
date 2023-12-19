@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>477</width>
-    <height>601</height>
+    <width>474</width>
+    <height>597</height>
    </rect>
   </property>
   <property name="palette">
@@ -66,7 +66,7 @@
       <x>0</x>
       <y>0</y>
       <width>481</width>
-      <height>651</height>
+      <height>606</height>
      </rect>
     </property>
     <property name="maximumSize">
@@ -160,7 +160,7 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>55</y>
+        <y>60</y>
         <width>241</width>
         <height>16</height>
        </rect>
@@ -466,9 +466,9 @@
      <widget class="QPushButton" name="botao_terminar">
       <property name="geometry">
        <rect>
-        <x>355</x>
+        <x>350</x>
         <y>530</y>
-        <width>106</width>
+        <width>111</width>
         <height>31</height>
        </rect>
       </property>
@@ -495,9 +495,9 @@ background-color:rgb(73, 218, 107);</string>
      <widget class="QPushButton" name="botao_salvar">
       <property name="geometry">
        <rect>
-        <x>355</x>
+        <x>350</x>
         <y>490</y>
-        <width>106</width>
+        <width>111</width>
         <height>31</height>
        </rect>
       </property>
@@ -638,7 +638,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -688,7 +688,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -752,16 +752,16 @@ background-color:rgb(0, 180, 210);
      <widget class="QDateEdit" name="campo_data_nascimento">
       <property name="geometry">
        <rect>
-        <x>340</x>
+        <x>330</x>
         <y>240</y>
-        <width>121</width>
+        <width>131</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -782,7 +782,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -886,7 +886,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -910,7 +910,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1032,14 +1032,14 @@ background-color:rgb(0, 180, 210);
        <rect>
         <x>10</x>
         <y>240</y>
-        <width>321</width>
+        <width>316</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>75</weight>
         <bold>true</bold>
        </font>
@@ -1066,7 +1066,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1113,7 +1113,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1137,7 +1137,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1167,7 +1167,7 @@ background-color:rgb(0, 180, 210);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1256,14 +1256,14 @@ background-color:rgb(0, 180, 210);
        <rect>
         <x>10</x>
         <y>490</y>
-        <width>336</width>
+        <width>236</width>
         <height>71</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1317,7 +1317,7 @@ background-color:rgb(0, 180, 210);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>585</y>
+        <y>635</y>
         <width>451</width>
         <height>31</height>
        </rect>
@@ -1338,6 +1338,216 @@ background-color:rgb(0, 180, 210);
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_lista_junta_comercial">
+      <property name="geometry">
+       <rect>
+        <x>255</x>
+        <y>490</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AM</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>BA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DF</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ES</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>GO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MG</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PI</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RJ</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>TO</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QPushButton" name="botao_junta">
+      <property name="geometry">
+       <rect>
+        <x>255</x>
+        <y>530</y>
+        <width>81</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Century Gothic</family>
+        <pointsize>12</pointsize>
+        <weight>75</weight>
+        <italic>false</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string>IR</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>260</x>
+        <y>475</y>
+        <width>71</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color: #333;</string>
+      </property>
+      <property name="text">
+       <string>JUNTA COM.</string>
       </property>
      </widget>
      <zorder>campo_cnh</zorder>
@@ -1390,6 +1600,9 @@ background-color:rgb(0, 180, 210);
      <zorder>botao_consulta_cnpj</zorder>
      <zorder>line</zorder>
      <zorder>caminho_pasta</zorder>
+     <zorder>campo_lista_junta_comercial</zorder>
+     <zorder>botao_junta</zorder>
+     <zorder>label_28</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -1399,7 +1612,7 @@ background-color:rgb(0, 180, 210);
       <property name="geometry">
        <rect>
         <x>330</x>
-        <y>540</y>
+        <y>530</y>
         <width>131</width>
         <height>31</height>
        </rect>
@@ -1428,7 +1641,7 @@ background-color:rgb(73, 218, 107);
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>540</y>
+        <y>530</y>
         <width>181</width>
         <height>31</height>
        </rect>
@@ -1460,7 +1673,7 @@ background-color:rgb(73, 218, 107);
         <x>10</x>
         <y>100</y>
         <width>451</width>
-        <height>431</height>
+        <height>421</height>
        </rect>
       </property>
       <property name="font">
@@ -1728,7 +1941,7 @@ background-color:rgb(73, 218, 107);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>540</y>
+        <y>530</y>
         <width>111</width>
         <height>31</height>
        </rect>
@@ -1765,13 +1978,13 @@ background-color:rgb(73, 218, 107);
         <x>10</x>
         <y>20</y>
         <width>451</width>
-        <height>126</height>
+        <height>96</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>9</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1779,30 +1992,34 @@ background-color:rgb(73, 218, 107);
       <property name="cursor" stdset="0">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica','Helvetica'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Olá! tudo bem?&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Preciso de uma foto completa do seu documento de identificação,podendo ser (CNH, RG, OAB),&lt;span style=&quot; font-weight:600;&quot;&gt; FRENTE E VERSO&lt;/span&gt;.&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;-Por favor, retire o documento do plástico e abra-o. &lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;-O VERSO é a parte que contém o QR code.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Olá! tudo bem?&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Preciso de uma foto completa do seu documento de identificação,podendo ser (CNH, RG, OAB),&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica'; font-weight:600;&quot;&gt; FRENTE E VERSO&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;--Por favor, retire o documento do plástico e abra-o. &lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;--O VERSO é a parte que contém o QR code.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="campo_msg3">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>240</y>
+        <y>210</y>
         <width>451</width>
-        <height>66</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>9</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1810,27 +2027,31 @@ p, li { white-space: pre-wrap; }
       <property name="cursor" stdset="0">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica','Helvetica'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;O senhor é o responsável legal pela empresa perante a Receita Federal?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;O senhor é o responsável legal pela empresa perante a Receita Federal?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="campo_msg5">
+     <widget class="QTextEdit" name="campo_msg7">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>385</y>
+        <y>440</y>
         <width>451</width>
-        <height>91</height>
+        <height>61</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>9</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1838,27 +2059,31 @@ p, li { white-space: pre-wrap; }
       <property name="cursor" stdset="0">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica','Helvetica'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Agradeço pela disponibilidade. Se desejar adquirir mais certificados, você pode fazê-lo através do seguinte link: &lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;https://loja.certisign.com.br/?cod_rev=91384&lt;/span&gt;&lt;/a&gt;. Até mais!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Agradeço pela disponibilidade. Se precisar adquirir mais certificados, pode fazê-lo através do link: &lt;/span&gt;&lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica'; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;https://loja.certisign.com.br/?cod_rev=91384&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;. Até mais!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="campo_msg2">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>160</y>
+        <y>130</y>
         <width>451</width>
-        <height>66</height>
+        <height>61</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>9</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1866,27 +2091,63 @@ p, li { white-space: pre-wrap; }
       <property name="cursor" stdset="0">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica','Helvetica'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Irei precisar também do documento de constituição da empresa, podendo ser o&lt;span style=&quot; font-weight:600;&quot;&gt; Contrato Social, Certidão de inteiro teor ,Estatuto social,Requerimento de empresário.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Irei precisar também do documento de constituição da empresa, podendo ser o&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica'; font-weight:600;&quot;&gt; Contrato Social, Certidão de inteiro teor ,Estatuto social,Requerimento de empresário.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="campo_msg6">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>380</y>
+        <width>451</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Podemos iniciar a vídeo-conferência?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="campo_msg4">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>320</y>
+        <y>260</y>
         <width>451</width>
-        <height>51</height>
+        <height>36</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>12</pointsize>
+        <pointsize>9</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1894,12 +2155,74 @@ p, li { white-space: pre-wrap; }
       <property name="cursor" stdset="0">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
       <property name="html">
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica','Helvetica'; font-size:12pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Podemos iniciar a vídeo-conferência?&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Deseja adicionar o número do PIS/CEI ao seu certificado?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="campo_msg5">
+      <property name="geometry">
+       <rect>
+        <x>70</x>
+        <y>310</y>
+        <width>391</width>
+        <height>51</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border: 2px solid #031525;
+</string>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica','Helvetica';&quot;&gt;Caso o senhor tenha funcionário e deseja acessar o e-CAC, será necessário o número do PIS/CEI&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_2">
+      <property name="geometry">
+       <rect>
+        <x>30</x>
+        <y>320</y>
+        <width>41</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_3">
+      <property name="geometry">
+       <rect>
+        <x>20</x>
+        <y>300</y>
+        <width>21</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </widget>
@@ -1999,9 +2322,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>130</y>
+        <y>125</y>
         <width>451</width>
-        <height>321</height>
+        <height>326</height>
        </rect>
       </property>
       <property name="font">
@@ -2451,32 +2774,12 @@ border-radius:10px;</string>
         </property>
        </item>
       </widget>
-      <widget class="QLabel" name="label_8">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>20</y>
-         <width>181</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>nome arquivo</string>
-       </property>
-      </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>460</y>
+        <y>450</y>
         <width>451</width>
         <height>111</height>
        </rect>
@@ -2497,9 +2800,9 @@ border-radius:10px;</string>
       <widget class="QPushButton" name="botao_converter_jpgPDF">
        <property name="geometry">
         <rect>
-         <x>175</x>
+         <x>155</x>
          <y>50</y>
-         <width>91</width>
+         <width>131</width>
          <height>31</height>
         </rect>
        </property>
@@ -2521,10 +2824,58 @@ border-radius:10px;</string>
         <string>CONVERTER</string>
        </property>
       </widget>
+      <widget class="QRadioButton" name="pdf_para_jpg">
+       <property name="geometry">
+        <rect>
+         <x>260</x>
+         <y>25</y>
+         <width>111</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>PDF &gt; JPG</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="jpg_para_pdf">
+       <property name="geometry">
+        <rect>
+         <x>70</x>
+         <y>25</y>
+         <width>116</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>12</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>JPG &gt; PDF</string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
       <widget class="QProgressBar" name="barra_progresso_jpg">
        <property name="geometry">
         <rect>
-         <x>25</x>
+         <x>20</x>
          <y>90</y>
          <width>411</width>
          <height>8</height>
@@ -2546,54 +2897,6 @@ border-radius:10px;</string>
        </property>
        <property name="format">
         <string/>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="pdf_para_jpg">
-       <property name="geometry">
-        <rect>
-         <x>60</x>
-         <y>25</y>
-         <width>106</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>PDF &gt; JPG</string>
-       </property>
-      </widget>
-      <widget class="QRadioButton" name="jpg_para_pdf">
-       <property name="geometry">
-        <rect>
-         <x>270</x>
-         <y>25</y>
-         <width>116</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="font">
-        <font>
-         <family>Helvetica</family>
-         <pointsize>12</pointsize>
-         <weight>50</weight>
-         <bold>false</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>JPG &gt; PDF</string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
        </property>
       </widget>
      </widget>
