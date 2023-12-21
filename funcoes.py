@@ -10,7 +10,6 @@ import PyPDF2
 import fitz
 import firebase_admin
 from winotify import Notification
-from PyQt5.QtGui import QDesktopServices,QPixmap,QImage
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -18,11 +17,15 @@ from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt
+from PyQt5.QtGui import QDesktopServices,QPixmap,QImage,QColor
+from PyQt5.QtWidgets import QApplication,QFileDialog,QMainWindow
 from Interface import Ui_janela
 from data_base import *
 from firebase_admin import db
-from PyQt5.QtWidgets import QApplication
-import requests
+import pyautogui
+from reportlab.lib.pagesizes import letter
+from reportlab.lib.utils import ImageReader
+
 
 
 
@@ -44,6 +47,125 @@ acoes = firebase_admin.credentials.Certificate(credenciais)
 firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
 ref = db.reference("/")
 
+
+
+def converter_todas_imagens_para_pdf(ui):
+    caminho_pasta = ui.caminho_pasta.text()
+
+    if caminho_pasta != "":
+        for arquivo in os.listdir(caminho_pasta):
+            if arquivo.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                imagem_path = os.path.join(caminho_pasta, arquivo)
+
+                # Cria um arquivo PDF com o mesmo nome da imagem
+                pdf_path = os.path.splitext(imagem_path)[0] + ".pdf"
+                pdf = canvas.Canvas(pdf_path, pagesize=letter)
+
+                # Adiciona a imagem ao PDF mantendo as dimensões originais
+                imagem = ImageReader(imagem_path)
+                largura, altura = imagem.getSize()
+                
+                # Ajusta as dimensões do PDF conforme as dimensões da imagem
+                pdf.setPageSize((largura, altura))
+                pdf.drawImage(imagem, 0, 0, width=largura, height=altura)
+
+                # Fecha o arquivo PDF
+                pdf.save()
+
+                notificacao = Notification(app_id="", title="", msg=f"Todas imagens foram convertidas em PDF!")
+                notificacao.show()
+                print(f'Imagem {arquivo} convertida para {pdf_path}')
+    else:
+        notificacao = Notification(app_id="", title="", msg=f"É necessário criar pasta do cliente para conversão!")
+        notificacao.show()
+
+def obter_janela_principal(widget):
+    # Função para obter a janela principal a partir de um widget
+    while widget:
+        if isinstance(widget, QMainWindow):
+            return widget
+        widget = widget.parent()
+    return None
+
+def print_tela(ui):
+    caminho = ui.caminho_pasta.text()
+
+    if not caminho:
+        nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:")
+        if not ok or not nome_documento:           
+            return
+
+        caminho_escolhido = QFileDialog.getExistingDirectory(ui.centralwidget, 'Escolher Pasta', '/')
+        if not caminho_escolhido:      
+            return
+
+        caminho = f"{caminho_escolhido}/{nome_documento}.png"
+    else:
+        nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:")
+        caminho = f"{caminho}/{nome_documento}.png"
+    janela_principal = obter_janela_principal(ui.centralwidget)
+
+    if janela_principal:
+        # Minimiza a janela principal
+        janela_principal.showMinimized()
+
+    # Aguarda um curto período para garantir que a janela tenha tempo de minimizar
+    time.sleep(0.7)
+
+    # Tira um screenshot da tela
+    screenshot = pyautogui.screenshot()
+    screenshot = pyautogui.screenshot()
+
+    # Restaura a janela principal (opcional)
+    if janela_principal:
+        janela_principal.showNormal()
+
+    # Salva o screenshot no caminho especificado
+    screenshot.save(caminho)
+
+def gerar_link_video_conferencia(ui):
+    pedido = ui.campo_pedido.text()
+    if not pedido:
+        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário ter o número do pedido!")
+        notificacao.show()
+        return
+    if ui.caminho_pasta.text() == "":
+        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar a pasta do cliente!")
+        notificacao.show()
+        return
+
+    link = f"https://certisign.omotor.com.br/#/dossie-detail/{pedido}"
+
+    try:
+        default_file_name = "LINK VIDEO"
+        
+        # Obtém o caminho do arquivo diretamente do campo_pasta
+        save_path = ui.caminho_pasta.text()
+
+        if not save_path:
+            return
+
+        # Adiciona a extensão PDF se não estiver presente
+        if not save_path.lower().endswith(".pdf"):
+            save_path = os.path.join(save_path, f"{default_file_name}.pdf")
+        # Criar um arquivo PDF
+        c = canvas.Canvas(save_path, pagesize=letter)
+        # Definir o tamanho da fonte e a posição para começar a escrever o texto
+        font_size = 14
+        x, y = 20, 680  # Posição inicial
+        # Adicionar o texto ao PDF
+        c.setFont("Helvetica", font_size)
+        for line in link.split('\n'):
+            c.drawString(x, y, line)
+            y -= 15  # Espaçamento entre as linhas
+        # Salvar o arquivo PDF
+        c.save()
+        ui.campo_link_video.setText("")
+        notificacao = Notification(app_id="Concluído", title="", msg=f"Texto salvo com sucesso!")
+        notificacao.show()
+    except Exception as e:
+        notificacao = Notification(app_id="Erro", title="", msg=f"Feche o arquivo PDF!")
+        notificacao.show()
 
 def forcar_fechamento_de_arquivo_e_deletar_pasta(folder_path):
     for _ in range(3):  # Tentar até três vezes
@@ -175,22 +297,9 @@ def procurar_rg(ui):
 
 def procurar_cnpj(ui):
     
-    if  ui.campo_cnpj_uf.text() == 'SP✅':
-        
-        cnpj = ui.campo_cnpj.text()
-        url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
-        QDesktopServices.openUrl(url_receita)
-        url_jucesp = QUrl("https://www.jucesponline.sp.gov.br/")
-        QDesktopServices.openUrl(url_jucesp)
-
-    elif ui.campo_cnpj_uf.text() != 'SP✅' and ui.campo_cnpj_uf.text() != "---" and ui.campo_cnpj_uf.text() != "":
-        
-        cnpj = ui.campo_cnpj.text()
-        url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}") 
-        QDesktopServices.openUrl(url_receita)
-
-    elif ui.campo_cnpj_uf.text() == "---" or ui.campo_cnpj_uf.text() == "":
-        pass
+    cnpj = ui.campo_cnpj.text()
+    url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
+    QDesktopServices.openUrl(url_receita)
 
 def procurar_junta(ui):
     
@@ -253,9 +362,20 @@ def procurar_junta(ui):
             link_consulta  = "https://www.empresafacil.ro.gov.br/"
         case 'RN':
             link_consulta  = "https://www.redesim.rn.gov.br/"
+        case 'SP':
+            link_consulta  = "https://www.jucesponline.sp.gov.br/"
+
 
     url_junta = QUrl(link_consulta)
     QDesktopServices.openUrl(url_junta)
+
+def formatar_nome(ui):
+    nome = ui.campo_nome.text()  # Obtenha o texto do campo_nome_mae
+    ui.campo_nome.setText(nome.upper())
+
+def formatar_nome_mae(ui):
+    texto_mae = ui.campo_nome_mae.text()  # Obtenha o texto do campo_nome_mae
+    ui.campo_nome_mae.setText(texto_mae.upper())
 
 def dados_cnpj(ui):
     ui.campo_cnpj_municipio.setText("")
@@ -281,6 +401,7 @@ def dados_cnpj(ui):
                 
             else:
                 ui.campo_cnpj_uf.setText(str(uf + "✅"))
+                ui.campo_lista_junta_comercial.setCurrentText(uf)
 
         else:
             ui.campo_cnpj_municipio.setText("")
@@ -831,6 +952,27 @@ def preencher_tabela(ui):
                         ui.tableWidget.setItem(row_position, 8, QTableWidgetItem(pedido_info['DIRETORIO']))
                     except:
                         pass
+
+                    for col in range(ui.tableWidget.columnCount()):
+                        item = ui.tableWidget.item(row_position, col)
+
+                        # Obter a data e hora da célula
+                        data_celula = ui.tableWidget.item(row_position, 2).text()
+                        hora_celula = ui.tableWidget.item(row_position, 3).text()
+
+                        # Converter as strings em objetos datetime
+                        data_hora_celula = datetime.datetime.strptime(f"{data_celula} {hora_celula}", "%d/%m/%Y %H:%M")
+
+                        # Verificar se a célula não está vazia
+                        if item is not None:
+                            # Comparar com a data e hora atuais
+                            if data_hora_celula <= datetime.datetime.now():
+                                #item.setBackground(QColor(227, 225, 225))   
+                                pass                       
+                            else:
+                                # Configurar o fundo para azul claro para todas as outras células
+                                item.setBackground(QColor(177, 215, 252))  # Azul claro
+                        
                     y += 1
                     porcentagem = (y/total_pedidos)*100
                     ui.barra_progresso_consulta.setValue(int(porcentagem))
@@ -852,6 +994,7 @@ def preencher_tabela(ui):
             ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
+            print(e)
             pass
 
 def carregar_dados(ui):
@@ -924,7 +1067,7 @@ def copiar_pedido_tabela(event):
         ui.label_msg_copiado.setText("")
     
 def pegar_valor_tabela(event):
-   #evento disparado ao dar double click
+   #evento disparado ao dar double click na tabela
 
     req = ref.get()
     item = ui.tableWidget.currentItem()  # Obtenha o item selecionado
@@ -966,6 +1109,10 @@ def pegar_valor_tabela(event):
                         ui.campo_diretorio_pasta.setText(req[id]['DIRETORIO'])
                         ui.campo_cnpj_municipio.setText(req[id]['MUNICIPIO'])
                         ui.campo_cnpj_uf.setText(req[id]['UF'])
+                        try:
+                            ui.caminho_pasta.setText(req[id]['PASTA'])
+                        except:
+                            pass
                         return
                         
     except Exception as e:
@@ -985,7 +1132,7 @@ def mesclar_pdf(ui):
         elif ui.campo_lista_nome_doc.currentText() == "DOC ADICIONAL":
             nome_documento = "DOC ADICIONAL"
 
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
 
         quantidade_labels_com_imagem = 0
 
@@ -1174,7 +1321,7 @@ def texto_para_pdf(ui):
         notificacao.show()
 
 def carregar_pdf_na_label(ui):
-    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
+    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
     options = {}
     options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
     options['multiple'] = True
@@ -1182,7 +1329,7 @@ def carregar_pdf_na_label(ui):
     file_paths = filedialog.askopenfilenames(**options)
 
     if file_paths:
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6, ui.label_PDF7, ui.label_PDF8, ui.label_PDF9, ui.label_PDF10, ui.label_PDF11, ui.label_PDF12]
+        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
 
         for i, pdf_path in enumerate(file_paths):
             if i < len(labels):
@@ -1207,12 +1354,6 @@ def limpar_label_pdf(ui):
     ui.label_PDF4.clear()
     ui.label_PDF5.clear()
     ui.label_PDF6.clear()
-    ui.label_PDF7.clear()
-    ui.label_PDF8.clear()
-    ui.label_PDF9.clear()
-    ui.label_PDF10.clear()
-    ui.label_PDF11.clear()
-    ui.label_PDF12.clear()
 
     ui.label_PDF1.pdf_path = None
     ui.label_PDF2.pdf_path = None
@@ -1220,13 +1361,7 @@ def limpar_label_pdf(ui):
     ui.label_PDF4.pdf_path = None
     ui.label_PDF5.pdf_path = None
     ui.label_PDF6.pdf_path = None
-    ui.label_PDF7.pdf_path = None
-    ui.label_PDF8.pdf_path = None
-    ui.label_PDF9.pdf_path = None
-    ui.label_PDF10.pdf_path = None
-    ui.label_PDF11.pdf_path = None
-    ui.label_PDF12.pdf_path = None
-    
+ 
 def on_close_event(event):
 
     
@@ -1328,39 +1463,30 @@ def copiar_campo(nome_campo):
             except:
                 pass
 
-def verificar_atualizacao():
-    # URL do arquivo da versão mais recente
-    url_nova_versao = 'https://github.com/RafaelNegrao/Interface-certificado/raw/main/versao.txt'
-   
-    response = requests.get(url_nova_versao)
-    data = response.json()
-    nova_versao = data['tag_name']
-    print(data)
-
 class JanelaOcultaHelper:
     def __init__(self, parent):
         self.parent = parent
 
     def enterEvent(self, event):
-        
-        self.parent.setFixedSize(473, 595)
+            self.parent.setFixedSize(465, 630)
 
     def leaveEvent(self, event):
-        cursor_pos = QtGui.QCursor.pos()
-        window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
-        window_rect = QtCore.QRect(window_pos, self.parent.size())
+        if not ui.campo_tela_cheia.isChecked():
+            cursor_pos = QtGui.QCursor.pos()
+            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
+            window_rect = QtCore.QRect(window_pos, self.parent.size())
 
-        # Verifica se o mouse está dentro da janela
-        mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+            # Verifica se o mouse está dentro da janela
+            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
-        if mouse_dentro_da_janela:
-            pass
-        else:
-            self.parent.setFixedSize(250, 23)
+            if mouse_dentro_da_janela:
+                pass
+            else:
+                self.parent.setFixedSize(213, 38)
         
 
     def mousePressEvent(self, event):
-        self.parent.setFixedSize(473, 595)
+        self.parent.setFixedSize(465, 630)
 
 import sys
 app = QtWidgets.QApplication(sys.argv)
@@ -1381,6 +1507,8 @@ ui.campo_cpf.editingFinished.connect(lambda:formatar_cpf(ui))
 ui.campo_pedido.editingFinished.connect(lambda:carregar_dados(ui))
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
 ui.campo_cnpj.editingFinished.connect (lambda:formatar_cnpj(ui))
+ui.campo_nome.editingFinished.connect(lambda:formatar_nome(ui))
+ui.campo_nome_mae.editingFinished.connect(lambda:formatar_nome_mae(ui))
 ui.botao_consulta_cnpj.clicked.connect(lambda:procurar_cnpj(ui))
 ui.botao_consulta_cpf.clicked.connect(lambda:procurar_cpf(ui))
 ui.botao_consulta_cnh.clicked.connect(lambda:procurar_cnh(ui))
@@ -1389,10 +1517,13 @@ ui.tableWidget.itemDoubleClicked.connect(lambda:pegar_valor_tabela(ui))
 ui.tableWidget.itemClicked.connect(lambda:copiar_pedido_tabela(ui))
 ui.botao_salvar.clicked.connect(lambda:salvar(ui))
 ui.botao_junta.clicked.connect(lambda:procurar_junta(ui))
+ui.botao_print_direto_na_pasta.clicked.connect(lambda:print_tela(ui))
 ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
 ui.botao_converter_jpgPDF.clicked.connect(lambda:converter_jpg_pdf(ui))
 ui.botao_transf_link_PDF.clicked.connect(lambda:texto_para_pdf(ui))
 ui.botao_pasta_cliente.clicked.connect(lambda:criar_pasta_cliente(ui))
+ui.botao_gerar_link.clicked.connect(lambda:gerar_link_video_conferencia(ui))
+ui.botao_converter_todas_imagens_em_pdf.clicked.connect(lambda:converter_todas_imagens_para_pdf(ui))
 ui.campo_data_de.setDate(QDate.currentDate())
 ui.campo_data_ate.setDate(QDate.currentDate())
 ui.botao_selecionar_arquivos_mesclar.clicked.connect(lambda:carregar_pdf_na_label(ui))
@@ -1425,24 +1556,21 @@ ui.campo_msg4.setReadOnly(True)
 ui.campo_msg5.setReadOnly(True)
 ui.campo_msg6.setReadOnly(True)
 ui.campo_msg7.setReadOnly(True)
-
-
-
-
-
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
+ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
+ui.botao_gerar_link.setToolTip("Gera a link da vídeo-conferência")
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
+ui.campo_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
 x = screen_rect.width() - janela.width() - 20
 y = (screen_rect.height() - janela.height()) // 6
-verificar_atualizacao(ui)
+
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(250, 25)           
+janela.setFixedSize(213, 38)           
 janela.show()
-
 
 
 sys.exit(app.exec_())
