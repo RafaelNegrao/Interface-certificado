@@ -15,17 +15,13 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog
-from PyQt5.QtCore import QDate, QTime,QUrl, Qt
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog
+from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect
 from PyQt5.QtGui import QDesktopServices,QPixmap,QImage,QColor
-from PyQt5.QtWidgets import QApplication,QFileDialog,QMainWindow
 from Interface import Ui_janela
-from data_base import *
 from firebase_admin import db
 import pyautogui
-from reportlab.lib.pagesizes import letter
 from reportlab.lib.utils import ImageReader
-
 
 
 
@@ -72,11 +68,11 @@ def converter_todas_imagens_para_pdf(ui):
                 # Fecha o arquivo PDF
                 pdf.save()
 
-                notificacao = Notification(app_id="", title="", msg=f"Todas imagens foram convertidas em PDF!")
-                notificacao.show()
-                print(f'Imagem {arquivo} convertida para {pdf_path}')
+                
+        notificacao = Notification(app_id="Concluído", title="", msg=f"imagens convertidas!")
+        notificacao.show()
     else:
-        notificacao = Notification(app_id="", title="", msg=f"É necessário criar pasta do cliente para conversão!")
+        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar pasta do cliente para conversão!")
         notificacao.show()
 
 def obter_janela_principal(widget):
@@ -88,40 +84,48 @@ def obter_janela_principal(widget):
     return None
 
 def print_tela(ui):
-    caminho = ui.caminho_pasta.text()
+    try:
+        caminho = ui.caminho_pasta.text()
 
-    if not caminho:
-        nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:")
-        if not ok or not nome_documento:           
-            return
+        if not caminho:
+            nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
+            if not ok or not nome_documento:           
+                return
 
-        caminho_escolhido = QFileDialog.getExistingDirectory(ui.centralwidget, 'Escolher Pasta', '/')
-        if not caminho_escolhido:      
-            return
+            caminho_escolhido = QFileDialog.getExistingDirectory(ui.centralwidget, 'Escolher Pasta', '/')
+            if not caminho_escolhido:      
+                return
 
-        caminho = f"{caminho_escolhido}/{nome_documento}.png"
-    else:
-        nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:")
-        caminho = f"{caminho}/{nome_documento}.png"
-    janela_principal = obter_janela_principal(ui.centralwidget)
+            caminho = f"{caminho_escolhido}/{nome_documento}.png"
+        else:
+            nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
+            caminho = f"{caminho}/{nome_documento}.png"
+        janela_principal = obter_janela_principal(ui.centralwidget)
 
-    if janela_principal:
-        # Minimiza a janela principal
-        janela_principal.showMinimized()
+        if janela_principal:
+            # Minimiza a janela principal
+            janela_principal.showMinimized()
 
-    # Aguarda um curto período para garantir que a janela tenha tempo de minimizar
-    time.sleep(0.7)
+        # Aguarda um curto período para garantir que a janela tenha tempo de minimizar
+        time.sleep(0.7)
 
-    # Tira um screenshot da tela
-    screenshot = pyautogui.screenshot()
-    screenshot = pyautogui.screenshot()
+        # Tira um screenshot da tela
+        screenshot = pyautogui.screenshot()
+        screenshot = pyautogui.screenshot()
 
-    # Restaura a janela principal (opcional)
-    if janela_principal:
-        janela_principal.showNormal()
+        # Restaura a janela principal (opcional)
+        if janela_principal:
+            janela_principal.showNormal()
 
-    # Salva o screenshot no caminho especificado
-    screenshot.save(caminho)
+        # Salva o screenshot no caminho especificado
+    
+        
+        notificacao = Notification(app_id="Concluído", title="", msg=f"Print capturada!")
+        notificacao.show()
+        screenshot.save(caminho)
+    except Exception as e:
+        notificacao = Notification(app_id="Erro", title="", msg=f"Não foi possível capturar a tela!")
+        notificacao.show()
 
 def gerar_link_video_conferencia(ui):
     pedido = ui.campo_pedido.text()
@@ -133,6 +137,12 @@ def gerar_link_video_conferencia(ui):
         notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar a pasta do cliente!")
         notificacao.show()
         return
+
+    if ui.campo_lista_status_4.currentText() == "PRESENCIAL":
+        notificacao = Notification(app_id="Erro", title="", msg=f"Não é possível gerar link na modalidade presencial!")
+        notificacao.show()
+        return
+
 
     link = f"https://certisign.omotor.com.br/#/dossie-detail/{pedido}"
 
@@ -161,7 +171,7 @@ def gerar_link_video_conferencia(ui):
         # Salvar o arquivo PDF
         c.save()
         ui.campo_link_video.setText("")
-        notificacao = Notification(app_id="Concluído", title="", msg=f"Texto salvo com sucesso!")
+        notificacao = Notification(app_id="Concluído", title="", msg=f"Link salvo com sucesso!")
         notificacao.show()
     except Exception as e:
         notificacao = Notification(app_id="Erro", title="", msg=f"Feche o arquivo PDF!")
@@ -271,14 +281,11 @@ def limpar_campos(ui):
     ui.campo_nome_mae.setText("")
     ui.campo_cnh.setText("")
     ui.campo_seguranca_cnh.setText("")
-    ui.campo_link_video.setText("")
     ui.campo_diretorio_pasta.setText("")
     ui.campo_cnpj_municipio.setText("")
     ui.campo_cnpj_uf.setText("")
     ui.caminho_pasta.setText("")
-    ui.campo_lista_nome_doc.setCurrentText("")
     ui.campo_lista_junta_comercial.setCurrentText("")
-    limpar_label_pdf(ui)
 
 def procurar_cnh(ui):
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -482,6 +489,11 @@ def salvar(ui):
     for id in req:
         if num_pedido == req[id]['PEDIDO']:
             if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+                resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                if resposta == QMessageBox.Yes:
+                    pass
+                else:
+                    return
                 #aqui o pedido existente será gravado
                 #caso o status seja diferente de Aguardando
                 #os dados do cliente serão deletados
@@ -576,6 +588,11 @@ def salvar(ui):
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
     if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+        resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if resposta == QMessageBox.Yes:
+            pass
+        else:
+            return
         
         pedido = ui.campo_pedido.text()
         tipo = ui.campo_certificado.text()
@@ -664,6 +681,11 @@ def gravar_dados(ui):
     for id in req:
         if num_pedido == req[id]['PEDIDO']:
             if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+                resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                if resposta == QMessageBox.Yes:
+                    pass
+                else:
+                    return
                 #aqui o pedido existente será gravado
                 #caso o status seja diferente de Aguardando
                 #os dados do cliente serão deletados
@@ -749,6 +771,11 @@ def gravar_dados(ui):
                 return
    
     if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+        resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if resposta == QMessageBox.Yes:
+            pass
+        else:
+            return
         #aqui o pedido não existe e será gravado
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
@@ -994,7 +1021,6 @@ def preencher_tabela(ui):
             ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
-            print(e)
             pass
 
 def carregar_dados(ui):
@@ -1120,89 +1146,58 @@ def pegar_valor_tabela(event):
 
 def mesclar_pdf(ui):
     try:
-        if ui.campo_lista_nome_doc.currentText() == "":
-            nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:")
+        folder_to_open_directory = ui.caminho_pasta.text()
+        folder_to_open_raw = r"{}".format(folder_to_open_directory)
 
-        elif ui.campo_lista_nome_doc.currentText() == "CNH COMPLETA":
-            nome_documento = "CNH COMPLETA"
-        elif ui.campo_lista_nome_doc.currentText() == "DOC COMPLETO":
-            nome_documento = "DOC COMPLETO"
-        elif ui.campo_lista_nome_doc.currentText() == "RG COMPLETO":
-            nome_documento = "RG COMPLETO"
-        elif ui.campo_lista_nome_doc.currentText() == "DOC ADICIONAL":
-            nome_documento = "DOC ADICIONAL"
+        # Obter o nome do documento do usuário
+        nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:", text="CNH COMPLETA")
 
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
-
-        quantidade_labels_com_imagem = 0
-
-        # Verifique cada label na lista
-        for label in labels:
-            # Obtenha o pixmap da label
-            pixmap = label.pixmap()
-
-            # Verifique se a label tem um pixmap e se o pixmap não é nulo (ou seja, se a label tem uma imagem)
-            if pixmap is not None and not pixmap.isNull():
-                quantidade_labels_com_imagem += 1
-
-        # Agora, 'quantidade_labels_com_imagem' contém o número de labels com imagem
-
-        if quantidade_labels_com_imagem == 0:
-            notificacao = Notification(app_id="Arquivo não gerado", title="", msg="Selecione os arquivos!")
-            notificacao.show()
+        # Verificar se o usuário cancelou a operação ou não forneceu um nome
+        if not ok or not nome_documento:
             return
 
         # Criar um objeto PdfMerger para mesclar os PDFs
         pdf_merger = PyPDF2.PdfMerger()
 
-        # Lista de caminhos dos PDFs armazenados nas labels
-        file_paths = [label.pdf_path for label in labels if hasattr(label, 'pdf_path')]
+        try:
+            # Tentar abrir o diretório especificado
+            file_paths, _ = QFileDialog.getOpenFileNames(ui.centralwidget, "Selecionar PDFs para Mesclar", folder_to_open_raw, "Arquivos PDF (*.pdf);;Todos os arquivos (*)")
 
-        # Verificar se há caminhos de PDF válidos na lista antes de adicionar ao PdfMerger
+            # Verificar se o usuário cancelou a seleção ou não escolheu nenhum arquivo
+            if not file_paths:
+                return
+
+        except Exception as e:
+            # Se não for possível abrir o diretório especificado, abrir o diálogo padrão
+            file_paths, _ = QFileDialog.getOpenFileNames(ui.centralwidget, "Selecionar PDFs para Mesclar", "", "Arquivos PDF (*.pdf);;Todos os arquivos (*)")
+
+            # Verificar se o usuário cancelou a seleção ou não escolheu nenhum arquivo
+            if not file_paths:
+                return
+
+        # Adicionar os PDFs ao PdfMerger
         for path in file_paths:
-            if path:
-                pdf_merger.append(path)
+            pdf_merger.append(path)
 
-        # Usar o caminho da pasta da primeira label como diretório padrão
-        save_dir = os.path.dirname(file_paths[0]) if file_paths and os.path.dirname(file_paths[0]) else os.path.expanduser("~")
+        # Usar o caminho da pasta do primeiro PDF como diretório padrão
+        save_dir = os.path.dirname(file_paths[0])
 
         # Construir o caminho completo para o arquivo a ser salvo
         save_path = os.path.join(save_dir, f"{nome_documento}.pdf")
 
-        # Configurar a barra de progresso
-        ui.barra_progresso_mesclar.setMaximum(len(file_paths))
-        ui.barra_progresso_mesclar.setValue(0)
-        ui.barra_progresso_mesclar.setVisible(True)
-
         # Mesclar os arquivos PDF
-        for i, path in enumerate(file_paths):
-            # Atualizar a barra de progresso
-            ui.barra_progresso_mesclar.setValue(i + 1)
-            time.sleep(0.1)
-            QApplication.processEvents()
-
-        # Salvar o arquivo mesclado diretamente na pasta especificada
         with open(save_path, 'wb') as merged_pdf:
             pdf_merger.write(merged_pdf)
 
-        for label in labels:
-            if hasattr(label, 'setPixmap'):
-                label.setPixmap(QtGui.QPixmap())  # Define o pixmap como nulo
-
-        del file_paths
-        del save_path
+        # Fechar o objeto PdfMerger
         pdf_merger.close()
-        del pdf_merger
 
-        # Informar ao usuário que a mesclagem foi concluída
-        ui.barra_progresso_mesclar.setVisible(False)
-        limpar_label_pdf(ui)
+        # Notificar o usuário sobre a conclusão
         notificacao = Notification(app_id="Concluído", title="", msg="Os arquivos PDF foram mesclados com sucesso!")
         notificacao.show()
+
     except Exception as e:
-        print(f"Erro: {e}")
-        limpar_label_pdf(ui)
-        ui.barra_progresso_mesclar.setVisible(False)
+        # Lidar com exceções (você pode adicionar mais detalhes aqui, se necessário)
         return
 
 def converter_jpg_pdf(ui):
@@ -1282,8 +1277,7 @@ def converter_jpg_pdf(ui):
             notificacao.show()
 
     except Exception as e:
-        # Em caso de exceção, lidar com o erro apropriado
-        print(f"Erro: {e}")
+
         return
 
 def texto_para_pdf(ui):
@@ -1347,21 +1341,6 @@ def carregar_pdf_na_label(ui):
                 # Armazena o caminho do PDF na label
                 labels[i].pdf_path = pdf_path
 
-def limpar_label_pdf(ui):
-    ui.label_PDF1.clear()
-    ui.label_PDF2.clear()
-    ui.label_PDF3.clear()
-    ui.label_PDF4.clear()
-    ui.label_PDF5.clear()
-    ui.label_PDF6.clear()
-
-    ui.label_PDF1.pdf_path = None
-    ui.label_PDF2.pdf_path = None
-    ui.label_PDF3.pdf_path = None
-    ui.label_PDF4.pdf_path = None
-    ui.label_PDF5.pdf_path = None
-    ui.label_PDF6.pdf_path = None
- 
 def on_close_event(event):
 
     
@@ -1463,30 +1442,69 @@ def copiar_campo(nome_campo):
             except:
                 pass
 
+def manter_tela_aberta(ui):
+    if ui.campo_verifica_tela_cheia.text() == "SIM":
+        ui.campo_verifica_tela_cheia.setText("NAO")
+        ui.botao_tela_cheia.setText("🔓")
+    else:
+        ui.campo_verifica_tela_cheia.setText("SIM")
+        ui.botao_tela_cheia.setText("🔒")
+
+
 class JanelaOcultaHelper:
     def __init__(self, parent):
         self.parent = parent
+        self.animation_timer = QTimer()
+        self.animation_timer.timeout.connect(self.update_window_size)
+        self.animation_step = 5  # Ajuste conforme necessário
+        self.animation_duration = 2  # Duração da animação em milissegundos
+        self.animation_target_width = 0
+        self.animation_target_height = 0
 
     def enterEvent(self, event):
-            self.parent.setFixedSize(465, 630)
-
-    def leaveEvent(self, event):
-        if not ui.campo_tela_cheia.isChecked():
-            cursor_pos = QtGui.QCursor.pos()
-            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
-            window_rect = QtCore.QRect(window_pos, self.parent.size())
-
-            # Verifica se o mouse está dentro da janela
-            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
-
-            if mouse_dentro_da_janela:
-                pass
-            else:
-                self.parent.setFixedSize(213, 38)
+        self.animate_window_resize(469, 640)
         
 
+    def leaveEvent(self, event):
+        if not ui.campo_verifica_tela_cheia.text()=="SIM":
+            cursor_pos = QtGui.QCursor.pos()
+            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
+            window_rect = QRect(window_pos, self.parent.size())
+
+            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+
+            if not mouse_dentro_da_janela:
+                self.animate_window_resize(250, 38)
+
     def mousePressEvent(self, event):
-        self.parent.setFixedSize(465, 630)
+        self.animate_window_resize(469, 640)
+
+    def animate_window_resize(self, target_width, target_height):
+        self.animation_target_width = target_width
+        self.animation_target_height = target_height
+        self.animation_timer.stop()
+        self.animation_timer.start(int(self.animation_duration / self.animation_step))
+
+    def update_window_size(self):
+        current_width = self.parent.width()
+        current_height = self.parent.height()
+
+        width_difference = self.animation_target_width - current_width
+        height_difference = self.animation_target_height - current_height
+
+        width_step = width_difference / self.animation_step
+        height_step = height_difference / self.animation_step
+
+        new_width = current_width + width_step
+        new_height = current_height + height_step
+
+        self.parent.setFixedSize(int(new_width), int(new_height))
+
+        if (width_step > 0 and new_width >= self.animation_target_width) or \
+           (width_step < 0 and new_width <= self.animation_target_width):
+            self.animation_timer.stop()
+            self.parent.setFixedSize(self.animation_target_width, self.animation_target_height)
+
 
 import sys
 app = QtWidgets.QApplication(sys.argv)
@@ -1519,19 +1537,15 @@ ui.botao_salvar.clicked.connect(lambda:salvar(ui))
 ui.botao_junta.clicked.connect(lambda:procurar_junta(ui))
 ui.botao_print_direto_na_pasta.clicked.connect(lambda:print_tela(ui))
 ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
-ui.botao_converter_jpgPDF.clicked.connect(lambda:converter_jpg_pdf(ui))
-ui.botao_transf_link_PDF.clicked.connect(lambda:texto_para_pdf(ui))
 ui.botao_pasta_cliente.clicked.connect(lambda:criar_pasta_cliente(ui))
+ui.botao_tela_cheia.clicked.connect(lambda: manter_tela_aberta(ui))
 ui.botao_gerar_link.clicked.connect(lambda:gerar_link_video_conferencia(ui))
 ui.botao_converter_todas_imagens_em_pdf.clicked.connect(lambda:converter_todas_imagens_para_pdf(ui))
 ui.campo_data_de.setDate(QDate.currentDate())
 ui.campo_data_ate.setDate(QDate.currentDate())
-ui.botao_selecionar_arquivos_mesclar.clicked.connect(lambda:carregar_pdf_na_label(ui))
-ui.botao_limpar_PDF.clicked.connect(lambda:limpar_label_pdf(ui))
-ui.barra_progresso_jpg.setVisible(False)
-ui.barra_progresso_mesclar.setVisible(False)
 ui.barra_progresso_pedido.setVisible(False)
 ui.barra_progresso_consulta.setVisible(False)
+ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
 janela.closeEvent = on_close_event
 ui.campo_cnh.mousePressEvent = lambda event: copiar_campo("campo_cnh")
 ui.campo_cnpj.mousePressEvent = lambda event: copiar_campo("campo_cnpj")
@@ -1560,16 +1574,19 @@ ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
 ui.botao_gerar_link.setToolTip("Gera a link da vídeo-conferência")
+ui.botao_converter_todas_imagens_em_pdf.setToolTip("Converte todas imagens da pasta do cliente em PDF")
+ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
+ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
-ui.campo_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
+
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
 x = screen_rect.width() - janela.width() - 20
 y = (screen_rect.height() - janela.height()) // 6
 
 janela.move(x, y)
-janela.setWindowTitle("Auxiliar Certificados")
-janela.setFixedSize(213, 38)           
+janela.setWindowTitle("Auxiliar")
+janela.setFixedSize(250, 38)           
 janela.show()
 
 
