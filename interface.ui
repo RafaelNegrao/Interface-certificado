@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>467</width>
-    <height>631</height>
+    <width>466</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="palette">
@@ -65,9 +65,15 @@
      <rect>
       <x>-5</x>
       <y>40</y>
-      <width>481</width>
-      <height>879</height>
+      <width>519</width>
+      <height>665</height>
      </rect>
+    </property>
+    <property name="minimumSize">
+     <size>
+      <width>0</width>
+      <height>0</height>
+     </size>
     </property>
     <property name="maximumSize">
      <size>
@@ -256,7 +262,7 @@
        </font>
       </property>
       <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
+       <cursorShape>IBeamCursor</cursorShape>
       </property>
       <property name="text">
        <string/>
@@ -1208,6 +1214,9 @@
         <bold>false</bold>
        </font>
       </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
      </widget>
      <widget class="QPushButton" name="botao_consulta_cnpj">
       <property name="geometry">
@@ -1248,36 +1257,6 @@
       </property>
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="caminho_pasta">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>635</y>
-        <width>451</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>IBeamCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
       </property>
      </widget>
      <widget class="QComboBox" name="campo_lista_junta_comercial">
@@ -1495,36 +1474,6 @@
        <string>JUNTA C..</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="campo_verifica_tela_cheia">
-      <property name="enabled">
-       <bool>false</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>670</y>
-        <width>156</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>IBeamCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
      <zorder>campo_cnh</zorder>
      <zorder>campo_seguranca_cnh</zorder>
      <zorder>campo_rg</zorder>
@@ -1572,11 +1521,9 @@
      <zorder>campo_diretorio_pasta</zorder>
      <zorder>botao_consulta_cnpj</zorder>
      <zorder>line</zorder>
-     <zorder>caminho_pasta</zorder>
      <zorder>campo_lista_junta_comercial</zorder>
      <zorder>botao_junta</zorder>
      <zorder>label_28</zorder>
-     <zorder>campo_verifica_tela_cheia</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -2175,6 +2122,189 @@ p, li { white-space: pre-wrap; }
       </property>
      </widget>
     </widget>
+    <widget class="QWidget" name="tab">
+     <attribute name="title">
+      <string>Configs</string>
+     </attribute>
+     <widget class="QLineEdit" name="caminho_pasta">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>90</y>
+        <width>451</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_verifica_tela_cheia">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>146</y>
+        <width>159</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="caminho_pasta_principal">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>30</y>
+        <width>411</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_7">
+      <property name="geometry">
+       <rect>
+        <x>14</x>
+        <y>12</y>
+        <width>181</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>DIRETÓRIO PASTA PRINCIPAL</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>12</x>
+        <y>73</y>
+        <width>181</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>DIRETÓRIO PASTA CLIENTE ATUAL</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_9">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>130</y>
+        <width>67</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>TELA CHEIA</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_altera_pasta_principal">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>30</y>
+        <width>31</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="text">
+       <string>📂</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
     <property name="geometry">
@@ -2202,6 +2332,9 @@ p, li { white-space: pre-wrap; }
     <property name="text">
      <string extracomment="Tira um print da tela">📸</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="botao_gerar_link">
     <property name="geometry">
@@ -2228,6 +2361,9 @@ p, li { white-space: pre-wrap; }
     </property>
     <property name="text">
      <string extracomment="Cria a link do vídeo">🔗</string>
+    </property>
+    <property name="flat">
+     <bool>true</bool>
     </property>
    </widget>
    <widget class="QLabel" name="label_5">
@@ -2279,6 +2415,9 @@ p, li { white-space: pre-wrap; }
     <property name="text">
      <string extracomment="Tira um print da tela">🔓</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="botao_salvar">
     <property name="geometry">
@@ -2309,6 +2448,9 @@ p, li { white-space: pre-wrap; }
     <property name="text">
      <string>💾</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="botao_terminar">
     <property name="geometry">
@@ -2338,13 +2480,16 @@ background-color:rgb(73, 218, 107);</string>
     <property name="text">
      <string>FINALIZAR</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="botao_agrupar_PDF">
     <property name="geometry">
      <rect>
-      <x>198</x>
+      <x>202</x>
       <y>0</y>
-      <width>46</width>
+      <width>55</width>
       <height>36</height>
      </rect>
     </property>
@@ -2369,13 +2514,16 @@ background-color:rgb(73, 218, 107);</string>
     <property name="text">
      <string extracomment="Cria a link do vídeo">🗃️</string>
     </property>
+    <property name="flat">
+     <bool>true</bool>
+    </property>
    </widget>
    <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
     <property name="geometry">
      <rect>
-      <x>152</x>
+      <x>154</x>
       <y>2</y>
-      <width>45</width>
+      <width>47</width>
       <height>32</height>
      </rect>
     </property>
@@ -2403,7 +2551,7 @@ background-color:rgb(73, 218, 107);</string>
      <bool>false</bool>
     </property>
     <property name="flat">
-     <bool>false</bool>
+     <bool>true</bool>
     </property>
    </widget>
    <zorder>label_5</zorder>

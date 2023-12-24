@@ -9,20 +9,21 @@ import requests
 import PyPDF2
 import fitz
 import firebase_admin
+import json
 from winotify import Notification
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect
-from PyQt5.QtGui import QDesktopServices,QPixmap,QImage,QColor
+from PyQt5.QtGui import QDesktopServices,QColor
 from Interface import Ui_janela
 from firebase_admin import db
 import pyautogui
 from reportlab.lib.utils import ImageReader
-
+from requests.exceptions import RequestException
 
 
 credenciais = {
@@ -43,7 +44,28 @@ acoes = firebase_admin.credentials.Certificate(credenciais)
 firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
 ref = db.reference("/")
 
+def trazer_diretorio_raiz(ui):
 
+    link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+    # Faz uma solicitação GET para obter as configurações do banco de dados
+    bd = requests.get(f"{link}.json")
+    # Converte a resposta JSON em um dicionário Python
+    config = bd.json()
+    # Imprime as configurações (opcional, para depuração)
+    print(config)
+    
+def atualizar_diretorio_raiz(ui):
+    link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+    # Faz uma solicitação GET para obter as configurações do banco de dados
+    bd = requests.get(f"{link}.json")
+    # Converte a resposta JSON em um dicionário Python
+    config = bd.json()
+    # Imprime as configurações (opcional, para depuração)
+    print(config)
+    # Aqui vou criar a nova config
+    nova_config = {"diretorio raiz": "PASSED","ultima_abertura":"10:00","ultima_saida":"15:00"}
+    # Acessa o nó 'Configuracoes' no banco de dados e atualiza com as novas configurações
+    requests.patch(f'{link}.json',data=json.dumps(nova_config))
 
 def converter_todas_imagens_para_pdf(ui):
     caminho_pasta = ui.caminho_pasta.text()
@@ -72,8 +94,7 @@ def converter_todas_imagens_para_pdf(ui):
         notificacao = Notification(app_id="Concluído", title="", msg=f"imagens convertidas!")
         notificacao.show()
     else:
-        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar pasta do cliente para conversão!")
-        notificacao.show()
+        escolher_conversao(ui)
 
 def obter_janela_principal(widget):
     # Função para obter a janela principal a partir de um widget
@@ -89,7 +110,10 @@ def print_tela(ui):
 
         if not caminho:
             nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
-            if not ok or not nome_documento:           
+            if not ok:           
+                return
+            
+            if not nome_documento:
                 return
 
             caminho_escolhido = QFileDialog.getExistingDirectory(ui.centralwidget, 'Escolher Pasta', '/')
@@ -98,7 +122,13 @@ def print_tela(ui):
 
             caminho = f"{caminho_escolhido}/{nome_documento}.png"
         else:
+
             nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
+            if not ok:           
+                return
+            
+            if not nome_documento:
+                return
             caminho = f"{caminho}/{nome_documento}.png"
         janela_principal = obter_janela_principal(ui.centralwidget)
 
@@ -128,15 +158,42 @@ def print_tela(ui):
         notificacao.show()
 
 def gerar_link_video_conferencia(ui):
+    
     pedido = ui.campo_pedido.text()
     if not pedido:
-        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário ter o número do pedido!")
-        notificacao.show()
+        pedido, ok = QInputDialog.getText(ui.centralwidget, "Criar LINK", "Digite o número do PEDIDO:")
+        if not ok:
+            return
+
+        # Obter o link
+        link = f"https://certisign.omotor.com.br/#/dossie-detail/{pedido}"
+        save_path, _ = QFileDialog.getSaveFileName(ui.centralwidget, "Salvar PDF", os.path.expanduser("~"), "Arquivos PDF (*.pdf)")
+
+        if not save_path:
+            return
+
+        save_dir = os.path.dirname(save_path)
+
+        default_file_name = "LINK VIDEO"
+
+        if not save_path.lower().endswith(".pdf"):
+            save_path = os.path.join(save_dir, f"{default_file_name}.pdf")
+        c = canvas.Canvas(save_path, pagesize=letter)
+        font_size = 14
+        x, y = 20, 680
+        c.setFont("Helvetica", font_size)
+        for line in link.split('\n'):
+            c.drawString(x, y, line)
+            y -= 15
+        c.save()
+        
+
+        
         return
-    if ui.caminho_pasta.text() == "":
-        notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar a pasta do cliente!")
-        notificacao.show()
-        return
+    # if ui.caminho_pasta.text() == "":
+    #     notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar a pasta do cliente!")
+    #     notificacao.show()
+    #     return
 
     if ui.campo_lista_status_4.currentText() == "PRESENCIAL":
         notificacao = Notification(app_id="Erro", title="", msg=f"Não é possível gerar link na modalidade presencial!")
@@ -153,6 +210,8 @@ def gerar_link_video_conferencia(ui):
         save_path = ui.caminho_pasta.text()
 
         if not save_path:
+            notificacao = Notification(app_id="Pasta ausente", title="", msg=f"Crie a pasta do cliente!")
+            notificacao.show()
             return
 
         # Adiciona a extensão PDF se não estiver presente
@@ -170,11 +229,10 @@ def gerar_link_video_conferencia(ui):
             y -= 15  # Espaçamento entre as linhas
         # Salvar o arquivo PDF
         c.save()
-        ui.campo_link_video.setText("")
         notificacao = Notification(app_id="Concluído", title="", msg=f"Link salvo com sucesso!")
         notificacao.show()
     except Exception as e:
-        notificacao = Notification(app_id="Erro", title="", msg=f"Feche o arquivo PDF!")
+        notificacao = Notification(app_id="Arquivo existente", title="", msg=f"Já existe um arquivo LINK_VIDEO na pasta!")
         notificacao.show()
 
 def forcar_fechamento_de_arquivo_e_deletar_pasta(folder_path):
@@ -387,42 +445,56 @@ def formatar_nome_mae(ui):
 def dados_cnpj(ui):
     ui.campo_cnpj_municipio.setText("")
     ui.campo_cnpj_uf.setText("")  
+
     cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
-    if cnpj == '':
+
+    if not cnpj:
         return
     
     url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
     
     try:
         resposta = requests.get(url)
-        data = resposta.json()
 
         if resposta.status_code == 200:
+            data = resposta.json()
             ui.campo_cnpj_municipio.setText(data['municipio'])
             
             uf = data['uf']
             
             if uf != "SP":
-                ui.campo_cnpj_uf.setText(str(uf + "⚠"))
+                ui.campo_cnpj_uf.setText(str(uf + "❌"))
                 ui.campo_lista_junta_comercial.setCurrentText(uf)
-                
+                return
             else:
                 ui.campo_cnpj_uf.setText(str(uf + "✅"))
                 ui.campo_lista_junta_comercial.setCurrentText(uf)
+                return
 
         else:
             ui.campo_cnpj_municipio.setText("")
-            ui.campo_cnpj_uf.setText("") 
+            ui.campo_cnpj_uf.setText("")
+            return
+    except RequestException:
+        ui.campo_cnpj_municipio.setText("")
+        ui.campo_cnpj_uf.setText("")
+        notificacao = Notification(app_id="ERRO DE CONEXÃO", title="", msg="Sem conexão com a internet.", duration="short")
+        notificacao.show()
+        return
     except Exception as e:
-        if resposta.status_code == 429:
+        if hasattr(e, 'response') and e.response.status_code == 429:
             ui.campo_cnpj_municipio.setText("")
             ui.campo_cnpj_uf.setText("")
-            notificacao = Notification(app_id="ACESSO BLOQUEADO",title="",msg="Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!",duration="short")
+            notificacao = Notification(app_id="ACESSO BLOQUEADO", title="", msg="Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!", duration="short")
             notificacao.show()
-            
+            return
         else:
             ui.campo_cnpj_municipio.setText('CNPJ INVÁLIDO')
-            ui.campo_cnpj_uf.setText('---')    
+            ui.campo_cnpj_uf.setText('---') 
+            return
+    finally:
+        if 'resposta' in locals() and resposta:
+            resposta.close()    
 
 def procurar_cpf(ui):
     
@@ -1197,88 +1269,69 @@ def mesclar_pdf(ui):
         notificacao.show()
 
     except Exception as e:
+        pdf_merger.close()
         # Lidar com exceções (você pode adicionar mais detalhes aqui, se necessário)
         return
 
-def converter_jpg_pdf(ui):
-    try:
-        if ui.jpg_para_pdf.isChecked():
-        # Pede ao usuário para selecionar múltiplos arquivos
-            image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
+def escolher_conversao(ui):
+    # Criação da janela de diálogo
+    dialog = QDialog(ui.centralwidget)
+    dialog.setWindowTitle("Selecione o tipo de conversão")
+    
+    # Layout vertical para adicionar RadioButtons
+    layout_dialog = QVBoxLayout(dialog)
 
-            # Verificar se o usuário selecionou algum arquivo de imagem
-            if not image_paths:
-                return
+    # Criando os RadioButtons
+    radio_jpg_to_pdf = QRadioButton("JPG para PDF")
+    radio_pdf_to_jpg = QRadioButton("PDF para JPG")
+    
+    # Adicionando os RadioButtons ao layout
+    layout_dialog.addWidget(radio_jpg_to_pdf)
+    layout_dialog.addWidget(radio_pdf_to_jpg)
 
-            # Exibir a barra de progresso antes do loop
-            ui.barra_progresso_jpg.setVisible(True)
+    # Botão para confirmar e fechar a janela de diálogo
+    botao_confirmar = QPushButton("Confirmar")
+    layout_dialog.addWidget(botao_confirmar)
 
-            # Iterar sobre cada caminho de imagem selecionado
-            for idx, image_path in enumerate(image_paths):
-                # Extrair o nome do arquivo (sem a extensão) do caminho
-                nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
+    # Função para ser executada ao clicar no botão de confirmação
+    def confirmar():
+        # Verificar qual RadioButton foi selecionado
+        if radio_jpg_to_pdf.isChecked():
+            # Chamar a função converter_jpg_to_pdf
+            converter_jpg_para_pdf(ui)
+        elif radio_pdf_to_jpg.isChecked():
+            # Chamar a função converter_pdf_to_jpg
+            converter_pdf_para_jpg(ui)
+        dialog.accept()
+    botao_confirmar.clicked.connect(confirmar)
+    dialog.exec_()
 
-                # Abrir a imagem
-                imagem = Image.open(image_path)
-
-                # Salvar a imagem como PDF no mesmo local
-                imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
-
-                # Calcular a porcentagem concluída e atualizar a barra de progresso
-                porcentagem = (idx + 1) / len(image_paths) * 100
-                ui.barra_progresso_jpg.setValue(int(porcentagem))
-                QApplication.processEvents()
-
-            # Ocultar a barra de progresso quando o loop terminar
-            ui.barra_progresso_jpg.setVisible(False)
-
-            # Exibir a notificação de conclusão
-            notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
-            notificacao.show()
-        elif ui.pdf_para_jpg.isChecked():
-            # Pede ao usuário para selecionar múltiplos arquivos PDF
-            pdf_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")], title="Converter PDF > img")
-
-            # Verificar se o usuário selecionou algum arquivo PDF
-            if not pdf_paths:
-                return
-
-            # Exibir a barra de progresso antes do loop
-            ui.barra_progresso_jpg.setVisible(True)
-
-            # Iterar sobre cada caminho de PDF selecionado
-            for idx, pdf_path in enumerate(pdf_paths):
-                # Extrair o nome do arquivo (sem a extensão) do caminho
-                nome_do_arquivo, _ = os.path.splitext(os.path.basename(pdf_path))
-
-                # Abrir o PDF com PyMuPDF
-                pdf_document = fitz.open(pdf_path)
-
-                # Extrair a primeira página como imagem
-                primeira_pagina = pdf_document.load_page(0)
-                imagem = primeira_pagina.get_pixmap()
-
-                # Converter a imagem para modo RGB
-                imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
-
-                # Salvar a imagem como JPG no mesmo local
-                imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
-
-                # Calcular a porcentagem concluída e atualizar a barra de progresso
-                porcentagem = (idx + 1) / len(pdf_paths) * 100
-                ui.barra_progresso_jpg.setValue(int(porcentagem))
-                QApplication.processEvents()
-
-            # Ocultar a barra de progresso quando o loop terminar
-            ui.barra_progresso_jpg.setVisible(False)
-
-            # Exibir a notificação de conclusão
-            notificacao = Notification(app_id="Concluído", title="", msg="Os PDFs foram convertidos em JPG com sucesso!")
-            notificacao.show()
-
-    except Exception as e:
-
+def converter_jpg_para_pdf(ui):
+    image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
+    if not image_paths:
         return
+    for image_path in image_paths:
+        nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
+        imagem = Image.open(image_path)
+        imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
+
+    notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
+    notificacao.show()
+
+def converter_pdf_para_jpg(ui):
+    pdf_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")], title="Converter PDF > img")
+    if not pdf_paths:
+        return
+    for pdf_path in pdf_paths:
+        nome_do_arquivo, _ = os.path.splitext(os.path.basename(pdf_path))
+        pdf_document = fitz.open(pdf_path)
+        primeira_pagina = pdf_document.load_page(0)
+        imagem = primeira_pagina.get_pixmap()
+        imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
+        imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
+
+    notificacao = Notification(app_id="Concluído", title="", msg="Os PDFs foram convertidos em JPG com sucesso!")
+    notificacao.show()
 
 def texto_para_pdf(ui):
     # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
@@ -1314,34 +1367,10 @@ def texto_para_pdf(ui):
         notificacao = Notification(app_id="Erro",title="",msg=f"Feche o arquivo PDF!")
         notificacao.show()
 
-def carregar_pdf_na_label(ui):
-    labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
-    options = {}
-    options['filetypes'] = [('Arquivos PDF', '*.pdf'), ('Todos os Arquivos', '*.*')]
-    options['multiple'] = True
+def evento_ao_abrir(event):
+    pass
 
-    file_paths = filedialog.askopenfilenames(**options)
-
-    if file_paths:
-        labels = [ui.label_PDF1, ui.label_PDF2, ui.label_PDF3, ui.label_PDF4, ui.label_PDF5, ui.label_PDF6]
-
-        for i, pdf_path in enumerate(file_paths):
-            if i < len(labels):
-                pdf_document = fitz.open(pdf_path)
-                pdf_page = pdf_document.load_page(0)
-                pdf_image = pdf_page.get_pixmap()
-
-                # Redimensiona a imagem para caber no tamanho da label
-                image = QImage(pdf_image.samples, pdf_image.width, pdf_image.height, pdf_image.stride, QImage.Format_RGB888)
-                pixmap = QPixmap.fromImage(image.scaled(labels[i].width(), labels[i].height(), Qt.KeepAspectRatio))
-
-                # Exibe a imagem na label
-                labels[i].setPixmap(pixmap)
-
-                # Armazena o caminho do PDF na label
-                labels[i].pdf_path = pdf_path
-
-def on_close_event(event):
+def evento_ao_fechar(event):
 
     
     result = QMessageBox.question(janela, "Confirmação", "Você realmente deseja sair?", QMessageBox.Yes | QMessageBox.No)
@@ -1349,10 +1378,12 @@ def on_close_event(event):
     if result == QMessageBox.Yes:
         try:
             event.accept()  
+          
         except:
-            event.accept()  
+            event.accept()
+           
     else:
-        event.ignore() 
+        event.ignore()
 
 def copiar_campo(nome_campo):
     
@@ -1450,7 +1481,6 @@ def manter_tela_aberta(ui):
         ui.campo_verifica_tela_cheia.setText("SIM")
         ui.botao_tela_cheia.setText("🔒")
 
-
 class JanelaOcultaHelper:
     def __init__(self, parent):
         self.parent = parent
@@ -1474,7 +1504,7 @@ class JanelaOcultaHelper:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
-                self.animate_window_resize(250, 38)
+                self.animate_window_resize(256, 38)
 
     def mousePressEvent(self, event):
         self.animate_window_resize(469, 640)
@@ -1546,7 +1576,8 @@ ui.campo_data_ate.setDate(QDate.currentDate())
 ui.barra_progresso_pedido.setVisible(False)
 ui.barra_progresso_consulta.setVisible(False)
 ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
-janela.closeEvent = on_close_event
+janela.closeEvent = evento_ao_fechar
+#janela.showEvent = evento_ao_abrir
 ui.campo_cnh.mousePressEvent = lambda event: copiar_campo("campo_cnh")
 ui.campo_cnpj.mousePressEvent = lambda event: copiar_campo("campo_cnpj")
 ui.campo_pedido.mousePressEvent = lambda event: copiar_campo("campo_pedido")
@@ -1573,11 +1604,17 @@ ui.campo_msg7.setReadOnly(True)
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
+ui.botao_print_direto_na_pasta.setFlat(True)
 ui.botao_gerar_link.setToolTip("Gera a link da vídeo-conferência")
-ui.botao_converter_todas_imagens_em_pdf.setToolTip("Converte todas imagens da pasta do cliente em PDF")
+ui.botao_gerar_link.setFlat(True)
+ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
+ui.botao_converter_todas_imagens_em_pdf.setFlat(True)
 ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
+ui.botao_tela_cheia.setFlat(True)
 ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
+ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
+
 
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
@@ -1586,7 +1623,7 @@ y = (screen_rect.height() - janela.height()) // 6
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(250, 38)           
+janela.setFixedSize(256, 38)           
 janela.show()
 
 
