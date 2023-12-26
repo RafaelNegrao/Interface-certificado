@@ -15,7 +15,7 @@ from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from PIL import Image
-from PyQt5 import QtGui, QtWidgets,QtCore
+from PyQt5 import QtGui, QtWidgets,QtCore,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect
 from PyQt5.QtGui import QDesktopServices,QColor
@@ -52,20 +52,41 @@ def trazer_diretorio_raiz(ui):
     # Converte a resposta JSON em um dicionário Python
     config = bd.json()
     # Imprime as configurações (opcional, para depuração)
-    print(config)
+    ui.caminho_pasta_principal.setText(config['diretorio_raiz'])
     
 def atualizar_diretorio_raiz(ui):
-    link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
-    # Faz uma solicitação GET para obter as configurações do banco de dados
-    bd = requests.get(f"{link}.json")
-    # Converte a resposta JSON em um dicionário Python
-    config = bd.json()
-    # Imprime as configurações (opcional, para depuração)
-    print(config)
-    # Aqui vou criar a nova config
-    nova_config = {"diretorio raiz": "PASSED","ultima_abertura":"10:00","ultima_saida":"15:00"}
-    # Acessa o nó 'Configuracoes' no banco de dados e atualiza com as novas configurações
-    requests.patch(f'{link}.json',data=json.dumps(nova_config))
+    widget_pai = ui.centralwidget
+    # Abrir o explorer para selecionar a pasta raiz
+    resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Tem certeza que deseja atualizar a pasta raiz?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    if resposta == QMessageBox.Yes:
+        pass
+    else:
+        return
+
+    diretorio_selecionado = QFileDialog.getExistingDirectory(widget_pai , 'Selecione o diretório raiz')
+
+    if diretorio_selecionado:
+        # Atualizar o campo de texto na interface gráfica
+        ui.caminho_pasta_principal.setText(diretorio_selecionado)
+
+        # Link para o Firebase Realtime Database
+        link_firebase = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+
+        # Obter o diretório da interface gráfica
+        diretorio = ui.caminho_pasta_principal.text()
+
+        # Criar um dicionário com a nova configuração
+        nova_config = {"diretorio_raiz": diretorio}
+
+        # Enviar a requisição PATCH para atualizar no Firebase
+        response = requests.patch(f'{link_firebase}.json', data=json.dumps(nova_config))
+
+        if response.ok:
+            print("Diretório raiz atualizado com sucesso!")
+        else:
+            print(f"Erro ao atualizar o diretório raiz: {response.status_code}")
+    else:
+        print("Seleção de diretório cancelada.")
 
 def converter_todas_imagens_para_pdf(ui):
     caminho_pasta = ui.caminho_pasta.text()
@@ -89,6 +110,7 @@ def converter_todas_imagens_para_pdf(ui):
 
                 # Fecha o arquivo PDF
                 pdf.save()
+                mostrar_documentos_cliente(ui)
 
                 
         notificacao = Notification(app_id="Concluído", title="", msg=f"imagens convertidas!")
@@ -149,10 +171,11 @@ def print_tela(ui):
 
         # Salva o screenshot no caminho especificado
     
-        
+        screenshot.save(caminho)
+        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Concluído", title="", msg=f"Print capturada!")
         notificacao.show()
-        screenshot.save(caminho)
+       
     except Exception as e:
         notificacao = Notification(app_id="Erro", title="", msg=f"Não foi possível capturar a tela!")
         notificacao.show()
@@ -186,6 +209,7 @@ def gerar_link_video_conferencia(ui):
             c.drawString(x, y, line)
             y -= 15
         c.save()
+        mostrar_documentos_cliente(ui)
         
 
         
@@ -196,6 +220,7 @@ def gerar_link_video_conferencia(ui):
     #     return
 
     if ui.campo_lista_status_4.currentText() == "PRESENCIAL":
+        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Erro", title="", msg=f"Não é possível gerar link na modalidade presencial!")
         notificacao.show()
         return
@@ -229,6 +254,7 @@ def gerar_link_video_conferencia(ui):
             y -= 15  # Espaçamento entre as linhas
         # Salvar o arquivo PDF
         c.save()
+        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Concluído", title="", msg=f"Link salvo com sucesso!")
         notificacao.show()
     except Exception as e:
@@ -269,49 +295,49 @@ def fechar_arquivo_em_uso(folder_path):
         except (psutil.AccessDenied, psutil.NoSuchProcess, psutil.ZombieProcess):
             continue
 
+def pasta_existe(diretorio, nome_pasta):
+    caminho_pasta = os.path.join(diretorio, nome_pasta)
+    return os.path.exists(caminho_pasta)
+
 def criar_pasta_cliente(ui):
     pedido = ui.campo_pedido.text()
     tipo = ui.campo_certificado.text()
-    hora  = ui.campo_hora_agendamento.text()
+    hora = ui.campo_hora_agendamento.text()
     data = ui.campo_data_agendamento.text()
     status = ui.campo_lista_status.currentText()
     modalidade = ui.campo_lista_status_4.currentText()
+
     if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
-        notificacao = Notification(app_id="Pasta não criada",title="",msg="Adicione os itens com 🌟 para criar a pasta do cliente!",duration="short")
+        notificacao = Notification(app_id="Pasta não criada", title="", msg="Adicione os itens com 🌟 para criar a pasta do cliente!", duration="short")
         notificacao.show()
         return
-    #Tente criar a pasta 
-    #caso não consiga,vá para o except
+
     try:
         nome_pasta = ui.campo_nome.text()
         if nome_pasta == '':
             notificacao = Notification(app_id="Pasta não criada", title="", msg="Preencha o NOME do cliente.")
             notificacao.show()
             return
-        # Obtenha o diretório selecionado
-        diretorio = filedialog.askdirectory()
 
-        if diretorio:
-            # Verifique se a pasta já existe no diretório
-            pasta_existente = os.path.exists(os.path.join(diretorio, nome_pasta))
-            
-            if not pasta_existente:
-                # Crie a pasta com o nome da variável no diretório selecionado
-                nova_pasta = os.path.join(diretorio, nome_pasta)
-                os.mkdir(nova_pasta)
-                nova_pasta = nova_pasta.replace("/","\\")
-                ui.caminho_pasta.setText(nova_pasta)
-                salvar(ui)
-                
-                notificacao = Notification(app_id="Pasta Criada", title="", msg=f"Pasta do cliente {nome_pasta} criada com sucesso!",duration="short")
-                notificacao.show()
-            else:
-                notificacao = Notification(app_id="Pasta existente", title="", msg=f"Pasta do cliente {nome_pasta} já existe no diretório!",duration="short")
-                notificacao.show()
+        # Tente criar a pasta no diretório padrão
+        diretorio_padrão = ui.caminho_pasta_principal.text()
+        pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
+
+        if not pasta_existe(diretorio_padrão, nome_pasta):
+            os.mkdir(pasta_padrão)
+            pasta_padrão = pasta_padrão.replace("/", "\\")
+            ui.caminho_pasta.setText(pasta_padrão)
+            salvar(ui)
+
+            notificacao = Notification(app_id="Pasta Criada", title="", msg=f"Pasta do cliente {nome_pasta} criada com sucesso!", duration="short")
+            notificacao.show()
         else:
-            return
+            # Se a pasta já existe no diretório padrão, mostre a notificação
+            notificacao = Notification(app_id="Pasta não criada", title="", msg=f"Pasta do cliente {nome_pasta} já existe no diretório!", duration="short")
+            notificacao.show()
     except Exception as e:
-        notificacao = Notification(app_id="Pasta não criada", title="", msg="",duration="short")
+        # Handle outras exceções aqui
+        notificacao = Notification(app_id="Pasta não criada", title="", msg="", duration="short")
         notificacao.show()
 
 def limpar_campos(ui):
@@ -344,6 +370,7 @@ def limpar_campos(ui):
     ui.campo_cnpj_uf.setText("")
     ui.caminho_pasta.setText("")
     ui.campo_lista_junta_comercial.setCurrentText("")
+    ui.campo_lista_documentos.setText("")
 
 def procurar_cnh(ui):
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -1135,6 +1162,7 @@ def carregar_dados(ui):
                 ui.campo_cnpj_municipio.setText(req[pedido]['MUNICIPIO'])
                 ui.campo_cnpj_uf.setText(req[pedido]['UF'])
                 ui.caminho_pasta.setText(req[pedido]['PASTA'])
+                mostrar_documentos_cliente(ui)
 
             # Atualize a barra de progresso
             num_pedidos_processados += 1
@@ -1142,8 +1170,8 @@ def carregar_dados(ui):
             ui.barra_progresso_pedido.setValue(progresso)
             QApplication.processEvents()
             ui.barra_progresso_pedido.setVisible(False)
-
     except Exception as e:
+        
         ui.barra_progresso_pedido.setVisible(False)
         ui.campo_novo_noBd.setText("")
         return
@@ -1211,8 +1239,8 @@ def pegar_valor_tabela(event):
                             ui.caminho_pasta.setText(req[id]['PASTA'])
                         except:
                             pass
+                        mostrar_documentos_cliente(ui)
                         return
-                        
     except Exception as e:
         pass
 
@@ -1314,7 +1342,7 @@ def converter_jpg_para_pdf(ui):
         nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
         imagem = Image.open(image_path)
         imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
-
+        mostrar_documentos_cliente(ui)
     notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
     notificacao.show()
 
@@ -1329,7 +1357,8 @@ def converter_pdf_para_jpg(ui):
         imagem = primeira_pagina.get_pixmap()
         imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
         imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
-
+        
+    mostrar_documentos_cliente(ui)
     notificacao = Notification(app_id="Concluído", title="", msg="Os PDFs foram convertidos em JPG com sucesso!")
     notificacao.show()
 
@@ -1361,6 +1390,7 @@ def texto_para_pdf(ui):
         # Salvar o arquivo PDF
         c.save()
         ui.campo_link_video.setText("")
+        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Concluído",title="",msg=f"Texto salvo com sucesso!")
         notificacao.show()
     except Exception as e:
@@ -1368,7 +1398,7 @@ def texto_para_pdf(ui):
         notificacao.show()
 
 def evento_ao_abrir(event):
-    pass
+    trazer_diretorio_raiz(ui)
 
 def evento_ao_fechar(event):
 
@@ -1481,6 +1511,33 @@ def manter_tela_aberta(ui):
         ui.campo_verifica_tela_cheia.setText("SIM")
         ui.botao_tela_cheia.setText("🔒")
 
+def mostrar_documentos_cliente(ui):
+    pasta_cliente = ui.caminho_pasta.text()
+
+    try:
+        # Verifica se a pasta existe
+        if not os.path.exists(pasta_cliente):
+            raise FileNotFoundError
+
+        # Lista os arquivos na pasta
+        documentos = [f for f in os.listdir(pasta_cliente) if os.path.isfile(os.path.join(pasta_cliente, f))]
+
+        # Exibe os documentos em uma caixa de diálogo
+        if documentos:
+            mensagem = "\n".join(documentos)
+            ui.campo_lista_documentos.setText(f"{mensagem}\n")
+        else:
+            raise FileNotFoundError
+
+    except FileNotFoundError:
+        pass
+
+    except StopIteration:
+        pass
+
+    except Exception as e:
+        print(f"Erro: {e}")
+
 class JanelaOcultaHelper:
     def __init__(self, parent):
         self.parent = parent
@@ -1492,7 +1549,8 @@ class JanelaOcultaHelper:
         self.animation_target_height = 0
 
     def enterEvent(self, event):
-        self.animate_window_resize(469, 640)
+        self.animate_window_resize(469, 655)
+        mostrar_documentos_cliente(ui)
         
 
     def leaveEvent(self, event):
@@ -1504,10 +1562,10 @@ class JanelaOcultaHelper:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
-                self.animate_window_resize(256, 38)
+                self.animate_window_resize(256, 42)
 
     def mousePressEvent(self, event):
-        self.animate_window_resize(469, 640)
+        self.animate_window_resize(469, 655)
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -1535,14 +1593,12 @@ class JanelaOcultaHelper:
             self.animation_timer.stop()
             self.parent.setFixedSize(self.animation_target_width, self.animation_target_height)
 
-
 import sys
 app = QtWidgets.QApplication(sys.argv)
 janela = QtWidgets.QMainWindow()
 desktop = QDesktopWidget()
 ui = Ui_janela()
 ui.setupUi(janela)
-
 
 helper = JanelaOcultaHelper(janela)
 janela.enterEvent = helper.enterEvent
@@ -1577,7 +1633,7 @@ ui.barra_progresso_pedido.setVisible(False)
 ui.barra_progresso_consulta.setVisible(False)
 ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
 janela.closeEvent = evento_ao_fechar
-#janela.showEvent = evento_ao_abrir
+janela.showEvent = evento_ao_abrir
 ui.campo_cnh.mousePressEvent = lambda event: copiar_campo("campo_cnh")
 ui.campo_cnpj.mousePressEvent = lambda event: copiar_campo("campo_cnpj")
 ui.campo_pedido.mousePressEvent = lambda event: copiar_campo("campo_pedido")
@@ -1601,6 +1657,10 @@ ui.campo_msg4.setReadOnly(True)
 ui.campo_msg5.setReadOnly(True)
 ui.campo_msg6.setReadOnly(True)
 ui.campo_msg7.setReadOnly(True)
+ui.campo_lista_documentos.setReadOnly(True)
+ui.caminho_pasta_principal.setReadOnly(True)
+ui.caminho_pasta.setReadOnly(True)
+ui.campo_verifica_tela_cheia.setReadOnly(True)
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
@@ -1614,7 +1674,7 @@ ui.botao_tela_cheia.setFlat(True)
 ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
 ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
-
+ui.botao_altera_pasta_principal.clicked.connect(lambda: atualizar_diretorio_raiz(ui))
 
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
@@ -1623,10 +1683,8 @@ y = (screen_rect.height() - janela.height()) // 6
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(256, 38)           
+janela.setFixedSize(256, 42)           
 janela.show()
-
+#ui.label_5.setStyleSheet("background-color:rgb(90,54,247);")
 
 sys.exit(app.exec_())
-
-
