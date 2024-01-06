@@ -10,20 +10,23 @@ import PyPDF2
 import fitz
 import firebase_admin
 import json
+import smtplib
+import pyautogui
 from winotify import Notification
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect
 from PyQt5.QtGui import QDesktopServices,QColor
 from Interface import Ui_janela
 from firebase_admin import db
-import pyautogui
-from reportlab.lib.utils import ImageReader
 from requests.exceptions import RequestException
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
 
 
 credenciais = {
@@ -44,16 +47,207 @@ acoes = firebase_admin.credentials.Certificate(credenciais)
 firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
 ref = db.reference("/")
 
-def trazer_diretorio_raiz(ui):
+def atualizar_barras_metas(ui):
+    
+    try:
+        soma = int(ui.campo_certificados_semana_1.text()) + int(ui.campo_certificados_semana_2.text()) + int(ui.campo_certificados_semana_3.text()) + int(ui.campo_certificados_semana_4.text()) + int(ui.campo_certificados_semana_5.text())
+        meta_mensal = int(ui.campo_meta_mes.text())  # Convertido para inteiro
+        meta_semanal = int(ui.campo_meta_semanal.text())  # Convertido para inteiro
+
+        certificados_semana_1 = int(ui.campo_certificados_semana_1.text())
+        ui.barra_meta_semana_1.setMaximum(int(meta_semanal))
+        if certificados_semana_1 >= meta_semanal:
+            #Meta atingida
+            ui.label_meta1.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta1.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta1.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta1.setText(f"{certificados_semana_1}/{meta_semanal}")
+
+        certificados_semana_2 = int(ui.campo_certificados_semana_2.text())
+        ui.barra_meta_semana_2.setMaximum(int(meta_semanal))
+        if certificados_semana_2 >= meta_semanal:
+            #Meta atingida
+            ui.label_meta2.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta2.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta2.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta2.setText(f"{certificados_semana_2}/{meta_semanal}")
+
+        certificados_semana_3 = int(ui.campo_certificados_semana_3.text())
+        ui.barra_meta_semana_3.setMaximum(int(meta_semanal))
+        if certificados_semana_3 >= meta_semanal:
+            #Meta atingida
+            ui.label_meta3.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta3.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta3.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta3.setText(f"{certificados_semana_3}/{meta_semanal}")
+
+        certificados_semana_4 = int(ui.campo_certificados_semana_4.text())
+        ui.barra_meta_semana_4.setMaximum(int(meta_semanal))
+        if certificados_semana_4 >= meta_semanal:
+            #Meta atingida
+            ui.label_meta4.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta4.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta4.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta4.setText(f"{certificados_semana_4}/{meta_semanal}")
+
+        certificados_semana_5 = int(ui.campo_certificados_semana_5.text())
+        ui.barra_meta_semana_5.setMaximum(int(meta_semanal))
+        if certificados_semana_5 >= meta_semanal:
+            #Meta atingida
+            ui.label_meta5.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta5.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta5.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta5.setText(f"{certificados_semana_5}/{meta_semanal}")
+
+        ui.barra_meta_mensal.setMaximum(int(meta_mensal))
+        ui.label_meta_mes.setText(f"{soma}/{ui.campo_meta_mes.text()}")
+        if soma >= meta_mensal:
+             #Meta atingida
+            ui.label_meta_mes.setStyleSheet('background-color: rgb(0, 173, 247);')
+            ui.label_meta_mes.setText(f"Meta atingida!🥳")
+        else:
+            #Meta não atingida
+            ui.label_meta_mes.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+            ui.label_meta_mes.setText(f"{soma}/{meta_mensal}")
+
+    except Exception as e:
+        pass
+
+def trazer_metas(ui):
+    link = "https://configs-5d64c-default-rtdb.firebaseio.com/Metas"
+    # Faz uma solicitação GET para obter as configurações do banco de dados
+    bd = requests.get(f"{link}.json")
+    # Converte a resposta JSON em um dicionário Python
+    config = bd.json()
+   
+    try:
+        valor_semanal = config['SEMANAL']
+        valor_mensal = config['MENSAL']
+        ui.campo_meta_semanal.setValue(int(valor_semanal))
+        ui.campo_meta_mes.setValue(int(valor_mensal))
+    except Exception as e:
+        pass       
+
+def atualizar_meta_clientes(ui):
+    if ui.tabWidget.currentIndex() == 4:
+        # Certifique-se de que req é um dicionário
+        req = ref.get()
+        
+        # Inicializando contadores para cada semana
+        semana1 = 0
+        semana2 = 0
+        semana3 = 0
+        semana4 = 0
+        semana5 = 0
+
+        # Obter a data do campo ui.campo_data_meta
+        mes_meta = ui.campo_data_meta.date().month()
+        ano_meta = ui.campo_data_meta.date().year()
+        
+        for pedido_info in req:
+            # Verificando se o status é aprovado
+            if req[pedido_info]['STATUS'] == "APROVADO":
+                # Obtendo a data do pedido
+                data_pedido = req[pedido_info]['DATA']
+                
+                # Convertendo a data para o formato desejado (considerando que DATA_PEDIDO é uma string)
+                data_formatada = datetime.datetime.strptime(data_pedido, "%d/%m/%Y")
+                
+                # Verificando se o pedido pertence ao mesmo mês e ano de referência
+                if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
+                    # Obtendo a semana do mês
+                    semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
+                    
+                    # Incrementando o contador da semana correspondente
+                    if semana_do_mes == 1:
+                        semana1 += 1
+                    elif semana_do_mes == 2:
+                        semana2 += 1
+                    elif semana_do_mes == 3:
+                        semana3 += 1
+                    elif semana_do_mes == 4:
+                        semana4 += 1
+                    elif semana_do_mes == 5:
+                        semana5 += 1
+
+        ui.campo_certificados_semana_1.setText(str(semana1))
+        ui.campo_certificados_semana_2.setText(str(semana2))
+        ui.campo_certificados_semana_3.setText(str(semana3))
+        ui.campo_certificados_semana_4.setText(str(semana4))
+        ui.campo_certificados_semana_5.setText(str(semana5))
+        # Agora você tem a quantidade de pedidos aprovados para cada semana
+        
+        ui.barra_meta_semana_1.setValue(semana1)
+        ui.barra_meta_semana_2.setValue(semana2)
+        ui.barra_meta_semana_3.setValue(semana3)
+        ui.barra_meta_semana_4.setValue(semana4)
+        ui.barra_meta_semana_5.setValue(semana5)
+        total = semana1 + semana2 + semana3 + semana4 + semana5
+        ui.barra_meta_mensal.setValue(total)
+        ui.barra_meta_mensal.setMaximum(int(ui.campo_meta_mes.text()))
+        ui.campo_certificados_mes.setText(str(total))
+        atualizar_barras_metas(ui)
+
+def Atualizar_meta(ui):
+
+    link = "https://configs-5d64c-default-rtdb.firebaseio.com/Metas"
+    # Faz uma solicitação GET para obter as configurações do banco de dados
+    bd = requests.get(f"{link}.json")
+    # Converte a resposta JSON em um dicionário Python
+
+    meta_semana = ui.campo_meta_semanal.text()
+    meta_mes = ui.campo_meta_mes.text()
+
+
+    nova_meta = {"MENSAL": meta_mes,"SEMANAL":meta_semana}
+    try:
+        requests.patch(f'{link}.json', data=json.dumps(nova_meta))
+    except:
+        requests.post(f'{link}.json', data=json.dumps(nova_meta))
+
+def trazer_configuracoes(ui):
 
     link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
     # Faz uma solicitação GET para obter as configurações do banco de dados
     bd = requests.get(f"{link}.json")
     # Converte a resposta JSON em um dicionário Python
     config = bd.json()
-    # Imprime as configurações (opcional, para depuração)
-    ui.caminho_pasta_principal.setText(config['diretorio_raiz'])
+   
+    try:
+        ui.caminho_pasta_principal.setText(config['DIRETORIO-RAIZ'])
+        ui.campo_senha_email_empresa.setText(config['SENHA'])
+        ui.campo_email_empresa.setText(config['E-MAIL'])
+    except Exception as e:
+        pass       
+
+def atualizar_configuracoes(ui):
+    resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+    if resposta == QMessageBox.Yes:
+        pass
+    else:
+        return
     
+    link_firebase = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+  
+    diretorio = ui.caminho_pasta_principal.text()
+    email = ui.campo_email_empresa.text()
+    senha = ui.campo_senha_email_empresa.text()
+    nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha}
+    try:
+        requests.patch(f'{link_firebase}.json', data=json.dumps(nova_config))
+    except:
+        requests.post(f'{link_firebase}.json', data=json.dumps(nova_config))
+ 
 def atualizar_diretorio_raiz(ui):
     widget_pai = ui.centralwidget
     # Abrir o explorer para selecionar a pasta raiz
@@ -69,24 +263,8 @@ def atualizar_diretorio_raiz(ui):
         # Atualizar o campo de texto na interface gráfica
         ui.caminho_pasta_principal.setText(diretorio_selecionado)
 
-        # Link para o Firebase Realtime Database
-        link_firebase = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
-
-        # Obter o diretório da interface gráfica
-        diretorio = ui.caminho_pasta_principal.text()
-
-        # Criar um dicionário com a nova configuração
-        nova_config = {"diretorio_raiz": diretorio}
-
-        # Enviar a requisição PATCH para atualizar no Firebase
-        response = requests.patch(f'{link_firebase}.json', data=json.dumps(nova_config))
-
-        if response.ok:
-            print("Diretório raiz atualizado com sucesso!")
-        else:
-            print(f"Erro ao atualizar o diretório raiz: {response.status_code}")
     else:
-        print("Seleção de diretório cancelada.")
+        pass
 
 def converter_todas_imagens_para_pdf(ui):
     caminho_pasta = ui.caminho_pasta.text()
@@ -110,7 +288,6 @@ def converter_todas_imagens_para_pdf(ui):
 
                 # Fecha o arquivo PDF
                 pdf.save()
-                mostrar_documentos_cliente(ui)
 
                 
         notificacao = Notification(app_id="Concluído", title="", msg=f"imagens convertidas!")
@@ -159,10 +336,9 @@ def print_tela(ui):
             janela_principal.showMinimized()
 
         # Aguarda um curto período para garantir que a janela tenha tempo de minimizar
-        time.sleep(0.7)
+        time.sleep(0.5)
 
         # Tira um screenshot da tela
-        screenshot = pyautogui.screenshot()
         screenshot = pyautogui.screenshot()
 
         # Restaura a janela principal (opcional)
@@ -172,7 +348,7 @@ def print_tela(ui):
         # Salva o screenshot no caminho especificado
     
         screenshot.save(caminho)
-        mostrar_documentos_cliente(ui)
+
         notificacao = Notification(app_id="Concluído", title="", msg=f"Print capturada!")
         notificacao.show()
        
@@ -209,18 +385,12 @@ def gerar_link_video_conferencia(ui):
             c.drawString(x, y, line)
             y -= 15
         c.save()
-        mostrar_documentos_cliente(ui)
-        
-
         
         return
-    # if ui.caminho_pasta.text() == "":
-    #     notificacao = Notification(app_id="Erro", title="", msg=f"É necessário criar a pasta do cliente!")
-    #     notificacao.show()
-    #     return
+
 
     if ui.campo_lista_status_4.currentText() == "PRESENCIAL":
-        mostrar_documentos_cliente(ui)
+
         notificacao = Notification(app_id="Erro", title="", msg=f"Não é possível gerar link na modalidade presencial!")
         notificacao.show()
         return
@@ -254,7 +424,6 @@ def gerar_link_video_conferencia(ui):
             y -= 15  # Espaçamento entre as linhas
         # Salvar o arquivo PDF
         c.save()
-        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Concluído", title="", msg=f"Link salvo com sucesso!")
         notificacao.show()
     except Exception as e:
@@ -278,7 +447,7 @@ def forcar_fechamento_de_arquivo_e_deletar_pasta(folder_path):
             notificacao = Notification(app_id="Erro ao excluir pasta do cliente")
             notificacao.show()
             break
-        
+   
 def fechar_arquivo_em_uso(folder_path):
     processes = psutil.process_iter(['pid', 'name', 'open_files'])
     for process in processes:
@@ -370,7 +539,11 @@ def limpar_campos(ui):
     ui.campo_cnpj_uf.setText("")
     ui.caminho_pasta.setText("")
     ui.campo_lista_junta_comercial.setCurrentText("")
-    ui.campo_lista_documentos.setText("")
+    ui.campo_lista_tipo_certificado.setCurrentText("")
+    ui.campo_link_webex.setText("")
+    ui.campo_msg_agendamento.setText("")
+    ui.campo_assunto_email.setText("")
+    ui.campo_msg3.setPlainText("")
 
 def procurar_cnh(ui):
     url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -456,7 +629,6 @@ def procurar_junta(ui):
             link_consulta  = "https://www.redesim.rn.gov.br/"
         case 'SP':
             link_consulta  = "https://www.jucesponline.sp.gov.br/"
-
 
     url_junta = QUrl(link_consulta)
     QDesktopServices.openUrl(url_junta)
@@ -587,7 +759,7 @@ def salvar(ui):
     req = ref.get()
     for id in req:
         if num_pedido == req[id]['PEDIDO']:
-            if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+            if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO" and ui.campo_lista_status.currentText() != "VIDEO REALIZADA" :
                 resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                 if resposta == QMessageBox.Yes:
                     pass
@@ -596,6 +768,7 @@ def salvar(ui):
                 #aqui o pedido existente será gravado
                 #caso o status seja diferente de Aguardando
                 #os dados do cliente serão deletados
+                certificado = ui.campo_lista_tipo_certificado.currentText()
                 pedido = ui.campo_pedido.text()
                 tipo = ui.campo_certificado.text()
                 hora  = ui.campo_hora_agendamento.text()
@@ -617,9 +790,11 @@ def salvar(ui):
                 municipio = ""
                 uf = ""
                 caminho_pasta = ""
+                link_webex = ""
 
 
-                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
                     notificacao.show()
@@ -627,7 +802,7 @@ def salvar(ui):
                 
             
                 #
-                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 ##############################################################################################################################
                 
                 
@@ -647,6 +822,7 @@ def salvar(ui):
             #e mante-los nos campos
             
             else:
+                certificado = ui.campo_lista_tipo_certificado.currentText()
                 pedido = ui.campo_pedido.text()
                 tipo = ui.campo_certificado.text()
                 hora  = ui.campo_hora_agendamento.text()
@@ -668,14 +844,15 @@ def salvar(ui):
                 municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
                 caminho_pasta = ui.caminho_pasta.text()
+                link_webex = ui.campo_link_webex.text()
 
-                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
@@ -686,13 +863,13 @@ def salvar(ui):
         #aqui o pedido não existe e será gravado
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
-    if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+    if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO" and ui.campo_lista_status.currentText() != "VIDEO REALIZADA":
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
             pass
         else:
             return
-        
+        certificado = ui.campo_lista_tipo_certificado.currentText()
         pedido = ui.campo_pedido.text()
         tipo = ui.campo_certificado.text()
         hora  = ui.campo_hora_agendamento.text()
@@ -715,8 +892,9 @@ def salvar(ui):
         municipio = ""
         uf = ""
         caminho_pasta = ""
+        link_webex = ""
 
-        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
             notificacao.show()
@@ -724,7 +902,7 @@ def salvar(ui):
         
         
         #
-        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         ##############################################################################################################################
        
         folder_to_delete = ui.caminho_pasta.text()
@@ -737,6 +915,7 @@ def salvar(ui):
         limpar_campos(ui)
         return
     else:
+        certificado = ui.campo_lista_tipo_certificado.currentText()
         pedido = ui.campo_pedido.text()
         tipo = ui.campo_certificado.text()
         hora  = ui.campo_hora_agendamento.text()
@@ -758,14 +937,15 @@ def salvar(ui):
         municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
         caminho_pasta = ui.caminho_pasta.text()
+        link_webex = ui.campo_link_webex.text()
     
-        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
             notificacao.show()
             return
         #
-        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -779,7 +959,7 @@ def gravar_dados(ui):
     req = ref.get()
     for id in req:
         if num_pedido == req[id]['PEDIDO']:
-            if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+            if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO" and ui.campo_lista_status.currentText() != "VIDEO REALIZADA":
                 resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
                 if resposta == QMessageBox.Yes:
                     pass
@@ -788,6 +968,7 @@ def gravar_dados(ui):
                 #aqui o pedido existente será gravado
                 #caso o status seja diferente de Aguardando
                 #os dados do cliente serão deletados
+                certificado = ui.campo_lista_tipo_certificado.currentText()
                 pedido = ui.campo_pedido.text()
                 tipo = ui.campo_certificado.text()
                 hora  = ui.campo_hora_agendamento.text()
@@ -809,16 +990,15 @@ def gravar_dados(ui):
                 municipio = ""
                 uf = ""
                 caminho_pasta = ""
+                link_webex = ""
 
-                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
                     notificacao.show()
                     return
-                
 
-                #
-                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 ##############################################################################################################################
                 
                 folder_to_delete = ui.caminho_pasta.text()
@@ -830,10 +1010,8 @@ def gravar_dados(ui):
                 ref.child(id).update(novos_dados)
                 limpar_campos(ui)
                 return
-            
-            
-            
             else:
+                certificado = ui.campo_lista_tipo_certificado.currentText()
                 pedido = ui.campo_pedido.text()
                 tipo = ui.campo_certificado.text()
                 hora  = ui.campo_hora_agendamento.text()
@@ -855,21 +1033,22 @@ def gravar_dados(ui):
                 municipio = ui.campo_cnpj_municipio.text()
                 uf = ui.campo_cnpj_uf.text()
                 caminho_pasta = ui.caminho_pasta.text()
+                link_webex = ui.campo_link_webex.text()
 
-                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+                if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
                     notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
                     notificacao.show()
                     return
                 #
-                novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+                novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
                 notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} atualizado com sucesso\nStatus:{status}!",duration="short")
                 notificacao.show()
                 ref.child(id).update(novos_dados)
                 limpar_campos(ui)
                 return
    
-    if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO":
+    if ui.campo_lista_status.currentText() != "DIGITAÇÃO" and ui.campo_lista_status.currentText() != "VERIFICAÇÃO" and ui.campo_lista_status.currentText() != "VIDEO REALIZADA":
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", f"Finalizar o pedido como {ui.campo_lista_status.currentText()}?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
             pass
@@ -878,6 +1057,7 @@ def gravar_dados(ui):
         #aqui o pedido não existe e será gravado
         #caso o status seja diferente de Aguardando
         #os dados do cliente serão deletados
+        certificado = ui.campo_lista_tipo_certificado.currentText()
         pedido = ui.campo_pedido.text()
         tipo = ui.campo_certificado.text()
         hora  = ui.campo_hora_agendamento.text()
@@ -899,15 +1079,16 @@ def gravar_dados(ui):
         municipio = ""
         uf = ""
         caminho_pasta = ""
+        link_webex = ""
 
-        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
             notificacao.show()
             return
         
 
-        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         notificacao = Notification(app_id="Pedido",title="",msg=f"Pedido {pedido} salvo com sucesso\nStatus:{status}!",duration="short")
         
         ##############################################################################################################################
@@ -921,6 +1102,7 @@ def gravar_dados(ui):
         limpar_campos(ui)
         return
     else:
+        certificado = ui.campo_lista_tipo_certificado.currentText()
         pedido = ui.campo_pedido.text()
         tipo = ui.campo_certificado.text()
         hora  = ui.campo_hora_agendamento.text()
@@ -942,14 +1124,15 @@ def gravar_dados(ui):
         municipio = ui.campo_cnpj_municipio.text()
         uf = ui.campo_cnpj_uf.text()
         caminho_pasta = ui.caminho_pasta.text()
+        link_webex = ui.campo_link_webex.text()
 
-        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or certificado == "":
 
             notificacao = Notification(app_id="Erro no Envio",title="",msg="Adicione os itens com 🌟 para Encerrar o pedido!",duration="short")
             notificacao.show()
             return
         #
-        novos_dados = {"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
+        novos_dados = {"WEBEX":link_webex,"CERTIFICADO":certificado,"PASTA":caminho_pasta,"MUNICIPIO": municipio,"UF":uf,"DIRETORIO":diretorio,"PEDIDO":pedido , "DATA":data, "HORA":hora, "TIPO":tipo, "STATUS":status,"NOME":nome,"RG":rg,"CPF":cpf,"CNH":cnh,"MAE":mae ,"CNPJ":cnpj,"EMAIL":email,"NASCIMENTO":data_nascimento,"VENDIDO POR MIM?":vendido,"MODALIDADE":modalidade,"CODIGO DE SEG CNH":cod_seg_cnh}
         
         notificacao = Notification(app_id="Novo pedido",title="",msg=f"Pedido {pedido} criado com sucesso\nStatus:{status}!",duration="short")
         notificacao.show()
@@ -980,15 +1163,22 @@ def exportar_excel(ui):
                 if status_filtro == status_servidor:
                 
                     x += 1
+                    
                     pedido = req[cliente]['PEDIDO']
                     data_agendamento = req[cliente]['DATA']
+                    try:
+                        certificado = req[cliente]['CERTIFICADO']
+                    except:
+                        certificado =""
+                        pass
                     tipo_pedido = req[cliente]['TIPO']
                     hora_agendamento = req[cliente]['HORA']    
                     status_agendamento = req[cliente]['STATUS']
                     vendido = req[cliente]['VENDIDO POR MIM?']
                     modalidade = req[cliente]['MODALIDADE']
 
-                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade))   
+
+                    dados_selecionados.append((pedido, data_agendamento,certificado, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade))   
 
                 elif status_filtro == "TODAS":
 
@@ -996,19 +1186,24 @@ def exportar_excel(ui):
 
                     pedido = req[cliente]['PEDIDO']
                     data_agendamento = req[cliente]['DATA']
+                    try:
+                        certificado = req[cliente]['CERTIFICADO']
+                    except:
+                        certificado =""
+                        pass
                     tipo_pedido = req[cliente]['TIPO']
                     hora_agendamento = req[cliente]['HORA']    
                     status_agendamento = req[cliente]['STATUS']
                     vendido = req[cliente]['VENDIDO POR MIM?']
                     modalidade = req[cliente]['MODALIDADE']
-                    dados_selecionados.append((pedido, data_agendamento, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade)) 
+                    dados_selecionados.append((pedido, data_agendamento,certificado, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade)) 
         
         if x > 0:
             root = tk.Tk()
             root.withdraw()
             caminho_arquivo = filedialog.askdirectory()
             if caminho_arquivo:
-                df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
+                df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Certificado','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
                 data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
                 data_final = ui.campo_data_ate.text()
                 data_inicial = ui.campo_data_de.text()
@@ -1065,13 +1260,13 @@ def preencher_tabela(ui):
                 
                     row_position = ui.tableWidget.rowCount()
                     ui.tableWidget.insertRow(row_position)
-
-                    ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['PEDIDO']))
-                    ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['NOME']))
-                    ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['DATA']))
-                    ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
-                    ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['MODALIDADE']))
-                    ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['STATUS']))
+                    
+                    ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
+                    ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
+                    ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['NOME']))
+                    ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['DATA']))
+                    ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['HORA']))
+                    ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['MODALIDADE']))
                     ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['VENDIDO POR MIM?']))
                     ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['TIPO']))
                     try:
@@ -1082,42 +1277,38 @@ def preencher_tabela(ui):
                     for col in range(ui.tableWidget.columnCount()):
                         item = ui.tableWidget.item(row_position, col)
 
-                        # Obter a data e hora da célula
-                        data_celula = ui.tableWidget.item(row_position, 2).text()
-                        hora_celula = ui.tableWidget.item(row_position, 3).text()
+                        status = ui.tableWidget.item(row_position,0).text()
 
-                        # Converter as strings em objetos datetime
-                        data_hora_celula = datetime.datetime.strptime(f"{data_celula} {hora_celula}", "%d/%m/%Y %H:%M")
-
-                        # Verificar se a célula não está vazia
                         if item is not None:
-                            # Comparar com a data e hora atuais
-                            if data_hora_celula <= datetime.datetime.now():
-                                #item.setBackground(QColor(227, 225, 225))   
-                                pass                       
-                            else:
-                                # Configurar o fundo para azul claro para todas as outras células
-                                item.setBackground(QColor(177, 215, 252))  # Azul claro
-                        
+                            match status:
+                                case 'DIGITAÇÃO':
+                                    item.setBackground(QColor(204, 204, 204))  # Cinza
+                                case 'VIDEO REALIZADA':
+                                    item.setBackground(QColor(25, 200, 255))  # Amarelo
+                                case 'VERIFICAÇÃO':
+                                    item.setBackground(QColor(255, 167, 91))  # Laranja claro
+                                case 'APROVADO':
+                                    item.setBackground(QColor(173, 255, 47))  # Verde limão
+                                case 'CANCELADO':
+                                    item.setBackground(QColor(255, 30, 30))  # Vermelho claro   
+
                     y += 1
                     porcentagem = (y/total_pedidos)*100
                     ui.barra_progresso_consulta.setValue(int(porcentagem))
                     QApplication.processEvents()
                     
-        
         total = 100
         while porcentagem <= total:
             ui.barra_progresso_consulta.setValue(int(porcentagem))
             porcentagem +=1
             QApplication.processEvents()
             
-        
         ui.barra_progresso_consulta.setValue(100)
         ui.label_quantidade_bd.setText(f"{x} registro(s)")
-        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
+        ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","TIPO","OBSERVAÇÕES"])
         ui.barra_progresso_consulta.setVisible(False)
     except Exception as e:
-            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "STATUS", "VENDA","TIPO","OBSERVAÇÕES"])
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","TIPO","OBSERVAÇÕES"])
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
             pass
@@ -1162,7 +1353,8 @@ def carregar_dados(ui):
                 ui.campo_cnpj_municipio.setText(req[pedido]['MUNICIPIO'])
                 ui.campo_cnpj_uf.setText(req[pedido]['UF'])
                 ui.caminho_pasta.setText(req[pedido]['PASTA'])
-                mostrar_documentos_cliente(ui)
+                ui.campo_lista_tipo_certificado.setCurrentText(req[pedido]['CERTIFICADO'])
+                ui.campo_link_webex.setText(req[pedido]['WEBEX'])
 
             # Atualize a barra de progresso
             num_pedidos_processados += 1
@@ -1181,7 +1373,7 @@ def copiar_pedido_tabela(event):
     item = ui.tableWidget.currentItem()
     coluna = item.column()
     # Verifica se há um item selecionado
-    if item is not None and coluna == 0:
+    if item is not None and coluna == 1:
         # Obtém o texto da célula
         valor_celula = item.text()
 
@@ -1202,7 +1394,7 @@ def pegar_valor_tabela(event):
             coluna = item.column()
             valor = item.text()
 
-            if coluna == 0 :    
+            if coluna == 1 :    
                    
                 for id in req:
                     if req[id]["PEDIDO"] == valor: 
@@ -1239,7 +1431,15 @@ def pegar_valor_tabela(event):
                             ui.caminho_pasta.setText(req[id]['PASTA'])
                         except:
                             pass
-                        mostrar_documentos_cliente(ui)
+                        try:
+                            ui.campo_lista_tipo_certificado.setCurrentText(req[id]['CERTIFICADO'])
+                        except:
+                            pass
+                        try:
+                            ui.campo_link_webex.setText(req[id]['WEBEX'])   
+                        except:
+                            pass    
+
                         return
     except Exception as e:
         pass
@@ -1271,7 +1471,6 @@ def mesclar_pdf(ui):
             # Se não for possível abrir o diretório especificado, abrir o diálogo padrão
             file_paths, _ = QFileDialog.getOpenFileNames(ui.centralwidget, "Selecionar PDFs para Mesclar", "", "Arquivos PDF (*.pdf);;Todos os arquivos (*)")
 
-            # Verificar se o usuário cancelou a seleção ou não escolheu nenhum arquivo
             if not file_paths:
                 return
 
@@ -1306,22 +1505,19 @@ def escolher_conversao(ui):
     dialog = QDialog(ui.centralwidget)
     dialog.setWindowTitle("Selecione o tipo de conversão")
     
-    # Layout vertical para adicionar RadioButtons
     layout_dialog = QVBoxLayout(dialog)
 
-    # Criando os RadioButtons
     radio_jpg_to_pdf = QRadioButton("JPG para PDF")
     radio_pdf_to_jpg = QRadioButton("PDF para JPG")
     
-    # Adicionando os RadioButtons ao layout
+
     layout_dialog.addWidget(radio_jpg_to_pdf)
     layout_dialog.addWidget(radio_pdf_to_jpg)
 
-    # Botão para confirmar e fechar a janela de diálogo
     botao_confirmar = QPushButton("Confirmar")
     layout_dialog.addWidget(botao_confirmar)
 
-    # Função para ser executada ao clicar no botão de confirmação
+
     def confirmar():
         # Verificar qual RadioButton foi selecionado
         if radio_jpg_to_pdf.isChecked():
@@ -1342,7 +1538,7 @@ def converter_jpg_para_pdf(ui):
         nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
         imagem = Image.open(image_path)
         imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
-        mostrar_documentos_cliente(ui)
+
     notificacao = Notification(app_id="Concluído", title="", msg="As imagens foram convertidas em PDF com sucesso!")
     notificacao.show()
 
@@ -1358,7 +1554,6 @@ def converter_pdf_para_jpg(ui):
         imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
         imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
         
-    mostrar_documentos_cliente(ui)
     notificacao = Notification(app_id="Concluído", title="", msg="Os PDFs foram convertidos em JPG com sucesso!")
     notificacao.show()
 
@@ -1369,7 +1564,6 @@ def texto_para_pdf(ui):
         default_file_name = "LINK VIDEO"
         # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
         save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],initialfile=default_file_name,title="Local de download")
-        
         # Verificar se o usuário selecionou um local de salvamento
         if not save_path:
             return
@@ -1390,7 +1584,6 @@ def texto_para_pdf(ui):
         # Salvar o arquivo PDF
         c.save()
         ui.campo_link_video.setText("")
-        mostrar_documentos_cliente(ui)
         notificacao = Notification(app_id="Concluído",title="",msg=f"Texto salvo com sucesso!")
         notificacao.show()
     except Exception as e:
@@ -1398,7 +1591,9 @@ def texto_para_pdf(ui):
         notificacao.show()
 
 def evento_ao_abrir(event):
-    trazer_diretorio_raiz(ui)
+    trazer_configuracoes(ui)
+    trazer_metas(ui)
+    ui.campo_data_meta.setDate(QDate.currentDate())
 
 def evento_ao_fechar(event):
 
@@ -1478,13 +1673,10 @@ def copiar_campo(nome_campo):
             except:
                 pass
         case'campo_msg3':
-            try:
-                QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
-            except:
-                pass
-        case'campo_msg4':
-            try:
-                QApplication.clipboard().setText(ui.campo_msg4.toPlainText())
+            #Campo que contém o e-mail padrão 
+            try: 
+                    email_padrao_webex(ui)        
+                    QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
             except:
                 pass
         case'campo_msg5':
@@ -1502,6 +1694,16 @@ def copiar_campo(nome_campo):
                 QApplication.clipboard().setText(ui.campo_msg7.toPlainText())
             except:
                 pass
+        case'campo_msg_agendamento':
+            try:
+                QApplication.clipboard().setText(ui.campo_msg_agendamento.text())
+            except:
+                pass
+        case'campo_assunto_email':
+            try:
+                QApplication.clipboard().setText(ui.campo_assunto_email.text())
+            except:
+                pass
 
 def manter_tela_aberta(ui):
     if ui.campo_verifica_tela_cheia.text() == "SIM":
@@ -1511,32 +1713,134 @@ def manter_tela_aberta(ui):
         ui.campo_verifica_tela_cheia.setText("SIM")
         ui.botao_tela_cheia.setText("🔒")
 
-def mostrar_documentos_cliente(ui):
-    pasta_cliente = ui.caminho_pasta.text()
+def abrir_pasta_cliente(ui):
+    try:
+        caminho_pasta_cliente = ui.caminho_pasta.text()
+        QDesktopServices.openUrl(QUrl.fromLocalFile(caminho_pasta_cliente))
+    except:
+        return
+
+def email_padrao_webex(ui):
+    try:
+        if ui.campo_lista_tipo_certificado.currentText() == "e-CNPJ":
+                        texto_formatado = (
+                            f"""Olá {ui.campo_nome.text().capitalize()}, tudo bem?
+
+Sou o Rafael, agente de registro da AR ACB SERVICOS E NEGOCIOS e estou entrando em contato pois temos uma validação para seu certificado digital às {ui.campo_hora_agendamento.time().toString("hh:mm")} do dia {ui.campo_data_agendamento.text()}, pedido {ui.campo_pedido.text()}.
+
+Para agilizar o processo, peço que o senhor encaminhe para um dos contatos abaixo, os seguintes documentos:
+1 - Uma foto completa(frente e verso) de seu documento de identificação, podendo ser(CNH,RG,OAB).
+2 - O documento de constituição da empresa, podendo ser o Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.
+
+Para acessar a reunião,clique no link da vídeo-conferência abaixo.  
+{ui.campo_link_webex.text()}
+
+Em caso de dúvidas, sinta-se à vontade para me contatar pelos seguintes meios:
+Whatsapp: (11)97187-2108
+e-mail: paranagua@acbdigital.com.br
+
+
+Att.
+Rafael Negrão de Souza"""
+                                )
+                        ui.campo_assunto_email.setText("")
+                        ui.campo_assunto_email.setText(f"VALIDAÇÃO PEDIDO {ui.campo_pedido.text()}")
+                        ui.campo_msg_agendamento.setText("")
+                        ui.campo_msg_agendamento.setText(f"pedido_{ui.campo_pedido.text()}-CLIENTE_{ui.campo_nome.text().capitalize()}")
+                        ui.campo_msg3.setPlainText("")
+                        ui.campo_msg3.setPlainText(texto_formatado)
+                        QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
+
+        elif ui.campo_lista_tipo_certificado.currentText() == "e-CPF":
+            texto_formatado = (
+            f"""Olá {ui.campo_nome.text().capitalize()}, tudo bem?
+
+Sou o Rafael, agente de registro da AR ACB SERVICOS E NEGOCIOS e estou entrando em contato pois temos uma validação para seu certificado digital às {ui.campo_hora_agendamento.time().toString("hh:mm")} do dia {ui.campo_data_agendamento.text()}, pedido {ui.campo_pedido.text()}.
+
+Para agilizar o processo, peço que o senhor encaminhe para um dos contatos abaixo, os documentos:
+1 - Uma foto completa(frente e verso) de seu documento de identificação, podendo ser(CNH,RG,OAB).
+
+Para acessar a reunião,clique no link da vídeo-conferência abaixo
+{ui.campo_link_webex.text()}
+
+Em caso de dúvidas, sinta-se à vontade para me contatar pelos seguintes meios:
+Whatsapp: (11)97187-2108
+e-mail: paranagua@acbdigital.com.br
+
+
+Att.
+Rafael Negrão de Souza"""
+                )
+            ui.campo_assunto_email.setText("")
+            ui.campo_assunto_email.setText(f"VALIDAÇÃO PEDIDO {ui.campo_pedido.text()}")
+            ui.campo_msg_agendamento.setText("")
+            ui.campo_msg_agendamento.setText(f"pedido_{ui.campo_pedido.text()}-CLIENTE_{ui.campo_nome.text().capitalize()}")
+            ui.campo_msg3.setPlainText("")
+            ui.campo_msg3.setPlainText(texto_formatado)
+            QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
+    except:
+        pass
+
+def atualizar_aba(ui):
+    if ui.tabWidget.currentIndex() == 3:
+        email_padrao_webex(ui)
+    elif ui.tabWidget.currentIndex() == 4:
+        atualizar_meta_clientes(ui)
+        
+    pass
+
+def envio_de_email(ui):
+
+    nome = ui.campo_nome.text()
+    pedido = ui.campo_pedido.text()
+    hora  = ui.campo_hora_agendamento.text()
+    data = ui.campo_data_agendamento.text()
+    link = ui.campo_link_webex.text()
+    mensagem = ui.campo_msg3.toPlainText()
+    email = ui.campo_email_empresa.text()
+    senha = ui.campo_senha_email_empresa.text()
+
+    if nome == "" or pedido == "" or link == "" or  hora == "00:00" or data == "01/01/2000" or email == "" or senha == "":
+        notificacao = Notification(app_id="Erro no envio",title="",msg=f"Preencha os seguintes campos para enviar o e-mail! \n-nome\n-pedido\n-hora\n-data\n-link",duration="short")
+        notificacao.show()
+        return
 
     try:
-        # Verifica se a pasta existe
-        if not os.path.exists(pasta_cliente):
-            raise FileNotFoundError
+        smtp_server = 'smtp.acbdigital.com.br'  # Substitua pelo seu servidor SMTP
+        smtp_port = 587  # Porta do servidor SMTP
+        smtp_username = email  # Seu endereço de e-mail
+        smtp_password = senha  # Sua senha de e-mail
+    
 
-        # Lista os arquivos na pasta
-        documentos = [f for f in os.listdir(pasta_cliente) if os.path.isfile(os.path.join(pasta_cliente, f))]
+        # Configurações do e-mail
+        sender_email = email
+        receiver_email = ui.campo_email.text()
+        subject = ui.campo_assunto_email.text()
+        body = mensagem
 
-        # Exibe os documentos em uma caixa de diálogo
-        if documentos:
-            mensagem = "\n".join(documentos)
-            ui.campo_lista_documentos.setText(f"{mensagem}\n")
-        else:
-            raise FileNotFoundError
+        # Criação do objeto MIMEMultipart
+        message = MIMEMultipart()
+        message['From'] = sender_email
+        message['To'] = receiver_email
+        message['Subject'] = subject
+        message.attach(MIMEText(body, 'plain'))
 
-    except FileNotFoundError:
+        # Conexão com o servidor SMTP
+        try:
+            with smtplib.SMTP(smtp_server, smtp_port) as server:
+                server.starttls()
+                server.login(smtp_username, smtp_password)
+                text = message.as_string()
+                server.sendmail(sender_email, receiver_email, text)
+            notificacao = Notification(app_id="Pedido",title="",msg=f"E-mail enviado com sucesso!",duration="short")
+            notificacao.show()
+        except Exception as e:
+            notificacao = Notification(app_id="Pedido",title="",msg=f"Erro ao enviar e-mail\nmotivo: {e}",duration="short")
+            notificacao.show()
+            
+    except:
         pass
 
-    except StopIteration:
-        pass
-
-    except Exception as e:
-        print(f"Erro: {e}")
 
 class JanelaOcultaHelper:
     def __init__(self, parent):
@@ -1549,8 +1853,8 @@ class JanelaOcultaHelper:
         self.animation_target_height = 0
 
     def enterEvent(self, event):
-        self.animate_window_resize(469, 655)
-        mostrar_documentos_cliente(ui)
+        self.animate_window_resize(467, 650)
+       
         
 
     def leaveEvent(self, event):
@@ -1562,10 +1866,10 @@ class JanelaOcultaHelper:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
-                self.animate_window_resize(256, 42)
+                self.animate_window_resize(155, 42)
 
     def mousePressEvent(self, event):
-        self.animate_window_resize(469, 655)
+        self.animate_window_resize(467, 650)#467
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -1601,39 +1905,72 @@ ui = Ui_janela()
 ui.setupUi(janela)
 
 helper = JanelaOcultaHelper(janela)
+
+#Manipulações
 janela.enterEvent = helper.enterEvent
 janela.leaveEvent = helper.leaveEvent
 janela.mousePressEvent = helper.mousePressEvent
+janela.closeEvent = evento_ao_fechar
+janela.showEvent = evento_ao_abrir
+
+#Campos botões
+ui.botao_atualizar_meta.clicked.connect(lambda:Atualizar_meta(ui))
+ui.botao_atualizar_configuracoes.clicked.connect(lambda:atualizar_configuracoes(ui))
 ui.botao_consultar.clicked.connect(lambda:preencher_tabela(ui))
 ui.botao_terminar.clicked.connect(lambda:gravar_dados(ui))
 ui.botao_procurar.clicked.connect(lambda:exportar_excel(ui))
-ui.campo_cpf.editingFinished.connect(lambda:formatar_cpf(ui))
-ui.campo_pedido.editingFinished.connect(lambda:carregar_dados(ui))
-ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
-ui.campo_cnpj.editingFinished.connect (lambda:formatar_cnpj(ui))
-ui.campo_nome.editingFinished.connect(lambda:formatar_nome(ui))
-ui.campo_nome_mae.editingFinished.connect(lambda:formatar_nome_mae(ui))
+ui.botao_abrir_pasta_cliente.clicked.connect(lambda:abrir_pasta_cliente(ui))
+ui.botao_abrir_pasta_cliente.setToolTip("Abrir pasta do cliente")
 ui.botao_consulta_cnpj.clicked.connect(lambda:procurar_cnpj(ui))
 ui.botao_consulta_cpf.clicked.connect(lambda:procurar_cpf(ui))
 ui.botao_consulta_cnh.clicked.connect(lambda:procurar_cnh(ui))
 ui.botao_consulta_rg.clicked.connect(lambda:procurar_rg(ui))
-ui.tableWidget.itemDoubleClicked.connect(lambda:pegar_valor_tabela(ui))
-ui.tableWidget.itemClicked.connect(lambda:copiar_pedido_tabela(ui))
 ui.botao_salvar.clicked.connect(lambda:salvar(ui))
 ui.botao_junta.clicked.connect(lambda:procurar_junta(ui))
 ui.botao_print_direto_na_pasta.clicked.connect(lambda:print_tela(ui))
-ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
+ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
+ui.botao_print_direto_na_pasta.setFlat(True)
 ui.botao_pasta_cliente.clicked.connect(lambda:criar_pasta_cliente(ui))
 ui.botao_tela_cheia.clicked.connect(lambda: manter_tela_aberta(ui))
+ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
+ui.botao_tela_cheia.setFlat(True)
 ui.botao_gerar_link.clicked.connect(lambda:gerar_link_video_conferencia(ui))
+ui.botao_gerar_link.setToolTip("Gera a link da vídeo-conferência")
+ui.botao_gerar_link.setFlat(True)
 ui.botao_converter_todas_imagens_em_pdf.clicked.connect(lambda:converter_todas_imagens_para_pdf(ui))
+ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
+ui.botao_converter_todas_imagens_em_pdf.setFlat(True)
+ui.botao_enviar_email.clicked.connect(lambda:envio_de_email(ui))
+ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
+ui.botao_agrupar_PDF.setFlat(True)
+ui.botao_agrupar_PDF.clicked.connect(lambda:mesclar_pdf(ui))
+ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
+ui.botao_altera_pasta_principal.clicked.connect(lambda: atualizar_diretorio_raiz(ui))
+
+#Campos de formatação
+ui.campo_cnpj_municipio.setReadOnly(True)
+ui.caminho_pasta_principal.setReadOnly(True)
+ui.caminho_pasta.setReadOnly(True)
+ui.campo_verifica_tela_cheia.setReadOnly(True)
+ui.campo_cnpj_uf.setReadOnly(True)
+ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
+ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Password)
+ui.campo_cpf.editingFinished.connect(lambda:formatar_cpf(ui))
+ui.campo_pedido.editingFinished.connect(lambda:carregar_dados(ui))
+ui.campo_cnpj.editingFinished.connect (lambda:formatar_cnpj(ui))
+ui.campo_meta_semanal.valueChanged.connect(lambda:atualizar_meta_clientes(ui))
+ui.campo_meta_mes.valueChanged.connect(lambda:atualizar_meta_clientes(ui))
+ui.campo_data_meta.dateChanged.connect(lambda:atualizar_meta_clientes(ui))
+ui.campo_nome.editingFinished.connect(lambda:formatar_nome(ui))
+ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
+ui.campo_nome_mae.editingFinished.connect(lambda:formatar_nome_mae(ui))
+ui.campo_link_webex.editingFinished.connect(lambda:atualizar_aba(ui))
 ui.campo_data_de.setDate(QDate.currentDate())
 ui.campo_data_ate.setDate(QDate.currentDate())
-ui.barra_progresso_pedido.setVisible(False)
-ui.barra_progresso_consulta.setVisible(False)
-ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
-janela.closeEvent = evento_ao_fechar
-janela.showEvent = evento_ao_abrir
+
+#Eventos
+ui.campo_msg_agendamento.mousePressEvent = lambda event: copiar_campo("campo_msg_agendamento")
+ui.campo_assunto_email.mousePressEvent = lambda event: copiar_campo("campo_assunto_email")
 ui.campo_cnh.mousePressEvent = lambda event: copiar_campo("campo_cnh")
 ui.campo_cnpj.mousePressEvent = lambda event: copiar_campo("campo_cnpj")
 ui.campo_pedido.mousePressEvent = lambda event: copiar_campo("campo_pedido")
@@ -1643,38 +1980,32 @@ ui.campo_rg.mousePressEvent = lambda event: copiar_campo("campo_rg")
 ui.campo_nome_mae.mousePressEvent = lambda event: copiar_campo("campo_nome_mae")
 ui.campo_nome.mousePressEvent = lambda event: copiar_campo("campo_nome")
 ui.campo_msg1.mousePressEvent = lambda event: copiar_campo("campo_msg1")
-ui.campo_msg2.mousePressEvent = lambda event: copiar_campo("campo_msg2")
-ui.campo_msg3.mousePressEvent = lambda event: copiar_campo("campo_msg3")
-ui.campo_msg4.mousePressEvent = lambda event: copiar_campo("campo_msg4")
-ui.campo_msg5.mousePressEvent = lambda event: copiar_campo("campo_msg5")
-ui.campo_msg6.mousePressEvent = lambda event: copiar_campo("campo_msg6")
-ui.campo_msg7.mousePressEvent = lambda event: copiar_campo("campo_msg7")
-ui.campo_cnpj_municipio.setReadOnly(True)
 ui.campo_msg1.setReadOnly(True)
+ui.campo_msg2.mousePressEvent = lambda event: copiar_campo("campo_msg2")
 ui.campo_msg2.setReadOnly(True)
+ui.campo_msg3.mousePressEvent = lambda event: copiar_campo("campo_msg3")
 ui.campo_msg3.setReadOnly(True)
-ui.campo_msg4.setReadOnly(True)
+ui.campo_msg5.mousePressEvent = lambda event: copiar_campo("campo_msg5")
 ui.campo_msg5.setReadOnly(True)
+ui.campo_msg6.mousePressEvent = lambda event: copiar_campo("campo_msg6")
 ui.campo_msg6.setReadOnly(True)
+ui.campo_msg7.mousePressEvent = lambda event: copiar_campo("campo_msg7")
 ui.campo_msg7.setReadOnly(True)
-ui.campo_lista_documentos.setReadOnly(True)
-ui.caminho_pasta_principal.setReadOnly(True)
-ui.caminho_pasta.setReadOnly(True)
-ui.campo_verifica_tela_cheia.setReadOnly(True)
-ui.campo_cnpj_uf.setReadOnly(True)
-ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
-ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
-ui.botao_print_direto_na_pasta.setFlat(True)
-ui.botao_gerar_link.setToolTip("Gera a link da vídeo-conferência")
-ui.botao_gerar_link.setFlat(True)
-ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
-ui.botao_converter_todas_imagens_em_pdf.setFlat(True)
-ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
-ui.botao_tela_cheia.setFlat(True)
-ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
-ui.botao_agrupar_PDF.setFlat(True)
-ui.botao_dados_cnpj.clicked.connect(lambda:dados_cnpj(ui))
-ui.botao_altera_pasta_principal.clicked.connect(lambda: atualizar_diretorio_raiz(ui))
+
+
+ui.tabWidget.currentChanged.connect(lambda: atualizar_aba(ui))
+ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
+ui.tableWidget.itemDoubleClicked.connect(lambda:pegar_valor_tabela(ui))
+ui.tableWidget.itemClicked.connect(lambda:copiar_pedido_tabela(ui))
+
+
+ui.barra_progresso_pedido.setVisible(False)
+ui.barra_progresso_consulta.setVisible(False)
+
+
+
+
+
 
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 
@@ -1683,7 +2014,7 @@ y = (screen_rect.height() - janela.height()) // 6
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(256, 42)           
+janela.setFixedSize(155, 42)           
 janela.show()
 #ui.label_5.setStyleSheet("background-color:rgb(90,54,247);")
 
