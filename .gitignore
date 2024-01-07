@@ -1,16 +1,6 @@
-credentials.json
-arq1.txt
-arq2.txt
 comandos.txt
-iconeP.ico
 interface.ui
 Auxiliar.spec
-data_base.py
-exclusao_de_pasta.py
-config.py
-teste.py
-interface backup.ui
-requirements.txt
-README.md
-main.py
+credenciaisBd.py
+
 

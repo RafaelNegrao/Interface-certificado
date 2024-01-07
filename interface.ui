@@ -64,9 +64,9 @@
     <property name="geometry">
      <rect>
       <x>-5</x>
-      <y>44</y>
+      <y>49</y>
       <width>476</width>
-      <height>696</height>
+      <height>691</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -161,7 +161,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -183,7 +183,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -211,6 +211,23 @@
       <property name="styleSheet">
        <string notr="true"/>
       </property>
+      <property name="dateTime">
+       <datetime>
+        <hour>0</hour>
+        <minute>0</minute>
+        <second>0</second>
+        <year>2000</year>
+        <month>1</month>
+        <day>1</day>
+       </datetime>
+      </property>
+      <property name="maximumDate">
+       <date>
+        <year>9999</year>
+        <month>12</month>
+        <day>26</day>
+       </date>
+      </property>
      </widget>
      <widget class="QLabel" name="label_17">
       <property name="geometry">
@@ -226,7 +243,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -314,7 +331,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -336,7 +353,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -344,34 +361,7 @@
        <string>🌟 DATA AGENDA</string>
       </property>
      </widget>
-     <widget class="QLabel" name="campo_novo_noBd">
-      <property name="geometry">
-       <rect>
-        <x>170</x>
-        <y>26</y>
-        <width>31</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>14</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignCenter</set>
-      </property>
-     </widget>
-     <widget class="QComboBox" name="campo_lista_status_3">
+     <widget class="QComboBox" name="campo_lista_venda">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -419,7 +409,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -441,7 +431,7 @@
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -449,7 +439,7 @@
        <string>🌟 MODALIDADE</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="campo_lista_status_4">
+     <widget class="QComboBox" name="campo_lista_modalidade">
       <property name="geometry">
        <rect>
         <x>110</x>
@@ -570,7 +560,7 @@
      <widget class="QPushButton" name="botao_consulta_rg">
       <property name="geometry">
        <rect>
-        <x>431</x>
+        <x>330</x>
         <y>290</y>
         <width>31</width>
         <height>31</height>
@@ -589,7 +579,8 @@
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-radius:10px;</string>
+       <string notr="true">border-radius:10px;
+</string>
       </property>
       <property name="text">
        <string>🔍</string>
@@ -598,9 +589,9 @@
      <widget class="QLineEdit" name="campo_cnpj">
       <property name="geometry">
        <rect>
-        <x>225</x>
+        <x>205</x>
         <y>340</y>
-        <width>201</width>
+        <width>221</width>
         <height>31</height>
        </rect>
       </property>
@@ -652,7 +643,7 @@
        <rect>
         <x>10</x>
         <y>290</y>
-        <width>206</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
@@ -677,9 +668,9 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>210</x>
         <y>280</y>
-        <width>76</width>
+        <width>96</width>
         <height>11</height>
        </rect>
       </property>
@@ -702,10 +693,10 @@
      <widget class="QLabel" name="label_14">
       <property name="geometry">
        <rect>
-        <x>230</x>
+        <x>210</x>
         <y>329</y>
-        <width>106</width>
-        <height>16</height>
+        <width>126</width>
+        <height>11</height>
        </rect>
       </property>
       <property name="font">
@@ -800,7 +791,7 @@
      <widget class="QPushButton" name="botao_consulta_cnh">
       <property name="geometry">
        <rect>
-        <x>186</x>
+        <x>171</x>
         <y>340</y>
         <width>31</width>
         <height>31</height>
@@ -819,7 +810,8 @@
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-radius:10px;</string>
+       <string notr="true">border-radius:10px;
+</string>
       </property>
       <property name="text">
        <string>🔍</string>
@@ -855,7 +847,7 @@
        <rect>
         <x>10</x>
         <y>340</y>
-        <width>206</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
@@ -954,7 +946,7 @@
      <widget class="QPushButton" name="botao_consulta_cpf">
       <property name="geometry">
        <rect>
-        <x>186</x>
+        <x>171</x>
         <y>290</y>
         <width>31</width>
         <height>31</height>
@@ -973,7 +965,8 @@
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-radius:10px;</string>
+       <string notr="true">border-radius:10px;
+</string>
       </property>
       <property name="text">
        <string>🔍︎</string>
@@ -1037,9 +1030,9 @@
      <widget class="QLineEdit" name="campo_rg">
       <property name="geometry">
        <rect>
-        <x>225</x>
+        <x>205</x>
         <y>290</y>
-        <width>236</width>
+        <width>156</width>
         <height>31</height>
        </rect>
       </property>
@@ -1053,6 +1046,9 @@
       </property>
       <property name="cursor">
        <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>431596608</string>
       </property>
       <property name="placeholderText">
        <string/>
@@ -1088,7 +1084,7 @@
        <rect>
         <x>10</x>
         <y>390</y>
-        <width>206</width>
+        <width>191</width>
         <height>31</height>
        </rect>
       </property>
@@ -1110,9 +1106,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>225</x>
+        <x>205</x>
         <y>390</y>
-        <width>161</width>
+        <width>186</width>
         <height>31</height>
        </rect>
       </property>
@@ -1167,9 +1163,9 @@
      <widget class="QLabel" name="label_25">
       <property name="geometry">
        <rect>
-        <x>228</x>
+        <x>208</x>
         <y>378</y>
-        <width>126</width>
+        <width>146</width>
         <height>13</height>
        </rect>
       </property>
@@ -1239,12 +1235,12 @@
        <string>OBSERVAÇÕES</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="campo_diretorio_pasta">
+     <widget class="QTextEdit" name="campo_comentario">
       <property name="geometry">
        <rect>
         <x>8</x>
         <y>485</y>
-        <width>386</width>
+        <width>356</width>
         <height>87</height>
        </rect>
       </property>
@@ -1282,7 +1278,8 @@
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true">border-radius:10px;</string>
+       <string notr="true">border-radius:10px;
+</string>
       </property>
       <property name="text">
        <string>🔍</string>
@@ -1304,10 +1301,10 @@
      <widget class="QComboBox" name="campo_lista_junta_comercial">
       <property name="geometry">
        <rect>
-        <x>400</x>
-        <y>485</y>
-        <width>59</width>
-        <height>47</height>
+        <x>365</x>
+        <y>290</y>
+        <width>61</width>
+        <height>31</height>
        </rect>
       </property>
       <property name="font">
@@ -1460,42 +1457,11 @@
        </property>
       </item>
      </widget>
-     <widget class="QPushButton" name="botao_junta">
-      <property name="geometry">
-       <rect>
-        <x>400</x>
-        <y>541</y>
-        <width>59</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Century Gothic</family>
-        <pointsize>12</pointsize>
-        <weight>75</weight>
-        <italic>false</italic>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);
-color:rgb(90,54,247);
-</string>
-      </property>
-      <property name="text">
-       <string>IR</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_28">
       <property name="geometry">
        <rect>
-        <x>398</x>
-        <y>470</y>
+        <x>365</x>
+        <y>276</y>
         <width>56</width>
         <height>20</height>
        </rect>
@@ -1530,7 +1496,7 @@ color:rgb(90,54,247);
         <family>Helvetica</family>
         <pointsize>7</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1577,6 +1543,101 @@ color:rgb(90,54,247);
        </property>
       </item>
      </widget>
+     <widget class="QPushButton" name="botao_excluir_dados">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>485</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>20</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;
+background-color:rgb(180, 30, 30);</string>
+      </property>
+      <property name="text">
+       <string>🗑️</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_salvar">
+      <property name="geometry">
+       <rect>
+        <x>370</x>
+        <y>530</y>
+        <width>91</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>20</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::RightToLeft</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;
+background-color:rgb(73, 218, 107);</string>
+      </property>
+      <property name="text">
+       <string>💾</string>
+      </property>
+      <property name="iconSize">
+       <size>
+        <width>16</width>
+        <height>16</height>
+       </size>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_junta">
+      <property name="geometry">
+       <rect>
+        <x>430</x>
+        <y>290</y>
+        <width>31</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
      <zorder>campo_lista_status</zorder>
      <zorder>campo_cnh</zorder>
      <zorder>campo_seguranca_cnh</zorder>
@@ -1588,10 +1649,9 @@ color:rgb(90,54,247);
      <zorder>campo_hora_agendamento</zorder>
      <zorder>label_4</zorder>
      <zorder>label_3</zorder>
-     <zorder>campo_novo_noBd</zorder>
-     <zorder>campo_lista_status_3</zorder>
+     <zorder>campo_lista_venda</zorder>
      <zorder>label_22</zorder>
-     <zorder>campo_lista_status_4</zorder>
+     <zorder>campo_lista_modalidade</zorder>
      <zorder>label_2</zorder>
      <zorder>label</zorder>
      <zorder>label_23</zorder>
@@ -1621,14 +1681,16 @@ color:rgb(90,54,247);
      <zorder>label_25</zorder>
      <zorder>label_26</zorder>
      <zorder>label_27</zorder>
-     <zorder>campo_diretorio_pasta</zorder>
+     <zorder>campo_comentario</zorder>
      <zorder>botao_consulta_cnpj</zorder>
      <zorder>line</zorder>
      <zorder>campo_lista_junta_comercial</zorder>
-     <zorder>botao_junta</zorder>
      <zorder>label_28</zorder>
      <zorder>label_13</zorder>
      <zorder>campo_lista_tipo_certificado</zorder>
+     <zorder>botao_excluir_dados</zorder>
+     <zorder>botao_salvar</zorder>
+     <zorder>botao_junta</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -1784,7 +1846,7 @@ color:rgb(90,54,247);
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>16</pointsize>
+        <pointsize>18</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1793,7 +1855,8 @@ color:rgb(90,54,247);
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">color:rgb(90,54,247);
+border-radius:10px;</string>
       </property>
       <property name="text">
        <string>🔍</string>
@@ -2035,7 +2098,7 @@ color:rgb(90,54,247);
         <x>10</x>
         <y>5</y>
         <width>451</width>
-        <height>96</height>
+        <height>196</height>
        </rect>
       </property>
       <property name="font">
@@ -2058,17 +2121,20 @@ color:rgb(90,54,247);
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Olá! tudo bem?&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Preciso de uma foto completa do seu documento de identificação,podendo ser (CNH, RG, OAB),&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; font-weight:600;&quot;&gt; FRENTE E VERSO&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;.&lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;--Por favor, retire o documento do plástico e abra-o. &lt;/span&gt;&lt;/p&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;--O VERSO é a parte que contém o QR code.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Boa tarde! tudo bem?&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Irei precisar dos documentos listados abaixo:&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;1 - uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser _*CNH, RG, OAB.*_ &lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;_*Observações: Retire o documento do plástico e abra-o.*_&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;2 - O documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QTextEdit" name="campo_msg7">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>250</y>
+        <y>285</y>
         <width>451</width>
         <height>61</height>
        </rect>
@@ -2096,43 +2162,11 @@ p, li { white-space: pre-wrap; }
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Agradeço pela disponibilidade. Se precisar adquirir mais certificados, pode fazê-lo através do link: &lt;/span&gt;&lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;https://loja.certisign.com.br/?cod_rev=91384&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;. Até mais!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
-     <widget class="QTextEdit" name="campo_msg2">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>105</y>
-        <width>451</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Irei precisar também do documento de constituição da empresa, podendo ser o&lt;/span&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; font-weight:600;&quot;&gt; Contrato Social, Certidão de inteiro teor ,Estatuto social,Requerimento de empresário.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
      <widget class="QTextEdit" name="campo_msg6">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>205</y>
+        <y>240</y>
         <width>451</width>
         <height>41</height>
        </rect>
@@ -2163,9 +2197,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QTextEdit" name="campo_msg5">
       <property name="geometry">
        <rect>
-        <x>75</x>
-        <y>170</y>
-        <width>386</width>
+        <x>10</x>
+        <y>205</y>
+        <width>451</width>
         <height>31</height>
        </rect>
       </property>
@@ -2195,7 +2229,7 @@ p, li { white-space: pre-wrap; }
     </widget>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
-      <string>WEBEX</string>
+      <string>Webex</string>
      </attribute>
      <widget class="QTextEdit" name="campo_msg3">
       <property name="geometry">
@@ -2209,7 +2243,7 @@ p, li { white-space: pre-wrap; }
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>9</pointsize>
+        <pointsize>7</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -2225,8 +2259,8 @@ p, li { white-space: pre-wrap; }
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:7pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QPushButton" name="botao_enviar_email">
@@ -2520,16 +2554,16 @@ color:rgb(90,54,247);
      <widget class="QPushButton" name="botao_atualizar_meta">
       <property name="geometry">
        <rect>
-        <x>330</x>
+        <x>345</x>
         <y>540</y>
-        <width>126</width>
+        <width>111</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Century Gothic</family>
-        <pointsize>12</pointsize>
+        <pointsize>10</pointsize>
         <weight>75</weight>
         <italic>false</italic>
         <bold>true</bold>
@@ -3491,12 +3525,43 @@ color:rgb(90,54,247);
        <string>ATUALIZAR CONFIGURAÇÕES</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="botao_ver_senha">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>260</y>
+        <width>36</width>
+        <height>36</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>16</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;</string>
+      </property>
+      <property name="text">
+       <string>👁️</string>
+      </property>
+     </widget>
     </widget>
    </widget>
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
     <property name="geometry">
      <rect>
-      <x>55</x>
+      <x>210</x>
       <y>-10</y>
       <width>47</width>
       <height>55</height>
@@ -3526,10 +3591,10 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_gerar_link">
     <property name="geometry">
      <rect>
-      <x>110</x>
+      <x>265</x>
       <y>0</y>
       <width>41</width>
-      <height>39</height>
+      <height>46</height>
      </rect>
     </property>
     <property name="font">
@@ -3559,7 +3624,7 @@ color:rgb(90,54,247);
       <x>-15</x>
       <y>-5</y>
       <width>496</width>
-      <height>51</height>
+      <height>56</height>
      </rect>
     </property>
     <property name="font">
@@ -3570,7 +3635,7 @@ color:rgb(90,54,247);
      </font>
     </property>
     <property name="styleSheet">
-     <string notr="true">background-color:rgb(90,54,247);
+     <string notr="true">background-color:rgb(60, 2, 156);
 </string>
     </property>
     <property name="text">
@@ -3580,9 +3645,9 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_tela_cheia">
     <property name="geometry">
      <rect>
-      <x>5</x>
+      <x>10</x>
       <y>0</y>
-      <width>46</width>
+      <width>56</width>
       <height>41</height>
      </rect>
     </property>
@@ -3607,80 +3672,13 @@ color:rgb(90,54,247);
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="botao_salvar">
-    <property name="geometry">
-     <rect>
-      <x>305</x>
-      <y>5</y>
-      <width>41</width>
-      <height>36</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Century Gothic</family>
-      <pointsize>20</pointsize>
-      <weight>50</weight>
-      <italic>false</italic>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-radius:10px;
-
-</string>
-    </property>
-    <property name="text">
-     <string>💾</string>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
-    </property>
-   </widget>
-   <widget class="QPushButton" name="botao_terminar">
-    <property name="geometry">
-     <rect>
-      <x>355</x>
-      <y>9</y>
-      <width>101</width>
-      <height>29</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Century Gothic</family>
-      <pointsize>14</pointsize>
-      <weight>75</weight>
-      <italic>false</italic>
-      <bold>true</bold>
-     </font>
-    </property>
-    <property name="cursor">
-     <cursorShape>PointingHandCursor</cursorShape>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);
-color:rgb(90,54,247);
-</string>
-    </property>
-    <property name="text">
-     <string>FINALIZAR</string>
-    </property>
-    <property name="flat">
-     <bool>true</bool>
-    </property>
-   </widget>
    <widget class="QPushButton" name="botao_agrupar_PDF">
     <property name="geometry">
      <rect>
-      <x>202</x>
+      <x>357</x>
       <y>0</y>
       <width>55</width>
-      <height>41</height>
+      <height>46</height>
      </rect>
     </property>
     <property name="font">
@@ -3707,10 +3705,10 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
     <property name="geometry">
      <rect>
-      <x>155</x>
+      <x>310</x>
       <y>0</y>
       <width>47</width>
-      <height>41</height>
+      <height>46</height>
      </rect>
     </property>
     <property name="font">
@@ -3743,10 +3741,10 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_abrir_pasta_cliente">
     <property name="geometry">
      <rect>
-      <x>255</x>
+      <x>410</x>
       <y>0</y>
       <width>51</width>
-      <height>38</height>
+      <height>41</height>
      </rect>
     </property>
     <property name="font">
@@ -3771,16 +3769,112 @@ color:rgb(90,54,247);
      <string>📂</string>
     </property>
    </widget>
+   <widget class="QLabel" name="campo_status_bd">
+    <property name="geometry">
+     <rect>
+      <x>65</x>
+      <y>0</y>
+      <width>51</width>
+      <height>46</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Helvetica</family>
+      <pointsize>22</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="text">
+     <string>🕑</string>
+    </property>
+    <property name="alignment">
+     <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_confirmacao_tirar_print">
+    <property name="geometry">
+     <rect>
+      <x>245</x>
+      <y>5</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_confirmacao_criar_link_video">
+    <property name="geometry">
+     <rect>
+      <x>290</x>
+      <y>5</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_confirmacao_converter_pdf">
+    <property name="geometry">
+     <rect>
+      <x>340</x>
+      <y>5</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_confirmacao_mesclar_pdf">
+    <property name="geometry">
+     <rect>
+      <x>390</x>
+      <y>5</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_confirmacao_criar_pasta">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>5</y>
+      <width>16</width>
+      <height>16</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>label_5</zorder>
    <zorder>tabWidget</zorder>
    <zorder>botao_print_direto_na_pasta</zorder>
    <zorder>botao_gerar_link</zorder>
    <zorder>botao_tela_cheia</zorder>
-   <zorder>botao_salvar</zorder>
-   <zorder>botao_terminar</zorder>
    <zorder>botao_agrupar_PDF</zorder>
    <zorder>botao_converter_todas_imagens_em_pdf</zorder>
    <zorder>botao_abrir_pasta_cliente</zorder>
+   <zorder>campo_status_bd</zorder>
+   <zorder>label_confirmacao_tirar_print</zorder>
+   <zorder>label_confirmacao_converter_pdf</zorder>
+   <zorder>label_confirmacao_mesclar_pdf</zorder>
+   <zorder>label_confirmacao_criar_pasta</zorder>
+   <zorder>label_confirmacao_criar_link_video</zorder>
   </widget>
  </widget>
  <tabstops>
@@ -3789,8 +3883,8 @@ color:rgb(90,54,247);
   <tabstop>campo_hora_agendamento</tabstop>
   <tabstop>campo_lista_tipo_certificado</tabstop>
   <tabstop>campo_certificado</tabstop>
-  <tabstop>campo_lista_status_3</tabstop>
-  <tabstop>campo_lista_status_4</tabstop>
+  <tabstop>campo_lista_venda</tabstop>
+  <tabstop>campo_lista_modalidade</tabstop>
   <tabstop>campo_lista_status</tabstop>
   <tabstop>campo_nome</tabstop>
   <tabstop>campo_email</tabstop>
@@ -3801,7 +3895,7 @@ color:rgb(90,54,247);
   <tabstop>campo_cnpj</tabstop>
   <tabstop>campo_seguranca_cnh</tabstop>
   <tabstop>campo_nome_mae</tabstop>
-  <tabstop>campo_diretorio_pasta</tabstop>
+  <tabstop>campo_comentario</tabstop>
   <tabstop>campo_lista_junta_comercial</tabstop>
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
@@ -3819,14 +3913,11 @@ color:rgb(90,54,247);
   <tabstop>botao_atualizar_configuracoes</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>botao_procurar</tabstop>
-  <tabstop>botao_junta</tabstop>
   <tabstop>campo_msg1</tabstop>
   <tabstop>campo_msg7</tabstop>
-  <tabstop>campo_msg2</tabstop>
   <tabstop>campo_msg6</tabstop>
   <tabstop>campo_msg5</tabstop>
   <tabstop>botao_pasta_cliente</tabstop>
-  <tabstop>botao_salvar</tabstop>
   <tabstop>botao_consulta_cpf</tabstop>
   <tabstop>botao_altera_pasta_principal</tabstop>
   <tabstop>botao_print_direto_na_pasta</tabstop>
@@ -3839,7 +3930,6 @@ color:rgb(90,54,247);
   <tabstop>botao_consulta_rg</tabstop>
   <tabstop>botao_enviar_email</tabstop>
   <tabstop>botao_consulta_cnh</tabstop>
-  <tabstop>botao_terminar</tabstop>
   <tabstop>botao_dados_cnpj</tabstop>
   <tabstop>campo_assunto_email</tabstop>
   <tabstop>tabWidget</tabstop>
