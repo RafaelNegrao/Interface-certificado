@@ -33,7 +33,7 @@ from credenciaisBd import obter_credenciais
 credenciais = obter_credenciais()
 
 acoes = firebase_admin.credentials.Certificate(credenciais)
-firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/' }) 
+firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/'}) 
 ref = db.reference("/")
 
 
@@ -42,7 +42,6 @@ class Funcoes_padrao:
         self.ui = ui
         self.acoes = Acoes_banco_de_dados(ui)
     
-
     def atualizar_barras_metas(self):
         
         try:
@@ -117,6 +116,30 @@ class Funcoes_padrao:
                 ui.label_meta_mes.setText(f"{soma}/{meta_mensal}")
 
         except Exception as e:
+            pass
+
+    def trazer_configuracoes(self):
+        try:
+            link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+            # Faz uma solicitação GET para obter as configurações do banco de dados
+            bd = requests.get(f"{link}.json")
+            # Converte a resposta JSON em um dicionário Python
+            config = bd.json()
+
+            
+            try:
+                cor = config["RGB"]
+                r, g, b = map(int, cor.split(','))
+                ui.caminho_pasta_principal.setText(config['DIRETORIO-RAIZ'])
+                ui.campo_senha_email_empresa.setText(config['SENHA'])
+                ui.campo_email_empresa.setText(config['E-MAIL'])
+                ui.campo_cor_R.setValue(int(r))
+                ui.campo_cor_G.setValue(int(g))
+                ui.campo_cor_B.setValue(int(b))
+            except Exception as e:
+                print(e)
+                pass
+        except:
             pass
 
     def trazer_metas(self):
@@ -194,6 +217,12 @@ class Funcoes_padrao:
             ui.campo_certificados_mes.setText(str(total))
             self.atualizar_barras_metas()
 
+    def definir_cor(self):
+        cor_R = ui.campo_cor_R.value()
+        cor_G = ui.campo_cor_G.value()
+        cor_B = ui.campo_cor_B.value()
+        ui.label_5.setStyleSheet(f"background-color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+       
     def Atualizar_meta(self):
 
         link = "https://configs-5d64c-default-rtdb.firebaseio.com/Metas"
@@ -210,22 +239,7 @@ class Funcoes_padrao:
             requests.patch(f'{link}.json', data=json.dumps(nova_meta))
         except:
             requests.post(f'{link}.json', data=json.dumps(nova_meta))
-
-    def trazer_configuracoes(self):
-
-        link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
-        # Faz uma solicitação GET para obter as configurações do banco de dados
-        bd = requests.get(f"{link}.json")
-        # Converte a resposta JSON em um dicionário Python
-        config = bd.json()
-    
-        try:
-            ui.caminho_pasta_principal.setText(config['DIRETORIO-RAIZ'])
-            ui.campo_senha_email_empresa.setText(config['SENHA'])
-            ui.campo_email_empresa.setText(config['E-MAIL'])
-        except Exception as e:
-            pass       
-
+   
     def atualizar_configuracoes(self):
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
@@ -238,7 +252,8 @@ class Funcoes_padrao:
         diretorio = ui.caminho_pasta_principal.text()
         email = ui.campo_email_empresa.text()
         senha = ui.campo_senha_email_empresa.text()
-        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha}
+        rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
+        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb}
         try:
             requests.patch(f'{link_firebase}.json', data=json.dumps(nova_config))
         except:
@@ -443,14 +458,14 @@ class Funcoes_padrao:
 
         if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
 
-
+            ui.label_confirmacao_criar_pasta.setText("❌")
             self.mensagem_alerta("Erro","Adicione os itens com 🌟 para criar a pasta do cliente!")
             return
 
         try:
             nome_pasta = ui.campo_nome.text()
             if nome_pasta == '':
-
+                ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Erro","Preencha o NOME do cliente.")
                 return
 
@@ -463,14 +478,16 @@ class Funcoes_padrao:
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
                 self.acoes.analise_dados()
-                self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
+                ui.label_confirmacao_criar_pasta.setText("✅")
+                #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
 
             else:
                 # Se a pasta já existe no diretório padrão, mostre a notificação
-                self.mensagem_alerta("Erro","Pasta não criada")
+                ui.label_confirmacao_criar_pasta.setText("❌")
+                #self.mensagem_alerta("Erro","Pasta não criada")
         except:
-
-            self.mensagem_alerta("Erro","Pasta não criada")
+            ui.label_confirmacao_criar_pasta.setText("❌")
+            #self.mensagem_alerta("Erro","Pasta não criada")
 
     def procurar_cnh(self):
         url = QUrl("https://sso.acesso.gov.br/login?client_id=portalservicos.denatran.serpro.gov.br&authorization_id=18aa635cf94")
@@ -926,6 +943,7 @@ class Funcoes_padrao:
     def evento_ao_abrir(self,event):
         self.trazer_configuracoes()
         self.trazer_metas()
+        self.definir_cor()
         ui.campo_data_meta.setDate(QDate.currentDate())
         self.ui.campo_status_bd.setText("")
         self.ui.campo_status_bd.setToolTip("")
@@ -1322,7 +1340,6 @@ Rafael Negrão de Souza
             ui.botao_ver_senha.setText("❌")
 
     
-
 class Acoes_banco_de_dados:
     def __init__(self,ui):
         self.ui = ui
@@ -1879,6 +1896,7 @@ ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
 ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
+ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
 
 
 #Campos de formatação
