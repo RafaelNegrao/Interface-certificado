@@ -34,7 +34,10 @@ credenciais = obter_credenciais()
 
 acoes = firebase_admin.credentials.Certificate(credenciais)
 firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/'}) 
+
+#Referência raiz do banco de dados
 ref = db.reference("/")
+
 
 
 class Funcoes_padrao:
@@ -449,24 +452,25 @@ class Funcoes_padrao:
         return os.path.exists(caminho_pasta)
 
     def criar_pasta_cliente(self):
-        pedido = ui.campo_pedido.text()
-        tipo = ui.campo_certificado.text()
-        hora = ui.campo_hora_agendamento.text()
-        data = ui.campo_data_agendamento.text()
-        status = ui.campo_lista_status.currentText()
-        modalidade = ui.campo_lista_modalidade.currentText()
-
-        if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
-
-            ui.label_confirmacao_criar_pasta.setText("❌")
-            self.mensagem_alerta("Erro","Adicione os itens com 🌟 para criar a pasta do cliente!")
-            return
-
         try:
+            pedido = ui.campo_pedido.text()
+            tipo = ui.campo_certificado.text()
+            hora = ui.campo_hora_agendamento.text()
+            data = ui.campo_data_agendamento.text()
+            status = ui.campo_lista_status.currentText()
+            modalidade = ui.campo_lista_modalidade.currentText()
+
+            if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+
+                ui.label_confirmacao_criar_pasta.setText("❌")
+                self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
+                return
+
+
             nome_pasta = ui.campo_nome.text()
             if nome_pasta == '':
                 ui.label_confirmacao_criar_pasta.setText("❌")
-                self.mensagem_alerta("Erro","Preencha o NOME do cliente.")
+                self.mensagem_alerta("Pasta não criada","Preencha o NOME do cliente.")
                 return
 
             # Tente criar a pasta no diretório padrão
@@ -477,14 +481,22 @@ class Funcoes_padrao:
                 os.mkdir(pasta_padrão)
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
+                
+                status = ui.campo_lista_status.currentText()
+                if status == "APROVADO" or status == "CANCELADO":
+                    confirmacao = ""
+                else:
+                    confirmacao = "✅"
+
                 self.acoes.analise_dados()
-                ui.label_confirmacao_criar_pasta.setText("✅")
+
+                ui.label_confirmacao_criar_pasta.setText(confirmacao)
                 #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
 
             else:
                 # Se a pasta já existe no diretório padrão, mostre a notificação
                 ui.label_confirmacao_criar_pasta.setText("❌")
-                #self.mensagem_alerta("Erro","Pasta não criada")
+                self.mensagem_alerta("Pasta não criada","Pasta do cliente já existe no diretório")
         except:
             ui.label_confirmacao_criar_pasta.setText("❌")
             #self.mensagem_alerta("Erro","Pasta não criada")
@@ -800,8 +812,12 @@ class Funcoes_padrao:
             folder_to_open_raw = r"{}".format(folder_to_open_directory)
 
             # Obter o nome do documento do usuário
-            nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:", text="CNH COMPLETA")
-
+            nome_documento, ok = QInputDialog.getItem(ui.centralwidget, "Nome do Documento", "Escolha o tipo de documento:", ["CNH COMPLETA", "RG COMPLETO","DOC ADICIONAL","DOC COMPLETO","OUTRO"], 0, False)
+            
+            
+            if nome_documento == "OUTRO":
+                nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:")
+            
             # Verificar se o usuário cancelou a operação ou não forneceu um nome
             if not ok or not nome_documento:
                 return
@@ -1033,20 +1049,14 @@ class Funcoes_padrao:
                             
                             
                     if certificado == "e-CPF":
-                        mensagem = f"""{mensagem_inicial} tudo bem?
-Irei precisar dos documentos listados abaixo:
-
-1 - uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser _*CNH, RG, OAB.*_ 
+                        mensagem = f"""{mensagem_inicial} tudo bem?                                                                                      
+Irei precisar de uma foto completa do seu documento de identificação, _*FRENTE E VERSO*_, podendo ser _*CNH, RG, OAB.*_                                         
 _*Observações: Retire o documento do plástico e abra-o.*_"""
                         ui.campo_msg1.setPlainText(mensagem)
                     elif certificado == "e-CNPJ":
-                        mensagem = f"""{mensagem_inicial} tudo bem?
-Irei precisar dos documentos listados abaixo:
-
-1 - uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser _*CNH, RG, OAB.*_ 
-_*Observações: Retire o documento do plástico e abra-o.*_
-
-2 - O documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_""" 
+                        mensagem = f"""{mensagem_inicial} tudo bem?                                             
+Irei precisar de _*uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser CNH, RG, OAB.*_                                                
+Observações: Retire o documento do plástico e abra-o. O documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_""" 
                         ui.campo_msg1.setPlainText(mensagem)                   
                     QApplication.clipboard().setText(mensagem)
                 except:
@@ -1182,8 +1192,7 @@ Rafael Negrão de Souza
         if ui.tabWidget.currentIndex() == 3:
             self.email_padrao_webex()
         elif ui.tabWidget.currentIndex() == 4:
-            self.atualizar_meta_clientes()
-            
+            self.atualizar_meta_clientes()    
         pass
 
     def envio_de_email(self):
@@ -1224,42 +1233,66 @@ Rafael Negrão de Souza
 
         try:
             # Configurar o objeto MIMEText
-            if ui.campo_lista_tipo_certificado.currentText() == "e-CNPJ":
-                mensagem_final = f"""
+            if not ui.checkBox_documentos_webex.isChecked():
+
+                if ui.campo_lista_tipo_certificado.currentText() == "e-CNPJ":
+                
+                        mensagem_final = f"""
                     Olá <b>{nome.capitalize()}</b>, tudo bem?<br>
 
                     Sou o Rafael, agente de registro da AR ACB SERVICOS E NEGOCIOS e estou entrando em contato pois temos uma validação para<br>
                     seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>, pedido <b>{pedido}</b>.<br>
-<br>
+    <br>
                     Para agilizar o processo, peço que encaminhe para um dos contatos abaixo, os seguintes documentos:<br>
-<br>
+    <br>
                     <b>1</b> - uma foto completa do seu documento de identificação, <b>FRENTE E VERSO</b>, podendo ser<b> CNH, RG, OAB</b><br>
                     Observações: Retire o documento do plástico e abra-o.<br>
-<br>
+    <br>
                     <b> 2</b> - O documento de constituição da empresa, podendo ser <b>Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.</b><br>
-<br>
+    <br>
                     Para acessar a reunião, clique no link da vídeo-conferência abaixo:<br>
                     <b>{link}</b><br>
-<br>
+    <br>
                     Para o envio de documentos ou esclarecimento de dúvidas, utilize os contatos abaixo:<br>
                     <b>Whatsapp: (11)97187-2108</b><br>
                     <b>E-mail: paranagua@acbdigital.com.br</b><br>
-<br>
+    <br>
                     Att.<br>
                     Rafael Negrão de Souza<br>
                 """
-            elif ui.campo_lista_tipo_certificado.currentText() == "e-CPF":
+
+                elif ui.campo_lista_tipo_certificado.currentText() == "e-CPF":
+                        mensagem_final = f"""
+                        Olá <b>{nome.capitalize()}</b>, tudo bem?<br>
+    <br>
+                        Sou o Rafael, agente de registro da AR ACB SERVICOS E NEGOCIOS e estou entrando em contato pois temos uma validação para<br>
+                        seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>, pedido <b>{pedido}</b>.<br>
+    <br>
+                        Para agilizar o processo, peço que encaminhe para um dos contatos abaixo, os seguintes documentos:<br>
+    <br>                    
+                        <b> 1</b> - uma foto completa do seu documento de identificação, <b>FRENTE E VERSO</b>, podendo ser <b>CNH, RG, OAB</b><br>
+                        Observações: Retire o documento do plástico e abra-o.<br>
+    <br>
+                        Para acessar a reunião, clique no link da vídeo-conferência abaixo:<br>
+                        <b>{link}</b><br>
+    <br>
+                        Para o envio de documentos ou esclarecimento de dúvidas, utilize os contatos abaixo:<br>
+                        <b>Whatsapp: (11)97187-2108</b><br>
+                        <b>E-mail: paranagua@acbdigital.com.br</b><br>
+    <br>
+                        Att.<br>
+                        Rafael Negrão de Souza<br>
+                    """
+                
+
+            else:
+
                 mensagem_final = f"""
                     Olá <b>{nome.capitalize()}</b>, tudo bem?<br>
 <br>
                     Sou o Rafael, agente de registro da AR ACB SERVICOS E NEGOCIOS e estou entrando em contato pois temos uma validação para<br>
                     seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>, pedido <b>{pedido}</b>.<br>
 <br>
-                    Para agilizar o processo, peço que encaminhe para um dos contatos abaixo, os seguintes documentos:<br>
-<br>                    
-                    <b> 1</b> - uma foto completa do seu documento de identificação, <b>FRENTE E VERSO</b>, podendo ser <b>CNH, RG, OAB</b><br>
-                    Observações: Retire o documento do plástico e abra-o.<br>
-<br>
                     Para acessar a reunião, clique no link da vídeo-conferência abaixo:<br>
                     <b>{link}</b><br>
 <br>
@@ -1270,6 +1303,7 @@ Rafael Negrão de Souza
                     Att.<br>
                     Rafael Negrão de Souza<br>
                 """
+
 
             mensagem_mime = MIMEText(mensagem_final, "html")
 
@@ -1315,10 +1349,10 @@ Rafael Negrão de Souza
                 valor_anterior = self.obter_valor_campo(campo_anterior)
 
                 if valor_anterior != novo_valor:
-                    self.ui.campo_status_bd.setText("🕑")
+                    self.ui.campo_status_bd.setText("❌")
                     self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
                 else:
-                    self.ui.campo_status_bd.setText("🕑")
+                    self.ui.campo_status_bd.setText("❌")
                     self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
 
     def obter_valor_campo(self, campo):
@@ -1339,7 +1373,20 @@ Rafael Negrão de Souza
             ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Normal)
             ui.botao_ver_senha.setText("❌")
 
-    
+    def verificar_texto_lista_status(self):
+        valor_campo = ui.campo_lista_status.currentText()
+
+        if valor_campo == "APROVADO":
+        # Alterar a fonte para verde
+            ui.campo_lista_status.setStyleSheet("color: green;font-weight: bold;")
+        elif valor_campo == "CANCELADO":
+            # Alterar a fonte para vermelha
+            ui.campo_lista_status.setStyleSheet("color: red;font-weight: bold;")
+        else:
+            # Caso padrão, alterar a fonte para preta
+            ui.campo_lista_status.setStyleSheet("color: black;")
+
+
 class Acoes_banco_de_dados:
     def __init__(self,ui):
         self.ui = ui
@@ -1382,7 +1429,7 @@ class Acoes_banco_de_dados:
 #Pedido novo + gravado Definitivo--------------------------------------------------------------------------------------------    
         if self.verificar_status() == "Definitivo":
             self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-            self.gravar_pedido_existente()
+            self.gravar_pedido_novo()
             self.ui.campo_status_bd.setText("")
             self.ui.campo_status_bd.setToolTip("")
             self.limpar_campos_pedido()
@@ -1390,7 +1437,6 @@ class Acoes_banco_de_dados:
             return
         
 #Pedido novo + gravado Temporario-------------------------------------------------------------------------------------------- 
-        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
         self.gravar_pedido_novo()
         self.ui.campo_status_bd.setText("✅")
         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
@@ -1408,11 +1454,10 @@ class Acoes_banco_de_dados:
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
 
     def verificar_status(self):
-        if (ui.campo_lista_status.currentText() != "DIGITAÇÃO" 
-            and ui.campo_lista_status.currentText() != "VERIFICAÇÃO" 
-            and ui.campo_lista_status.currentText() != "VIDEO REALIZADA" ):
-            return "Definitivo"
-        return"Temporario"
+        if ui.campo_lista_status.currentText() != "APROVADO" and ui.campo_lista_status.currentText() != "CANCELADO":
+            return"Temporario"
+        else:
+            return"Definitivo"
                
     def analise_de_campos(self):
         if (ui.campo_pedido.text() == "" or 
@@ -1429,20 +1474,20 @@ class Acoes_banco_de_dados:
 
     def limpar_campos_pedido(self):
         #Dados pedido   
-        ui.campo_link_webex.setText(""),
-        ui.caminho_pasta.setText(""),
-        ui.campo_cnpj_municipio.setText(""),
-        ui.campo_cnpj_uf.setText(""),
-        ui.campo_comentario.setPlainText(""),
-        ui.campo_nome.setText(""),
-        ui.campo_rg.setText(""),
-        ui.campo_cpf.setText(""),
-        ui.campo_cnh.setText(""),
-        ui.campo_nome_mae.setText("") ,
-        ui.campo_cnpj.setText(""),
-        ui.campo_email.setText(""),
-        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1)),
-        ui.campo_seguranca_cnh.setText(""),
+        ui.campo_link_webex.setText("")
+        ui.caminho_pasta.setText("")
+        ui.campo_cnpj_municipio.setText("")
+        ui.campo_cnpj_uf.setText("")
+        ui.campo_comentario.setPlainText("")
+        ui.campo_nome.setText("")
+        ui.campo_rg.setText("")
+        ui.campo_cpf.setText("")
+        ui.campo_cnh.setText("")
+        ui.campo_nome_mae.setText("") 
+        ui.campo_cnpj.setText("")
+        ui.campo_email.setText("")
+        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
+        ui.campo_seguranca_cnh.setText("")
         ui.campo_msg3.setPlainText("")
         ui.campo_msg_agendamento.setText("")
         ui.campo_assunto_email.setText("")
@@ -1598,6 +1643,7 @@ class Acoes_banco_de_dados:
     #quando um novo pedido é digitado no campo PEDIDO
         try:
             num_pedido = ui.campo_pedido.text()
+
             if num_pedido == "":
                 return
             self.req = ref.get()
@@ -1675,7 +1721,11 @@ class Acoes_banco_de_dados:
         ui.campo_link_webex.setText(self.req[self.id]['WEBEX'])
         ui.campo_status_bd.setText("✅")
         ui.campo_status_bd.setToolTip("Pedido Atualizado")
-
+        
+        print(ui.caminho_pasta.text())
+        if ui.caminho_pasta.text() != "": 
+            ui.label_confirmacao_criar_pasta.setText("✅")
+            
     def preencher_tabela(self):
 
     #USO DE BANCO DE DADOS
@@ -1777,7 +1827,7 @@ class JanelaOculta:
         self.animation_target_height = 0
 
     def enterEvent(self, event):
-        self.animate_window_resize(467, 655)
+        self.animate_window_resize(469, 660)
        
     def leaveEvent(self, event):
         if not ui.campo_verifica_tela_cheia.text()=="SIM":
@@ -1788,10 +1838,10 @@ class JanelaOculta:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
-                self.animate_window_resize(128, 42)
+                self.animate_window_resize(128, 45)
 
     def mousePressEvent(self, event):
-        self.animate_window_resize(467, 655)#467
+        self.animate_window_resize(469, 660)#467
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -1897,6 +1947,7 @@ ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
 ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
 ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
+ui.campo_lista_status.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status()) 
 
 
 #Campos de formatação
@@ -1906,6 +1957,7 @@ ui.caminho_pasta.setReadOnly(True)
 ui.campo_verifica_tela_cheia.setReadOnly(True)
 ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
+ui.campo_status_bd_2.setToolTip("Status dos dados no servidor\n✅ - Pedido atualizado no servidor\n❌ - Pedido desatualizado no servidor")
 ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Password)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados())
@@ -1959,7 +2011,7 @@ y = (screen_rect.height() - janela.height()) // 6
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(128, 42)           
+janela.setFixedSize(128, 45)           
 janela.show()
 #ui.label_5.setStyleSheet("background-color:rgb(90,54,247);")
 
