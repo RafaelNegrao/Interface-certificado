@@ -486,7 +486,7 @@ class Funcoes_padrao:
             pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
 
             if not self.pasta_existe(diretorio_padrão, nome_pasta):
-                self.acoes.analise_dados()
+                
                 os.mkdir(pasta_padrão)
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
@@ -499,7 +499,7 @@ class Funcoes_padrao:
 
                 ui.label_confirmacao_criar_pasta.setText(confirmacao)
                 #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
-
+                self.acoes.analise_dados()
             else:
                 # Se a pasta já existe no diretório padrão, mostre a notificação
                 ui.label_confirmacao_criar_pasta.setText("❌")
@@ -719,7 +719,8 @@ class Funcoes_padrao:
 
     def exportar_excel(self):
         try:
-            req =ref.get()
+            ref = db.reference("/Pedidos")
+            req = ref.get()
             
             data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
             numero_inteiro_inicial = data_inicial.toordinal()
@@ -750,7 +751,7 @@ class Funcoes_padrao:
                         tipo_pedido = req[cliente]['TIPO']
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
-                        vendido = req[cliente]['VENDIDO POR MIM?']
+                        vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
 
 
@@ -770,7 +771,7 @@ class Funcoes_padrao:
                         tipo_pedido = req[cliente]['TIPO']
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
-                        vendido = req[cliente]['VENDIDO POR MIM?']
+                        vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
                         dados_selecionados.append((pedido, data_agendamento,certificado, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade)) 
             
@@ -1587,12 +1588,15 @@ class Acoes_banco_de_dados:
         ui.campo_lista_venda.setCurrentText("NAO")
         ui.campo_lista_modalidade.setCurrentText("")
         ui.campo_lista_tipo_certificado.setCurrentText("")
+        self.limpar_labels()
+
+    def limpar_labels(self):
         ui.campo_status_bd.setText("")
         ui.label_confirmacao_converter_pdf.setText("")
         ui.label_confirmacao_criar_link_video.setText("")
         ui.label_confirmacao_criar_pasta.setText("")
-        ui.label_confirmacao_tirar_print.setText("")
         ui.label_confirmacao_mesclar_pdf.setText("")
+        ui.label_confirmacao_tirar_print.setText("")
          
     def dicionario_banco_de_dados(self):
            
@@ -1706,46 +1710,51 @@ class Acoes_banco_de_dados:
             if item is not None:
                 coluna = item.column()
                 if coluna == 1 :            
-                    ui.tabWidget.setCurrentIndex(0)       
+                    ui.tabWidget.setCurrentIndex(0)  
+                    self.limpar_labels()
                     self.preencher_dados(pedido_data)
+                    ui.campo_status_bd.setText("✅")
                     return             
-        except Exception as e:
+        except :
             pass
 
     def preencher_dados(self,pedido_data):
         #CORRIGIDO------------------------------------------------------------
-        status = pedido_data.get("STATUS")
-        ui.campo_lista_status.setCurrentText(status)
-        ui.campo_certificado.setText(pedido_data.get("TIPO"))
-        data_nula = QDate(2000, 1, 1)  
-        ui.campo_data_nascimento.setDate(data_nula)
-        ui.campo_nome.setText(pedido_data.get("NOME")) 
-        ui.campo_rg.setText(pedido_data.get("RG"))   
-        ui.campo_cpf.setText(pedido_data.get("CPF"))   
-        ui.campo_cnh.setText(pedido_data.get("CNH"))  
-        ui.campo_cnpj.setText(pedido_data.get("CNPJ"))  
-        ui.campo_email.setText(pedido_data.get("EMAIL"))  
-        ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO"), "dd/MM/yyyy"))  
-        ui.campo_pedido.setText(pedido_data.get("PEDIDO")) 
-        ui.campo_data_agendamento.setDate(QDate.fromString(pedido_data.get("DATA"), "dd/MM/yyyy"))
-        ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA"), "hh:mm"))
-        ui.campo_lista_venda.setCurrentText("NAO")
-        ui.campo_lista_venda.setCurrentText(pedido_data.get("VENDA"))
-        ui.campo_lista_modalidade.setCurrentText(pedido_data.get("MODALIDADE"))
-        ui.campo_pedido.setReadOnly(True)
-        ui.campo_seguranca_cnh.setText(pedido_data.get("CODIGO DE SEG CNH"))
-        ui.campo_nome_mae.setText(pedido_data.get("MAE"))
-        ui.campo_comentario.setText(pedido_data.get("DIRETORIO"))
-        ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
-        ui.campo_cnpj_uf.setText(pedido_data.get("UF"))
-        ui.caminho_pasta.setText(pedido_data.get("PASTA"))
-        ui.campo_lista_tipo_certificado.setCurrentText(pedido_data.get("CERTIFICADO"))
-        ui.campo_link_webex.setText(pedido_data.get("WEBEX"))
-        ui.campo_status_bd.setText("✅")
-        ui.campo_status_bd.setToolTip("Pedido Atualizado")
-    
-        if ui.caminho_pasta.text() != "": 
-            ui.label_confirmacao_criar_pasta.setText("✅")
+        try:
+            status = pedido_data.get("STATUS")
+            ui.campo_lista_status.setCurrentText(status)
+            ui.campo_certificado.setText(pedido_data.get("TIPO"))
+            data_nula = QDate(2000, 1, 1)  
+            ui.campo_data_nascimento.setDate(data_nula)
+            ui.campo_nome.setText(pedido_data.get("NOME")) 
+            ui.campo_rg.setText(pedido_data.get("RG"))   
+            ui.campo_cpf.setText(pedido_data.get("CPF"))   
+            ui.campo_cnh.setText(pedido_data.get("CNH"))  
+            ui.campo_cnpj.setText(pedido_data.get("CNPJ"))  
+            ui.campo_email.setText(pedido_data.get("EMAIL"))  
+            ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO"), "dd/MM/yyyy"))  
+            ui.campo_pedido.setText(pedido_data.get("PEDIDO")) 
+            ui.campo_data_agendamento.setDate(QDate.fromString(pedido_data.get("DATA"), "dd/MM/yyyy"))
+            ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA"), "hh:mm"))
+            ui.campo_lista_venda.setCurrentText("NAO")
+            ui.campo_lista_venda.setCurrentText(pedido_data.get("VENDA"))
+            ui.campo_lista_modalidade.setCurrentText(pedido_data.get("MODALIDADE"))
+            ui.campo_pedido.setReadOnly(True)
+            ui.campo_seguranca_cnh.setText(pedido_data.get("CODIGO DE SEG CNH"))
+            ui.campo_nome_mae.setText(pedido_data.get("MAE"))
+            ui.campo_comentario.setText(pedido_data.get("DIRETORIO"))
+            ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
+            ui.campo_cnpj_uf.setText(pedido_data.get("UF"))
+            ui.caminho_pasta.setText(pedido_data.get("PASTA"))
+            ui.campo_lista_tipo_certificado.setCurrentText(pedido_data.get("CERTIFICADO"))
+            ui.campo_link_webex.setText(pedido_data.get("WEBEX"))
+            ui.campo_status_bd.setText("✅")
+            ui.campo_status_bd.setToolTip("Pedido Atualizado")
+            pasta = ui.caminho_pasta.text()
+            if pasta != "": 
+                ui.label_confirmacao_criar_pasta.setText("✅")
+        except:
+            pass
             
     def preencher_tabela(self):
     #CORRIGIDO ---------------------------------------------------------
