@@ -9,7 +9,6 @@ import requests
 import PyPDF2
 import fitz
 import firebase_admin
-import json
 import smtplib
 import pyautogui
 import sys
@@ -20,15 +19,14 @@ from reportlab.lib.utils import ImageReader
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit
-from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect
-from PyQt5.QtGui import QDesktopServices,QColor
+from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from credenciaisBd import obter_credenciais
-
 
 credenciais = obter_credenciais()
 
@@ -37,7 +35,6 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 
 #Referência raiz do banco de dados
 ref = db.reference("/")
-
 
 
 class Funcoes_padrao:
@@ -122,48 +119,47 @@ class Funcoes_padrao:
             pass
 
     def trazer_configuracoes(self):
+        #CORRIGIDO ------------------------------------------------------------------
         try:
-            link = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
+            ref = db.reference("/Configuracoes")
             # Faz uma solicitação GET para obter as configurações do banco de dados
-            bd = requests.get(f"{link}.json")
-            # Converte a resposta JSON em um dicionário Python
-            config = bd.json()
+            configs = ref.get()
 
-            
             try:
-                cor = config["RGB"]
+                cor = configs["RGB"]
                 r, g, b = map(int, cor.split(','))
-                ui.caminho_pasta_principal.setText(config['DIRETORIO-RAIZ'])
-                ui.campo_senha_email_empresa.setText(config['SENHA'])
-                ui.campo_email_empresa.setText(config['E-MAIL'])
+
+                ui.caminho_pasta_principal.setText(configs['DIRETORIO-RAIZ'])
+                ui.campo_senha_email_empresa.setText(configs['SENHA'])
+                ui.campo_email_empresa.setText(configs['E-MAIL'])
                 ui.campo_cor_R.setValue(int(r))
                 ui.campo_cor_G.setValue(int(g))
                 ui.campo_cor_B.setValue(int(b))
             except Exception as e:
-                print(e)
                 pass
         except:
             pass
 
     def trazer_metas(self):
-        link = "https://configs-5d64c-default-rtdb.firebaseio.com/Metas"
+        #CORRIGIDO ----------------------------------------------------------
+        ref = db.reference("/Metas")
         # Faz uma solicitação GET para obter as configurações do banco de dados
-        bd = requests.get(f"{link}.json")
-        # Converte a resposta JSON em um dicionário Python
-        config = bd.json()
+        Metas = ref.get()
     
         try:
-            valor_semanal = config['SEMANAL']
-            valor_mensal = config['MENSAL']
+            valor_semanal = Metas['SEMANAL']
+            valor_mensal = Metas['MENSAL']
             ui.campo_meta_semanal.setValue(int(valor_semanal))
             ui.campo_meta_mes.setValue(int(valor_mensal))
         except Exception as e:
             pass       
 
     def atualizar_meta_clientes(self):
+        #CORRIGIDO ----------------------------------------------------------------------------------------
         if ui.tabWidget.currentIndex() == 4:
             # Certifique-se de que req é um dicionário
-            req = ref.get()
+            ref = db.reference("/Pedidos")
+            Pedidos = ref.get()
             
             # Inicializando contadores para cada semana
             semana1 = 0
@@ -176,11 +172,11 @@ class Funcoes_padrao:
             mes_meta = ui.campo_data_meta.date().month()
             ano_meta = ui.campo_data_meta.date().year()
             
-            for pedido_info in req:
+            for pedido_info in Pedidos:
                 # Verificando se o status é aprovado
-                if req[pedido_info]['STATUS'] == "APROVADO":
+                if Pedidos[pedido_info]['STATUS'] == "APROVADO":
                     # Obtendo a data do pedido
-                    data_pedido = req[pedido_info]['DATA']
+                    data_pedido = Pedidos[pedido_info]['DATA']
                     
                     # Convertendo a data para o formato desejado (considerando que DATA_PEDIDO é uma string)
                     data_formatada = datetime.datetime.strptime(data_pedido, "%d/%m/%Y")
@@ -227,41 +223,53 @@ class Funcoes_padrao:
         ui.label_5.setStyleSheet(f"background-color:rgb({cor_R}, {cor_G}, {cor_B});\n")
        
     def Atualizar_meta(self):
+        #CORRIGIDO
+        ref = db.reference("/Metas")
 
-        link = "https://configs-5d64c-default-rtdb.firebaseio.com/Metas"
-        # Faz uma solicitação GET para obter as configurações do banco de dados
-        bd = requests.get(f"{link}.json")
-        # Converte a resposta JSON em um dicionário Python
-
+        # Obtém as metas da interface do usuário
         meta_semana = ui.campo_meta_semanal.text()
         meta_mes = ui.campo_meta_mes.text()
 
+        # Cria um dicionário com as novas metas
+        nova_meta = {"MENSAL": meta_mes, "SEMANAL": meta_semana}
 
-        nova_meta = {"MENSAL": meta_mes,"SEMANAL":meta_semana}
         try:
-            requests.patch(f'{link}.json', data=json.dumps(nova_meta))
-        except:
-            requests.post(f'{link}.json', data=json.dumps(nova_meta))
+            # Tenta atualizar as metas no banco de dados
+            ref.update(nova_meta)
+            print("Metas atualizadas com sucesso.")
+        except Exception as e:
+            # Se ocorrer um erro, tenta adicionar as novas metas
+            try:
+                ref.set(nova_meta)
+                print("Novas metas adicionadas com sucesso.")
+            except Exception as e:
+                print(f"Erro ao atualizar ou adicionar metas: {e}")
    
     def atualizar_configuracoes(self):
+        #CORRIGIDO --------------------------------------------------
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
             pass
         else:
             return
         
-        link_firebase = "https://configs-5d64c-default-rtdb.firebaseio.com/Configuracoes"
-    
+        ref = db.reference("/Configuracoes")
+        
         diretorio = ui.caminho_pasta_principal.text()
         email = ui.campo_email_empresa.text()
         senha = ui.campo_senha_email_empresa.text()
         rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
         nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb}
+
         try:
-            requests.patch(f'{link_firebase}.json', data=json.dumps(nova_config))
-        except:
-            requests.post(f'{link_firebase}.json', data=json.dumps(nova_config))
-    
+            ref.update(nova_config)
+        except Exception as e:
+            try:
+                ref.set(nova_config)
+                print("Novas metas adicionadas com sucesso.")
+            except Exception as e:
+                print(f"Erro ao atualizar ou adicionar metas: {e}")
+
     def atualizar_diretorio_raiz(self):
         widget_pai = ui.centralwidget
         # Abrir o explorer para selecionar a pasta raiz
@@ -466,7 +474,7 @@ class Funcoes_padrao:
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
                 return
 
-
+            self.formatar_nome()
             nome_pasta = ui.campo_nome.text()
             if nome_pasta == '':
                 ui.label_confirmacao_criar_pasta.setText("❌")
@@ -478,6 +486,7 @@ class Funcoes_padrao:
             pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
 
             if not self.pasta_existe(diretorio_padrão, nome_pasta):
+                self.acoes.analise_dados()
                 os.mkdir(pasta_padrão)
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
@@ -487,8 +496,6 @@ class Funcoes_padrao:
                     confirmacao = ""
                 else:
                     confirmacao = "✅"
-
-                self.acoes.analise_dados()
 
                 ui.label_confirmacao_criar_pasta.setText(confirmacao)
                 #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
@@ -593,7 +600,7 @@ class Funcoes_padrao:
         QDesktopServices.openUrl(url_junta)
 
     def formatar_nome(self):
-        nome = ui.campo_nome.text()  # Obtenha o texto do campo_nome_mae
+        nome = ui.campo_nome.text().rstrip()  # Obtenha o texto do campo_nome_mae
         ui.campo_nome.setText(nome.upper())
 
     def formatar_nome_mae(self):
@@ -1056,7 +1063,7 @@ _*Observações: Retire o documento do plástico e abra-o.*_"""
                     elif certificado == "e-CNPJ":
                         mensagem = f"""{mensagem_inicial} tudo bem?                                             
 Irei precisar de _*uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser CNH, RG, OAB.*_                                                
-Observações: Retire o documento do plástico e abra-o. O documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_""" 
+.Também irei precisar do documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_""" 
                         ui.campo_msg1.setPlainText(mensagem)                   
                     QApplication.clipboard().setText(mensagem)
                 except:
@@ -1390,58 +1397,64 @@ Rafael Negrão de Souza
 class Acoes_banco_de_dados:
     def __init__(self,ui):
         self.ui = ui
+        self.ref = db.reference("/Pedidos")
     
     def analise_dados(self):
-        #Analisa se os campos do pedido estão preenchidos
+        # Analisa se os campos do pedido estão preenchidos
         if not self.analise_de_campos():
             return
-        
+
         if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {ui.campo_lista_status.currentText()}?"):
             return
 
+        ref = db.reference("/Pedidos")
         self.num_pedido = ui.campo_pedido.text()
-        req = ref.get()
 
-#ARRUME A PARTIR DAQUI
-        #Percorre o banco de dados procurando o pedido
-        for self.id in req:  
-            #O pedido da interface é o mesmo do banco de dados    
-            if self.num_pedido == req[self.id]['PEDIDO']:
-
- #Pedido existente + gravado Definitivo--------------------------------------------------------------------------------------               
-                if self.verificar_status() == "Definitivo":
+        num_pedido = ui.campo_pedido.text()
+        novo_pedido_ref = ref.child(num_pedido)
+        
+        # Verifica se o nó já existe
+        #PEDIDO EXISTE
+        if novo_pedido_ref.get() is not None:
+            #verificar se o pedido é DEFINITIVO ou TEMPORARIO
+            condic = self.verificar_status()
+            match condic:
+                #Pedido existente + gravado Definitivo
+                case 'DEFINITIVO':
                     self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-                    self.gravar_pedido_existente()
+                    novo_pedido_ref.update(self.dicionario_banco_de_dados())
                     self.ui.campo_status_bd.setText("")
                     self.ui.campo_status_bd.setToolTip("")
                     self.limpar_campos_pedido()
-                    self.mensagem_alerta("Sucesso","Pedido salvo!")     
-                    return
-                
-#Pedido existente + gravado Temporario----------------------------------------------------------------------------------------                     
-                else:    
-                    self.gravar_pedido_existente()
+                    self.mensagem_alerta("Sucesso","Pedido salvo!") 
+
+                #Pedido existente + gravado temporariamente
+                case 'TEMPORARIO':
+                    novo_pedido_ref.update(self.dicionario_banco_de_dados())
                     self.ui.campo_status_bd.setText("✅")
                     self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                     self.mensagem_alerta("Sucesso","Pedido salvo!")
-                    return
-                
-#Pedido novo + gravado Definitivo--------------------------------------------------------------------------------------------    
-        if self.verificar_status() == "Definitivo":
-            self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-            self.gravar_pedido_novo()
-            self.ui.campo_status_bd.setText("")
-            self.ui.campo_status_bd.setToolTip("")
-            self.limpar_campos_pedido()
-            self.mensagem_alerta("Sucesso","Novo pedido salvo!")
-            return
         
-#Pedido novo + gravado Temporario-------------------------------------------------------------------------------------------- 
-        self.gravar_pedido_novo()
-        self.ui.campo_status_bd.setText("✅")
-        self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-        self.mensagem_alerta("Sucesso","Novo pedido salvo!")
-        return
+        #NOVO PEDIDO
+        else:
+            condic = self.verificar_status()
+            match condic:
+                #Pedido existente + gravado Definitivo
+                case 'DEFINITIVO':
+                    self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
+                    novo_pedido_ref.set(self.dicionario_banco_de_dados())
+                    self.ui.campo_status_bd.setText("")
+                    self.ui.campo_status_bd.setToolTip("")
+                    self.limpar_campos_pedido()
+                    self.mensagem_alerta("Sucesso","Pedido salvo!") 
+
+                #Pedido existente + gravado temporariamente
+                case 'TEMPORARIO':
+
+                    novo_pedido_ref.set(self.dicionario_banco_de_dados())
+                    self.ui.campo_status_bd.setText("✅")
+                    self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
+                    self.mensagem_alerta("Sucesso","Pedido salvo!")
 
     def mensagem_confirmacao(self,titulo,mensagem):
         resposta = QMessageBox.question(ui.centralwidget, titulo, mensagem, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
@@ -1455,20 +1468,46 @@ class Acoes_banco_de_dados:
 
     def verificar_status(self):
         if ui.campo_lista_status.currentText() != "APROVADO" and ui.campo_lista_status.currentText() != "CANCELADO":
-            return"Temporario"
+            return"TEMPORARIO"
         else:
-            return"Definitivo"
+            return"DEFINITIVO"
                
     def analise_de_campos(self):
-        if (ui.campo_pedido.text() == "" or 
-            ui.campo_certificado.text() == "" or 
-            ui.campo_hora_agendamento.text() == "00:00" or 
-            ui.campo_data_agendamento.text() == "01/01/2000" or 
-            ui.campo_lista_status.currentText() == "" or 
-            ui.campo_lista_modalidade.currentText() == "" or 
-            ui.campo_lista_tipo_certificado.currentText() == ""):
 
-            self.mensagem_alerta("Erro","Adicione os campos 🌟 para salvar o pedido")
+
+        pedido = ui.campo_pedido.text()
+        certificado = ui.campo_certificado.text() 
+        hora = ui.campo_hora_agendamento.time().toString("HH:mm")
+        data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")
+        status = ui.campo_lista_status.currentText() 
+        modalidade = ui.campo_lista_modalidade.currentText()
+        certificado = ui.campo_lista_tipo_certificado.currentText()
+        descricao = ui.campo_certificado.text()
+
+
+        # Lista de variáveis
+        variaveis = [pedido, certificado, hora, data, status, modalidade, certificado,descricao]
+
+        # Mapeia os nomes das variáveis para mensagens correspondentes
+        nomes_mensagens = {
+            "pedido": "Pedido",
+            "certificado": "Certificado",
+            "hora": "Hora",
+            "data": "Data",
+            "status": "Status",
+            "modalidade": "Modalidade",
+            "certificado": "Certificado",
+            "descricao":"Descrição Certificado"
+        }
+
+        # Verifica se há alguma variável vazia, exceto para data e hora
+        campos_vazios = [nomes_mensagens[nome_variavel] for nome_variavel, valor in zip(["pedido","certificado","hora","data","status","modalidade","certificado","descricao"], variaveis) if (isinstance(valor, str) and valor == "") or (nome_variavel == "hora" and valor == "00:00") or (nome_variavel == "data" and valor == "01/01/2000")]
+
+        # Verifica se há campos vazios e exibe a mensagem de alerta
+        if campos_vazios:
+            campos_faltando = "\n⭐ ".join(campos_vazios)
+            mensagem_alerta = f"Preencha os seguintes campos para salvar o pedido!\n⭐{campos_faltando}"
+            self.mensagem_alerta("Erro no envio", mensagem_alerta)
             return False
         return True
 
@@ -1576,11 +1615,11 @@ class Acoes_banco_de_dados:
                     "PEDIDO":ui.campo_pedido.text() , 
                     "DATA":ui.campo_data_agendamento.text(), 
                     "HORA":ui.campo_hora_agendamento.text(),
-                    "VENDIDO POR MIM?":ui.campo_lista_venda.currentText(),
+                    "VENDA":ui.campo_lista_venda.currentText(),
                     "MODALIDADE":ui.campo_lista_modalidade.currentText(),
                     "CERTIFICADO":ui.campo_lista_tipo_certificado.currentText(),
                     }
-        if self.verificar_status() == "Definitivo":
+        if self.verificar_status() == "DEFINITIVO":
             novos_dados.update({
                     "WEBEX": "",
                     "PASTA": "",
@@ -1599,12 +1638,6 @@ class Acoes_banco_de_dados:
                     })
 
         return novos_dados
-    
-    def gravar_pedido_existente(self):
-        ref.child(self.id).update(self.dicionario_banco_de_dados())
-
-    def gravar_pedido_novo(self):
-        ref.push(self.dicionario_banco_de_dados())
 
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
         for _ in range(3):  # Tentar até três vezes
@@ -1638,104 +1671,92 @@ class Acoes_banco_de_dados:
                 continue
 
     def carregar_dados(self):
-    #USO DE BANCO DE DADOS
-    #Verifica se o pedido existe no servidor 
-    #quando um novo pedido é digitado no campo PEDIDO
+        #CORRIGIDO ------------------------------------------------
         try:
             num_pedido = ui.campo_pedido.text()
 
             if num_pedido == "":
                 return
-            self.req = ref.get()
-            num_pedidos_total = len(self.req)
-            num_pedidos_processados = 0
 
-            for self.id in self.req:
-                ui.barra_progresso_pedido.setVisible(True)
-                pedido_servidor = self.req[self.id]['PEDIDO']
-                
-                if num_pedido == pedido_servidor:
-                    ui.campo_pedido.setReadOnly(True)
-                    
-                    # Preenche os dados na tabela
-                    self.preencher_dados()
+            #Referência para o nó /Pedidos
+            self.ref = db.reference("/Pedidos")
 
-                # Atualize a barra de progresso
-                num_pedidos_processados += 1
-                progresso = int((num_pedidos_processados / num_pedidos_total) * 100)
-                ui.barra_progresso_pedido.setValue(progresso)
-                QApplication.processEvents()
-                ui.barra_progresso_pedido.setVisible(False)
+            # Verifica se o nó com o número do pedido existe
+            pedido_ref = self.ref.child(num_pedido)
+            pedido_data = pedido_ref.get()
 
-        except:
-            ui.barra_progresso_pedido.setVisible(False)
-            return
+            if pedido_data:
+                # Se existir, o pedido foi encontrado
+                self.preencher_dados(pedido_data)
+                # Realize as ações necessárias com os detalhes do pedido encontrado
+            else:  
+               return
+
+        except Exception as e:
+            pass
 
     def pegar_valor_tabela(self):
    #evento disparado ao dar double click na tabela
-        self.req = ref.get()
-        item = ui.tableWidget.currentItem()  # Obtenha o item selecionado
+        #Pega o item selecionado
+        item = ui.tableWidget.currentItem() 
+        pedido = item.text()
         try:
+            pedido_ref = self.ref.child(pedido)
+            pedido_data = pedido_ref.get()
             if item is not None:
                 coluna = item.column()
-                valor = item.text()
-                if coluna == 1 :       
-                    for self.id in self.req:
-                        if self.req[self.id]["PEDIDO"] == valor: 
-                            self.limpar_campos_pedido()             
-                            ui.tabWidget.setCurrentIndex(0)       
-                            self.preencher_dados()
-                            return             
+                if coluna == 1 :            
+                    ui.tabWidget.setCurrentIndex(0)       
+                    self.preencher_dados(pedido_data)
+                    return             
         except Exception as e:
-            print(e)
             pass
 
-    def preencher_dados(self):
-        
-        status = self.req[self.id]["STATUS"]  
+    def preencher_dados(self,pedido_data):
+        #CORRIGIDO------------------------------------------------------------
+        status = pedido_data.get("STATUS")
         ui.campo_lista_status.setCurrentText(status)
-        ui.campo_certificado.setText(self.req[self.id]["TIPO"])
+        ui.campo_certificado.setText(pedido_data.get("TIPO"))
         data_nula = QDate(2000, 1, 1)  
         ui.campo_data_nascimento.setDate(data_nula)
-        ui.campo_nome.setText(self.req[self.id]["NOME"]) 
-        ui.campo_rg.setText(self.req[self.id]["RG"])   
-        ui.campo_cpf.setText(self.req[self.id]["CPF"])   
-        ui.campo_cnh.setText(self.req[self.id]["CNH"])  
-        ui.campo_cnpj.setText(self.req[self.id]["CNPJ"])  
-        ui.campo_email.setText(self.req[self.id]["EMAIL"])  
-        ui.campo_data_nascimento.setDate(QDate.fromString(self.req[self.id]["NASCIMENTO"], "dd/MM/yyyy"))  
-        ui.campo_pedido.setText(self.req[self.id]["PEDIDO"]) 
-        ui.campo_data_agendamento.setDate(QDate.fromString(self.req[self.id]["DATA"], "dd/MM/yyyy"))
-        ui.campo_hora_agendamento.setTime(QTime.fromString(self.req[self.id]["HORA"], "hh:mm"))
+        ui.campo_nome.setText(pedido_data.get("NOME")) 
+        ui.campo_rg.setText(pedido_data.get("RG"))   
+        ui.campo_cpf.setText(pedido_data.get("CPF"))   
+        ui.campo_cnh.setText(pedido_data.get("CNH"))  
+        ui.campo_cnpj.setText(pedido_data.get("CNPJ"))  
+        ui.campo_email.setText(pedido_data.get("EMAIL"))  
+        ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO"), "dd/MM/yyyy"))  
+        ui.campo_pedido.setText(pedido_data.get("PEDIDO")) 
+        ui.campo_data_agendamento.setDate(QDate.fromString(pedido_data.get("DATA"), "dd/MM/yyyy"))
+        ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA"), "hh:mm"))
         ui.campo_lista_venda.setCurrentText("NAO")
-        ui.campo_lista_venda.setCurrentText(self.req[self.id]['VENDIDO POR MIM?'])
-        ui.campo_lista_modalidade.setCurrentText(self.req[self.id]['MODALIDADE'])
+        ui.campo_lista_venda.setCurrentText(pedido_data.get("VENDA"))
+        ui.campo_lista_modalidade.setCurrentText(pedido_data.get("MODALIDADE"))
         ui.campo_pedido.setReadOnly(True)
-        ui.campo_seguranca_cnh.setText(self.req[self.id]['CODIGO DE SEG CNH'])
-        ui.campo_nome_mae.setText(self.req[self.id]['MAE'])
-        ui.campo_comentario.setText(self.req[self.id]['DIRETORIO'])
-        ui.campo_cnpj_municipio.setText(self.req[self.id]['MUNICIPIO'])
-        ui.campo_cnpj_uf.setText(self.req[self.id]['UF'])
-        ui.caminho_pasta.setText(self.req[self.id]['PASTA'])
-        ui.campo_lista_tipo_certificado.setCurrentText(self.req[self.id]['CERTIFICADO'])
-        ui.campo_link_webex.setText(self.req[self.id]['WEBEX'])
+        ui.campo_seguranca_cnh.setText(pedido_data.get("CODIGO DE SEG CNH"))
+        ui.campo_nome_mae.setText(pedido_data.get("MAE"))
+        ui.campo_comentario.setText(pedido_data.get("DIRETORIO"))
+        ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
+        ui.campo_cnpj_uf.setText(pedido_data.get("UF"))
+        ui.caminho_pasta.setText(pedido_data.get("PASTA"))
+        ui.campo_lista_tipo_certificado.setCurrentText(pedido_data.get("CERTIFICADO"))
+        ui.campo_link_webex.setText(pedido_data.get("WEBEX"))
         ui.campo_status_bd.setText("✅")
         ui.campo_status_bd.setToolTip("Pedido Atualizado")
-        
-        print(ui.caminho_pasta.text())
+    
         if ui.caminho_pasta.text() != "": 
             ui.label_confirmacao_criar_pasta.setText("✅")
             
     def preencher_tabela(self):
-
+    #CORRIGIDO ---------------------------------------------------------
     #USO DE BANCO DE DADOS
         ui.tableWidget.setRowCount(0)
         try:
             ui.tableWidget.clear()
             
-            req = ref.get()
+            pedidos = self.ref.get()
             # Ordene a lista de acordo com a data em ordem decrescente
-            req = sorted(req.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
+            pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
 
             data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
             numero_inteiro_inicial = data_inicial.toordinal()
@@ -1746,14 +1767,14 @@ class Acoes_banco_de_dados:
             x = 0
             ui.barra_progresso_consulta.setVisible(True)
             ui.barra_progresso_consulta.setValue(0)
-            total_pedidos = len(req)
+            total_pedidos = len(pedidos)
             y = 0
-            for pedido_info in req:
+            for pedido_info in pedidos:
                 
                 data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%d/%m/%Y")
                 numero_inteiro_bd = data_bd.toordinal()
                 status_servidor = pedido_info['STATUS']
-                
+               
                 if (numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final) :
 
                     if status_filtro == status_servidor or status_filtro == "TODAS":
@@ -1769,7 +1790,7 @@ class Acoes_banco_de_dados:
                         ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['DATA']))
                         ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['HORA']))
                         ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['MODALIDADE']))
-                        ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['VENDIDO POR MIM?']))
+                        ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['VENDA']))
                         ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['TIPO']))
                         try:
                             ui.tableWidget.setItem(row_position, 8, QTableWidgetItem(pedido_info['DIRETORIO']))
@@ -1993,6 +2014,9 @@ ui.campo_msg6.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_ms
 ui.campo_msg6.setReadOnly(True)
 ui.campo_msg7.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg7")
 ui.campo_msg7.setReadOnly(True)
+regex = QRegExp("[0-9]*")
+validator = QRegExpValidator(regex)
+ui.campo_pedido.setValidator(validator)
 
 
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
