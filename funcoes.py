@@ -20,13 +20,14 @@ from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QPixmap, QImage
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from credenciaisBd import obter_credenciais
+
 
 credenciais = obter_credenciais()
 
@@ -135,6 +136,11 @@ class Funcoes_padrao:
                 ui.campo_cor_R.setValue(int(r))
                 ui.campo_cor_G.setValue(int(g))
                 ui.campo_cor_B.setValue(int(b))
+                ui.campo_porcentagem_validacao.setValue(int(configs['PORCENTAGEM']))
+                ui.campo_imposto_validacao.setValue(configs['IMPOSTO VALIDACAO'])
+                ui.campo_desconto_validacao.setValue(configs['DESCONTO VALIDACAO'])
+
+
             except Exception as e:
                 pass
         except:
@@ -259,7 +265,10 @@ class Funcoes_padrao:
         email = ui.campo_email_empresa.text()
         senha = ui.campo_senha_email_empresa.text()
         rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
-        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb}
+        porcentagem = ui.campo_porcentagem_validacao.value()
+        desconto = ui.campo_desconto_validacao.value()
+        imposto = ui.campo_imposto_validacao.value()
+        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto}
 
         try:
             ref.update(nova_config)
@@ -342,7 +351,7 @@ class Funcoes_padrao:
                 caminho = f"{caminho_escolhido}/{nome_documento}.png"
             else:
 
-                nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
+                nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text=f"DOC ADICIONAL")
                 if not ok:           
                     return
                 
@@ -410,9 +419,13 @@ class Funcoes_padrao:
 
 
         if ui.campo_lista_modalidade.currentText() == "PRESENCIAL":
-
             ui.label_confirmacao_criar_link_video.setText("❌")
             self.mensagem_alerta("Erro","Não é possível gerar link na modalidade presencial!")
+            return
+        
+        elif ui.campo_link_webex.text() != "":
+            ui.label_confirmacao_criar_link_video.setText("❌")
+            self.mensagem_alerta("Erro","Não é possível gerar link quando a reunião é feita pelo WEBEX!")
             return
 
 
@@ -462,20 +475,20 @@ class Funcoes_padrao:
     def criar_pasta_cliente(self):
         try:
             pedido = ui.campo_pedido.text()
-            tipo = ui.campo_certificado.text()
+            versao = ui.campo_lista_versao_certificado.currentText()
             hora = ui.campo_hora_agendamento.text()
             data = ui.campo_data_agendamento.text()
             status = ui.campo_lista_status.currentText()
             modalidade = ui.campo_lista_modalidade.currentText()
 
-            if pedido == "" or tipo == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "":
+            if pedido == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or versao == "":
 
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
                 return
 
             self.formatar_nome()
-            nome_pasta = ui.campo_nome.text()
+            nome_pasta = f'{ui.campo_pedido.text()}-{ui.campo_nome.text()}'
             if nome_pasta == '':
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Preencha o NOME do cliente.")
@@ -501,9 +514,7 @@ class Funcoes_padrao:
                 #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
                 self.acoes.analise_dados()
             else:
-                # Se a pasta já existe no diretório padrão, mostre a notificação
-                ui.label_confirmacao_criar_pasta.setText("❌")
-                self.mensagem_alerta("Pasta não criada","Pasta do cliente já existe no diretório")
+                self.abrir_pasta_cliente()
         except:
             ui.label_confirmacao_criar_pasta.setText("❌")
             #self.mensagem_alerta("Erro","Pasta não criada")
@@ -517,6 +528,7 @@ class Funcoes_padrao:
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
 
     def procurar_oab(self):
+
         url = QUrl("https://cna.oab.org.br/")
         QDesktopServices.openUrl(url)
         return
@@ -526,14 +538,17 @@ class Funcoes_padrao:
         QDesktopServices.openUrl(url)
         return
 
+    def formatar_orgao_rg(self):
+        orgao = ui.campo_rg_orgao.text().rstrip()
+        ui.campo_rg_orgao.setText(orgao.upper())
+
     def procurar_cnpj(self):
-        
         cnpj = ui.campo_cnpj.text()
         url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
         QDesktopServices.openUrl(url_receita)
 
     def procurar_junta(self):
-        
+
         estado = ui.campo_lista_junta_comercial.currentText()
 
         match  estado:
@@ -622,17 +637,18 @@ class Funcoes_padrao:
             resposta = requests.get(url)
 
             if resposta.status_code == 200:
+                
                 data = resposta.json()
                 ui.campo_cnpj_municipio.setText(data['municipio'])
-                
+                ui.campo_cnpj_razao_social.setText(data['nome'])
                 uf = data['uf']
                 
                 if uf != "SP":
-                    ui.campo_cnpj_uf.setText(str(uf + "❌"))
+                    ui.campo_cnpj_uf.setText(str(uf))
                     ui.campo_lista_junta_comercial.setCurrentText(uf)
                     return
                 else:
-                    ui.campo_cnpj_uf.setText(str(uf + "✅"))
+                    ui.campo_cnpj_uf.setText(str(uf))
                     ui.campo_lista_junta_comercial.setCurrentText(uf)
                     return
 
@@ -646,18 +662,8 @@ class Funcoes_padrao:
             self.mensagem_alerta("ERRO DE CONEXÃO","Sem conexão com a internet.")
             return
         except Exception as e:
-            if hasattr(e, 'response') and e.response.status_code == 429:
-                ui.campo_cnpj_municipio.setText("")
-                ui.campo_cnpj_uf.setText("")
-                self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
-                return
-            else:
-                ui.campo_cnpj_municipio.setText('CNPJ INVÁLIDO')
-                ui.campo_cnpj_uf.setText('---') 
-                return
-        finally:
-            if 'resposta' in locals() and resposta:
-                resposta.close()    
+            self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
+            return   
 
     def procurar_cpf(self):
         
@@ -743,19 +749,27 @@ class Funcoes_padrao:
                         
                         pedido = req[cliente]['PEDIDO']
                         data_agendamento = req[cliente]['DATA']
+
                         try:
-                            certificado = req[cliente]['CERTIFICADO']
+                            versao = req[cliente]['VERSAO']
                         except:
-                            certificado =""
+                            versao = ""
                             pass
-                        tipo_pedido = req[cliente]['TIPO']
+
+                        try:
+                            preco = req[cliente]['PRECO']
+                        except:
+                            preco = ""
+                            pass
+
+
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
                         vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
+                        
 
-
-                        dados_selecionados.append((pedido, data_agendamento,certificado, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade))   
+                        dados_selecionados.append((pedido, data_agendamento, versao, hora_agendamento,status_agendamento,vendido,modalidade,preco))   
 
                     elif status_filtro == "TODAS":
 
@@ -763,24 +777,36 @@ class Funcoes_padrao:
 
                         pedido = req[cliente]['PEDIDO']
                         data_agendamento = req[cliente]['DATA']
+
                         try:
-                            certificado = req[cliente]['CERTIFICADO']
+                            versao = req[cliente]['VERSAO']
                         except:
-                            certificado =""
+                            versao = ""
                             pass
-                        tipo_pedido = req[cliente]['TIPO']
+
+                        try:
+                            preco = req[cliente]['PRECO']
+                        except:
+                            preco = ""
+                            pass
+                        
+
+
+                        
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
                         vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
-                        dados_selecionados.append((pedido, data_agendamento,certificado, tipo_pedido, hora_agendamento,status_agendamento,vendido,modalidade)) 
+                        
+
+                        dados_selecionados.append((pedido, data_agendamento, versao,hora_agendamento,status_agendamento,vendido,modalidade,preco)) 
             
             if x > 0:
                 root = tk.Tk()
                 root.withdraw()
                 caminho_arquivo = filedialog.askdirectory()
                 if caminho_arquivo:
-                    df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Certificado','Tipo de certificado','hora','Status Pedido','Vendido por mim?','Modalidade'])
+                    df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Versão','hora','Status Pedido','Vendido por mim?','Modalidade','Preço'])
                     data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
                     data_final = ui.campo_data_ate.text()
                     data_inicial = ui.campo_data_de.text()
@@ -810,7 +836,7 @@ class Funcoes_padrao:
             # Copia o valor da célula para a área de transferência
             clipboard = QApplication.clipboard()
             clipboard.setText(valor_celula)
-            ui.label_msg_copiado.setText("COPIADO!")
+            ui.label_msg_copiado.setText("✅")
         else:
             ui.label_msg_copiado.setText("")
         
@@ -968,6 +994,7 @@ class Funcoes_padrao:
         self.trazer_configuracoes()
         self.trazer_metas()
         self.definir_cor()
+        self.carregar_lista_certificados()
         ui.campo_data_meta.setDate(QDate.currentDate())
         self.ui.campo_status_bd.setText("")
         self.ui.campo_status_bd.setToolTip("")
@@ -1039,14 +1066,10 @@ class Funcoes_padrao:
                     ui.campo_nome.selectAll()
                 except:
                     pass
-            case'campo_msg1':
+            case'campo_msg_doc_idf':
                 try:
                     agora = datetime.datetime.now().time()
-                    certificado = ui.campo_lista_tipo_certificado.currentText()
-                    if not certificado:
-                        self.mensagem_alerta("Erro","Verifique o tipo de certificado")
-                        return
-                    
+                 
                     match agora:
                         case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
                             mensagem_inicial = "Bom dia!"
@@ -1056,19 +1079,24 @@ class Funcoes_padrao:
                             mensagem_inicial = "Boa noite!"
                             
                             
-                    if certificado == "e-CPF":
-                        mensagem = f"""{mensagem_inicial} tudo bem?                                                                                      
+
+                    mensagem = f"""{mensagem_inicial} tudo bem?                                                                                      
 Irei precisar de uma foto completa do seu documento de identificação, _*FRENTE E VERSO*_, podendo ser _*CNH, RG, OAB.*_                                         
-_*Observações: Retire o documento do plástico e abra-o.*_"""
-                        ui.campo_msg1.setPlainText(mensagem)
-                    elif certificado == "e-CNPJ":
-                        mensagem = f"""{mensagem_inicial} tudo bem?                                             
-Irei precisar de _*uma foto completa do seu documento de identificação, FRENTE E VERSO, podendo ser CNH, RG, OAB.*_                                                
-.Também irei precisar do documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_""" 
-                        ui.campo_msg1.setPlainText(mensagem)                   
+_*Observações:*_ Retire o documento do plástico e abra-o."""
+    
+                    ui.campo_msg_doc_idf.setPlainText(mensagem)                   
                     QApplication.clipboard().setText(mensagem)
                 except:
                     pass
+
+            case'campo_msg_doc_empresa':
+                try:
+                    mensagem = f"""                                                                                         
+Irei precisar tambem do documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_"""                  
+                    QApplication.clipboard().setText(mensagem)
+                except:
+                    pass
+
             case'campo_msg2':
                 try:
                     QApplication.clipboard().setText(ui.campo_msg2.toPlainText())
@@ -1106,6 +1134,16 @@ Irei precisar de _*uma foto completa do seu documento de identificação, FRENTE
                     QApplication.clipboard().setText(ui.campo_assunto_email.text())
                 except:
                     pass
+            case'campo_msg_venda':
+                try:
+                    QApplication.clipboard().setText(ui.campo_msg_venda.toPlainText())
+                except:
+                    pass
+            case'campo_msg_reembolso':
+                try:
+                    QApplication.clipboard().setText(ui.campo_msg_reembolso.toPlainText())
+                except:
+                    pass
 
     def manter_tela_aberta(self):
         if ui.campo_verifica_tela_cheia.text() == "SIM":
@@ -1132,7 +1170,14 @@ Irei precisar de _*uma foto completa do seu documento de identificação, FRENTE
             senha = ui.campo_senha_email_empresa.text()
             hora = ui.campo_hora_agendamento.time().toString("HH:mm")
             data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")
-            if ui.campo_lista_tipo_certificado.currentText() == "e-CNPJ":
+            certificado = ui.campo_lista_versao_certificado.currentText()
+            if "e-CNPJ" in certificado:
+                versao = "e-CNPJ"
+            elif "e-CPF" in certificado:
+                versao = "e-CPF"
+
+            
+            if versao == "e-CNPJ":
                             texto_formatado = (
 f"""Olá {nome.capitalize()}, tudo bem?
 
@@ -1164,7 +1209,7 @@ Rafael Negrão de Souza
                             ui.campo_msg3.setPlainText(texto_formatado)
                             QApplication.clipboard().setText(ui.campo_msg3.toPlainText())
 
-            elif ui.campo_lista_tipo_certificado.currentText() == "e-CPF":
+            elif versao == "e-CPF":
                 texto_formatado = (
 f"""Olá {nome.capitalize()}, tudo bem?
  
@@ -1242,8 +1287,15 @@ Rafael Negrão de Souza
         try:
             # Configurar o objeto MIMEText
             if not ui.checkBox_documentos_webex.isChecked():
+                certificado = ui.campo_lista_versao_certificado.currentText()
 
-                if ui.campo_lista_tipo_certificado.currentText() == "e-CNPJ":
+                if "e-CNPJ" in certificado:
+                    versao = "e-CNPJ"
+                elif "e-CPF" in certificado:
+                    versao = "e-CPF"
+
+                print(versao)
+                if versao == "e-CNPJ":
                 
                         mensagem_final = f"""
                     Olá <b>{nome.capitalize()}</b>, tudo bem?<br>
@@ -1269,7 +1321,7 @@ Rafael Negrão de Souza
                     Rafael Negrão de Souza<br>
                 """
 
-                elif ui.campo_lista_tipo_certificado.currentText() == "e-CPF":
+                elif versao == "e-CPF ":
                         mensagem_final = f"""
                         Olá <b>{nome.capitalize()}</b>, tudo bem?<br>
     <br>
@@ -1349,7 +1401,9 @@ Rafael Negrão de Souza
             self.mensagem_alerta("Erro no envio", f"Erro ao enviar e-mail\nMotivo: {e}")
 
     def valor_alterado(self, campo_atual):
+        self.atualizar_documentos_tabela()
         if campo_atual is not None:
+            nome_campo_atual = campo_atual.objectName()
             novo_valor = self.obter_valor_campo(campo_atual)
             campo_anterior = getattr(self.ui, campo_atual.objectName(), None)
 
@@ -1362,7 +1416,11 @@ Rafael Negrão de Souza
                 else:
                     self.ui.campo_status_bd.setText("❌")
                     self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
-
+            
+            if nome_campo_atual == "campo_lista_versao_certificado":
+                self.buscar_preco_certificado()
+                pass
+        
     def obter_valor_campo(self, campo):
         if isinstance(campo, QtWidgets.QLineEdit) or isinstance(campo, QtWidgets.QComboBox):
             return campo.text() if isinstance(campo, QtWidgets.QLineEdit) else campo.currentText()
@@ -1390,10 +1448,145 @@ Rafael Negrão de Souza
         elif valor_campo == "CANCELADO":
             # Alterar a fonte para vermelha
             ui.campo_lista_status.setStyleSheet("color: red;font-weight: bold;")
+        elif valor_campo == "VIDEO REALIZADA":
+            # Alterar a fonte para azul
+            ui.campo_lista_status.setStyleSheet("color: blue;font-weight: bold;")
+        elif valor_campo == "VERIFICAÇÃO":
+            # Alterar a fonte para laranja
+            ui.campo_lista_status.setStyleSheet("color: orange;font-weight: bold;")
         else:
             # Caso padrão, alterar a fonte para preta
             ui.campo_lista_status.setStyleSheet("color: black;")
 
+    def carregar_lista_certificados(self):
+        ref = db.reference("/Certificados")
+        certificados = ref.get()
+
+        ui.campo_lista_versao_certificado.clear()  # Limpar qualquer item existente no combobox
+        ui.campo_lista_versao_certificado.addItem("")
+        ui.campo_lista_versao_certificado.addItems(certificados.keys())  # Adicionar as chaves do dicionário ao combobox
+        
+        ui.campo_lista_versao_certificado.removeItem(19)
+        ui.campo_lista_versao_certificado.removeItem(39)
+
+        ui.campo_lista_versao_certificado.insertItem(1,'e-CNPJ - no computador - 12 meses')
+        ui.campo_lista_versao_certificado.insertItem(2,'e-CPF - no computador - 12 meses')
+       
+    def buscar_preco_certificado(self):
+        ref = db.reference("/Certificados")
+        lista_certificados = ref.get()
+
+        certificado = ui.campo_lista_versao_certificado.currentText()
+        if certificado in lista_certificados:
+            # Armazenar o valor da chave correspondente em uma variável
+            valor_do_certificado = float(lista_certificados[certificado].replace(',','.'))
+            porcentagem_validacao = int(ui.campo_porcentagem_validacao.value())/100
+            imposto_de_renda = 1-(ui.campo_imposto_validacao.value()/100)
+            desconto_validacao = float(ui.campo_desconto_validacao.text().replace(',','.'))
+            
+            
+            valor_final = ((valor_do_certificado * porcentagem_validacao) * imposto_de_renda) - desconto_validacao
+            valor_final_formatado = "{:.2f}".format(valor_final)  # Formatar o valor para duas casas decimais
+            ui.campo_preco_certificado.setText(valor_final_formatado)
+
+    def duplicar_pedido(self):
+        resposta = QMessageBox.question(ui.centralwidget,'Duplicar pedido', 'Duplicar pedido atual?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if resposta == QMessageBox.Yes:
+            ui.campo_pedido.setText('')
+            ui.campo_pedido.setReadOnly(False)
+            ui.campo_cnpj.setText('')
+            ui.campo_cnpj_razao_social.setText('')
+            ui.campo_cnpj_uf.setText('')
+            ui.campo_cnpj_municipio.setText('')
+            ui.checkBox_cnh.setChecked(False)
+            ui.checkBox_cnpj.setChecked(False)
+            ui.checkBox_cpf.setChecked(False)
+            ui.checkBox_doc_empresa.setChecked(False)
+            ui.checkBox_doc_identificacao.setChecked(False)
+            ui.checkBox_oab.setChecked(False)
+            ui.checkBox_rg.setChecked(False)
+            ui.checkBox_doc_complementar.setChecked(False)
+            self.acoes.limpar_labels()
+            ui.campo_lista_versao_certificado.setCurrentText("")
+            ui.campo_preco_certificado.setText('')
+            ui.campo_status_bd.setText('❌')
+            return True
+        else:
+            return False
+        
+    def atualizar_documentos_tabela(self):
+        caminho_pasta = self.ui.caminho_pasta.text()
+        # Obtém a referência à tabela da interface do usuário
+        tabela = self.ui.tabela_documentos
+        # Obtém a referência ao campo de quantidade de documentos
+        campo_quantidade_docs = self.ui.campo_quantidade_docs
+
+        # Obtém a quantidade atual de documentos na pasta, verificando se o campo não está vazio
+        quantidade_docs_atual = int(campo_quantidade_docs.text()) if campo_quantidade_docs.text() else 0
+
+        # Verifica se o caminho da pasta não está vazio e se é um diretório válido
+        if caminho_pasta and os.path.isdir(caminho_pasta):
+            # Obtém a lista de arquivos na pasta
+            arquivos = os.listdir(caminho_pasta)
+            # Atualiza o campo de quantidade de documentos
+            campo_quantidade_docs.setText(str(len(arquivos)))
+
+            # Verifica se a quantidade de documentos na pasta é diferente da quantidade atual de documentos na tabela
+            if len(arquivos) != quantidade_docs_atual:
+                # Limpa a tabela antes de carregar novas imagens
+                tabela.clear()
+                # Define o número de colunas na tabela
+                tabela.setColumnCount(1)
+                # Define o cabeçalho da tabela
+                tabela.setHorizontalHeaderLabels(['Imagem'])
+
+                # Loop através dos arquivos na pasta
+                for idx, arquivo in enumerate(arquivos):
+                    # Define o caminho completo do arquivo
+                    caminho_arquivo = os.path.join(caminho_pasta, arquivo)
+                    
+                    # Verifica se é um arquivo de imagem (suporta extensões PNG, JPG e JPEG)
+                    if arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
+                        # Carrega a imagem
+                        pixmap = QPixmap(caminho_arquivo).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        # Verifica se a imagem foi carregada com sucesso
+                        if not pixmap.isNull():
+                            # Cria um item da tabela
+                            item = QTableWidgetItem()
+                            # Define a imagem como o conteúdo do item
+                            item.setData(Qt.DecorationRole, pixmap)
+                            # Adiciona o item à tabela
+                            tabela.setRowCount(idx + 1)
+                            tabela.setItem(idx, 0, item)
+                        else:
+                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar a imagem: {caminho_arquivo}")
+                    # Verifica se é um arquivo PDF
+                    elif arquivo.lower().endswith('.pdf'):
+                        # Carrega o PDF
+                        pdf_document = fitz.open(caminho_arquivo)
+                        # Obtém a imagem da primeira página do PDF
+                        imagem = pdf_document.load_page(0).get_pixmap()
+                        # Converte a imagem para QImage
+                        q_image = QImage(imagem.samples, imagem.width, imagem.height, imagem.stride, QImage.Format_RGB888)
+                        # Converte QImage para QPixmap
+                        pixmap = QPixmap.fromImage(q_image).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        # Verifica se a imagem foi carregada com sucesso
+                        if not pixmap.isNull():
+                            # Cria um item da tabela
+                            item = QTableWidgetItem()
+                            # Define a imagem como o conteúdo do item
+                            item.setData(Qt.DecorationRole, pixmap)
+                            # Adiciona o item à tabela
+                            tabela.setRowCount(idx + 1)
+                            tabela.setItem(idx, 0, item)
+                        else:
+                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar o PDF como imagem: {caminho_arquivo}")
+        else:
+            # Caso o caminho da pasta esteja vazio ou não seja um diretório válido, limpa a tabela
+            tabela.clear()
+            # Atualiza o campo de quantidade de documentos
+            campo_quantidade_docs.setText('0')
+        
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -1402,61 +1595,64 @@ class Acoes_banco_de_dados:
     
     def analise_dados(self):
         # Analisa se os campos do pedido estão preenchidos
-        if not self.analise_de_campos():
-            return
+        try:
+            if not self.analise_de_campos():
+                return
 
-        if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {ui.campo_lista_status.currentText()}?"):
-            return
+            if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {ui.campo_lista_status.currentText()}?"):
+                return
 
-        ref = db.reference("/Pedidos")
-        self.num_pedido = ui.campo_pedido.text()
+            ref = db.reference("/Pedidos")
+            self.num_pedido = ui.campo_pedido.text()
 
-        num_pedido = ui.campo_pedido.text()
-        novo_pedido_ref = ref.child(num_pedido)
+            num_pedido = ui.campo_pedido.text()
+            novo_pedido_ref = ref.child(num_pedido)
+            
+            # Verifica se o nó já existe
+            #PEDIDO EXISTE
+            if novo_pedido_ref.get() is not None:
+                #verificar se o pedido é DEFINITIVO ou TEMPORARIO
+                condic = self.verificar_status()
+                match condic:
+                    #Pedido existente + gravado Definitivo
+                    case 'DEFINITIVO':
+                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
+                        novo_pedido_ref.update(self.dicionario_banco_de_dados())
+                        self.ui.campo_status_bd.setText("")
+                        self.ui.campo_status_bd.setToolTip("")
+                        self.limpar_campos_pedido()
+                        self.mensagem_alerta("Sucesso","Pedido salvo!") 
+
+                    #Pedido existente + gravado temporariamente
+                    case 'TEMPORARIO':
+                        novo_pedido_ref.update(self.dicionario_banco_de_dados())
+                        self.ui.campo_status_bd.setText("✅")
+                        self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
+                        self.mensagem_alerta("Sucesso","Pedido salvo!")
+            
+            #NOVO PEDIDO
+            else:
+                condic = self.verificar_status()
+                match condic:
+                    #Pedido existente + gravado Definitivo
+                    case 'DEFINITIVO':
+                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
+                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
+                        self.ui.campo_status_bd.setText("")
+                        self.ui.campo_status_bd.setToolTip("")
+                        self.limpar_campos_pedido()
+                        self.mensagem_alerta("Sucesso","Pedido salvo!") 
+
+                    #Pedido existente + gravado temporariamente
+                    case 'TEMPORARIO':
+
+                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
+                        self.ui.campo_status_bd.setText("✅")
+                        self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
+                        self.mensagem_alerta("Sucesso","Pedido salvo!")
+        except:
+            self.mensagem_alerta("Erro","Não foi possível salvar os dados. Tente novamente.")
         
-        # Verifica se o nó já existe
-        #PEDIDO EXISTE
-        if novo_pedido_ref.get() is not None:
-            #verificar se o pedido é DEFINITIVO ou TEMPORARIO
-            condic = self.verificar_status()
-            match condic:
-                #Pedido existente + gravado Definitivo
-                case 'DEFINITIVO':
-                    self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-                    novo_pedido_ref.update(self.dicionario_banco_de_dados())
-                    self.ui.campo_status_bd.setText("")
-                    self.ui.campo_status_bd.setToolTip("")
-                    self.limpar_campos_pedido()
-                    self.mensagem_alerta("Sucesso","Pedido salvo!") 
-
-                #Pedido existente + gravado temporariamente
-                case 'TEMPORARIO':
-                    novo_pedido_ref.update(self.dicionario_banco_de_dados())
-                    self.ui.campo_status_bd.setText("✅")
-                    self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                    self.mensagem_alerta("Sucesso","Pedido salvo!")
-        
-        #NOVO PEDIDO
-        else:
-            condic = self.verificar_status()
-            match condic:
-                #Pedido existente + gravado Definitivo
-                case 'DEFINITIVO':
-                    self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-                    novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                    self.ui.campo_status_bd.setText("")
-                    self.ui.campo_status_bd.setToolTip("")
-                    self.limpar_campos_pedido()
-                    self.mensagem_alerta("Sucesso","Pedido salvo!") 
-
-                #Pedido existente + gravado temporariamente
-                case 'TEMPORARIO':
-
-                    novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                    self.ui.campo_status_bd.setText("✅")
-                    self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                    self.mensagem_alerta("Sucesso","Pedido salvo!")
-
     def mensagem_confirmacao(self,titulo,mensagem):
         resposta = QMessageBox.question(ui.centralwidget, titulo, mensagem, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
@@ -1477,32 +1673,28 @@ class Acoes_banco_de_dados:
 
 
         pedido = ui.campo_pedido.text()
-        certificado = ui.campo_certificado.text() 
         hora = ui.campo_hora_agendamento.time().toString("HH:mm")
-        data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")
-        status = ui.campo_lista_status.currentText() 
+        data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")    
+        versao = ui.campo_lista_versao_certificado.currentText()
         modalidade = ui.campo_lista_modalidade.currentText()
-        certificado = ui.campo_lista_tipo_certificado.currentText()
-        descricao = ui.campo_certificado.text()
+     
+        
 
 
         # Lista de variáveis
-        variaveis = [pedido, certificado, hora, data, status, modalidade, certificado,descricao]
+        variaveis = [pedido,hora,data,versao,modalidade]
 
         # Mapeia os nomes das variáveis para mensagens correspondentes
         nomes_mensagens = {
             "pedido": "Pedido",
-            "certificado": "Certificado",
             "hora": "Hora",
-            "data": "Data",
-            "status": "Status",
-            "modalidade": "Modalidade",
-            "certificado": "Certificado",
-            "descricao":"Descrição Certificado"
+            "data":"Data",
+            "versao":"Versao",
+            "modalidade":"Atendimento"
         }
 
         # Verifica se há alguma variável vazia, exceto para data e hora
-        campos_vazios = [nomes_mensagens[nome_variavel] for nome_variavel, valor in zip(["pedido","certificado","hora","data","status","modalidade","certificado","descricao"], variaveis) if (isinstance(valor, str) and valor == "") or (nome_variavel == "hora" and valor == "00:00") or (nome_variavel == "data" and valor == "01/01/2000")]
+        campos_vazios = [nomes_mensagens[nome_variavel] for nome_variavel, valor in zip(["pedido","hora","data","versao","modalidade"], variaveis) if (isinstance(valor, str) and valor == "") or (nome_variavel == "hora" and valor == "00:00") or (nome_variavel == "data" and valor == "01/01/2000")]
 
         # Verifica se há campos vazios e exibe a mensagem de alerta
         if campos_vazios:
@@ -1513,82 +1705,106 @@ class Acoes_banco_de_dados:
         return True
 
     def limpar_campos_pedido(self):
-        #Dados pedido   
-        ui.campo_link_webex.setText("")
-        ui.caminho_pasta.setText("")
-        ui.campo_cnpj_municipio.setText("")
-        ui.campo_cnpj_uf.setText("")
-        ui.campo_comentario.setPlainText("")
-        ui.campo_nome.setText("")
-        ui.campo_rg.setText("")
-        ui.campo_cpf.setText("")
-        ui.campo_cnh.setText("")
-        ui.campo_nome_mae.setText("") 
-        ui.campo_cnpj.setText("")
-        ui.campo_email.setText("")
-        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
-        ui.campo_seguranca_cnh.setText("")
-        ui.campo_msg3.setPlainText("")
-        ui.campo_msg_agendamento.setText("")
-        ui.campo_assunto_email.setText("")
-        ui.campo_lista_junta_comercial.setCurrentText("")
-        ui.label_quantidade_bd.setText("")
-        ui.tableWidget.setRowCount(0)
-        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
-        ui.campo_pedido.setReadOnly(False)
-        ui.campo_certificado.setReadOnly(False)
-        ui.campo_certificado.setText("")
-        ui.campo_pedido.setText("")
-        ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
-        ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
-        ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
-        ui.campo_lista_venda.setCurrentText("NAO")
-        ui.campo_lista_modalidade.setCurrentText("")
-        ui.campo_lista_tipo_certificado.setCurrentText("")
-        ui.campo_status_bd.setText("")
-        ui.label_confirmacao_converter_pdf.setText("")
-        ui.label_confirmacao_criar_link_video.setText("")
-        ui.label_confirmacao_criar_pasta.setText("")
-        ui.label_confirmacao_tirar_print.setText("")
-        ui.label_confirmacao_mesclar_pdf.setText("")
+        try:
+            #Dados pedido   
+            ui.campo_link_webex.setText("")
+            ui.caminho_pasta.setText("")
+            ui.campo_cnpj_municipio.setText("")
+            ui.campo_cnpj_uf.setText("")
+            ui.campo_comentario.setPlainText("")
+            ui.campo_nome.setText("")
+            ui.campo_rg.setText("")
+            ui.campo_cpf.setText("")
+            ui.campo_cnh.setText("")
+            ui.campo_nome_mae.setText("") 
+            ui.campo_cnpj.setText("")
+            ui.campo_email.setText("")
+            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
+            ui.campo_seguranca_cnh.setText("")
+            ui.campo_msg3.setPlainText("")
+            ui.campo_msg_agendamento.setText("")
+            ui.campo_assunto_email.setText("")
+            ui.campo_lista_junta_comercial.setCurrentText("")
+            ui.label_quantidade_bd.setText("")
+            ui.tableWidget.setRowCount(0)
+            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
+            ui.campo_pedido.setReadOnly(False)
+            ui.campo_pedido.setText("")
+            ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
+            ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
+            ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
+            ui.campo_lista_venda.setCurrentText("NAO")
+            ui.campo_lista_modalidade.setCurrentText("")
+            ui.label_confirmacao_converter_pdf.setText("")
+            ui.label_confirmacao_criar_link_video.setText("")
+            ui.label_confirmacao_criar_pasta.setText("")
+            ui.label_confirmacao_tirar_print.setText("")
+            ui.label_confirmacao_mesclar_pdf.setText("")
+            ui.checkBox_documentos_webex.setChecked(False)
+            ui.campo_lista_versao_certificado.setCurrentText("")
+            ui.campo_status_bd.setText("")
+            ui.campo_preco_certificado.setText("")
+            ui.campo_valor_estimado.setText("")
+            ui.campo_valor_estimado_menor.setText("")
+            ui.campo_oab.setText("")
+            ui.campo_oab_seccional.setText("")
+            ui.campo_cnpj_razao_social.setText("")
+            ui.campo_rg_orgao.setText("")
+            ui.campo_lista_junta_comercial.setCurrentText("SP")
+            ui.tabela_documentos.clearContents()
+            ui.tabela_documentos.setRowCount(0)
+           
+        except Exception as e:
+            print(e)
 
     def apagar_campos_pedido(self):
         if not self.mensagem_confirmacao("","Apagar dados?"):
             return
-        
-        #Dados pedido   
-        ui.campo_link_webex.setText(""),
-        ui.caminho_pasta.setText(""),
-        ui.campo_cnpj_municipio.setText(""),
-        ui.campo_cnpj_uf.setText(""),
-        ui.campo_comentario.setPlainText(""),
-        ui.campo_nome.setText(""),
-        ui.campo_rg.setText(""),
-        ui.campo_cpf.setText(""),
-        ui.campo_cnh.setText(""),
-        ui.campo_nome_mae.setText("") ,
-        ui.campo_cnpj.setText(""),
-        ui.campo_email.setText(""),
-        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1)),
-        ui.campo_seguranca_cnh.setText(""),
-        ui.campo_msg3.setPlainText("")
-        ui.campo_msg_agendamento.setText("")
-        ui.campo_assunto_email.setText("")
-        ui.campo_lista_junta_comercial.setCurrentText("")
-        ui.label_quantidade_bd.setText("")
-        ui.tableWidget.setRowCount(0)
-        ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
-        ui.campo_pedido.setReadOnly(False)
-        ui.campo_certificado.setReadOnly(False)
-        ui.campo_certificado.setText("")
-        ui.campo_pedido.setText("")
-        ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
-        ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
-        ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
-        ui.campo_lista_venda.setCurrentText("NAO")
-        ui.campo_lista_modalidade.setCurrentText("")
-        ui.campo_lista_tipo_certificado.setCurrentText("")
-        self.limpar_labels()
+        try:
+            #Dados pedido   
+            ui.campo_link_webex.setText(""),
+            ui.caminho_pasta.setText(""),
+            ui.campo_cnpj_municipio.setText(""),
+            ui.campo_cnpj_uf.setText(""),
+            ui.campo_comentario.setPlainText(""),
+            ui.campo_nome.setText(""),
+            ui.campo_rg.setText(""),
+            ui.campo_cpf.setText(""),
+            ui.campo_cnh.setText(""),
+            ui.campo_nome_mae.setText("") ,
+            ui.campo_cnpj.setText(""),
+            ui.campo_email.setText(""),
+            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1)),
+            ui.campo_seguranca_cnh.setText(""),
+            ui.campo_msg3.setPlainText("")
+            ui.campo_msg_agendamento.setText("")
+            ui.campo_assunto_email.setText("")
+            ui.campo_lista_junta_comercial.setCurrentText("")
+            ui.label_quantidade_bd.setText("")
+            ui.tableWidget.setRowCount(0)
+            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
+            ui.campo_pedido.setReadOnly(False)
+            ui.campo_pedido.setText("")
+            ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
+            ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
+            ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
+            ui.campo_lista_venda.setCurrentText("NAO")
+            ui.campo_lista_modalidade.setCurrentText("")
+            ui.checkBox_documentos_webex.setChecked(False)
+            ui.campo_lista_versao_certificado.setCurrentText("")
+            ui.campo_preco_certificado.setText("")
+            ui.campo_valor_estimado.setText("")
+            ui.campo_valor_estimado_menor.setText("")
+            ui.campo_oab.setText("")
+            ui.campo_oab_seccional.setText("")
+            ui.campo_cnpj_razao_social.setText("")
+            ui.campo_rg_orgao.setText("")
+            ui.campo_lista_junta_comercial.setCurrentText("SP")
+            ui.tabela_documentos.clearContents()
+            ui.tabela_documentos.setRowCount(0)
+            self.limpar_labels()
+        except Exception as e:
+            print(e)
 
     def limpar_labels(self):
         ui.campo_status_bd.setText("")
@@ -1597,7 +1813,7 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_criar_pasta.setText("")
         ui.label_confirmacao_mesclar_pdf.setText("")
         ui.label_confirmacao_tirar_print.setText("")
-         
+    
     def dicionario_banco_de_dados(self):
            
         novos_dados = {"WEBEX":ui.campo_link_webex.text(),
@@ -1614,24 +1830,27 @@ class Acoes_banco_de_dados:
                     "CNPJ":ui.campo_cnpj.text(),
                     "EMAIL":ui.campo_email.text(),
                     "NASCIMENTO":ui.campo_data_nascimento.text(),
-                    "TIPO":ui.campo_certificado.text(), 
                     "STATUS":ui.campo_lista_status.currentText(),
                     "PEDIDO":ui.campo_pedido.text() , 
                     "DATA":ui.campo_data_agendamento.text(), 
                     "HORA":ui.campo_hora_agendamento.text(),
                     "VENDA":ui.campo_lista_venda.currentText(),
                     "MODALIDADE":ui.campo_lista_modalidade.currentText(),
-                    "CERTIFICADO":ui.campo_lista_tipo_certificado.currentText(),
+                    "VERSAO":ui.campo_lista_versao_certificado.currentText(),
+                    "PRECO":ui.campo_preco_certificado.text(),
+                    "OAB":ui.campo_oab.text(),
+                    "OAB SECCIONAL":ui.campo_oab_seccional.text(),
+                    "RAZAO SOCIAL":ui.campo_cnpj_razao_social.text(),
+                    "ORGAO RG":ui.campo_rg_orgao.text()
                     }
         if self.verificar_status() == "DEFINITIVO":
             novos_dados.update({
+                    "NOME":"",
                     "WEBEX": "",
                     "PASTA": "",
                     "MUNICIPIO": "",
                     "UF": "",
-                    "DIRETORIO": "",
                     "CODIGO DE SEG CNH": "",
-                    "NOME": "",
                     "RG": "",
                     "CPF": "",
                     "CNH": "",
@@ -1639,6 +1858,10 @@ class Acoes_banco_de_dados:
                     "CNPJ": "",
                     "EMAIL": "",
                     "NASCIMENTO": "",
+                    "OAB":"",
+                    "OAB SECCIONAL":"",
+                    "RAZAO SOCIAL":"",
+                    "ORGAO RG":""
                     })
 
         return novos_dados
@@ -1694,7 +1917,7 @@ class Acoes_banco_de_dados:
                 self.preencher_dados(pedido_data)
                 # Realize as ações necessárias com os detalhes do pedido encontrado
             else:  
-               return
+               return 'Pedido nao existe'
 
         except Exception as e:
             pass
@@ -1720,10 +1943,11 @@ class Acoes_banco_de_dados:
 
     def preencher_dados(self,pedido_data):
         #CORRIGIDO------------------------------------------------------------
+
+        self.limpar_campos_pedido()
         try:
             status = pedido_data.get("STATUS")
             ui.campo_lista_status.setCurrentText(status)
-            ui.campo_certificado.setText(pedido_data.get("TIPO"))
             data_nula = QDate(2000, 1, 1)  
             ui.campo_data_nascimento.setDate(data_nula)
             ui.campo_nome.setText(pedido_data.get("NOME")) 
@@ -1746,20 +1970,43 @@ class Acoes_banco_de_dados:
             ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
             ui.campo_cnpj_uf.setText(pedido_data.get("UF"))
             ui.caminho_pasta.setText(pedido_data.get("PASTA"))
-            ui.campo_lista_tipo_certificado.setCurrentText(pedido_data.get("CERTIFICADO"))
             ui.campo_link_webex.setText(pedido_data.get("WEBEX"))
+            try:
+                ui.campo_lista_versao_certificado.setCurrentText(pedido_data.get("VERSAO"))
+            except:
+                pass
+            try:
+                ui.campo_rg_orgao.setText(pedido_data.get("ORGAO RG"))
+            except:
+                pass
+            try:
+                ui.campo_oab.setText(pedido_data.get("OAB"))
+            except:
+                pass
+            try:
+                ui.campo_oab_seccional.setText(pedido_data.get("OAB SECCIONAL"))
+            except:
+                pass
+            try:
+                ui.campo_cnpj_razao_social.setText(pedido_data.get("RAZAO SOCIAL"))
+            except:
+                pass
+            
+
             ui.campo_status_bd.setText("✅")
             ui.campo_status_bd.setToolTip("Pedido Atualizado")
             pasta = ui.caminho_pasta.text()
             if pasta != "": 
                 ui.label_confirmacao_criar_pasta.setText("✅")
+            self.atualizar_documentos_tabela()
         except:
-            pass
+            self.atualizar_documentos_tabela()
             
     def preencher_tabela(self):
     #CORRIGIDO ---------------------------------------------------------
     #USO DE BANCO DE DADOS
         ui.tableWidget.setRowCount(0)
+        valor_estimado = 0
         try:
             ui.tableWidget.clear()
             
@@ -1800,11 +2047,34 @@ class Acoes_banco_de_dados:
                         ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['HORA']))
                         ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['MODALIDADE']))
                         ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['VENDA']))
-                        ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['TIPO']))
+                        try:
+                            ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['VERSAO']))
+                        except:
+                            pass
                         try:
                             ui.tableWidget.setItem(row_position, 8, QTableWidgetItem(pedido_info['DIRETORIO']))
                         except:
                             pass
+
+                        # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
+                        
+                        try:
+                            # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
+                            if 'PRECO' in pedido_info:
+                                # Substitui a vírgula por um ponto no valor do preço
+                                preco = float(pedido_info['PRECO'])
+                                # Converte o valor para float e soma ao valor estimado
+                                valor_estimado += float(preco)
+                                valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
+                                valor_formatado_menor = "{:.2f}".format(valor_estimado*0.90).replace('.', ',')
+                                ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
+                                ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
+                                
+                                QApplication.processEvents()
+                        except ValueError:
+                            pass
+
+                        
 
                         for col in range(ui.tableWidget.columnCount()):
                             item = ui.tableWidget.item(row_position, col)
@@ -1836,15 +2106,98 @@ class Acoes_banco_de_dados:
                 QApplication.processEvents()
                 
             ui.barra_progresso_consulta.setValue(100)
+            valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
+            valor_formatado_menor = "{:.2f}".format(valor_estimado*0.90).replace('.', ',')
+
+
+            ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
+            ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
+
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","TIPO","OBSERVAÇÕES"])
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","VERSAO","OBSERVAÇÕES"])
             ui.barra_progresso_consulta.setVisible(False)
+            self.atualizar_documentos_tabela()
         except Exception as e:
-                ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","TIPO","OBSERVAÇÕES"])
+                print(e)
+                ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","VERSAO","OBSERVAÇÕES"])
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
+                self.atualizar_documentos_tabela()
                 pass
 
+    def atualizar_documentos_tabela(self):
+
+        caminho_pasta = self.ui.caminho_pasta.text()
+        # Obtém a referência à tabela da interface do usuário
+        tabela = self.ui.tabela_documentos
+        # Obtém a referência ao campo de quantidade de documentos
+        campo_quantidade_docs = self.ui.campo_quantidade_docs
+
+        # Obtém a quantidade atual de documentos na pasta, verificando se o campo não está vazio
+        quantidade_docs_atual = int(campo_quantidade_docs.text()) if campo_quantidade_docs.text() else 0
+
+        # Verifica se o caminho da pasta não está vazio e se é um diretório válido
+        if caminho_pasta and os.path.isdir(caminho_pasta):
+            # Obtém a lista de arquivos na pasta
+            arquivos = os.listdir(caminho_pasta)
+            # Atualiza o campo de quantidade de documentos
+            campo_quantidade_docs.setText(str(len(arquivos)))
+
+            # Verifica se a quantidade de documentos na pasta é diferente da quantidade atual de documentos na tabela
+            if len(arquivos) != quantidade_docs_atual:
+                # Limpa a tabela antes de carregar novas imagens
+                tabela.clear()
+                # Define o número de colunas na tabela
+                tabela.setColumnCount(1)
+                # Define o cabeçalho da tabela
+                tabela.setHorizontalHeaderLabels(['Imagem'])
+
+                # Loop através dos arquivos na pasta
+                for idx, arquivo in enumerate(arquivos):
+                    # Define o caminho completo do arquivo
+                    caminho_arquivo = os.path.join(caminho_pasta, arquivo)
+                    
+                    # Verifica se é um arquivo de imagem (suporta extensões PNG, JPG e JPEG)
+                    if arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
+                        # Carrega a imagem
+                        pixmap = QPixmap(caminho_arquivo).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        # Verifica se a imagem foi carregada com sucesso
+                        if not pixmap.isNull():
+                            # Cria um item da tabela
+                            item = QTableWidgetItem()
+                            # Define a imagem como o conteúdo do item
+                            item.setData(Qt.DecorationRole, pixmap)
+                            # Adiciona o item à tabela
+                            tabela.setRowCount(idx + 1)
+                            tabela.setItem(idx, 0, item)
+                        else:
+                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar a imagem: {caminho_arquivo}")
+                    # Verifica se é um arquivo PDF
+                    elif arquivo.lower().endswith('.pdf'):
+                        # Carrega o PDF
+                        pdf_document = fitz.open(caminho_arquivo)
+                        # Obtém a imagem da primeira página do PDF
+                        imagem = pdf_document.load_page(0).get_pixmap()
+                        # Converte a imagem para QImage
+                        q_image = QImage(imagem.samples, imagem.width, imagem.height, imagem.stride, QImage.Format_RGB888)
+                        # Converte QImage para QPixmap
+                        pixmap = QPixmap.fromImage(q_image).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
+                        # Verifica se a imagem foi carregada com sucesso
+                        if not pixmap.isNull():
+                            # Cria um item da tabela
+                            item = QTableWidgetItem()
+                            # Define a imagem como o conteúdo do item
+                            item.setData(Qt.DecorationRole, pixmap)
+                            # Adiciona o item à tabela
+                            tabela.setRowCount(idx + 1)
+                            tabela.setItem(idx, 0, item)
+                        else:
+                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar o PDF como imagem: {caminho_arquivo}")
+        else:
+            # Caso o caminho da pasta esteja vazio ou não seja um diretório válido, limpa a tabela
+            tabela.clear()
+            # Atualiza o campo de quantidade de documentos
+            campo_quantidade_docs.setText('0')
 
 class JanelaOculta:
     def __init__(self, parent):
@@ -1855,10 +2208,12 @@ class JanelaOculta:
         self.animation_duration = 2  # Duração da animação em milissegundos
         self.animation_target_width = 0
         self.animation_target_height = 0
+        self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(469, 660)
-       
+        self.animate_window_resize(469, 668)
+        self.janela.atualizar_documentos_tabela()
+
     def leaveEvent(self, event):
         if not ui.campo_verifica_tela_cheia.text()=="SIM":
             cursor_pos = QtGui.QCursor.pos()
@@ -1869,9 +2224,11 @@ class JanelaOculta:
 
             if not mouse_dentro_da_janela:
                 self.animate_window_resize(128, 45)
+        
+        self.janela.atualizar_documentos_tabela()
 
     def mousePressEvent(self, event):
-        self.animate_window_resize(469, 660)#467
+        self.animate_window_resize(469, 668)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -1918,6 +2275,9 @@ janela.closeEvent = funcoes_app.evento_ao_fechar
 janela.showEvent = funcoes_app.evento_ao_abrir
 
 #Alterações nos campos
+ui.campo_rg_orgao.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_rg_orgao))
+ui.campo_oab_seccional.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab_seccional))
+ui.campo_oab.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab))
 ui.campo_nome.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome))
 ui.campo_cnpj_municipio.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj_municipio))
 ui.caminho_pasta_principal.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.caminho_pasta_principal))
@@ -1932,25 +2292,26 @@ ui.campo_link_webex.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.cam
 ui.campo_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnh))
 ui.campo_lista_modalidade.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_modalidade))
 ui.campo_lista_status.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_status))
-ui.campo_lista_tipo_certificado.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_tipo_certificado))
 ui.campo_lista_venda.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_venda))
 ui.campo_hora_agendamento.timeChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_hora_agendamento))
 ui.campo_data_agendamento.dateChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_data_agendamento))
-ui.campo_certificado.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_certificado))
 ui.campo_email.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_email))
 ui.campo_rg.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_rg))
 ui.campo_seguranca_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_seguranca_cnh))
 ui.campo_comentario.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_comentario))
+ui.campo_data_nascimento.dateChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_data_nascimento))
+ui.campo_lista_versao_certificado.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_versao_certificado))
+
 
 #Campos botões
+ui.botao_consulta_oab.clicked.connect(lambda:funcoes_app.procurar_oab())
+ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
 ui.botao_ver_senha.clicked.connect(lambda:funcoes_app.visualizar_senha())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())
 ui.botao_consultar.clicked.connect(lambda:banco_dados.preencher_tabela())
 ui.botao_excluir_dados.clicked.connect(lambda:banco_dados.apagar_campos_pedido())
 ui.botao_procurar.clicked.connect(lambda:funcoes_app.exportar_excel())
-ui.botao_abrir_pasta_cliente.clicked.connect(lambda:funcoes_app.abrir_pasta_cliente())
-ui.botao_abrir_pasta_cliente.setToolTip("Abrir pasta do cliente")
 ui.botao_consulta_cnpj.clicked.connect(lambda:funcoes_app.procurar_cnpj())
 ui.botao_consulta_cpf.clicked.connect(lambda:funcoes_app.procurar_cpf())
 ui.botao_consulta_cnh.clicked.connect(lambda:funcoes_app.procurar_cnh())
@@ -1990,6 +2351,7 @@ ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO
 ui.campo_status_bd_2.setToolTip("Status dos dados no servidor\n✅ - Pedido atualizado no servidor\n❌ - Pedido desatualizado no servidor")
 ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Password)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
+ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
 ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados())
 ui.campo_cnpj.editingFinished.connect (lambda:funcoes_app.formatar_cnpj())
 ui.campo_meta_semanal.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
@@ -2013,8 +2375,10 @@ ui.campo_seguranca_cnh.mousePressEvent = lambda event: funcoes_app.copiar_campo(
 ui.campo_rg.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_rg")
 ui.campo_nome_mae.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_nome_mae")
 ui.campo_nome.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_nome")
-ui.campo_msg1.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg1")
-ui.campo_msg1.setReadOnly(True)
+ui.campo_msg_doc_idf.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg_doc_idf")
+ui.campo_msg_doc_idf.setReadOnly(True)
+ui.campo_msg_doc_empresa.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg_doc_empresa")
+ui.campo_msg_doc_empresa.setReadOnly(True)
 ui.campo_msg3.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg3")
 ui.campo_msg3.setReadOnly(True)
 ui.campo_msg5.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg5")
@@ -2023,6 +2387,19 @@ ui.campo_msg6.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_ms
 ui.campo_msg6.setReadOnly(True)
 ui.campo_msg7.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg7")
 ui.campo_msg7.setReadOnly(True)
+ui.campo_msg_reembolso.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg_reembolso")
+ui.campo_msg_reembolso.setReadOnly(True)
+ui.campo_msg_venda.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg_venda")
+ui.campo_msg_venda.setReadOnly(True)
+ui.campo_valor_estimado.setReadOnly(True)
+ui.campo_preco_certificado.setReadOnly(True)
+ui.campo_cnpj_razao_social.setReadOnly(True)
+ui.campo_valor_estimado.setToolTip("Valor estimado em emissão dos certificados")
+ui.botao_duplicar_pedido.setToolTip('Duplicar pedido')
+ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
+
+
+
 regex = QRegExp("[0-9]*")
 validator = QRegExpValidator(regex)
 ui.campo_pedido.setValidator(validator)
@@ -2033,8 +2410,6 @@ ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
 ui.tableWidget.itemDoubleClicked.connect(lambda:banco_dados.pegar_valor_tabela())
 ui.tableWidget.itemClicked.connect(lambda:funcoes_app.copiar_pedido_tabela(None))
 
-
-ui.barra_progresso_pedido.setVisible(False)
 ui.barra_progresso_consulta.setVisible(False)
 
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
