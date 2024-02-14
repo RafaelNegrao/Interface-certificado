@@ -12,6 +12,7 @@ import firebase_admin
 import smtplib
 import pyautogui
 import sys
+import subprocess
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -1246,7 +1247,8 @@ Rafael Negrão de Souza
             self.email_padrao_webex()
         elif ui.tabWidget.currentIndex() == 4:
             self.atualizar_meta_clientes()    
-        pass
+        else:
+            pass
 
     def envio_de_email(self):
         # Obtenção dos campos do formulário
@@ -1515,78 +1517,67 @@ Rafael Negrão de Souza
             return False
         
     def atualizar_documentos_tabela(self):
-        caminho_pasta = self.ui.caminho_pasta.text()
-        # Obtém a referência à tabela da interface do usuário
-        tabela = self.ui.tabela_documentos
-        # Obtém a referência ao campo de quantidade de documentos
-        campo_quantidade_docs = self.ui.campo_quantidade_docs
+        # Limpar qualquer conteúdo existente na tabela
+        self.ui.tabela_documentos.clearContents()
 
-        # Obtém a quantidade atual de documentos na pasta, verificando se o campo não está vazio
-        quantidade_docs_atual = int(campo_quantidade_docs.text()) if campo_quantidade_docs.text() else 0
+        # Obter o caminho da pasta do cliente
+        pasta_cliente = self.ui.caminho_pasta.text()
 
-        # Verifica se o caminho da pasta não está vazio e se é um diretório válido
-        if caminho_pasta and os.path.isdir(caminho_pasta):
-            # Obtém a lista de arquivos na pasta
-            arquivos = os.listdir(caminho_pasta)
-            # Atualiza o campo de quantidade de documentos
-            campo_quantidade_docs.setText(str(len(arquivos)))
+        # Verificar se o caminho da pasta existe
+        if not os.path.exists(pasta_cliente):
+            return
 
-            # Verifica se a quantidade de documentos na pasta é diferente da quantidade atual de documentos na tabela
-            if len(arquivos) != quantidade_docs_atual:
-                # Limpa a tabela antes de carregar novas imagens
-                tabela.clear()
-                # Define o número de colunas na tabela
-                tabela.setColumnCount(1)
-                # Define o cabeçalho da tabela
-                tabela.setHorizontalHeaderLabels(['Imagem'])
+        # Obter uma lista de arquivos na pasta do cliente
+        documentos = os.listdir(pasta_cliente)
 
-                # Loop através dos arquivos na pasta
-                for idx, arquivo in enumerate(arquivos):
-                    # Define o caminho completo do arquivo
-                    caminho_arquivo = os.path.join(caminho_pasta, arquivo)
-                    
-                    # Verifica se é um arquivo de imagem (suporta extensões PNG, JPG e JPEG)
-                    if arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
-                        # Carrega a imagem
-                        pixmap = QPixmap(caminho_arquivo).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                        # Verifica se a imagem foi carregada com sucesso
-                        if not pixmap.isNull():
-                            # Cria um item da tabela
-                            item = QTableWidgetItem()
-                            # Define a imagem como o conteúdo do item
-                            item.setData(Qt.DecorationRole, pixmap)
-                            # Adiciona o item à tabela
-                            tabela.setRowCount(idx + 1)
-                            tabela.setItem(idx, 0, item)
-                        else:
-                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar a imagem: {caminho_arquivo}")
-                    # Verifica se é um arquivo PDF
-                    elif arquivo.lower().endswith('.pdf'):
-                        # Carrega o PDF
-                        pdf_document = fitz.open(caminho_arquivo)
-                        # Obtém a imagem da primeira página do PDF
-                        imagem = pdf_document.load_page(0).get_pixmap()
-                        # Converte a imagem para QImage
-                        q_image = QImage(imagem.samples, imagem.width, imagem.height, imagem.stride, QImage.Format_RGB888)
-                        # Converte QImage para QPixmap
-                        pixmap = QPixmap.fromImage(q_image).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                        # Verifica se a imagem foi carregada com sucesso
-                        if not pixmap.isNull():
-                            # Cria um item da tabela
-                            item = QTableWidgetItem()
-                            # Define a imagem como o conteúdo do item
-                            item.setData(Qt.DecorationRole, pixmap)
-                            # Adiciona o item à tabela
-                            tabela.setRowCount(idx + 1)
-                            tabela.setItem(idx, 0, item)
-                        else:
-                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar o PDF como imagem: {caminho_arquivo}")
-        else:
-            # Caso o caminho da pasta esteja vazio ou não seja um diretório válido, limpa a tabela
-            tabela.clear()
-            # Atualiza o campo de quantidade de documentos
-            campo_quantidade_docs.setText('0')
-        
+        # Separar os documentos em PDFs e outros documentos
+        pdfs = [doc for doc in documentos if doc.lower().endswith('.pdf')]
+        outros_documentos = [doc for doc in documentos if not doc.lower().endswith('.pdf')]
+
+        # Preencher a tabela com os PDFs
+        num_documentos = len(pdfs)
+        self.ui.tabela_documentos.setRowCount(num_documentos)
+
+        for i, documento in enumerate(pdfs):
+            # Criar um item de tabela para o nome do documento
+            item_nome_documento = QTableWidgetItem(documento)
+
+            # Definir a cor do texto como preta para PDFs
+            item_nome_documento.setForeground(QColor(90, 54, 247))
+
+            # Definir o item na tabela
+            self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
+
+        # Preencher a tabela com os outros documentos
+        num_outros_documentos = len(outros_documentos)
+        self.ui.tabela_documentos.setRowCount(num_documentos + num_outros_documentos)
+
+        for i, documento in enumerate(outros_documentos):
+            # Criar um item de tabela para o nome do documento
+            item_nome_documento = QTableWidgetItem(documento)
+
+            # Definir a cor do texto como cinza para outros documentos
+            item_nome_documento.setForeground(QColor(128, 128, 128))
+
+            # Definir o item na tabela
+            self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
+
+    def abrir_documento_para_edicao(self):
+        # Obter o item clicado da tabela
+        item = self.ui.tabela_documentos.currentItem()
+
+        # Verificar se um item foi realmente clicado (pode ser None se o usuário clicar em uma célula vazia)
+        if item is not None:
+            # Obter o nome do documento clicado
+            nome_documento = item.text()
+
+            # Obter o caminho completo do documento
+            caminho_documento = os.path.join(self.ui.caminho_pasta.text(), nome_documento)
+            if os.name == 'nt':  # Verificar se o sistema operacional é Windows
+                os.startfile(caminho_documento)  # Abrir o arquivo no Windows
+            else:
+                subprocess.Popen(['xdg-open', caminho_documento])
+            
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -1998,9 +1989,8 @@ class Acoes_banco_de_dados:
             pasta = ui.caminho_pasta.text()
             if pasta != "": 
                 ui.label_confirmacao_criar_pasta.setText("✅")
-            self.atualizar_documentos_tabela()
         except:
-            self.atualizar_documentos_tabela()
+            pass
             
     def preencher_tabela(self):
     #CORRIGIDO ---------------------------------------------------------
@@ -2116,88 +2106,61 @@ class Acoes_banco_de_dados:
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","VERSAO","OBSERVAÇÕES"])
             ui.barra_progresso_consulta.setVisible(False)
-            self.atualizar_documentos_tabela()
         except Exception as e:
                 print(e)
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO","NOME", "DATA", "HORA", "MODALIDADE", "VENDA","VERSAO","OBSERVAÇÕES"])
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
-                self.atualizar_documentos_tabela()
                 pass
 
     def atualizar_documentos_tabela(self):
+        # Limpar qualquer conteúdo existente na tabela
+        self.ui.tabela_documentos.clearContents()
 
-        caminho_pasta = self.ui.caminho_pasta.text()
-        # Obtém a referência à tabela da interface do usuário
-        tabela = self.ui.tabela_documentos
-        # Obtém a referência ao campo de quantidade de documentos
-        campo_quantidade_docs = self.ui.campo_quantidade_docs
+        # Obter o caminho da pasta do cliente
+        pasta_cliente = self.ui.caminho_pasta.text()
 
-        # Obtém a quantidade atual de documentos na pasta, verificando se o campo não está vazio
-        quantidade_docs_atual = int(campo_quantidade_docs.text()) if campo_quantidade_docs.text() else 0
+        # Verificar se o caminho da pasta existe
+        if not os.path.exists(pasta_cliente):
+            return
 
-        # Verifica se o caminho da pasta não está vazio e se é um diretório válido
-        if caminho_pasta and os.path.isdir(caminho_pasta):
-            # Obtém a lista de arquivos na pasta
-            arquivos = os.listdir(caminho_pasta)
-            # Atualiza o campo de quantidade de documentos
-            campo_quantidade_docs.setText(str(len(arquivos)))
+        # Obter uma lista de arquivos na pasta do cliente
+        documentos = os.listdir(pasta_cliente)
 
-            # Verifica se a quantidade de documentos na pasta é diferente da quantidade atual de documentos na tabela
-            if len(arquivos) != quantidade_docs_atual:
-                # Limpa a tabela antes de carregar novas imagens
-                tabela.clear()
-                # Define o número de colunas na tabela
-                tabela.setColumnCount(1)
-                # Define o cabeçalho da tabela
-                tabela.setHorizontalHeaderLabels(['Imagem'])
+        # Separar os documentos em PDFs e outros documentos
+        pdfs = [doc for doc in documentos if doc.lower().endswith('.pdf')]
+        outros_documentos = [doc for doc in documentos if not doc.lower().endswith('.pdf')]
 
-                # Loop através dos arquivos na pasta
-                for idx, arquivo in enumerate(arquivos):
-                    # Define o caminho completo do arquivo
-                    caminho_arquivo = os.path.join(caminho_pasta, arquivo)
-                    
-                    # Verifica se é um arquivo de imagem (suporta extensões PNG, JPG e JPEG)
-                    if arquivo.lower().endswith(('.png', '.jpg', '.jpeg')):
-                        # Carrega a imagem
-                        pixmap = QPixmap(caminho_arquivo).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                        # Verifica se a imagem foi carregada com sucesso
-                        if not pixmap.isNull():
-                            # Cria um item da tabela
-                            item = QTableWidgetItem()
-                            # Define a imagem como o conteúdo do item
-                            item.setData(Qt.DecorationRole, pixmap)
-                            # Adiciona o item à tabela
-                            tabela.setRowCount(idx + 1)
-                            tabela.setItem(idx, 0, item)
-                        else:
-                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar a imagem: {caminho_arquivo}")
-                    # Verifica se é um arquivo PDF
-                    elif arquivo.lower().endswith('.pdf'):
-                        # Carrega o PDF
-                        pdf_document = fitz.open(caminho_arquivo)
-                        # Obtém a imagem da primeira página do PDF
-                        imagem = pdf_document.load_page(0).get_pixmap()
-                        # Converte a imagem para QImage
-                        q_image = QImage(imagem.samples, imagem.width, imagem.height, imagem.stride, QImage.Format_RGB888)
-                        # Converte QImage para QPixmap
-                        pixmap = QPixmap.fromImage(q_image).scaled(140, 225, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-                        # Verifica se a imagem foi carregada com sucesso
-                        if not pixmap.isNull():
-                            # Cria um item da tabela
-                            item = QTableWidgetItem()
-                            # Define a imagem como o conteúdo do item
-                            item.setData(Qt.DecorationRole, pixmap)
-                            # Adiciona o item à tabela
-                            tabela.setRowCount(idx + 1)
-                            tabela.setItem(idx, 0, item)
-                        else:
-                            QMessageBox.warning(self, "Erro", f"Não foi possível carregar o PDF como imagem: {caminho_arquivo}")
-        else:
-            # Caso o caminho da pasta esteja vazio ou não seja um diretório válido, limpa a tabela
-            tabela.clear()
-            # Atualiza o campo de quantidade de documentos
-            campo_quantidade_docs.setText('0')
+        # Preencher a tabela com os PDFs
+        num_documentos = len(pdfs)
+        self.ui.tabela_documentos.setRowCount(num_documentos)
+
+        for i, documento in enumerate(pdfs):
+            # Criar um item de tabela para o nome do documento
+            item_nome_documento = QTableWidgetItem(documento)
+
+            # Definir a cor do texto como preta para PDFs
+            item_nome_documento.setForeground(QColor(90, 54, 247))
+
+            # Definir o item na tabela
+            self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
+
+        # Preencher a tabela com os outros documentos
+        num_outros_documentos = len(outros_documentos)
+        self.ui.tabela_documentos.setRowCount(num_documentos + num_outros_documentos)
+
+        for i, documento in enumerate(outros_documentos):
+            # Criar um item de tabela para o nome do documento
+            item_nome_documento = QTableWidgetItem(documento)
+
+            # Definir a cor do texto como cinza para outros documentos
+            item_nome_documento.setForeground(QColor(128, 128, 128))
+
+            # Definir o item na tabela
+            self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
+            
+    
+
 
 class JanelaOculta:
     def __init__(self, parent):
@@ -2215,6 +2178,7 @@ class JanelaOculta:
         self.janela.atualizar_documentos_tabela()
 
     def leaveEvent(self, event):
+        self.janela.atualizar_documentos_tabela()
         if not ui.campo_verifica_tela_cheia.text()=="SIM":
             cursor_pos = QtGui.QCursor.pos()
             window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
@@ -2225,7 +2189,7 @@ class JanelaOculta:
             if not mouse_dentro_da_janela:
                 self.animate_window_resize(128, 45)
         
-        self.janela.atualizar_documentos_tabela()
+        
 
     def mousePressEvent(self, event):
         self.animate_window_resize(469, 668)#469
@@ -2340,7 +2304,6 @@ ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_di
 ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
 ui.campo_lista_status.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status()) 
 
-
 #Campos de formatação
 ui.campo_cnpj_municipio.setReadOnly(True)
 ui.caminho_pasta_principal.setReadOnly(True)
@@ -2404,11 +2367,13 @@ regex = QRegExp("[0-9]*")
 validator = QRegExpValidator(regex)
 ui.campo_pedido.setValidator(validator)
 
-
+#Eventos tabela
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
 ui.tableWidget.itemDoubleClicked.connect(lambda:banco_dados.pegar_valor_tabela())
 ui.tableWidget.itemClicked.connect(lambda:funcoes_app.copiar_pedido_tabela(None))
+ui.tabela_documentos.itemDoubleClicked.connect(lambda: funcoes_app.abrir_documento_para_edicao())
+
 
 ui.barra_progresso_consulta.setVisible(False)
 
