@@ -515,7 +515,7 @@ class Ui_janela(object):
         font.setWeight(50)
         self.campo_comentario.setFont(font)
         self.campo_comentario.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_comentario.setStyleSheet("color:rgb(90,54,247);")
+        #self.campo_comentario.setStyleSheet("color:rgb(90,54,247);")
         self.campo_comentario.setObjectName("campo_comentario")
         self.botao_consulta_cnpj = QtWidgets.QPushButton(self.tab_5)
         self.botao_consulta_cnpj.setGeometry(QtCore.QRect(172, 350, 26, 26))

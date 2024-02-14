@@ -21,14 +21,13 @@ from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QPixmap, QImage
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from credenciaisBd import obter_credenciais
-
 
 credenciais = obter_credenciais()
 
@@ -37,7 +36,6 @@ firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-def
 
 #Referência raiz do banco de dados
 ref = db.reference("/")
-
 
 class Funcoes_padrao:
     def __init__(self,ui):
@@ -381,8 +379,10 @@ class Funcoes_padrao:
 
             ui.label_confirmacao_tirar_print.setText("✅")
             #self.mensagem_alerta("Concluído",f"Print capturada!")
+            self.atualizar_documentos_tabela()
         
         except:
+            self.atualizar_documentos_tabela()
             ui.label_confirmacao_tirar_print.setText("❌")
             self.mensagem_alerta("Erro",f"Não foi possível capturar a tela!")
 
@@ -548,6 +548,68 @@ class Funcoes_padrao:
         url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
         QDesktopServices.openUrl(url_receita)
 
+    def dados_cnpj(self):
+        ui.campo_cnpj_municipio.setText("")
+        ui.campo_cnpj_uf.setText("")  
+
+        cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
+
+        if not cnpj:
+            return
+        
+        url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
+        
+        try:
+            resposta = requests.get(url)
+
+            if resposta.status_code == 200:
+                
+                data = resposta.json()
+                ui.campo_cnpj_municipio.setText(data['municipio'])
+                ui.campo_cnpj_razao_social.setText(data['nome'])
+
+                qsa = data.get('qsa', [])
+    
+                if len(qsa) == 1:
+                    if ui.campo_nome.text() == "":
+                        ui.campo_nome.setText(qsa[0]['nome'])
+                    else:
+                        pass
+                else:
+                    comentario = ui.campo_comentario.toPlainText()
+                    ui.campo_comentario.setPlainText(f'{comentario} \n*CNPJ COM MAIS DE UM SÓCIO') 
+                    pass
+
+                uf = data['uf']
+                
+                if uf != "SP":
+                    ui.campo_cnpj_uf.setText(str(uf))
+                    ui.campo_lista_junta_comercial.setCurrentText(uf)
+                    self.atualizar_documentos_tabela()
+                    return
+                else:
+                    ui.campo_cnpj_uf.setText(str(uf))
+                    ui.campo_lista_junta_comercial.setCurrentText(uf)
+                    self.atualizar_documentos_tabela()
+                    return
+                
+            else:
+                ui.campo_cnpj_municipio.setText("")
+                ui.campo_cnpj_uf.setText("")
+                self.atualizar_documentos_tabela()
+                return
+            
+        except RequestException:
+            ui.campo_cnpj_municipio.setText("")
+            ui.campo_cnpj_uf.setText("")
+            self.atualizar_documentos_tabela()
+            self.mensagem_alerta("ERRO DE CONEXÃO","Sem conexão com a internet.")
+            return
+        except Exception as e:
+            self.atualizar_documentos_tabela()
+            self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
+            return
+
     def procurar_junta(self):
 
         estado = ui.campo_lista_junta_comercial.currentText()
@@ -623,49 +685,6 @@ class Funcoes_padrao:
         texto_mae = ui.campo_nome_mae.text()  # Obtenha o texto do campo_nome_mae
         ui.campo_nome_mae.setText(texto_mae.upper())
 
-    def dados_cnpj(self):
-        ui.campo_cnpj_municipio.setText("")
-        ui.campo_cnpj_uf.setText("")  
-
-        cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
-
-        if not cnpj:
-            return
-        
-        url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
-        
-        try:
-            resposta = requests.get(url)
-
-            if resposta.status_code == 200:
-                
-                data = resposta.json()
-                ui.campo_cnpj_municipio.setText(data['municipio'])
-                ui.campo_cnpj_razao_social.setText(data['nome'])
-                uf = data['uf']
-                
-                if uf != "SP":
-                    ui.campo_cnpj_uf.setText(str(uf))
-                    ui.campo_lista_junta_comercial.setCurrentText(uf)
-                    return
-                else:
-                    ui.campo_cnpj_uf.setText(str(uf))
-                    ui.campo_lista_junta_comercial.setCurrentText(uf)
-                    return
-
-            else:
-                ui.campo_cnpj_municipio.setText("")
-                ui.campo_cnpj_uf.setText("")
-                return
-        except RequestException:
-            ui.campo_cnpj_municipio.setText("")
-            ui.campo_cnpj_uf.setText("")
-            self.mensagem_alerta("ERRO DE CONEXÃO","Sem conexão com a internet.")
-            return
-        except Exception as e:
-            self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
-            return   
-
     def procurar_cpf(self):
         
         cpf = ui.campo_cpf.text()
@@ -673,10 +692,12 @@ class Funcoes_padrao:
         if not nascimento == "01/01/2000":
             url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}&Nascimento={nascimento}")
             QDesktopServices.openUrl(url)
+            self.atualizar_documentos_tabela()
             return
         else:
             url = QUrl(f"https://servicos.receita.fazenda.gov.br/Servicos/CPF/ConsultaSituacao/ConsultaPublica.asp?cpf={cpf}")
             QDesktopServices.openUrl(url)
+            self.atualizar_documentos_tabela()
             return
 
     def formatar_cpf(self):
@@ -705,6 +726,15 @@ class Funcoes_padrao:
             
         elif len(novo_cpf)== "":
             return   
+            
+    def formatar_data_agendamento(self):
+        data_agendamento = ui.campo_data_agendamento.date()
+        data_atual = QDate.currentDate()
+
+        if data_agendamento < data_atual:
+            ui.campo_data_agendamento.setStyleSheet("color: red")
+        else:
+            ui.campo_data_agendamento.setStyleSheet("color: black")
             
     def formatar_cnpj(self):
         cnpj = ui.campo_cnpj.text()
@@ -889,10 +919,13 @@ class Funcoes_padrao:
 
             ui.label_confirmacao_mesclar_pdf.setText("✅")
             #self.mensagem_alerta("Concluído","Os arquivos PDF foram mesclados com sucesso!")
+            self.atualizar_documentos_tabela()
+
 
         except:
             ui.label_confirmacao_mesclar_pdf.setText("❌")
             pdf_merger.close()
+            self.atualizar_documentos_tabela()
             # Lidar com exceções (você pode adicionar mais detalhes aqui, se necessário)
             return
 
@@ -953,8 +986,10 @@ class Funcoes_padrao:
                 imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
                 imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
             ui.label_confirmacao_converter_pdf.setText("✅")
+            self.atualizar_documentos_tabela()
 
         except:
+            self.atualizar_documentos_tabela()
             ui.label_confirmacao_converter_pdf.setText("❌")
 
             
@@ -1019,6 +1054,12 @@ class Funcoes_padrao:
         
         match nome_campo:
             
+            case 'campo_oab':
+                try:
+                    QApplication.clipboard().setText(ui.campo_oab.text())
+                    ui.campo_oab.selectAll()
+                except:
+                    pass
             case 'campo_cnh':
                 try:
                     QApplication.clipboard().setText(ui.campo_cnh.text())
@@ -1494,24 +1535,19 @@ Rafael Negrão de Souza
     def duplicar_pedido(self):
         resposta = QMessageBox.question(ui.centralwidget,'Duplicar pedido', 'Duplicar pedido atual?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
+            pedido = ui.campo_pedido.text()
             ui.campo_pedido.setText('')
             ui.campo_pedido.setReadOnly(False)
             ui.campo_cnpj.setText('')
             ui.campo_cnpj_razao_social.setText('')
             ui.campo_cnpj_uf.setText('')
             ui.campo_cnpj_municipio.setText('')
-            ui.checkBox_cnh.setChecked(False)
-            ui.checkBox_cnpj.setChecked(False)
-            ui.checkBox_cpf.setChecked(False)
-            ui.checkBox_doc_empresa.setChecked(False)
-            ui.checkBox_doc_identificacao.setChecked(False)
-            ui.checkBox_oab.setChecked(False)
-            ui.checkBox_rg.setChecked(False)
-            ui.checkBox_doc_complementar.setChecked(False)
             self.acoes.limpar_labels()
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_preco_certificado.setText('')
             ui.campo_status_bd.setText('❌')
+            ui.campo_comentario.setPlainText('')
+            ui.campo_comentario.setPlainText(f'*DUPLICADO DO PEDIDO {pedido}')
             return True
         else:
             return False
@@ -2160,8 +2196,6 @@ class Acoes_banco_de_dados:
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
             
     
-
-
 class JanelaOculta:
     def __init__(self, parent):
         self.parent = parent
@@ -2265,7 +2299,7 @@ ui.campo_seguranca_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.
 ui.campo_comentario.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_comentario))
 ui.campo_data_nascimento.dateChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_data_nascimento))
 ui.campo_lista_versao_certificado.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_versao_certificado))
-
+ui.campo_data_agendamento.dateChanged.connect(lambda:funcoes_app.formatar_data_agendamento())
 
 #Campos botões
 ui.botao_consulta_oab.clicked.connect(lambda:funcoes_app.procurar_oab())
@@ -2328,6 +2362,7 @@ ui.campo_data_de.setDate(QDate.currentDate())
 ui.campo_data_ate.setDate(QDate.currentDate())
 
 #Eventos
+ui.campo_oab.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_oab")
 ui.campo_msg_agendamento.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_msg_agendamento")
 ui.campo_assunto_email.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_assunto_email")
 ui.campo_cnh.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_cnh")
@@ -2361,11 +2396,13 @@ ui.campo_valor_estimado.setToolTip("Valor estimado em emissão dos certificados"
 ui.botao_duplicar_pedido.setToolTip('Duplicar pedido')
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
-
-
+#Validador
 regex = QRegExp("[0-9]*")
 validator = QRegExpValidator(regex)
 ui.campo_pedido.setValidator(validator)
+ui.campo_cpf.setValidator(validator)
+ui.campo_cnpj.setValidator(validator)
+
 
 #Eventos tabela
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
