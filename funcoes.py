@@ -319,9 +319,11 @@ class Funcoes_padrao:
                     # Fecha o arquivo PDF
                     pdf.save()
             ui.label_confirmacao_converter_pdf.setText("✅")
+            self.atualizar_documentos_tabela()
             #self.mensagem_alerta("Concluído",f"imagens convertidas!")
         else:
             self.escolher_conversao()
+            self.atualizar_documentos_tabela()
 
     def obter_janela_principal(self,widget):
         # Função para obter a janela principal a partir de um widget
@@ -421,11 +423,13 @@ class Funcoes_padrao:
 
         if ui.campo_lista_modalidade.currentText() == "PRESENCIAL":
             ui.label_confirmacao_criar_link_video.setText("❌")
+            self.atualizar_documentos_tabela()
             self.mensagem_alerta("Erro","Não é possível gerar link na modalidade presencial!")
             return
         
         elif ui.campo_link_webex.text() != "":
             ui.label_confirmacao_criar_link_video.setText("❌")
+            self.atualizar_documentos_tabela()
             self.mensagem_alerta("Erro","Não é possível gerar link quando a reunião é feita pelo WEBEX!")
             return
 
@@ -462,11 +466,13 @@ class Funcoes_padrao:
             c.save()
             
             ui.label_confirmacao_criar_link_video.setText("✅")
+            self.atualizar_documentos_tabela()
             #self.mensagem_alerta("Concluído","Link salvo com sucesso!")
 
         except:
 
             ui.label_confirmacao_criar_link_video.setText("❌")
+            self.atualizar_documentos_tabela()
             self.mensagem_alerta("Arquivo existente","Já existe um arquivo LINK_VIDEO na pasta!")
 
     def pasta_existe(self,diretorio, nome_pasta):
@@ -490,7 +496,7 @@ class Funcoes_padrao:
 
             self.formatar_nome()
             nome_pasta = f'{ui.campo_pedido.text()}-{ui.campo_nome.text()}'
-            if nome_pasta == '':
+            if ui.campo_nome.text() == '':
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Preencha o NOME do cliente.")
                 return
@@ -542,6 +548,10 @@ class Funcoes_padrao:
     def formatar_orgao_rg(self):
         orgao = ui.campo_rg_orgao.text().rstrip()
         ui.campo_rg_orgao.setText(orgao.upper())
+
+    def formatar_seccional_oab(self):
+        seccional = ui.campo_oab_seccional.text().rstrip()
+        ui.campo_oab_seccional.setText(seccional.upper())
 
     def procurar_cnpj(self):
         cnpj = ui.campo_cnpj.text()
@@ -1482,38 +1492,63 @@ Rafael Negrão de Souza
             ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Normal)
             ui.botao_ver_senha.setText("❌")
 
-    def verificar_texto_lista_status(self):
-        valor_campo = ui.campo_lista_status.currentText()
-
-        if valor_campo == "APROVADO":
-        # Alterar a fonte para verde
-            ui.campo_lista_status.setStyleSheet("color: green;font-weight: bold;")
-        elif valor_campo == "CANCELADO":
-            # Alterar a fonte para vermelha
-            ui.campo_lista_status.setStyleSheet("color: red;font-weight: bold;")
-        elif valor_campo == "VIDEO REALIZADA":
-            # Alterar a fonte para azul
-            ui.campo_lista_status.setStyleSheet("color: blue;font-weight: bold;")
-        elif valor_campo == "VERIFICAÇÃO":
-            # Alterar a fonte para laranja
-            ui.campo_lista_status.setStyleSheet("color: orange;font-weight: bold;")
-        else:
-            # Caso padrão, alterar a fonte para preta
-            ui.campo_lista_status.setStyleSheet("color: black;")
+    def verificar_texto_lista_status(self,campo):
+        
+        if campo == 1:
+            valor_campo = ui.campo_lista_status.currentText()
+            if valor_campo == "APROVADO":
+            # Alterar a fonte para verde
+                ui.campo_lista_status.setStyleSheet("color: green;font-weight: bold;")
+            elif valor_campo == "CANCELADO":
+                # Alterar a fonte para vermelha
+                ui.campo_lista_status.setStyleSheet("color: red;font-weight: bold;")
+            elif valor_campo == "VIDEO REALIZADA":
+                # Alterar a fonte para azul
+                ui.campo_lista_status.setStyleSheet("color: blue;font-weight: bold;")
+            elif valor_campo == "VERIFICAÇÃO":
+                # Alterar a fonte para laranja
+                ui.campo_lista_status.setStyleSheet("color: orange;font-weight: bold;")
+            elif valor_campo == "REAGENDADO":
+                # Alterar a fonte para laranja
+                ui.campo_lista_status.setStyleSheet("color: maroon;font-weight: bold;")
+            else:
+                # Caso padrão, alterar a fonte para preta
+                ui.campo_lista_status.setStyleSheet("color: black;")
+        elif campo == 2:
+            valor_campo = ui.campo_lista_status_2.currentText()
+            if valor_campo == "APROVADO":
+            # Alterar a fonte para verde
+                ui.campo_lista_status_2.setStyleSheet("color: green;font-weight: bold;")
+            elif valor_campo == "CANCELADO":
+                # Alterar a fonte para vermelha
+                ui.campo_lista_status_2.setStyleSheet("color: red;font-weight: bold;")
+            elif valor_campo == "VIDEO REALIZADA":
+                # Alterar a fonte para azul
+                ui.campo_lista_status_2.setStyleSheet("color: blue;font-weight: bold;")
+            elif valor_campo == "VERIFICAÇÃO":
+                # Alterar a fonte para laranja
+                ui.campo_lista_status_2.setStyleSheet("color: orange;font-weight: bold;")
+            elif valor_campo == "REAGENDADO":
+                # Alterar a fonte para laranja
+                ui.campo_lista_status_2.setStyleSheet("color: maroon;font-weight: bold;")
+            else:
+                # Caso padrão, alterar a fonte para preta
+                ui.campo_lista_status_2.setStyleSheet("color: black;")
 
     def carregar_lista_certificados(self):
-        ref = db.reference("/Certificados")
-        certificados = ref.get()
+        if ui.campo_lista_versao_certificado.currentText() == "":
+            ref = db.reference("/Certificados")
+            certificados = ref.get()
 
-        ui.campo_lista_versao_certificado.clear()  # Limpar qualquer item existente no combobox
-        ui.campo_lista_versao_certificado.addItem("")
-        ui.campo_lista_versao_certificado.addItems(certificados.keys())  # Adicionar as chaves do dicionário ao combobox
-        
-        ui.campo_lista_versao_certificado.removeItem(19)
-        ui.campo_lista_versao_certificado.removeItem(39)
+            ui.campo_lista_versao_certificado.clear()  # Limpar qualquer item existente no combobox
+            ui.campo_lista_versao_certificado.addItem("")
+            ui.campo_lista_versao_certificado.addItems(certificados.keys())  # Adicionar as chaves do dicionário ao combobox
+            
+            ui.campo_lista_versao_certificado.removeItem(19)
+            ui.campo_lista_versao_certificado.removeItem(39)
 
-        ui.campo_lista_versao_certificado.insertItem(1,'e-CNPJ - no computador - 12 meses')
-        ui.campo_lista_versao_certificado.insertItem(2,'e-CPF - no computador - 12 meses')
+            ui.campo_lista_versao_certificado.insertItem(1,'e-CNPJ - no computador - 12 meses')
+            ui.campo_lista_versao_certificado.insertItem(2,'e-CPF - no computador - 12 meses')
        
     def buscar_preco_certificado(self):
         ref = db.reference("/Certificados")
@@ -2301,6 +2336,7 @@ ui.campo_data_nascimento.dateChanged.connect(lambda:funcoes_app.valor_alterado(u
 ui.campo_lista_versao_certificado.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_versao_certificado))
 ui.campo_data_agendamento.dateChanged.connect(lambda:funcoes_app.formatar_data_agendamento())
 
+
 #Campos botões
 ui.botao_consulta_oab.clicked.connect(lambda:funcoes_app.procurar_oab())
 ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
@@ -2336,7 +2372,8 @@ ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
 ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
 ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
-ui.campo_lista_status.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status()) 
+ui.campo_lista_status.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status(1))
+ui.campo_lista_status_2.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status(2))
 
 #Campos de formatação
 ui.campo_cnpj_municipio.setReadOnly(True)
@@ -2351,6 +2388,7 @@ ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
 ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados())
 ui.campo_cnpj.editingFinished.connect (lambda:funcoes_app.formatar_cnpj())
+ui.campo_oab_seccional.editingFinished.connect (lambda :funcoes_app.formatar_seccional_oab())
 ui.campo_meta_semanal.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
 ui.campo_meta_mes.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
 ui.campo_data_meta.dateChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
