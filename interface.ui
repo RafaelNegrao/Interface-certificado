@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>464</width>
-    <height>664</height>
+    <height>673</height>
    </rect>
   </property>
   <property name="palette">
@@ -64,9 +64,9 @@
     <property name="geometry">
      <rect>
       <x>-5</x>
-      <y>49</y>
+      <y>54</y>
       <width>486</width>
-      <height>691</height>
+      <height>712</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -245,7 +245,7 @@
        <rect>
         <x>10</x>
         <y>20</y>
-        <width>121</width>
+        <width>115</width>
         <height>25</height>
        </rect>
       </property>
@@ -514,10 +514,10 @@
      <widget class="QPushButton" name="botao_consulta_rg">
       <property name="geometry">
        <rect>
-        <x>320</x>
+        <x>288</x>
         <y>228</y>
-        <width>26</width>
-        <height>26</height>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
@@ -569,9 +569,9 @@
      <widget class="QLabel" name="label_18">
       <property name="geometry">
        <rect>
-        <x>165</x>
-        <y>299</y>
-        <width>101</width>
+        <x>13</x>
+        <y>300</y>
+        <width>103</width>
         <height>13</height>
        </rect>
       </property>
@@ -594,9 +594,9 @@
      <widget class="QLineEdit" name="campo_cpf">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>229</y>
-        <width>181</width>
+        <x>9</x>
+        <y>228</y>
+        <width>148</width>
         <height>25</height>
        </rect>
       </property>
@@ -625,9 +625,9 @@
      <widget class="QLabel" name="label_10">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>217</y>
-        <width>76</width>
+        <x>165</x>
+        <y>216</y>
+        <width>58</width>
         <height>13</height>
        </rect>
       </property>
@@ -699,7 +699,7 @@
        <rect>
         <x>8</x>
         <y>151</y>
-        <width>416</width>
+        <width>451</width>
         <height>25</height>
        </rect>
       </property>
@@ -749,10 +749,10 @@
      <widget class="QPushButton" name="botao_consulta_cnh">
       <property name="geometry">
        <rect>
-        <x>165</x>
+        <x>132</x>
         <y>270</y>
         <width>26</width>
-        <height>26</height>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
@@ -804,7 +804,7 @@
        <rect>
         <x>9</x>
         <y>270</y>
-        <width>181</width>
+        <width>148</width>
         <height>25</height>
        </rect>
       </property>
@@ -826,9 +826,9 @@
      <widget class="QLineEdit" name="campo_nome_mae">
       <property name="geometry">
        <rect>
-        <x>160</x>
-        <y>310</y>
-        <width>301</width>
+        <x>9</x>
+        <y>312</y>
+        <width>280</width>
         <height>25</height>
        </rect>
       </property>
@@ -903,10 +903,10 @@
      <widget class="QPushButton" name="botao_consulta_cpf">
       <property name="geometry">
        <rect>
-        <x>165</x>
+        <x>133</x>
         <y>228</y>
-        <width>26</width>
-        <height>26</height>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
@@ -931,10 +931,10 @@
      <widget class="QPushButton" name="botao_pasta_cliente">
       <property name="geometry">
        <rect>
-        <x>428</x>
-        <y>150</y>
+        <x>129</x>
+        <y>18</y>
         <width>31</width>
-        <height>26</height>
+        <height>28</height>
        </rect>
       </property>
       <property name="font">
@@ -959,9 +959,9 @@
      <widget class="QLineEdit" name="campo_email">
       <property name="geometry">
        <rect>
-        <x>10</x>
+        <x>9</x>
         <y>190</y>
-        <width>321</width>
+        <width>322</width>
         <height>25</height>
        </rect>
       </property>
@@ -990,8 +990,8 @@
      <widget class="QLineEdit" name="campo_rg">
       <property name="geometry">
        <rect>
-        <x>195</x>
-        <y>229</y>
+        <x>162</x>
+        <y>228</y>
         <width>151</width>
         <height>25</height>
        </rect>
@@ -1017,9 +1017,9 @@
      <widget class="QLabel" name="label_16">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>297</y>
-        <width>156</width>
+        <x>165</x>
+        <y>258</y>
+        <width>151</width>
         <height>15</height>
        </rect>
       </property>
@@ -1042,9 +1042,9 @@
      <widget class="QLineEdit" name="campo_seguranca_cnh">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>310</y>
-        <width>146</width>
+        <x>162</x>
+        <y>270</y>
+        <width>151</width>
         <height>25</height>
        </rect>
       </property>
@@ -1068,7 +1068,7 @@
        <rect>
         <x>235</x>
         <y>350</y>
-        <width>171</width>
+        <width>169</width>
         <height>25</height>
        </rect>
       </property>
@@ -1096,9 +1096,9 @@
       </property>
       <property name="geometry">
        <rect>
-        <x>410</x>
+        <x>409</x>
         <y>350</y>
-        <width>51</width>
+        <width>52</width>
         <height>25</height>
        </rect>
       </property>
@@ -1148,10 +1148,10 @@
      <widget class="QLabel" name="label_26">
       <property name="geometry">
        <rect>
-        <x>417</x>
-        <y>335</y>
-        <width>31</width>
-        <height>20</height>
+        <x>411</x>
+        <y>336</y>
+        <width>37</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="font">
@@ -1201,7 +1201,7 @@
         <x>11</x>
         <y>435</y>
         <width>226</width>
-        <height>151</height>
+        <height>154</height>
        </rect>
       </property>
       <property name="font">
@@ -1216,7 +1216,7 @@
        <cursorShape>IBeamCursor</cursorShape>
       </property>
       <property name="styleSheet">
-       <string notr="true"/>
+       <string notr="true">color:rgb(90,54,247);</string>
       </property>
      </widget>
      <widget class="QPushButton" name="botao_consulta_cnpj">
@@ -1468,8 +1468,8 @@
      <widget class="QLabel" name="label_confirmacao_criar_pasta">
       <property name="geometry">
        <rect>
-        <x>445</x>
-        <y>140</y>
+        <x>147</x>
+        <y>9</y>
         <width>21</width>
         <height>21</height>
        </rect>
@@ -1590,9 +1590,9 @@
      <widget class="QLineEdit" name="campo_oab">
       <property name="geometry">
        <rect>
-        <x>195</x>
-        <y>270</y>
-        <width>151</width>
+        <x>294</x>
+        <y>312</y>
+        <width>109</width>
         <height>25</height>
        </rect>
       </property>
@@ -1614,9 +1614,9 @@
      <widget class="QLabel" name="label_46">
       <property name="geometry">
        <rect>
-        <x>200</x>
-        <y>258</y>
-        <width>106</width>
+        <x>297</x>
+        <y>300</y>
+        <width>55</width>
         <height>13</height>
        </rect>
       </property>
@@ -1639,10 +1639,10 @@
      <widget class="QPushButton" name="botao_consulta_oab">
       <property name="geometry">
        <rect>
-        <x>320</x>
-        <y>270</y>
-        <width>26</width>
-        <height>26</height>
+        <x>378</x>
+        <y>312</y>
+        <width>25</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
@@ -1719,9 +1719,9 @@
      <widget class="QLineEdit" name="campo_rg_orgao">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>321</x>
         <y>228</y>
-        <width>111</width>
+        <width>139</width>
         <height>25</height>
        </rect>
       </property>
@@ -1746,10 +1746,10 @@
      <widget class="QLabel" name="label_48">
       <property name="geometry">
        <rect>
-        <x>355</x>
-        <y>218</y>
-        <width>81</width>
-        <height>11</height>
+        <x>321</x>
+        <y>217</y>
+        <width>61</width>
+        <height>13</height>
        </rect>
       </property>
       <property name="font">
@@ -1768,12 +1768,12 @@
        <string>ORGÃO RG</string>
       </property>
      </widget>
-     <widget class="QLineEdit" name="campo_oab_seccional">
+     <widget class="QLineEdit" name="campo_pis">
       <property name="geometry">
        <rect>
-        <x>350</x>
+        <x>319</x>
         <y>270</y>
-        <width>111</width>
+        <width>142</width>
         <height>25</height>
        </rect>
       </property>
@@ -1795,10 +1795,10 @@
      <widget class="QLabel" name="label_49">
       <property name="geometry">
        <rect>
-        <x>355</x>
+        <x>321</x>
         <y>258</y>
-        <width>101</width>
-        <height>16</height>
+        <width>70</width>
+        <height>13</height>
        </rect>
       </property>
       <property name="font">
@@ -1814,7 +1814,7 @@
        <string notr="true">color:rgb(102,102,102);</string>
       </property>
       <property name="text">
-       <string>SECCIONAL</string>
+       <string>PIS</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_44">
@@ -1848,7 +1848,7 @@
         <x>245</x>
         <y>435</y>
         <width>216</width>
-        <height>151</height>
+        <height>154</height>
        </rect>
       </property>
       <property name="font">
@@ -1895,6 +1895,223 @@
         <string>docs</string>
        </property>
       </column>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_pis">
+      <property name="geometry">
+       <rect>
+        <x>432</x>
+        <y>267</y>
+        <width>26</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_50">
+      <property name="geometry">
+       <rect>
+        <x>411</x>
+        <y>300</y>
+        <width>46</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>6</pointsize>
+        <weight>75</weight>
+        <italic>true</italic>
+        <bold>true</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">color:rgb(102,102,102);</string>
+      </property>
+      <property name="text">
+       <string>SEC.</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_oab_seccional">
+      <property name="geometry">
+       <rect>
+        <x>408</x>
+        <y>312</y>
+        <width>52</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string/>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AM</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>BA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DF</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ES</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>GO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MG</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PI</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RJ</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>TO</string>
+       </property>
+      </item>
      </widget>
      <zorder>campo_lista_status</zorder>
      <zorder>campo_cnh</zorder>
@@ -1954,10 +2171,13 @@
      <zorder>label_47</zorder>
      <zorder>campo_rg_orgao</zorder>
      <zorder>label_48</zorder>
-     <zorder>campo_oab_seccional</zorder>
+     <zorder>campo_pis</zorder>
      <zorder>label_49</zorder>
      <zorder>label_44</zorder>
      <zorder>tabela_documentos</zorder>
+     <zorder>botao_consulta_pis</zorder>
+     <zorder>label_50</zorder>
+     <zorder>campo_oab_seccional</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -1966,8 +2186,8 @@
      <widget class="QPushButton" name="botao_procurar">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>550</y>
+        <x>331</x>
+        <y>558</y>
         <width>131</width>
         <height>31</height>
        </rect>
@@ -1996,8 +2216,8 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_quantidade_bd">
       <property name="geometry">
        <rect>
-        <x>140</x>
-        <y>550</y>
+        <x>144</x>
+        <y>558</y>
         <width>181</width>
         <height>31</height>
        </rect>
@@ -2032,13 +2252,13 @@ color:rgb(90,54,247);
         <x>10</x>
         <y>120</y>
         <width>451</width>
-        <height>421</height>
+        <height>430</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>9</pointsize>
+        <pointsize>8</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -2053,7 +2273,10 @@ color:rgb(90,54,247);
        <number>16</number>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>90</number>
+       <number>70</number>
+      </attribute>
+      <attribute name="horizontalHeaderMinimumSectionSize">
+       <number>1</number>
       </attribute>
       <column>
        <property name="text">
@@ -2063,11 +2286,6 @@ color:rgb(90,54,247);
       <column>
        <property name="text">
         <string>PEDIDO</string>
-       </property>
-      </column>
-      <column>
-       <property name="text">
-        <string>NOME</string>
        </property>
       </column>
       <column>
@@ -2082,30 +2300,40 @@ color:rgb(90,54,247);
       </column>
       <column>
        <property name="text">
-        <string>MODALIDADE</string>
+        <string>NOME</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>VENDA</string>
+        <string>CPF</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>TIPO</string>
+        <string>CNH</string>
        </property>
       </column>
       <column>
        <property name="text">
-        <string>OBSERVAÇÕES</string>
+        <string>COD SEG</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>NOME MÃE</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>CNPJ</string>
        </property>
       </column>
      </widget>
      <widget class="QPushButton" name="botao_consultar">
       <property name="geometry">
        <rect>
-        <x>220</x>
-        <y>70</y>
+        <x>255</x>
+        <y>69</y>
         <width>31</width>
         <height>31</height>
        </rect>
@@ -2157,7 +2385,7 @@ color:rgb(90,54,247);
        <rect>
         <x>10</x>
         <y>70</y>
-        <width>206</width>
+        <width>241</width>
         <height>31</height>
        </rect>
       </property>
@@ -2331,8 +2559,8 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_msg_copiado">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>550</y>
+        <x>15</x>
+        <y>558</y>
         <width>31</width>
         <height>31</height>
        </rect>
@@ -2367,9 +2595,9 @@ color:rgb(90,54,247);
       </property>
       <property name="geometry">
        <rect>
-        <x>305</x>
+        <x>340</x>
         <y>20</y>
-        <width>156</width>
+        <width>121</width>
         <height>31</height>
        </rect>
       </property>
@@ -2400,10 +2628,10 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_41">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>340</x>
         <y>5</y>
-        <width>51</width>
-        <height>16</height>
+        <width>81</width>
+        <height>11</height>
        </rect>
       </property>
       <property name="font">
@@ -2425,9 +2653,9 @@ color:rgb(90,54,247);
       </property>
       <property name="geometry">
        <rect>
-        <x>305</x>
+        <x>340</x>
         <y>70</y>
-        <width>156</width>
+        <width>121</width>
         <height>31</height>
        </rect>
       </property>
@@ -2458,10 +2686,10 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_43">
       <property name="geometry">
        <rect>
-        <x>310</x>
+        <x>345</x>
         <y>55</y>
-        <width>56</width>
-        <height>16</height>
+        <width>81</width>
+        <height>11</height>
        </rect>
       </property>
       <property name="font">
@@ -2477,469 +2705,19 @@ color:rgb(90,54,247);
        <string>-10%</string>
       </property>
      </widget>
-    </widget>
-    <widget class="QWidget" name="tab_2">
-     <attribute name="title">
-      <string>Script</string>
-     </attribute>
-     <widget class="QTextEdit" name="campo_msg_doc_idf">
+     <widget class="QPushButton" name="botao_hoje">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>5</y>
-        <width>451</width>
-        <height>126</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;{mensagem_inicial} tudo bem?                                                                                      &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Irei precisar de uma foto completa do seu documento de identificação, _*frente e verso*_, podendo ser _*CNH, RG, OAB.*_                                         &lt;/p&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;_*Observações: Retire o documento do plástico e abra-o.*_&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg7">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>345</y>
-        <width>451</width>
-        <height>61</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Agradeço pela disponibilidade. Se precisar adquirir mais certificados, pode fazê-lo através do link: &lt;/span&gt;&lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; font-weight:600; text-decoration: underline; color:#0000ff;&quot;&gt;https://loja.certisign.com.br/?cod_rev=91384&lt;/span&gt;&lt;/a&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;. Até mais!&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg6">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>300</y>
-        <width>451</width>
-        <height>41</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica';&quot;&gt;Podemos iniciar a vídeo-conferência?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg5">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>265</y>
-        <width>451</width>
+        <x>255</x>
+        <y>21</y>
+        <width>31</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Estou finalizando o chat devido à ausência de interação. Até mais!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg_reembolso">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>450</y>
-        <width>451</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-color:rgb(255,20,20);
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Link para reembolso: https://www.certisign.com.br/reembolso&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg_venda">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>410</y>
-        <width>451</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; text-decoration: underline; color:#000000;&quot;&gt;Link para compra: &lt;/span&gt;&lt;/a&gt;&lt;a href=&quot;https://loja.certisign.com.br/?cod_rev=91384&quot;&gt;&lt;span style=&quot; font-family:'Helvetica,Helvetica'; text-decoration: underline; color:#0000ff;&quot;&gt;https://loja.certisign.com.br/?cod_rev=91384&lt;/span&gt;&lt;/a&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_42">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>555</y>
-        <width>256</width>
-        <height>26</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>10</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>SUPORTE CERTISIGN : 4020-9735</string>
-      </property>
-     </widget>
-     <widget class="QTextEdit" name="campo_msg_doc_empresa">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>135</y>
-        <width>451</width>
-        <height>126</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>9</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot; margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Irei precisar tambem do documento de constituição da empresa, podendo ser _*Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário.*_ &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-    </widget>
-    <widget class="QWidget" name="tab_3">
-     <attribute name="title">
-      <string>Webex</string>
-     </attribute>
-     <widget class="QTextEdit" name="campo_msg3">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>170</y>
-        <width>451</width>
-        <height>376</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor" stdset="0">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="html">
-       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Helvetica'; font-size:7pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="botao_enviar_email">
-      <property name="geometry">
-       <rect>
-        <x>350</x>
-        <y>555</y>
-        <width>111</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Century Gothic</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <italic>false</italic>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);
-color:rgb(90,54,247);
-</string>
-      </property>
-      <property name="text">
-       <string>ENVIAR E-MAIL</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_29">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>105</y>
-        <width>141</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #333;</string>
-      </property>
-      <property name="text">
-       <string>LINK WEBEX</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="campo_link_webex">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>120</y>
-        <width>451</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>IBeamCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_30">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>155</y>
-        <width>146</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #333;</string>
-      </property>
-      <property name="text">
-       <string>MENSAGEM E-MAIL</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_31">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>55</y>
-        <width>141</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #333;</string>
-      </property>
-      <property name="text">
-       <string>ASSUNTO E-MAIL</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_32">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>5</y>
-        <width>171</width>
-        <height>16</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">color: #333;</string>
-      </property>
-      <property name="text">
-       <string>MENSAGEM AGENDAMENTO</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="campo_msg_agendamento">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>20</y>
-        <width>451</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>11</pointsize>
+        <pointsize>14</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -2947,53 +2725,14 @@ color:rgb(90,54,247);
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
-      <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="campo_assunto_email">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>70</y>
-        <width>451</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">border: 2px solid #031525;
-</string>
+       <string notr="true"/>
       </property>
       <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QCheckBox" name="checkBox_documentos_webex">
-      <property name="geometry">
-       <rect>
-        <x>15</x>
-        <y>560</y>
-        <width>146</width>
-        <height>17</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Já enviou documentos</string>
+       <string>📅</string>
       </property>
      </widget>
     </widget>
@@ -3050,9 +2789,9 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_70">
       <property name="geometry">
        <rect>
-        <x>180</x>
+        <x>169</x>
         <y>15</y>
-        <width>86</width>
+        <width>97</width>
         <height>16</height>
        </rect>
       </property>
@@ -3066,14 +2805,14 @@ color:rgb(90,54,247);
        </font>
       </property>
       <property name="text">
-       <string>META SEMANAL</string>
+       <string>META SEMANAL(R$)</string>
       </property>
      </widget>
      <widget class="QPushButton" name="botao_atualizar_meta">
       <property name="geometry">
        <rect>
         <x>345</x>
-        <y>550</y>
+        <y>555</y>
         <width>111</width>
         <height>31</height>
        </rect>
@@ -3433,9 +3172,9 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_71">
       <property name="geometry">
        <rect>
-        <x>285</x>
+        <x>318</x>
         <y>15</y>
-        <width>86</width>
+        <width>100</width>
         <height>16</height>
        </rect>
       </property>
@@ -3449,7 +3188,7 @@ color:rgb(90,54,247);
        </font>
       </property>
       <property name="text">
-       <string>META MENSAL</string>
+       <string>META MENSAL(R$)</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="campo_certificados_semana_1">
@@ -3674,9 +3413,9 @@ color:rgb(90,54,247);
      <widget class="QSpinBox" name="campo_meta_semanal">
       <property name="geometry">
        <rect>
-        <x>175</x>
+        <x>166</x>
         <y>30</y>
-        <width>91</width>
+        <width>136</width>
         <height>31</height>
        </rect>
       </property>
@@ -3692,15 +3431,15 @@ color:rgb(90,54,247);
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>1000</number>
+       <number>100000</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="campo_meta_mes">
       <property name="geometry">
        <rect>
-        <x>280</x>
+        <x>315</x>
         <y>30</y>
-        <width>91</width>
+        <width>139</width>
         <height>31</height>
        </rect>
       </property>
@@ -3716,7 +3455,7 @@ color:rgb(90,54,247);
        <number>1</number>
       </property>
       <property name="maximum">
-       <number>1000</number>
+       <number>1000000</number>
       </property>
      </widget>
     </widget>
@@ -3731,9 +3470,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>90</y>
-        <width>446</width>
-        <height>31</height>
+        <y>80</y>
+        <width>448</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -3760,10 +3499,10 @@ color:rgb(90,54,247);
       </property>
       <property name="geometry">
        <rect>
-        <x>9</x>
-        <y>146</y>
-        <width>159</width>
-        <height>31</height>
+        <x>10</x>
+        <y>130</y>
+        <width>156</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -3793,7 +3532,7 @@ color:rgb(90,54,247);
         <x>10</x>
         <y>30</y>
         <width>411</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -3840,7 +3579,7 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>12</x>
-        <y>76</y>
+        <y>66</y>
         <width>181</width>
         <height>13</height>
        </rect>
@@ -3861,8 +3600,8 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>133</y>
+        <x>11</x>
+        <y>117</y>
         <width>67</width>
         <height>13</height>
        </rect>
@@ -3883,16 +3622,16 @@ color:rgb(90,54,247);
      <widget class="QPushButton" name="botao_altera_pasta_principal">
       <property name="geometry">
        <rect>
-        <x>425</x>
+        <x>426</x>
         <y>30</y>
         <width>31</width>
-        <height>31</height>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>16</pointsize>
+        <pointsize>14</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -3911,8 +3650,8 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_33">
       <property name="geometry">
        <rect>
-        <x>14</x>
-        <y>192</y>
+        <x>178</x>
+        <y>118</y>
         <width>181</width>
         <height>13</height>
        </rect>
@@ -3936,62 +3675,10 @@ color:rgb(90,54,247);
       </property>
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>205</y>
-        <width>446</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>IBeamCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true"/>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_34">
-      <property name="geometry">
-       <rect>
-        <x>15</x>
-        <y>250</y>
-        <width>181</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>SENHA E-MAIL</string>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="campo_senha_email_empresa">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>11</x>
-        <y>263</y>
-        <width>446</width>
-        <height>31</height>
+        <x>175</x>
+        <y>130</y>
+        <width>283</width>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4015,8 +3702,8 @@ color:rgb(90,54,247);
      <widget class="QPushButton" name="botao_atualizar_configuracoes">
       <property name="geometry">
        <rect>
-        <x>260</x>
-        <y>550</y>
+        <x>258</x>
+        <y>555</y>
         <width>201</width>
         <height>31</height>
        </rect>
@@ -4043,64 +3730,11 @@ color:rgb(90,54,247);
        <string>ATUALIZAR CONFIGURAÇÕES</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="botao_ver_senha">
-      <property name="geometry">
-       <rect>
-        <x>420</x>
-        <y>260</y>
-        <width>36</width>
-        <height>36</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>16</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-radius:10px;</string>
-      </property>
-      <property name="text">
-       <string>👁️</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_35">
-      <property name="geometry">
-       <rect>
-        <x>15</x>
-        <y>315</y>
-        <width>181</width>
-        <height>13</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>7</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="text">
-       <string>COR HEADER</string>
-      </property>
-     </widget>
      <widget class="QLabel" name="label_37">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>330</y>
+        <y>210</y>
         <width>16</width>
         <height>16</height>
        </rect>
@@ -4122,7 +3756,7 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>330</y>
+        <y>210</y>
         <width>16</width>
         <height>16</height>
        </rect>
@@ -4144,7 +3778,7 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>205</x>
-        <y>330</y>
+        <y>210</y>
         <width>21</width>
         <height>16</height>
        </rect>
@@ -4166,9 +3800,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>345</y>
+        <y>225</y>
         <width>86</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4190,9 +3824,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>105</x>
-        <y>345</y>
+        <y>225</y>
         <width>81</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4214,9 +3848,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>345</y>
+        <y>225</y>
         <width>76</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4238,9 +3872,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>290</x>
-        <y>345</y>
+        <y>225</y>
         <width>31</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4266,9 +3900,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>15</x>
-        <y>395</y>
-        <width>181</width>
-        <height>13</height>
+        <y>265</y>
+        <width>136</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="font">
@@ -4288,9 +3922,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>410</y>
+        <y>280</y>
         <width>141</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4308,16 +3942,16 @@ color:rgb(90,54,247);
        <number>100</number>
       </property>
       <property name="value">
-       <number>15</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QSpinBox" name="campo_imposto_validacao">
       <property name="geometry">
        <rect>
         <x>165</x>
-        <y>410</y>
+        <y>280</y>
         <width>131</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4335,16 +3969,16 @@ color:rgb(90,54,247);
        <number>100</number>
       </property>
       <property name="value">
-       <number>15</number>
+       <number>1</number>
       </property>
      </widget>
      <widget class="QLabel" name="label_51">
       <property name="geometry">
        <rect>
         <x>170</x>
-        <y>395</y>
-        <width>181</width>
-        <height>13</height>
+        <y>265</y>
+        <width>124</width>
+        <height>16</height>
        </rect>
       </property>
       <property name="font">
@@ -4364,7 +3998,7 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>315</x>
-        <y>395</y>
+        <y>265</y>
         <width>181</width>
         <height>13</height>
        </rect>
@@ -4386,9 +4020,9 @@ color:rgb(90,54,247);
       <property name="geometry">
        <rect>
         <x>315</x>
-        <y>410</y>
+        <y>280</y>
         <width>141</width>
-        <height>31</height>
+        <height>24</height>
        </rect>
       </property>
       <property name="font">
@@ -4409,7 +4043,89 @@ color:rgb(90,54,247);
        <double>0.100000000000000</double>
       </property>
       <property name="value">
-       <double>5.500000000000000</double>
+       <double>1.000000000000000</double>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_lista_tipo_criar_pasta">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>175</y>
+        <width>156</width>
+        <height>24</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>PEDIDO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>NOME</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PEDIDO-NOME</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLabel" name="label_42">
+      <property name="geometry">
+       <rect>
+        <x>13</x>
+        <y>163</y>
+        <width>181</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>7</pointsize>
+        <weight>50</weight>
+        <italic>true</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>MODO DE CRIAÇÃO DE PASTA</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="checkBox_comentario">
+      <property name="geometry">
+       <rect>
+        <x>180</x>
+        <y>170</y>
+        <width>241</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Century Gothic</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="text">
+       <string>ALERTAR COMENTÁRIO</string>
       </property>
      </widget>
     </widget>
@@ -4417,7 +4133,7 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
     <property name="geometry">
      <rect>
-      <x>180</x>
+      <x>228</x>
       <y>-6</y>
       <width>46</width>
       <height>56</height>
@@ -4447,8 +4163,8 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_gerar_link">
     <property name="geometry">
      <rect>
-      <x>230</x>
-      <y>2</y>
+      <x>714</x>
+      <y>180</y>
       <width>39</width>
       <height>46</height>
      </rect>
@@ -4480,7 +4196,7 @@ color:rgb(90,54,247);
       <x>-15</x>
       <y>-5</y>
       <width>496</width>
-      <height>56</height>
+      <height>61</height>
      </rect>
     </property>
     <property name="font">
@@ -4624,7 +4340,7 @@ color:rgb(90,54,247);
    <widget class="QLabel" name="label_confirmacao_tirar_print">
     <property name="geometry">
      <rect>
-      <x>208</x>
+      <x>256</x>
       <y>8</y>
       <width>16</width>
       <height>16</height>
@@ -4642,8 +4358,8 @@ color:rgb(90,54,247);
    <widget class="QLabel" name="label_confirmacao_criar_link_video">
     <property name="geometry">
      <rect>
-      <x>254</x>
-      <y>6</y>
+      <x>516</x>
+      <y>9</y>
       <width>16</width>
       <height>16</height>
      </rect>
@@ -4723,7 +4439,7 @@ color:rgb(90,54,247);
    <widget class="QPushButton" name="botao_duplicar_pedido">
     <property name="geometry">
      <rect>
-      <x>132</x>
+      <x>180</x>
       <y>0</y>
       <width>46</width>
       <height>47</height>
@@ -4821,6 +4537,406 @@ color:rgb(90,54,247);
      <string>🗑️</string>
     </property>
    </widget>
+   <widget class="QPushButton" name="botao_menagem">
+    <property name="geometry">
+     <rect>
+      <x>135</x>
+      <y>3</y>
+      <width>46</width>
+      <height>43</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Helvetica</family>
+      <pointsize>24</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;</string>
+    </property>
+    <property name="text">
+     <string>💬</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="campo_senha_email_empresa">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
+    <property name="geometry">
+     <rect>
+      <x>741</x>
+      <y>462</y>
+      <width>88</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Helvetica</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>IBeamCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true"/>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_34">
+    <property name="geometry">
+     <rect>
+      <x>745</x>
+      <y>449</y>
+      <width>181</width>
+      <height>13</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Helvetica</family>
+      <pointsize>7</pointsize>
+      <weight>50</weight>
+      <italic>true</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>SENHA E-MAIL</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="botao_ver_senha">
+    <property name="geometry">
+     <rect>
+      <x>738</x>
+      <y>507</y>
+      <width>36</width>
+      <height>36</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Helvetica</family>
+      <pointsize>16</pointsize>
+      <weight>50</weight>
+      <italic>false</italic>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>PointingHandCursor</cursorShape>
+    </property>
+    <property name="layoutDirection">
+     <enum>Qt::LeftToRight</enum>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">border-radius:10px;</string>
+    </property>
+    <property name="text">
+     <string>👁️</string>
+    </property>
+   </widget>
+   <widget class="QWidget" name="layoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>624</x>
+      <y>27</y>
+      <width>69</width>
+      <height>373</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLineEdit" name="campo_m1">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLineEdit" name="campo_m2">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLineEdit" name="campo_m3">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLineEdit" name="campo_m4">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLineEdit" name="campo_m5">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLineEdit" name="campo_m6">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QLineEdit" name="campo_m7">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0">
+      <widget class="QLineEdit" name="campo_m8">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="0">
+      <widget class="QLineEdit" name="campo_m9">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="0">
+      <widget class="QLineEdit" name="campo_m10">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="10" column="0">
+      <widget class="QLineEdit" name="campo_m11">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="11" column="0">
+      <widget class="QLineEdit" name="campo_m12">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="12" column="0">
+      <widget class="QLineEdit" name="campo_m13">
+       <property name="font">
+        <font>
+         <family>Helvetica</family>
+         <pointsize>11</pointsize>
+         <weight>50</weight>
+         <bold>false</bold>
+        </font>
+       </property>
+       <property name="cursor">
+        <cursorShape>IBeamCursor</cursorShape>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
+        <string/>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <zorder>layoutWidget</zorder>
    <zorder>label_5</zorder>
    <zorder>tabWidget</zorder>
    <zorder>botao_print_direto_na_pasta</zorder>
@@ -4837,6 +4953,10 @@ color:rgb(90,54,247);
    <zorder>botao_duplicar_pedido</zorder>
    <zorder>botao_salvar</zorder>
    <zorder>botao_excluir_dados</zorder>
+   <zorder>botao_menagem</zorder>
+   <zorder>campo_senha_email_empresa</zorder>
+   <zorder>label_34</zorder>
+   <zorder>botao_ver_senha</zorder>
   </widget>
  </widget>
  <tabstops>
@@ -4854,29 +4974,24 @@ color:rgb(90,54,247);
   <tabstop>campo_rg</tabstop>
   <tabstop>campo_rg_orgao</tabstop>
   <tabstop>campo_cnh</tabstop>
+  <tabstop>campo_seguranca_cnh</tabstop>
+  <tabstop>campo_pis</tabstop>
+  <tabstop>campo_nome_mae</tabstop>
   <tabstop>campo_oab</tabstop>
   <tabstop>campo_oab_seccional</tabstop>
-  <tabstop>campo_seguranca_cnh</tabstop>
-  <tabstop>campo_nome_mae</tabstop>
   <tabstop>campo_cnpj</tabstop>
+  <tabstop>campo_lista_junta_comercial</tabstop>
   <tabstop>campo_comentario</tabstop>
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
-  <tabstop>campo_link_webex</tabstop>
+  <tabstop>botao_hoje</tabstop>
+  <tabstop>campo_lista_status_2</tabstop>
   <tabstop>campo_data_meta</tabstop>
   <tabstop>campo_meta_semanal</tabstop>
   <tabstop>campo_meta_mes</tabstop>
-  <tabstop>caminho_pasta_principal</tabstop>
-  <tabstop>caminho_pasta</tabstop>
-  <tabstop>campo_email_empresa</tabstop>
-  <tabstop>campo_senha_email_empresa</tabstop>
-  <tabstop>campo_cor_R</tabstop>
   <tabstop>campo_cor_G</tabstop>
   <tabstop>campo_cor_B</tabstop>
   <tabstop>campo_porcentagem_validacao</tabstop>
-  <tabstop>campo_msg7</tabstop>
-  <tabstop>campo_msg6</tabstop>
-  <tabstop>campo_msg5</tabstop>
   <tabstop>botao_pasta_cliente</tabstop>
   <tabstop>botao_consulta_cpf</tabstop>
   <tabstop>botao_altera_pasta_principal</tabstop>
@@ -4887,10 +5002,8 @@ color:rgb(90,54,247);
   <tabstop>botao_converter_todas_imagens_em_pdf</tabstop>
   <tabstop>botao_consultar</tabstop>
   <tabstop>botao_consulta_rg</tabstop>
-  <tabstop>botao_enviar_email</tabstop>
   <tabstop>botao_consulta_cnh</tabstop>
   <tabstop>botao_dados_cnpj</tabstop>
-  <tabstop>campo_assunto_email</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>campo_certificados_semana_1</tabstop>
   <tabstop>campo_certificados_semana_2</tabstop>
@@ -4901,15 +5014,9 @@ color:rgb(90,54,247);
   <tabstop>campo_cnpj_municipio</tabstop>
   <tabstop>campo_cnpj_uf</tabstop>
   <tabstop>botao_consulta_cnpj</tabstop>
-  <tabstop>campo_msg_agendamento</tabstop>
-  <tabstop>campo_msg3</tabstop>
   <tabstop>botao_excluir_dados</tabstop>
   <tabstop>botao_salvar</tabstop>
   <tabstop>botao_junta</tabstop>
-  <tabstop>campo_msg_reembolso</tabstop>
-  <tabstop>campo_msg_venda</tabstop>
-  <tabstop>campo_msg_doc_empresa</tabstop>
-  <tabstop>checkBox_documentos_webex</tabstop>
   <tabstop>botao_ver_senha</tabstop>
   <tabstop>botao_atualizar_configuracoes</tabstop>
   <tabstop>tableWidget</tabstop>
@@ -4919,13 +5026,21 @@ color:rgb(90,54,247);
   <tabstop>campo_preco_certificado</tabstop>
   <tabstop>campo_valor_estimado</tabstop>
   <tabstop>campo_valor_estimado_menor</tabstop>
-  <tabstop>campo_msg_doc_idf</tabstop>
   <tabstop>botao_duplicar_pedido</tabstop>
   <tabstop>campo_verifica_tela_cheia</tabstop>
   <tabstop>botao_consulta_oab</tabstop>
   <tabstop>campo_cnpj_razao_social</tabstop>
-  <tabstop>campo_lista_status_2</tabstop>
-  <tabstop>campo_lista_junta_comercial</tabstop>
+  <tabstop>caminho_pasta_principal</tabstop>
+  <tabstop>caminho_pasta</tabstop>
+  <tabstop>tabela_documentos</tabstop>
+  <tabstop>campo_email_empresa</tabstop>
+  <tabstop>campo_imposto_validacao</tabstop>
+  <tabstop>campo_desconto_validacao</tabstop>
+  <tabstop>botao_menagem</tabstop>
+  <tabstop>campo_lista_tipo_criar_pasta</tabstop>
+  <tabstop>botao_consulta_pis</tabstop>
+  <tabstop>campo_senha_email_empresa</tabstop>
+  <tabstop>campo_cor_R</tabstop>
  </tabstops>
  <resources/>
  <connections/>
