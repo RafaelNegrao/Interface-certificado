@@ -13,19 +13,21 @@ import pyautogui
 import sys
 import subprocess
 import math
+import pyperclip
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.utils import ImageReader
 from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit,QScrollArea,QWidget
+from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit,QScrollArea,QWidget,QGridLayout
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp,QMimeData
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QGuiApplication
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
 from credenciaisBd import obter_credenciais
+
 
 
 credenciais = obter_credenciais()
@@ -148,11 +150,45 @@ class Funcoes_padrao:
                 ui.campo_desconto_validacao.setValue(configs['DESCONTO VALIDACAO'])
                 ui.campo_lista_tipo_criar_pasta.setCurrentText(configs['MODO PASTA'])
                 ui.checkBox_comentario.setChecked(configs['ALERTA'])
+                ui.campo_desconto.setValue(configs['DESCONTO TOTAL'])
+                ui.campo_cod_rev.setText(configs['COD REV'])
 
             except Exception as e:
                 pass
         except:
             pass
+
+    def atualizar_configuracoes(self):
+        #CORRIGIDO --------------------------------------------------
+        resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if resposta == QMessageBox.Yes:
+            pass
+        else:
+            return
+        
+        ref = db.reference("/Configuracoes")
+        
+        diretorio = ui.caminho_pasta_principal.text()
+        email = ui.campo_email_empresa.text()
+        senha = ui.campo_senha_email_empresa.text()
+        rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
+        porcentagem = ui.campo_porcentagem_validacao.value()
+        desconto = ui.campo_desconto_validacao.value()
+        imposto = ui.campo_imposto_validacao.value()
+        criar_pasta = ui.campo_lista_tipo_criar_pasta.currentText()
+        alerta_mensagem = ui.checkBox_comentario.isChecked()
+        campo_desconto = ui.campo_desconto.value()
+        campo_cod_rev = ui.campo_cod_rev.text()
+        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto,"MODO PASTA":criar_pasta,'ALERTA':alerta_mensagem,'DESCONTO TOTAL':campo_desconto,'COD REV':campo_cod_rev}
+
+        try:
+            ref.update(nova_config)
+        except Exception as e:
+            try:
+                ref.set(nova_config)
+                print("Novas metas adicionadas com sucesso.")
+            except Exception as e:
+                print(f"Erro ao atualizar ou adicionar metas: {e}")
 
     def trazer_metas(self):
         #CORRIGIDO ----------------------------------------------------------
@@ -170,6 +206,7 @@ class Funcoes_padrao:
 
     def atualizar_meta_clientes(self):
         #CORRIGIDO ----------------------------------------------------------------------------------------
+        
         if ui.tabWidget.currentIndex() == 2:
             # Certifique-se de que req é um dicionário
             ref = db.reference("/Pedidos")
@@ -192,25 +229,24 @@ class Funcoes_padrao:
                     # Obtendo a data do pedido
                     data_pedido = Pedidos[pedido_info]['DATA']
                     
-                    # Convertendo a data para o formato desejado (considerando que DATA_PEDIDO é uma string)
                     data_formatada = datetime.datetime.strptime(data_pedido, "%d/%m/%Y")
                     
-                    # Verificando se o pedido pertence ao mesmo mês e ano de referência
                     if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
-                        # Obtendo a semana do mês
-                        semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
                         
-                        # Incrementando o contador da semana correspondente
-                        if semana_do_mes == 1:
-                            semana1 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                        elif semana_do_mes == 2:
-                            semana2 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                        elif semana_do_mes == 3:
-                            semana3 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                        elif semana_do_mes == 4:
-                            semana4 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                        elif semana_do_mes == 5:
-                            semana5 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
+                        semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
+                        try:
+                            if semana_do_mes == 1:
+                                semana1 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
+                            elif semana_do_mes == 2:
+                                semana2 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
+                            elif semana_do_mes == 3:
+                                semana3 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
+                            elif semana_do_mes == 4:
+                                semana4 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
+                            elif semana_do_mes == 5:
+                                semana5 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
+                        except:
+                            pass
 
             ui.campo_certificados_semana_1.setText(str(semana1))
             ui.campo_certificados_semana_2.setText(str(semana2))
@@ -235,6 +271,11 @@ class Funcoes_padrao:
         cor_G = ui.campo_cor_G.value()
         cor_B = ui.campo_cor_B.value()
         ui.label_5.setStyleSheet(f"background-color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+        ui.campo_email.setStyleSheet(f"color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+        ui.campo_pedido.setStyleSheet(f"color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+        ui.campo_data_nascimento.setStyleSheet(f"color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+        ui.campo_cpf.setStyleSheet(f"color:rgb({cor_R}, {cor_G}, {cor_B});\n")
+        ui.campo_comentario.setStyleSheet(f"color:rgb({cor_R}, {cor_G}, {cor_B});\n")
        
     def Atualizar_meta(self):
         #CORRIGIDO
@@ -259,36 +300,6 @@ class Funcoes_padrao:
             except Exception as e:
                 print(f"Erro ao atualizar ou adicionar metas: {e}")
    
-    def atualizar_configuracoes(self):
-        #CORRIGIDO --------------------------------------------------
-        resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if resposta == QMessageBox.Yes:
-            pass
-        else:
-            return
-        
-        ref = db.reference("/Configuracoes")
-        
-        diretorio = ui.caminho_pasta_principal.text()
-        email = ui.campo_email_empresa.text()
-        senha = ui.campo_senha_email_empresa.text()
-        rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
-        porcentagem = ui.campo_porcentagem_validacao.value()
-        desconto = ui.campo_desconto_validacao.value()
-        imposto = ui.campo_imposto_validacao.value()
-        criar_pasta = ui.campo_lista_tipo_criar_pasta.currentText()
-        alerta_mensagem = ui.checkBox_comentario.isChecked()
-        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"SENHA":senha ,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto,"MODO PASTA":criar_pasta,'ALERTA':alerta_mensagem}
-
-        try:
-            ref.update(nova_config)
-        except Exception as e:
-            try:
-                ref.set(nova_config)
-                print("Novas metas adicionadas com sucesso.")
-            except Exception as e:
-                print(f"Erro ao atualizar ou adicionar metas: {e}")
-
     def atualizar_diretorio_raiz(self):
         widget_pai = ui.centralwidget
         # Abrir o explorer para selecionar a pasta raiz
@@ -506,10 +517,7 @@ class Funcoes_padrao:
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
                 return
-
-            
-
-            
+         
             self.formatar_nome()
             tipo = ui.campo_lista_tipo_criar_pasta.currentText()
             if tipo == "NOME":
@@ -527,7 +535,7 @@ class Funcoes_padrao:
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
                     ui.label_confirmacao_criar_pasta.setText("❌")
                     return
-                nome_pasta = f'{str(ui.campo_pedido.text())-ui.campo_nome.text()}'
+                nome_pasta = f'{str(ui.campo_pedido.text())}-{ui.campo_nome.text()}'
 
             # Tente criar a pasta no diretório padrão
             diretorio_padrão = ui.caminho_pasta_principal.text()
@@ -583,6 +591,12 @@ class Funcoes_padrao:
         orgao = ui.campo_rg_orgao.text().rstrip()
         ui.campo_rg_orgao.setText(orgao.upper())
 
+    def contato_telefone(self):
+        if ui.campo_telefone.text() == '':
+           return
+
+        self.mensagem_contato()
+
     def procurar_cnpj(self):
         cnpj = ui.campo_cnpj.text()
         url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
@@ -598,7 +612,7 @@ class Funcoes_padrao:
             return
         
         url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
-        
+
         try:
             resposta = requests.get(url)
 
@@ -722,6 +736,13 @@ class Funcoes_padrao:
     def formatar_nome_mae(self):
         texto_mae = ui.campo_nome_mae.text()  # Obtenha o texto do campo_nome_mae
         ui.campo_nome_mae.setText(texto_mae.upper())
+
+    def formatar_preco_certificado(self):
+        if not ui.campo_preco_certificado.text() =="":
+            texto = ui.campo_preco_certificado.text()
+            preco = float(texto)
+            preco = "{:.2f}".format(preco)
+            ui.campo_preco_certificado.setText(str(preco))
 
     def procurar_cpf(self):
         
@@ -1158,6 +1179,12 @@ class Funcoes_padrao:
                     ui.campo_pis.selectAll()
                 except:
                     pass
+            case'campo_telefone':
+                try:
+                    QApplication.clipboard().setText(ui.campo_telefone.text())
+                    ui.campo_telefone.selectAll()
+                except:
+                    pass
 
     def manter_tela_aberta(self):
         if ui.campo_verifica_tela_cheia.text() == "SIM":
@@ -1375,8 +1402,8 @@ class Funcoes_padrao:
         self.abrir_nova_janela(janela)
 
     def clique_btn1(self):
-        agora = datetime.datetime.now().time()
-        certif = ui.campo_lista_versao_certificado.currentText()        
+        #################### CPF
+        agora = datetime.datetime.now().time()      
         match agora:
             case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
                 mensagem_inicial = "Bom dia"
@@ -1385,90 +1412,139 @@ class Funcoes_padrao:
             case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
                 mensagem_inicial = "Boa noite"
 
-        if 'OAB' in certif:
-            mensagem = f'{mensagem_inicial}, tudo bem? Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. Para prosseguirmos com a validação, preciso que o Sr.(a) me encaminhe aqui pelo Chat:🔹Uma foto completa do seu documento de identificação OAB, frente e verso. 🔸Observações: 1.Caso não haja interação nos próximos 5 minutos,o chat será finalizado.'
-        elif 'CNPJ' in certif:
-            mensagem = f'{mensagem_inicial}, tudo bem? Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. Para prosseguirmos com a validação, preciso que o Sr.(a) me encaminhe aqui pelo Chat:🔹Uma foto completa do seu documento de identificação, frente e verso.  Pode ser CNH, RG, OAB. 🔹Irei precisar tambem do Documento de Constituição da Empresa, podendo ser Contrato Social, Certidão de inteiro teor, Estatuto social, Requerimento de empresário. 🔸Observações: 1️.Retire o documento de identificação do plástico e abra-o. 2️.Caso não haja interação nos próximos 5 minutos,o chat será finalizado.'
-        elif 'CPF' in certif:
-            mensagem = f'{mensagem_inicial}, tudo bem? Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. Para prosseguirmos com a validação, preciso que o Sr.(a) me encaminhe aqui pelo Chat:🔹Uma foto completa do seu documento de identificação, frente e verso.  Pode ser CNH, RG, OAB. 🔸Observações: 1️.Retire o documento do plástico e abra-o. 2️.Caso não haja interação nos próximos 5 minutos,o chat será finalizado.'
-        else:
-            mensagem = f'{mensagem_inicial}, tudo bem? Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. Para prosseguirmos com a validação, preciso que o Sr.(a) me encaminhe aqui pelo Chat:🔹Uma foto completa do seu documento de identificação, frente e verso.  Pode ser CNH, RG, OAB. 🔸Observações: 1️.Retire o documento do plástico e abra-o. 2️.Caso não haja interação nos próximos 5 minutos,o chat será finalizado.'
 
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
+        mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. \n' \
+'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat uma foto completa do seu documento de identificação, *frente e verso*, podendo ser:\n'\
+' •CNH\n'\
+' •RG\n'\
+' •OAB\n' \
+'\n '\
+'Observações: \n' \
+' 1. Retire o documento de identificação do plástico e abra-o.\n' \
+' 2. O verso do documento é onde está o QRcode.'
+
+
+        pyperclip.copy(mensagem)                                                                                                                                    
+        return "PEDIR DOCUMENTO PESSOAL"
     
+    def clique_btn5(self):
+        #################### CNPJ
+                                                                                                                                            
+        mensagem = 'Irei precisar também do Documento de Constituição da Empresa, podendo ser: \n'\
+' •Contrato Social\n'\
+' •Certidão de inteiro teor\n'\
+' •Estatuto social\n'\
+' •Requerimento de empresário'                                                               
+        pyperclip.copy(mensagem) 
+        #return mensagem
+        return "PEDIR DOCUMENTO EMPRESA"
+
+    def clique_btn9(self):
+        #######################  OAB
+        agora = datetime.datetime.now().time()      
+        match agora:
+            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
+                mensagem_inicial = "Bom dia"
+            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
+                mensagem_inicial = "Boa tarde"
+            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
+                mensagem_inicial = "Boa noite"
+                                                                                                                                            
+        mensagem = f'{mensagem_inicial}, tudo bem? \n'
+        'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.\n'\
+        'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat:\n' \
+        '\n ' \
+        '•Uma foto completa do seu documento de identificação *OAB*, frente e verso.'
+                                                                                                           
+        pyperclip.copy(mensagem) 
+        return "PEDIR OAB"
+
+    def clique_btn13(self):
+        #OBSERVAÇÕES
+
+        agora = datetime.datetime.now().time()      
+        match agora:
+            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
+                mensagem_inicial = "Bom dia"
+            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
+                mensagem_inicial = "Boa tarde"
+            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
+                mensagem_inicial = "Boa noite"
+                                                                                                                                            
+        mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+            'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.\n'\
+            'Podemos iniciar a vídeo-conferência?'
+                                                                                                           
+        pyperclip.copy(mensagem) 
+        return mensagem
+
     def clique_btn2(self):
-        agora = datetime.datetime.now().time()
-        match agora:
-            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
-            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
-            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
-
-        mensagem =f'{mensagem_inicial}, tudo bem? Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. Podemos iniciar a vídeo-conferência?.'
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
+        mensagem = 'Agradecemos pela disponibilidade!\n'\
+        '\n'\
+        'Em caso de dúvidas, contate o suporte através do número 4020-9735 ou pelo WhatsApp (11)96400-1221. \n'\
+        'Caso precise adquirir mais certificados, pode comprá-los através do link: \n'\
+        f'https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}. \n'\
+        '\n'\
+        'Até mais!'
+        pyperclip.copy(mensagem) 
+        return 'FINALIZAR ATENDIMENTO'
     
-    def clique_btn3(self):
+    def clique_btn6(self):
         mensagem = 'Podemos iniciar a vídeo-conferência?'
         QApplication.clipboard().setText(mensagem)
         return mensagem
-
-    def clique_btn4(self):
-        mensagem = 'Agradecemos pela disponibilidade. Em caso de dúvidas, pode entrar em contato com o suporte através do contato 4020-9735 ou pelo WhatsApp (11) 96400-1221. Caso precise adquirir mais certificados, pode comprá-los através do link: https://loja.certisign.com.br/?cod_rev=104347. Até mais!'
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
-    
-    def clique_btn5(self):
-        mensagem = 'Para acessar a reunião,basta clicar no link acima.'
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
-    
-    def clique_btn6(self):
+  
+    def clique_btn10(self):
         mensagem = 'Ainda está ai?'
         QApplication.clipboard().setText(mensagem)
         return mensagem
     
+    def clique_btn16(self):
+        mensagem = 'Estou finalizando o chat devido à ausência de interação.\n'\
+        'Caso queira agendar um novo atendimento, pode fazê-lo pelo Whatsapp:(11)96400-1221.\n'\
+        'Até mais!'
+        pyperclip.copy(mensagem)
+        return 'FINALIZADO SEM SUCESSO'
+
+    def clique_btn3(self):
+        mensagem = f'Link para compra: https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}'
+        QApplication.clipboard().setText(mensagem)
+        return 'LINK PADRÃO DE COMPRA'
+
     def clique_btn7(self):
-        mensagem = 'Estou finalizando o chat devido à ausência de interação. Caso queira agendar um novo atendimento, pode fazê-lo pelo Whatsapp:(11)96400-1221. Até mais!'
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
-
-    def clique_btn8(self):
-        mensagem = 'Link para compra: https://loja.certisign.com.br/?cod_rev=104347'
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
-
-    def clique_btn9(self):
         mensagem = 'Link para reembolso: https://www.certisign.com.br/reembolso'
         QApplication.clipboard().setText(mensagem)
-        return mensagem
+        return 'LINK REEMBOLSO'
 
-    def clique_btn10(self):
+    def clique_btn11(self):
         mensagem ='Suporte Certisign:4020-9735 / Whatsapp:(11)96400-1221'
         QApplication.clipboard().setText(mensagem)
         return mensagem
 
-    def clique_btn11(self):
+    def clique_btn15(self):
         mensagem = 'e-mail: paranagua@acbdigital.com.br'
         QApplication.clipboard().setText(mensagem)
         return mensagem
 
-    def clique_btn12(self):
+    def clique_btn4(self):
         mensagem = 'Link postos de atendimento: https://www.certisign.com.br/duvidas-suporte/certificado-digital/locais-atendimento - Basta digitar seu CEP e serão listados os postos mais próximos.'
         QApplication.clipboard().setText(mensagem)
-        return mensagem
+        return 'LINK MAPA POSTOS DE ATENDIMENTO'
 
-    def clique_btn13(self):
+    def clique_btn8(self):
         mensagem = 'Contatos: email:paranagua@acbdigital.com.br - Whatsapp:(11)97187-2108'
         QApplication.clipboard().setText(mensagem)
         return mensagem
         
-    def clique_btn14(self):
+    def clique_btn12(self):
         pedido = ui.campo_pedido.text()
         mensagem = str(f'https://gestaoar.certisign.com.br/GestaoAR/cliente/emissao/{pedido}')
+        QApplication.clipboard().setText(mensagem)
+        return 'LINK PARA INSTALAÇÃO DO CERTIFICADO'
+    
+    def clique_btn14(self):
+        mensagem = 'Obrigado. Um momento.'
         QApplication.clipboard().setText(mensagem)
         return mensagem
        
@@ -1489,8 +1565,9 @@ class Funcoes_padrao:
 
     def abrir_nova_janela(self, janela_pai):
         self.nova_janela = QDialog(janela_pai)
-        self.nova_janela.setFixedSize(270, 670)
+        self.nova_janela.setFixedSize(484, 670)  # Ajuste o tamanho da janela para acomodar duas colunas
         self.nova_janela.setWindowTitle('Mensagens')
+        self.nova_janela.setStyleSheet(f"color: #{'%02x%02x%02x' % (ui.campo_cor_R.value(), ui.campo_cor_G.value(), ui.campo_cor_B.value())};")
 
         # Obtém a posição da janela raiz
         pos = janela_pai.pos()
@@ -1500,11 +1577,11 @@ class Funcoes_padrao:
 
         # Cria uma área de rolagem
         scroll = QScrollArea(self.nova_janela)
-        scroll.setFixedSize(270, 670)
+        scroll.setFixedSize(484, 670)  # Ajuste o tamanho da área de rolagem para acomodar duas colunas
 
         # Cria um widget para conter os botões
         widget = QWidget()
-        layout = QVBoxLayout()
+        layout = QGridLayout()  # Mude para QGridLayout
 
         # Lista de funções para obter os textos dos botões
         funcoes = [
@@ -1521,7 +1598,9 @@ class Funcoes_padrao:
             self.clique_btn11,
             self.clique_btn12,
             self.clique_btn13,
-            self.clique_btn14
+            self.clique_btn14,
+            self.clique_btn15,
+            self.clique_btn16
         ]
 
         # Obtém as mensagens chamando cada função
@@ -1531,15 +1610,15 @@ class Funcoes_padrao:
         for i, botao_texto in enumerate(nomes):
             if botao_texto is not None:  # Verifica se o texto do botão não é None
                 botao = QPushButton()  # Cria um botão sem texto
-                botao.setFixedSize(230, 170)  # Define o tamanho do botão
-                botao.setStyleSheet("QPushButton { text-align: left; }")  # Alinha o texto do botão à esquerda
+                botao.setFixedSize(230, 152)  # Define o tamanho do botão
+                botao.setStyleSheet("QPushButton { text-align: justify; }")  # Alinha o texto do botão à esquerda
 
                 # Dividir o texto em linhas para caber no botão
                 linhas = [botao_texto[j:j+40] for j in range(0, len(botao_texto), 40)]
                 botao.setText('\n'.join(linhas))  # Define o texto do botão como várias linhas
 
                 botao.clicked.connect(lambda _, b=botao: self.copiar_e_fechar(b))  # Conecta o sinal clicked ao slot copiar_e_fechar
-                layout.addWidget(botao)  # Adiciona o botão no layout
+                layout.addWidget(botao, i // 4, i % 4)  # Adiciona o botão no layout em duas colunas
 
                 # Conecta o botão à função correspondente
                 func_name = f'clique_btn{i+1}'
@@ -1557,6 +1636,61 @@ class Funcoes_padrao:
         mime_data.setText(botao.text())
         clipboard.setMimeData(mime_data)
         self.nova_janela.close()
+
+    def mensagem_contato(self):
+        agora = datetime.datetime.now().time()      
+        match agora:
+            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
+                mensagem_inicial = "Bom dia"
+            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
+                mensagem_inicial = "Boa tarde"
+            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
+                mensagem_inicial = "Boa noite"
+
+        texto, ok = QInputDialog.getItem(ui.centralwidget, "Mensagens Whatsapp", "Escolha a Mensagem:", ["INICIAR ATENDIMENTO", "ERRO NA VALIDAÇÃO","RENOVAÇÃO","OUTRO"], 0, False)
+        
+        if not ok or not texto:
+            return
+        
+        nome_completo = ui.campo_nome.text()
+        primeiro_nome = nome_completo.split()[0]
+        primeiro_nome = primeiro_nome.capitalize()
+        
+        if texto == 'OUTRO':
+                mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+
+        if texto == 'INICIAR ATENDIMENTO':
+             mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+f'Sou o Rafael Negrão, agente de registro da ACB Digital e temos um agendamento para seu certificado digital às {ui.campo_hora_agendamento.text()}. \n' \
+'Podemos Iniciar o atendimento?'
+        
+        elif texto == 'ERRO NA VALIDAÇÃO':
+            mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+'Sou o Rafael Negrão que fez a validação do seu certificado digital.\n'\
+'Estou entrando em contato pois ocorreu um erro na validação do seu pedido.'
+            
+        elif texto == 'RENOVAÇÃO':
+            mensagem = f'*Prezado(a) {primeiro_nome},*\n'\
+            'Espero que esteja bem. Meu nome é Rafael Negrão e sou Agente de Registro da ACB Digital.\n'\
+            'Verifiquei que a validade do seu certificado digital está próxima do vencimento.\n'\
+            'Compreendemos a importância de manter a continuidade dos serviços digitais em sua organização. Portanto, gostaríamos de oferecer a renovação do seu certificado.\n'\
+            'Para sua conveniência, fornecemos um link para a renovação do seu certificado digital:\n'\
+            f'https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}\n'\
+            'Agradecemos a oportunidade de continuar a atendê-lo.\n'\
+            '\n'\
+            'Atenciosamente,\n'\
+            '*Rafael Negrão*'
+
+
+            
+
+
+        numero = ui.campo_telefone.text()  # substitua pelo número de telefone desejado
+        mensagem = mensagem.replace(' ', '%20')  # substitui espaços por %20
+        url_mensagem = QUrl(f'https://api.whatsapp.com/send?phone={numero}&text={mensagem}')
+        QDesktopServices.openUrl(url_mensagem)
+
+
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -1713,14 +1847,14 @@ class Acoes_banco_de_dados:
             ui.campo_preco_certificado.setText("")
             ui.campo_valor_estimado.setText("")
             ui.campo_valor_estimado_menor.setText("")
-            ui.campo_oab.setText("")
-            ui.campo_oab_seccional.setCurrentText("")
             ui.campo_cnpj_razao_social.setText("")
             ui.campo_rg_orgao.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("SP")
             ui.tabela_documentos.clearContents()
             ui.tabela_documentos.setRowCount(0)
             ui.campo_pis.setText("")
+            ui.campo_comentario.setStyleSheet("")
+            ui.campo_telefone.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
 
@@ -1762,14 +1896,14 @@ class Acoes_banco_de_dados:
             ui.campo_preco_certificado.setText("")
             ui.campo_valor_estimado.setText("")
             ui.campo_valor_estimado_menor.setText("")
-            ui.campo_oab.setText("")
-            ui.campo_oab_seccional.setCurrentText("")
             ui.campo_cnpj_razao_social.setText("")
             ui.campo_rg_orgao.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("SP")
             ui.tabela_documentos.clearContents()
             ui.tabela_documentos.setRowCount(0)
             ui.campo_pis.setText("")
+            ui.campo_comentario.setStyleSheet("")
+            ui.campo_telefone.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
             self.limpar_labels()
@@ -1808,16 +1942,13 @@ class Acoes_banco_de_dados:
                     "MODALIDADE":ui.campo_lista_modalidade.currentText(),
                     "VERSAO":ui.campo_lista_versao_certificado.currentText(),
                     "PRECO":ui.campo_preco_certificado.text(),
-                    "OAB":ui.campo_oab.text(),
-                    "OAB SECCIONAL":ui.campo_oab_seccional.currentText(),
                     "RAZAO SOCIAL":ui.campo_cnpj_razao_social.text(),
                     "ORGAO RG":ui.campo_rg_orgao.text(),
-                    "PIS":ui.campo_pis.text()
+                    "PIS":ui.campo_pis.text(),
+                    "TELEFONE":ui.campo_telefone.text()
                     }
         if self.verificar_status() == "DEFINITIVO":
             novos_dados.update({
-                    "NOME":"",
-                    "WEBEX": "",
                     "PASTA": "",
                     "MUNICIPIO": "",
                     "UF": "",
@@ -1829,8 +1960,6 @@ class Acoes_banco_de_dados:
                     "CNPJ": "",
                     "EMAIL": "",
                     "NASCIMENTO": "",
-                    "OAB":"",
-                    "OAB SECCIONAL":"",
                     "RAZAO SOCIAL":"",
                     "ORGAO RG":"",
                     "PIS":""
@@ -1887,7 +2016,7 @@ class Acoes_banco_de_dados:
             if pedido_data:
                 # Se existir, o pedido foi encontrado
                 self.preencher_dados(pedido_data)
-                # Realize as ações necessárias com os detalhes do pedido encontrado
+               
             else:  
                return 'Pedido nao existe'
 
@@ -1915,7 +2044,6 @@ class Acoes_banco_de_dados:
 
     def preencher_dados(self,pedido_data):
         #CORRIGIDO------------------------------------------------------------
-
         #self.limpar_campos_pedido()
         try:
             status = pedido_data.get("STATUS")
@@ -1951,19 +2079,19 @@ class Acoes_banco_de_dados:
             except:
                 pass
             try:
-                ui.campo_oab.setText(pedido_data.get("OAB"))
-            except:
-                pass
-            try:
-                ui.campo_oab_seccional.setCurrentText(pedido_data.get("OAB SECCIONAL"))
-            except:
-                pass
-            try:
                 ui.campo_cnpj_razao_social.setText(pedido_data.get("RAZAO SOCIAL"))
             except:
                 pass
             try:
                 ui.campo_pis.setText(pedido_data.get("PIS"))
+            except:
+                pass
+            try:
+                ui.campo_preco_certificado.setText(pedido_data.get("PRECO"))
+            except:
+                pass
+            try:
+                ui.campo_telefone.setText(pedido_data.get("TELEFONE"))
             except:
                 pass
             
@@ -1973,12 +2101,14 @@ class Acoes_banco_de_dados:
 
             if pasta != "": 
                 ui.label_confirmacao_criar_pasta.setText("✅")
-            
+
             comentario = pedido_data.get("DIRETORIO")
 
             if comentario != "" and ui.checkBox_comentario.isChecked() == True:
-                self.mensagem_alerta('Comentário','Atenção nos comentários❗')
-               
+                ui.campo_comentario.setStyleSheet(f"QTextEdit {{ border: 3px solid #{'%02x%02x%02x' % (ui.campo_cor_R.value(),ui.campo_cor_G.value(),ui.campo_cor_B.value())}; color: #{'%02x%02x%02x' % (120, 0, 255)}; }}")
+            else:
+                ui.campo_comentario.setStyleSheet("")
+            
         except:
             pass
 
@@ -2027,11 +2157,8 @@ class Acoes_banco_de_dados:
                         ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['DATA']))
                         ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
                         ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
-                        ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['CPF']))
-                        ui.tableWidget.setItem(row_position, 6, QTableWidgetItem(pedido_info['CNH']))
-                        ui.tableWidget.setItem(row_position, 7, QTableWidgetItem(pedido_info['CODIGO DE SEG CNH']))
-                        ui.tableWidget.setItem(row_position, 8, QTableWidgetItem(pedido_info['MAE']))
-                        ui.tableWidget.setItem(row_position, 9, QTableWidgetItem(pedido_info['CNPJ']))
+                        ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
+
                      
 
                         # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
@@ -2044,7 +2171,7 @@ class Acoes_banco_de_dados:
                                 # Converte o valor para float e soma ao valor estimado
                                 valor_estimado += float(preco)
                                 valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
-                                valor_formatado_menor = "{:.2f}".format(valor_estimado*0.90).replace('.', ',')
+                                valor_formatado_menor = "{:.2f}".format(valor_estimado * (1 - (ui.campo_desconto.value()/100))).replace('.', ',')
                                 ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
                                 ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
                                 
@@ -2084,20 +2211,21 @@ class Acoes_banco_de_dados:
                 QApplication.processEvents()
                 
             ui.barra_progresso_consulta.setValue(100)
+            
             valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
-            valor_formatado_menor = "{:.2f}".format(valor_estimado*0.90).replace('.', ',')
-
+            valor_formatado_menor = "{:.2f}".format(valor_estimado * (1 - (ui.campo_desconto.value()/100))).replace('.', ',')
 
             ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
             ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
-
+            ui.label_desconto.setText(f'-{ui.campo_desconto.value()}%')
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME", "CPF","CNH","COD SEG","NOME MAE", "CNPJ"])
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME", "VERSAO"])
             ui.barra_progresso_consulta.setVisible(False)
         except Exception as e:
                 print(e)
-                ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME","CPF","CNH","COD SEG","NOME MAE", "CNPJ"])
+                ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME","VERSAO"])
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
+                ui.label_desconto.setText(f'-{ui.campo_desconto.value}%')
                 ui.barra_progresso_consulta.setVisible(False)
                 pass
 
@@ -2174,8 +2302,6 @@ class JanelaOculta:
             if not mouse_dentro_da_janela:
                 self.animate_window_resize(128, 45)
         
-        
-
     def mousePressEvent(self, event):
         self.animate_window_resize(469, 674)#469
 
@@ -2225,8 +2351,6 @@ janela.showEvent = funcoes_app.evento_ao_abrir
 
 #Alterações nos campos
 ui.campo_rg_orgao.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_rg_orgao))
-ui.campo_oab_seccional.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab_seccional))
-ui.campo_oab.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab))
 ui.campo_nome.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome))
 ui.campo_cnpj_municipio.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj_municipio))
 ui.caminho_pasta_principal.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.caminho_pasta_principal))
@@ -2235,7 +2359,6 @@ ui.campo_cnpj.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnp
 ui.campo_cnpj_uf.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj_uf))
 ui.campo_senha_email_empresa.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_senha_email_empresa))
 ui.campo_cpf.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cpf))
-ui.campo_cnpj.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj))
 ui.campo_nome_mae.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome_mae))
 ui.campo_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnh))
 ui.campo_lista_modalidade.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_modalidade))
@@ -2249,12 +2372,10 @@ ui.campo_seguranca_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.
 ui.campo_comentario.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_comentario))
 ui.campo_data_nascimento.dateChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_data_nascimento))
 ui.campo_lista_versao_certificado.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_versao_certificado))
-ui.campo_data_agendamento.dateChanged.connect(lambda:funcoes_app.formatar_data_agendamento())
 ui.campo_pis.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_comentario))
-
+ui.campo_preco_certificado.editingFinished.connect(lambda:funcoes_app.formatar_preco_certificado())
 
 #Campos botões
-ui.botao_consulta_oab.clicked.connect(lambda:funcoes_app.procurar_oab())
 ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
 ui.botao_ver_senha.clicked.connect(lambda:funcoes_app.visualizar_senha())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
@@ -2287,6 +2408,7 @@ ui.campo_lista_status_2.currentIndexChanged.connect(lambda : funcoes_app.verific
 ui.botao_menagem.clicked.connect(lambda:funcoes_app.abrir_janela_mensagem())
 ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))
+ui.botao_telefone.clicked.connect((lambda:funcoes_app.contato_telefone()))
 
 
 #Campos de formatação
@@ -2298,7 +2420,7 @@ ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Password)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
-ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados())
+ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados()) ##########################################################################
 ui.campo_cnpj.editingFinished.connect (lambda:funcoes_app.formatar_cnpj())
 ui.campo_meta_semanal.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
 ui.campo_meta_mes.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
@@ -2310,18 +2432,18 @@ ui.campo_data_de.setDate(QDate.currentDate())
 ui.campo_data_ate.setDate(QDate.currentDate())
 
 #Eventos
-ui.campo_oab.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_oab")
 ui.campo_cnh.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_cnh")
 ui.campo_cnpj.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_cnpj")
-ui.campo_pedido.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pedido")
+ui.campo_pedido.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pedido") #*************************************************************
 ui.campo_cpf.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_cpf")
 ui.campo_seguranca_cnh.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_seguranca_cnh")
 ui.campo_rg.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_rg")
 ui.campo_nome_mae.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_nome_mae")
 ui.campo_nome.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_nome")
 ui.campo_pis.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pis")
+ui.campo_telefone.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_telefone")
 ui.campo_valor_estimado.setReadOnly(True)
-ui.campo_preco_certificado.setReadOnly(True)
+ui.campo_preco_certificado.setReadOnly(False)
 ui.campo_cnpj_razao_social.setReadOnly(True)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
@@ -2338,11 +2460,12 @@ ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
 ui.botao_menagem.setToolTip("Mensagens")
 
 #Validador
-regex = QRegExp("[0-9]*")
+regex = QRegExp("[0-9.]*")
 validator = QRegExpValidator(regex)
 ui.campo_pedido.setValidator(validator)
 ui.campo_cpf.setValidator(validator)
 ui.campo_cnpj.setValidator(validator)
+ui.campo_preco_certificado.setValidator(validator)
 
 
 #Eventos tabela
