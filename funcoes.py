@@ -22,11 +22,13 @@ from PIL import Image
 from PyQt5 import QtGui, QtWidgets,QtCore,Qt
 from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit,QScrollArea,QWidget,QGridLayout
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp,QMimeData
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QGuiApplication,QPixmap
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QGuiApplication
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
 from credenciaisBd import obter_credenciais
+import smtplib
+from email.mime.text import MIMEText
 
 
 
@@ -150,6 +152,7 @@ class Funcoes_padrao:
                 ui.campo_lista_tipo_criar_pasta.setCurrentText(configs['MODO PASTA'])
                 ui.campo_desconto.setValue(configs['DESCONTO TOTAL'])
                 ui.campo_cod_rev.setText(configs['COD REV'])
+                ui.campo_senha_email.setText(configs['SENHA EMAIL'])
 
             except Exception as e:
                 print(e)
@@ -176,7 +179,8 @@ class Funcoes_padrao:
         criar_pasta = ui.campo_lista_tipo_criar_pasta.currentText()
         campo_desconto = ui.campo_desconto.value()
         campo_cod_rev = ui.campo_cod_rev.text()
-        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto,"MODO PASTA":criar_pasta,'DESCONTO TOTAL':campo_desconto,'COD REV':campo_cod_rev}
+        senha_email = ui.campo_senha_email.text()
+        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto,"MODO PASTA":criar_pasta,'DESCONTO TOTAL':campo_desconto,'COD REV':campo_cod_rev,'SENHA EMAIL':senha_email}
 
         try:
             ref.update(nova_config)
@@ -267,8 +271,7 @@ class Funcoes_padrao:
         cor_R = ui.campo_cor_R.value()
         cor_G = ui.campo_cor_G.value()
         cor_B = ui.campo_cor_B.value()
-
-       
+  
     def Atualizar_meta(self):
         #CORRIGIDO
         ref = db.reference("/Metas")
@@ -595,8 +598,7 @@ class Funcoes_padrao:
         QDesktopServices.openUrl(url_receita)
 
     def dados_cnpj(self):
-        ui.campo_cnpj_municipio.setText("")
-        ui.campo_cnpj_uf.setText("")  
+        ui.campo_cnpj_municipio.setText("") 
 
         cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
 
@@ -609,9 +611,8 @@ class Funcoes_padrao:
             resposta = requests.get(url)
 
             if resposta.status_code == 200:
-                
                 data = resposta.json()
-                ui.campo_cnpj_municipio.setText(data['municipio'])
+                ui.campo_cnpj_municipio.setText(f'{data['municipio']}/{data['uf']}')
                 ui.campo_cnpj_razao_social.setText(data['nome'])
 
                 qsa = data.get('qsa', [])
@@ -627,19 +628,16 @@ class Funcoes_padrao:
                 uf = data['uf']
                 
                 if uf != "SP":
-                    ui.campo_cnpj_uf.setText(str(uf))
                     ui.campo_lista_junta_comercial.setCurrentText(uf)
                     self.atualizar_documentos_tabela()
                     return
                 else:
-                    ui.campo_cnpj_uf.setText(str(uf))
                     ui.campo_lista_junta_comercial.setCurrentText(uf)
                     self.atualizar_documentos_tabela()
                     return
                 
             else:
                 ui.campo_cnpj_municipio.setText("")
-                ui.campo_cnpj_uf.setText("")
                 self.atualizar_documentos_tabela()
                 return
             
@@ -803,7 +801,6 @@ class Funcoes_padrao:
             pass
         else:
             ui.campo_cnpj_municipio.setText('')
-            ui.campo_cnpj_uf.setText('')
 
     def exportar_excel(self):
         try:
@@ -1251,7 +1248,6 @@ class Funcoes_padrao:
                 # Caso padrão, alterar a fonte para preta
                 ui.label_status.setText("")
       
-
     def carregar_lista_certificados(self):
        if ui.campo_lista_versao_certificado.currentText() == "":
             ref = db.reference("/Certificados")
@@ -1689,7 +1685,109 @@ f'Sou o Rafael Negrão, agente de registro da ACB Digital e temos um agendamento
         url_mensagem = QUrl(f'https://api.whatsapp.com/send?phone={numero}&text={mensagem}')
         QDesktopServices.openUrl(url_mensagem)
 
+    def envio_de_email(self):
 
+        hora = ui.campo_hora_agendamento.time().toString("HH:mm")
+        data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")    
+        email = ui.campo_email.text()
+     
+        variaveis = [hora,data,email]
+
+        nomes_mensagens = {
+            "hora": "Hora",
+            "data":"Data",
+            "email":"Email",
+        }
+
+        campos_vazios = [nomes_mensagens[nome_variavel] for nome_variavel, valor in zip(["hora","data","email"], variaveis) if (isinstance(valor, str) and valor == "") or (nome_variavel == "hora" and valor == "00:00") or (nome_variavel == "data" and valor == "01/01/2000")]
+
+        if campos_vazios:
+            campos_faltando = "\n•".join(campos_vazios)
+            mensagem_alerta = f"Preencha os seguintes campos para enviar o E-mail! \n•{campos_faltando}"
+            self.mensagem_alerta("Erro no envio", mensagem_alerta)
+            return
+      
+
+        tipo_mensagem, ok = QInputDialog.getItem(ui.centralwidget, "Envio", "Escolha o conteúdo do E-mail:", ["INICIO DE ATENDIMENTO", "PROBLEMA DE PAGAMENTO"], 0, False)
+        if not ok:
+            return
+
+        match tipo_mensagem:
+            case 'INICIO DE ATENDIMENTO':
+                agora = datetime.datetime.now().time()      
+                match agora:
+                    case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
+                        mensagem_inicial = "Bom dia"
+                    case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
+                        mensagem_inicial = "Boa tarde"
+                    case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
+                        mensagem_inicial = "Boa noite"
+
+                assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"                                                                                                                           
+                corpo = f'''{mensagem_inicial}, tudo bem? 
+
+Sou o Rafael Negrão, agente de registro da ACB Digital.
+
+Estou entrando em contato pois temos uma validação para seu certificado digital às {ui.campo_hora_agendamento.text()} do dia {ui.campo_data_agendamento.text()}.
+
+Caso queira entrar em contato comigo através do Whatsapp, clique no link abaixo:
+            
+https://api.whatsapp.com/send?phone=5511910419450&text=Olá,%20quero%20iniciar%20a%20valida%C3%A7%C3%A3o%20para%20o%20pedido%20{ui.campo_pedido.text()}%20
+
+
+atenciosamente,
+
+Rafael Negrão de Souza'''
+
+        
+            case 'PROBLEMA DE PAGAMENTO':
+                agora = datetime.datetime.now().time()      
+                match agora:
+                    case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
+                        mensagem_inicial = "Bom dia"
+                    case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
+                        mensagem_inicial = "Boa tarde"
+                    case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
+                        mensagem_inicial = "Boa noite"
+
+                assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
+                corpo = f'''{mensagem_inicial}, Tudo bem?
+
+Sou Rafael Negrão, agente de registro da ACB Digital. Estou entrando em contato para informar que temos uma validação agendada para o seu certificado digital às {ui.campo_hora_agendamento.text()} do dia {ui.campo_data_agendamento.text()}. 
+
+No entanto, verifiquei que o pagamento ainda não foi reconhecido em nosso sistema.
+
+Para que possamos prosseguir com a validação, é necessário que o pagamento seja confirmado. 
+
+Peço que entre em contato com o suporte pelo telefone 4020-9735 para que possam verificar e regularizar a situação.
+
+Agradeço a compreensão.
+
+
+Atenciosamente,
+
+Rafael Negrão de Souza'''
+
+        if ui.campo_email.text():
+
+            remetente = ui.campo_email_empresa.text()
+            destinatarios = ui.campo_email.text()
+            senha = ui.campo_senha_email.text()
+
+            msg = MIMEText(corpo)
+            msg['Subject'] = assunto
+            msg['From'] = remetente
+            msg['To'] = destinatarios
+
+        try:
+            with smtplib.SMTP_SSL('email-ssl.com.br', 465) as smtp_server:
+                smtp_server.login(remetente, senha)
+                smtp_server.sendmail(remetente, destinatarios, msg.as_string())
+                self.mensagem_alerta("Sucesso","E-mail enviado com sucesso!")
+        except smtplib.SMTPException as e:
+            self.mensagem_alerta("Erro",f"Erro ao enviar o e-mail: {e}")
+            
+    # Exemplo de uso:
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -1774,16 +1872,12 @@ class Acoes_banco_de_dados:
                
     def analise_de_campos(self):
 
-
         pedido = ui.campo_pedido.text()
         hora = ui.campo_hora_agendamento.time().toString("HH:mm")
         data = ui.campo_data_agendamento.date().toString("dd/MM/yyyy")    
         versao = ui.campo_lista_versao_certificado.currentText()
         modalidade = ui.campo_lista_modalidade.currentText()
      
-        
-
-
         # Lista de variáveis
         variaveis = [pedido,hora,data,versao,modalidade]
 
@@ -1814,7 +1908,6 @@ class Acoes_banco_de_dados:
             ui.tableWidget.horizontalHeader().setDefaultSectionSize(70)
             ui.caminho_pasta.setText("")
             ui.campo_cnpj_municipio.setText("")
-            ui.campo_cnpj_uf.setText("")
             ui.campo_comentario.setPlainText("")
             ui.campo_nome.setText("")
             ui.campo_rg.setText("")
@@ -1869,7 +1962,6 @@ class Acoes_banco_de_dados:
             ui.tableWidget.horizontalHeader().setDefaultSectionSize(70)
             ui.caminho_pasta.setText("")
             ui.campo_cnpj_municipio.setText("")
-            ui.campo_cnpj_uf.setText("")
             ui.campo_comentario.setPlainText("")
             ui.campo_nome.setText("")
             ui.campo_rg.setText("")
@@ -1922,7 +2014,6 @@ class Acoes_banco_de_dados:
         novos_dados = {
                     "PASTA":ui.caminho_pasta.text(),
                     "MUNICIPIO": ui.campo_cnpj_municipio.text(),
-                    "UF":ui.campo_cnpj_uf.text(),
                     "DIRETORIO":ui.campo_comentario.toPlainText(),
                     "CODIGO DE SEG CNH":ui.campo_seguranca_cnh.text(),
                     "NOME":ui.campo_nome.text(),
@@ -1949,21 +2040,19 @@ class Acoes_banco_de_dados:
                     }
         if self.verificar_status() == "DEFINITIVO":
             novos_dados.update({
-                    "PASTA": "",
-                    "MUNICIPIO": "",
-                    "UF": "",
-                    "CODIGO DE SEG CNH": "",
-                    "RG": "",
-                    "CPF": "",
-                    "CNH": "",
-                    "MAE": "",
-                    "CNPJ": "",
-                    "EMAIL": "",
-                    "NASCIMENTO": "",
-                    "RAZAO SOCIAL":"",
-                    "ORGAO RG":"",
-                    "PIS":"",
-                    "OAB":""
+                    "PASTA": None,
+                    "MUNICIPIO": None,
+                    "CODIGO DE SEG CNH": None,
+                    "RG": None,
+                    "CPF": None,
+                    "CNH": None,
+                    "MAE": None,
+                    "CNPJ": None,
+                    "NASCIMENTO": None,
+                    "RAZAO SOCIAL": None,
+                    "ORGAO RG": None,
+                    "PIS": None,
+                    "OAB": None
                     })
 
         return novos_dados
@@ -2069,7 +2158,6 @@ class Acoes_banco_de_dados:
             ui.campo_nome_mae.setText(pedido_data.get("MAE"))
             ui.campo_comentario.setText(pedido_data.get("DIRETORIO"))
             ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
-            ui.campo_cnpj_uf.setText(pedido_data.get("UF"))
             ui.caminho_pasta.setText(pedido_data.get("PASTA"))
             try:
                 ui.campo_lista_versao_certificado.setCurrentText(pedido_data.get("VERSAO"))
@@ -2356,7 +2444,6 @@ ui.campo_cnpj_municipio.textChanged.connect(lambda:funcoes_app.valor_alterado(ui
 ui.caminho_pasta_principal.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.caminho_pasta_principal))
 ui.caminho_pasta.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.caminho_pasta))
 ui.campo_cnpj.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj))
-ui.campo_cnpj_uf.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj_uf))
 ui.campo_cpf.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cpf))
 ui.campo_nome_mae.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome_mae))
 ui.campo_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnh))
@@ -2408,14 +2495,13 @@ ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))
 ui.botao_telefone.clicked.connect((lambda:funcoes_app.contato_telefone()))
 ui.botao_consulta_oab.clicked.connect((lambda:funcoes_app.procurar_oab()))
-
+ui.botao_enviar_email.clicked.connect((lambda:funcoes_app.envio_de_email()))
 
 #Campos de formatação
 ui.campo_cnpj_municipio.setReadOnly(True)
 ui.caminho_pasta_principal.setReadOnly(True)
 ui.caminho_pasta.setReadOnly(True)
 ui.campo_verifica_tela_cheia.setReadOnly(True)
-ui.campo_cnpj_uf.setReadOnly(True)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
 ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados()) ##########################################################################
@@ -2449,13 +2535,13 @@ ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 #ToolTip
 ui.campo_valor_estimado.setToolTip("Valor estimado em emissão dos certificados")
 ui.botao_duplicar_pedido.setToolTip('Duplicar pedido')
-ui.campo_cnpj_uf.setToolTip("⚠ - NECESSÁRIO PEDIR DOCUMENTO DE CONSTITUIÇÃO DA EMPRESA\n✅ - DOC PODE SER OBTIDO NA JUCESP")
 ui.campo_status_bd_2.setToolTip("Status dos dados no servidor\n✅ - Pedido atualizado no servidor\n❌ - Pedido desatualizado no servidor")
 ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
 ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
 ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
 ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
 ui.botao_menagem.setToolTip("Mensagens")
+ui.botao_enviar_email.setToolTip("Enviar e-mail para cliente")
 
 #Validador
 regex = QRegExp("[0-9.]*")

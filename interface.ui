@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>466</width>
+    <width>465</width>
     <height>673</height>
    </rect>
   </property>
@@ -112,7 +112,7 @@
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -176,8 +176,7 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="font">
        <font>
-        <family>Helvetica</family>
-        <pointsize>11</pointsize>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -187,7 +186,7 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);color:rgb(90,54,247);</string>
+border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="text">
        <string/>
@@ -232,7 +231,7 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -257,7 +256,7 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -360,7 +359,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -385,7 +384,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -462,7 +461,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -487,7 +486,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -531,7 +530,7 @@ QComboBox::drop-down {
        <rect>
         <x>8</x>
         <y>332</y>
-        <width>165</width>
+        <width>189</width>
         <height>28</height>
        </rect>
       </property>
@@ -603,7 +602,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -628,7 +627,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -699,10 +698,10 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QPushButton" name="botao_dados_cnpj">
       <property name="geometry">
        <rect>
-        <x>178</x>
+        <x>174</x>
         <y>332</y>
-        <width>29</width>
-        <height>29</height>
+        <width>21</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
@@ -719,7 +718,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
+</string>
       </property>
       <property name="text">
        <string>📋</string>
@@ -767,7 +766,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -820,7 +819,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -845,7 +844,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -910,7 +909,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-</string>
+border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);color:rgb(90,54,247);</string>
       </property>
       <property name="text">
        <string>📁</string>
@@ -993,7 +992,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1035,43 +1034,9 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>212</x>
+        <x>204</x>
         <y>332</y>
-        <width>201</width>
-        <height>28</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>11</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>ForbiddenCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-radius:7px;
-border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-      <property name="placeholderText">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QLineEdit" name="campo_cnpj_uf">
-      <property name="enabled">
-       <bool>true</bool>
-      </property>
-      <property name="geometry">
-       <rect>
-        <x>416</x>
-        <y>332</y>
-        <width>45</width>
+        <width>193</width>
         <height>28</height>
        </rect>
       </property>
@@ -1100,7 +1065,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QLabel" name="label_25">
       <property name="geometry">
        <rect>
-        <x>220</x>
+        <x>212</x>
         <y>328</y>
         <width>73</width>
         <height>9</height>
@@ -1111,7 +1076,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1120,31 +1085,6 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="text">
        <string> MUNICÍPIO CNPJ</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_26">
-      <property name="geometry">
-       <rect>
-        <x>424</x>
-        <y>328</y>
-        <width>17</width>
-        <height>9</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Helvetica</family>
-        <pointsize>6</pointsize>
-        <weight>50</weight>
-        <italic>true</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:rgb(249,249, 249);color:rgb(110,110,110)</string>
-      </property>
-      <property name="text">
-       <string> UF</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_27">
@@ -1161,7 +1101,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1183,8 +1123,8 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="font">
        <font>
-        <weight>75</weight>
-        <bold>true</bold>
+        <weight>50</weight>
+        <bold>false</bold>
        </font>
       </property>
       <property name="cursor" stdset="0">
@@ -1192,7 +1132,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
+border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);color:rgb(249,150,0)</string>
       </property>
       <property name="horizontalScrollBarPolicy">
        <enum>Qt::ScrollBarAlwaysOff</enum>
@@ -1201,9 +1141,9 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QPushButton" name="botao_consulta_cnpj">
       <property name="geometry">
        <rect>
-        <x>152</x>
+        <x>156</x>
         <y>332</y>
-        <width>21</width>
+        <width>17</width>
         <height>25</height>
        </rect>
       </property>
@@ -1229,9 +1169,9 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QComboBox" name="campo_lista_junta_comercial">
       <property name="geometry">
        <rect>
-        <x>360</x>
-        <y>372</y>
-        <width>69</width>
+        <x>404</x>
+        <y>332</y>
+        <width>57</width>
         <height>28</height>
        </rect>
       </property>
@@ -1400,8 +1340,8 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_28">
       <property name="geometry">
        <rect>
-        <x>368</x>
-        <y>368</y>
+        <x>412</x>
+        <y>328</y>
         <width>41</width>
         <height>9</height>
        </rect>
@@ -1411,7 +1351,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1425,9 +1365,9 @@ QComboBox::drop-down {
      <widget class="QPushButton" name="botao_junta">
       <property name="geometry">
        <rect>
-        <x>432</x>
-        <y>372</y>
-        <width>29</width>
+        <x>440</x>
+        <y>332</y>
+        <width>17</width>
         <height>28</height>
        </rect>
       </property>
@@ -1441,7 +1381,7 @@ QComboBox::drop-down {
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-border: 1px solid rgb(170,170,170);</string>
+</string>
       </property>
       <property name="text">
        <string>🔍</string>
@@ -1516,7 +1456,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1575,7 +1515,7 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1589,9 +1529,9 @@ border: 1px solid rgb(90,54,247);background-color:rgb(249, 249, 249);</string>
      <widget class="QLineEdit" name="campo_telefone">
       <property name="geometry">
        <rect>
-        <x>288</x>
+        <x>316</x>
         <y>292</y>
-        <width>173</width>
+        <width>145</width>
         <height>28</height>
        </rect>
       </property>
@@ -1617,7 +1557,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QLabel" name="label_46">
       <property name="geometry">
        <rect>
-        <x>296</x>
+        <x>324</x>
         <y>288</y>
         <width>49</width>
         <height>9</height>
@@ -1628,7 +1568,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1672,14 +1612,14 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
        <rect>
         <x>8</x>
         <y>372</y>
-        <width>349</width>
+        <width>453</width>
         <height>28</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Helvetica</family>
-        <pointsize>11</pointsize>
+        <pointsize>10</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -1712,7 +1652,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1768,7 +1708,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1784,7 +1724,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
        <rect>
         <x>160</x>
         <y>292</y>
-        <width>121</width>
+        <width>149</width>
         <height>28</height>
        </rect>
       </property>
@@ -1821,7 +1761,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1835,7 +1775,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
      <widget class="QPushButton" name="botao_consulta_pis">
       <property name="geometry">
        <rect>
-        <x>260</x>
+        <x>284</x>
         <y>292</y>
         <width>21</width>
         <height>25</height>
@@ -1882,7 +1822,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
-border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
+border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249)</string>
       </property>
       <property name="text">
        <string/>
@@ -1902,7 +1842,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -1985,7 +1925,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -2001,7 +1941,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
        <rect>
         <x>168</x>
         <y>92</y>
-        <width>193</width>
+        <width>189</width>
         <height>28</height>
        </rect>
       </property>
@@ -2072,7 +2012,7 @@ QComboBox::drop-down {
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -2156,7 +2096,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249, 249, 249);</string>
         <family>Helvetica</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
-        <italic>true</italic>
+        <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
@@ -2191,6 +2131,34 @@ border-radius:10px;</string>
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="botao_enviar_email">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>172</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;</string>
+      </property>
+      <property name="text">
+       <string extracomment="Enviar e-mail para cliente">📧</string>
+      </property>
+     </widget>
      <zorder>campo_cnh</zorder>
      <zorder>campo_seguranca_cnh</zorder>
      <zorder>campo_rg</zorder>
@@ -2221,9 +2189,7 @@ border-radius:10px;</string>
      <zorder>campo_email</zorder>
      <zorder>label_16</zorder>
      <zorder>campo_cnpj_municipio</zorder>
-     <zorder>campo_cnpj_uf</zorder>
      <zorder>label_25</zorder>
-     <zorder>label_26</zorder>
      <zorder>campo_comentario</zorder>
      <zorder>botao_consulta_cnpj</zorder>
      <zorder>campo_lista_junta_comercial</zorder>
@@ -2257,6 +2223,7 @@ border-radius:10px;</string>
      <zorder>label_12</zorder>
      <zorder>label_27</zorder>
      <zorder>label_status</zorder>
+     <zorder>botao_enviar_email</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -4521,6 +4488,63 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
        <string/>
       </property>
      </widget>
+     <widget class="QLineEdit" name="campo_senha_email">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>179</x>
+        <y>162</y>
+        <width>283</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+border-radius:7px;
+border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_34">
+      <property name="geometry">
+       <rect>
+        <x>188</x>
+        <y>156</y>
+        <width>69</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Helvetica</family>
+        <pointsize>7</pointsize>
+        <weight>50</weight>
+        <italic>true</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(249,249, 249);</string>
+      </property>
+      <property name="text">
+       <string>SENHA EMAIL</string>
+      </property>
+     </widget>
      <zorder>caminho_pasta</zorder>
      <zorder>campo_verifica_tela_cheia</zorder>
      <zorder>caminho_pasta_principal</zorder>
@@ -4550,6 +4574,8 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
      <zorder>label_52</zorder>
      <zorder>label_53</zorder>
      <zorder>label_29</zorder>
+     <zorder>campo_senha_email</zorder>
+     <zorder>label_34</zorder>
     </widget>
    </widget>
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
@@ -5268,6 +5294,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
   <tabstop>campo_pedido</tabstop>
   <tabstop>campo_data_agendamento</tabstop>
   <tabstop>campo_hora_agendamento</tabstop>
+  <tabstop>campo_preco_certificado</tabstop>
   <tabstop>campo_lista_versao_certificado</tabstop>
   <tabstop>campo_lista_modalidade</tabstop>
   <tabstop>campo_lista_status</tabstop>
@@ -5285,9 +5312,8 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
   <tabstop>campo_pis</tabstop>
   <tabstop>campo_telefone</tabstop>
   <tabstop>campo_cnpj</tabstop>
-  <tabstop>campo_data_de</tabstop>
-  <tabstop>campo_data_ate</tabstop>
-  <tabstop>botao_hoje</tabstop>
+  <tabstop>campo_lista_junta_comercial</tabstop>
+  <tabstop>campo_comentario</tabstop>
   <tabstop>campo_lista_status_2</tabstop>
   <tabstop>botao_consultar</tabstop>
   <tabstop>campo_meta_mes</tabstop>
@@ -5313,7 +5339,6 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
   <tabstop>campo_certificados_semana_4</tabstop>
   <tabstop>campo_certificados_mes</tabstop>
   <tabstop>campo_cnpj_municipio</tabstop>
-  <tabstop>campo_cnpj_uf</tabstop>
   <tabstop>botao_consulta_cnpj</tabstop>
   <tabstop>botao_excluir_dados</tabstop>
   <tabstop>botao_salvar</tabstop>
@@ -5323,7 +5348,7 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
   <tabstop>botao_procurar</tabstop>
   <tabstop>botao_definir_cor</tabstop>
   <tabstop>botao_atualizar_meta</tabstop>
-  <tabstop>campo_preco_certificado</tabstop>
+  <tabstop>campo_data_de</tabstop>
   <tabstop>campo_valor_estimado</tabstop>
   <tabstop>campo_valor_estimado_menor</tabstop>
   <tabstop>botao_duplicar_pedido</tabstop>
@@ -5353,12 +5378,14 @@ border: 1px solid rgb(170,170,170);background-color:rgb(249,249, 249);</string>
   <tabstop>campo_m11</tabstop>
   <tabstop>campo_m12</tabstop>
   <tabstop>campo_m13</tabstop>
-  <tabstop>campo_lista_junta_comercial</tabstop>
+  <tabstop>campo_data_ate</tabstop>
   <tabstop>campo_data_meta</tabstop>
   <tabstop>campo_desconto</tabstop>
   <tabstop>campo_cod_rev</tabstop>
-  <tabstop>campo_comentario</tabstop>
+  <tabstop>botao_hoje</tabstop>
   <tabstop>botao_consulta_oab</tabstop>
+  <tabstop>botao_enviar_email</tabstop>
+  <tabstop>campo_senha_email</tabstop>
  </tabstops>
  <resources/>
  <connections/>
