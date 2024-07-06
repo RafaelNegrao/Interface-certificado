@@ -1287,14 +1287,11 @@ class Funcoes_padrao:
             ui.campo_pedido.setReadOnly(False)
             ui.campo_cnpj.setText('')
             ui.campo_cnpj_razao_social.setText('')
-            ui.campo_cnpj_uf.setText('')
             ui.campo_cnpj_municipio.setText('')
             self.acoes.limpar_labels()
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_preco_certificado.setText('')
             ui.campo_status_bd.setText('❌')
-            ui.campo_comentario.setPlainText('')
-            ui.campo_comentario.setPlainText(f'*DUPLICADO DO PEDIDO {pedido}')
             return True
         else:
             return False
@@ -1436,8 +1433,8 @@ class Funcoes_padrao:
                 mensagem_inicial = "Boa noite"
                                                                                                                                             
         mensagem = f'{mensagem_inicial}, tudo bem?\n'\
-            'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.\n'\
-            'Podemos iniciar a vídeo-conferência?'
+            'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.'\
+
                                                                                                            
         pyperclip.copy(mensagem) 
         return f'{mensagem_inicial.upper()}! PODEMOS INICIAR?'
@@ -1947,6 +1944,7 @@ class Acoes_banco_de_dados:
             ui.campo_pis.setText("")
             ui.campo_telefone.setText("")
             ui.campo_oab.setText("")
+            ui.campo_relatorio.setPlainText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
 
@@ -1995,6 +1993,7 @@ class Acoes_banco_de_dados:
             ui.campo_pis.setText("")
             ui.campo_telefone.setText("")
             ui.campo_oab.setText("")
+            ui.campo_relatorio.setPlainText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
             self.limpar_labels()
@@ -2209,6 +2208,7 @@ class Acoes_banco_de_dados:
         try:
             ui.tableWidget.clear()
             
+            
             pedidos = self.ref.get()
             # Ordene a lista de acordo com a data em ordem decrescente
             pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
@@ -2219,11 +2219,18 @@ class Acoes_banco_de_dados:
             numero_inteiro_final = data_final.toordinal()
             status_filtro = ui.campo_lista_status_2.currentText()
 
+
+            valor_cnpj = 0
+            valor_cpf = 0
             x = 0
+            y = 0
+            j = 0
+            f = 0
+            venda = 0
             ui.barra_progresso_consulta.setVisible(True)
             ui.barra_progresso_consulta.setValue(0)
             total_pedidos = len(pedidos)
-            y = 0
+            
             for pedido_info in pedidos:
                 
                 data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%d/%m/%Y")
@@ -2260,8 +2267,17 @@ class Acoes_banco_de_dados:
                                 valor_estimado += float(preco)
                                 valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
                                 valor_formatado_menor = "{:.2f}".format(valor_estimado * (1 - (ui.campo_desconto.value()/100))).replace('.', ',')
-                                ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
-                                ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
+
+                                if 'e-CNPJ' in pedido_info['VERSAO']:
+                                    valor_cnpj = float(valor_cnpj) + preco
+                                    j+=1
+                                    
+                                elif 'e-CPF' in pedido_info['VERSAO']:
+                                    valor_cpf = float(valor_cpf) + preco
+                                    f+=1
+                                
+                                if pedido_info['VENDA'] == "SIM":
+                                        venda += 1
                                 
                                 QApplication.processEvents()
                         except ValueError:
@@ -2300,20 +2316,25 @@ class Acoes_banco_de_dados:
                 
             ui.barra_progresso_consulta.setValue(100)
             
-            valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
-            valor_formatado_menor = "{:.2f}".format(valor_estimado * (1 - (ui.campo_desconto.value()/100))).replace('.', ',')
+            total = valor_cnpj + valor_cpf
+            ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}].......R$ {valor_cnpj:.2f}
+(+)e-CPF [{f}].........R$ {valor_cpf:.2f}
+(=)Total [{j+f}].........R$ {total:.2f}
+(-) {ui.campo_desconto.text()}%..................R$ {total * (float(ui.campo_desconto.text()) / 100):.2f}
+----------------------------------------------
+(=)Total Esperado....R$ {total * (1 - float(ui.campo_desconto.text()) / 100):.2f}
+Vendas.........{venda}
+''')
 
-            ui.campo_valor_estimado.setText(f'R$ {valor_formatado}')
-            ui.campo_valor_estimado_menor.setText(f'R$ {valor_formatado_menor}')
-            ui.label_desconto.setText(f'-{ui.campo_desconto.value()}%')
+
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME", "VERSAO"])
             ui.barra_progresso_consulta.setVisible(False)
         except Exception as e:
                 print(e)
+                ui.campo_relatorio.setPlainText("")
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME","VERSAO"])
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
-                ui.label_desconto.setText(f'-{ui.campo_desconto.value()}%')
                 ui.barra_progresso_consulta.setVisible(False)
                 pass
 
@@ -2500,6 +2521,7 @@ ui.botao_enviar_email.clicked.connect((lambda:funcoes_app.envio_de_email()))
 #Campos de formatação
 ui.campo_cnpj_municipio.setReadOnly(True)
 ui.caminho_pasta_principal.setReadOnly(True)
+ui.campo_relatorio.setReadOnly(True)
 ui.caminho_pasta.setReadOnly(True)
 ui.campo_verifica_tela_cheia.setReadOnly(True)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
@@ -2527,13 +2549,11 @@ ui.campo_nome.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_no
 ui.campo_pis.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pis")
 ui.campo_telefone.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_telefone")
 ui.campo_oab.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_oab")
-ui.campo_valor_estimado.setReadOnly(True)
 ui.campo_preco_certificado.setReadOnly(False)
 ui.campo_cnpj_razao_social.setReadOnly(True)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
 #ToolTip
-ui.campo_valor_estimado.setToolTip("Valor estimado em emissão dos certificados")
 ui.botao_duplicar_pedido.setToolTip('Duplicar pedido')
 ui.campo_status_bd_2.setToolTip("Status dos dados no servidor\n✅ - Pedido atualizado no servidor\n❌ - Pedido desatualizado no servidor")
 ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
