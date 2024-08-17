@@ -8,7 +8,6 @@ import psutil
 import requests
 import PyPDF2
 import fitz
-import firebase_admin
 import pyautogui
 import sys
 import subprocess
@@ -26,16 +25,10 @@ from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QGuiApplication
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
-from credenciaisBd import obter_credenciais
+from credenciaisBd import *
 import smtplib
 from email.mime.text import MIMEText
 
-
-
-credenciais = obter_credenciais()
-
-acoes = firebase_admin.credentials.Certificate(credenciais)
-firebase_admin.initialize_app(acoes, {'databaseURL':'https://bdpedidos-2078f-default-rtdb.firebaseio.com/'}) 
 
 #Referência raiz do banco de dados
 ref = db.reference("/")
@@ -48,29 +41,36 @@ class Funcoes_padrao:
 
     def atualizar_barras_metas(self):
         try:
+            # Calcula a soma dos valores das semanas
             soma = math.floor(float(ui.campo_certificados_semana_1.text().replace(',', '.'))) + \
                 math.floor(float(ui.campo_certificados_semana_2.text().replace(',', '.'))) + \
                 math.floor(float(ui.campo_certificados_semana_3.text().replace(',', '.'))) + \
                 math.floor(float(ui.campo_certificados_semana_4.text().replace(',', '.'))) + \
                 math.floor(float(ui.campo_certificados_semana_5.text().replace(',', '.')))
+
+            # Recupera as metas mensal e semanal, convertendo os valores para inteiro
             meta_mensal = int(float(ui.campo_meta_mes.text().replace(',', '.')))  # Convertido para inteiro
             meta_semanal = int(float(ui.campo_meta_semanal.text().replace(',', '.')))  # Convertido para inteiro
 
+            # Atualiza a barra de progresso e o label para a semana 1
             certificados_semana_1 = math.floor(float(ui.campo_certificados_semana_1.text().replace(',', '.')))
             ui.barra_meta_semana_1.setMaximum(meta_semanal)
             ui.barra_meta_semana_1.setValue(certificados_semana_1)  # Atualiza o valor da barra de progresso
+            
             if certificados_semana_1 >= meta_semanal:
-                #Meta atingida
+                # Se a meta foi atingida
                 ui.label_meta1.setStyleSheet('background-color: rgb(0, 173, 247);')
                 ui.label_meta1.setText(f"Meta atingida! - R${certificados_semana_1} / R${meta_semanal}")
             else:
-                #Meta não atingida
+                # Se não foi...
                 ui.label_meta1.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
                 ui.label_meta1.setText(f"R${certificados_semana_1} / R${meta_semanal}")
 
             certificados_semana_2 = math.floor(float(ui.campo_certificados_semana_2.text().replace(',', '.')))
+            # Repete o processo para as semanas 2 a 5# ...# Código para atualizar as outras semanas (igual ao trecho anterior)# ...# Atualiza a barra de progresso e o label para a meta mensal
             ui.barra_meta_semana_2.setMaximum(meta_semanal)
             ui.barra_meta_semana_2.setValue(certificados_semana_2)  # Atualiza o valor da barra de progresso
+            
             if certificados_semana_2 >= meta_semanal:
                 #Meta atingida
                 ui.label_meta2.setStyleSheet('background-color: rgb(0, 173, 247);')
@@ -138,6 +138,7 @@ class Funcoes_padrao:
             configs = ref.get()
 
             try:
+                # Carrega as configurações da interface com base nos dados obtidos
                 cor = configs["RGB"]
                 r, g, b = map(int, cor.split(','))
 
@@ -161,15 +162,17 @@ class Funcoes_padrao:
             pass
 
     def atualizar_configuracoes(self):
-        #CORRIGIDO --------------------------------------------------
+        # CORRIGIDO --------------------------------------------------
+        # Confirmação de atualização das configurações
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        
         if resposta == QMessageBox.Yes:
             pass
         else:
             return
         
         ref = db.reference("/Configuracoes")
-        
+        # Recupera o diretório da interface
         diretorio = ui.caminho_pasta_principal.text()
         email = ui.campo_email_empresa.text()
         rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
@@ -180,15 +183,30 @@ class Funcoes_padrao:
         campo_desconto = ui.campo_desconto.value()
         campo_cod_rev = ui.campo_cod_rev.text()
         senha_email = ui.campo_senha_email.text()
-        nova_config = {"DIRETORIO-RAIZ": diretorio,"E-MAIL":email,"RGB":rgb,"PORCENTAGEM":porcentagem,"IMPOSTO VALIDACAO":imposto,"DESCONTO VALIDACAO":desconto,"MODO PASTA":criar_pasta,'DESCONTO TOTAL':campo_desconto,'COD REV':campo_cod_rev,'SENHA EMAIL':senha_email}
+        # Cria um dicionário com as novas configurações
+        nova_config = {
+            "DIRETORIO-RAIZ": diretorio,
+            "E-MAIL":email,
+            "RGB":rgb,
+            "PORCENTAGEM":porcentagem,
+            "IMPOSTO VALIDACAO":imposto,
+            "DESCONTO VALIDACAO":desconto,
+            "MODO PASTA":criar_pasta,
+            "DESCONTO TOTAL":campo_desconto,
+            "COD REV":campo_cod_rev,
+            "SENHA EMAIL":senha_email
+            }
 
         try:
+            # Tenta atualizar as configurações no banco de dados
             ref.update(nova_config)
         except Exception as e:
             try:
+                # Se não conseguir atualizar, tenta adicionar as configurações
                 ref.set(nova_config)
                 print("Novas metas adicionadas com sucesso.")
             except Exception as e:
+                # Caso dê erro...
                 print(f"Erro ao atualizar ou adicionar metas: {e}")
 
     def trazer_metas(self):
@@ -197,13 +215,11 @@ class Funcoes_padrao:
         # Faz uma solicitação GET para obter as configurações do banco de dados
         Metas = ref.get()
     
-        #try:
+        # Carrega as metas na interface gráfica
         valor_semanal = Metas['SEMANAL']
         valor_mensal = Metas['MENSAL']
         ui.campo_meta_semanal.setValue(int(valor_semanal))
         ui.campo_meta_mes.setValue(int(valor_mensal))
-        #except Exception as e:
-         #   pass       
 
     def atualizar_meta_clientes(self):
         #CORRIGIDO ----------------------------------------------------------------------------------------
@@ -236,6 +252,7 @@ class Funcoes_padrao:
                         
                         semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
                         try:
+                            # Calcula o valor dos certificados com desconto
                             if semana_do_mes == 1:
                                 semana1 += float(Pedidos[pedido_info]['PRECO'].replace(',', '.')) * (1-(ui.campo_desconto.value()/100))
                             elif semana_do_mes == 2:
@@ -249,13 +266,14 @@ class Funcoes_padrao:
                         except:
                             pass
 
+            # Atualiza os campos da interface gráfica com os valores calculados                    
             ui.campo_certificados_semana_1.setText(str(semana1))
             ui.campo_certificados_semana_2.setText(str(semana2))
             ui.campo_certificados_semana_3.setText(str(semana3))
             ui.campo_certificados_semana_4.setText(str(semana4))
             ui.campo_certificados_semana_5.setText(str(semana5))
+
             # Agora você tem a quantidade de pedidos aprovados para cada semana
-            
             ui.barra_meta_semana_1.setValue(int(semana1))
             ui.barra_meta_semana_2.setValue(int(semana2))
             ui.barra_meta_semana_3.setValue(int(semana3))
@@ -268,6 +286,7 @@ class Funcoes_padrao:
             self.atualizar_barras_metas()
 
     def definir_cor(self):
+        # Define a cor da borda interna superior da interface
         cor_R = ui.campo_cor_R.value()
         cor_G = ui.campo_cor_G.value()
         cor_B = ui.campo_cor_B.value()
@@ -299,17 +318,15 @@ class Funcoes_padrao:
         widget_pai = ui.centralwidget
         # Abrir o explorer para selecionar a pasta raiz
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Tem certeza que deseja atualizar a pasta raiz?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if resposta == QMessageBox.Yes:
-            pass
-        else:
+        if not resposta == QMessageBox.Yes:
             return
-
+        
+        # Abre uma janela do Explorer para selecionar um novo diretório
         diretorio_selecionado = QFileDialog.getExistingDirectory(widget_pai , 'Selecione o diretório raiz')
 
         if diretorio_selecionado:
             # Atualizar o campo de texto na interface gráfica
             ui.caminho_pasta_principal.setText(diretorio_selecionado)
-
         else:
             pass
 
@@ -337,13 +354,15 @@ class Funcoes_padrao:
                     pdf.save()
             ui.label_confirmacao_converter_pdf.setText("✅")
             self.atualizar_documentos_tabela()
-            #self.mensagem_alerta("Concluído",f"imagens convertidas!")
         else:
+            # Chama a Função de escolher o tipo de conversão de imagem
             self.escolher_conversao()
+
+            # Atualiza a lista de documentos na tabela da janela 'Dados Pedido'
             self.atualizar_documentos_tabela()
 
     def obter_janela_principal(self,widget):
-        # Função para obter a janela principal a partir de um widget
+        # Função para recuperar a janela principal a partir de um widget
         while widget:
             if isinstance(widget, QMainWindow):
                 return widget
@@ -351,37 +370,51 @@ class Funcoes_padrao:
         return None
 
     def print_tela(self):
+        # Tira o print da tela
         try:
             caminho = ui.caminho_pasta.text()
 
             if not caminho:
+                # Se o caminho não estiver definido, pede ao usuário para inserir o nome do arquivo
                 nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text="DOC ADICIONAL")
+                
+                # Verifica se o usuário confirmou a entrada
                 if not ok:           
                     return
                 
                 if not nome_documento:
                     return
-
+                
+                # Se a pasta não for escolhida, retorna
                 caminho_escolhido = QFileDialog.getExistingDirectory(ui.centralwidget, 'Escolher Pasta', '/')
+                # Define o caminho completo com o nome do arquivo
                 if not caminho_escolhido:      
                     return
 
                 caminho = f"{caminho_escolhido}/{nome_documento}.png"
             else:
-
+                
+                # Caso o caminho já esteja definido na interface
                 nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome da print", "Digite o nome da print:",text=f"DOC ADICIONAL")
+                
+                # Verifica se o usuário confirmou a entrada
                 if not ok:           
                     return
                 
+                # Se o nome não for inserido, retorna
                 if not nome_documento:
                     return
+                
+                # Define o caminho completo com o nome do arquivo
                 caminho = f"{caminho}/{nome_documento}.png"
+
+            # Obtém a janela principal que será escondida durante o screenshot
             janela_principal = self.obter_janela_principal(ui.centralwidget)
 
             if janela_principal:
 
                 janela_principal.setWindowOpacity(0)
-            # Aguarda um curto período para garantir que a janela tenha tempo de minimizar
+            # Aguarda meio segundo para continuar
             time.sleep(0.5)
 
             # Tira um screenshot da tela
@@ -392,101 +425,21 @@ class Funcoes_padrao:
                 #janela_principal.showNormal()
                 janela_principal.setWindowOpacity(1)
 
-            # Salva o screenshot no caminho especificado
-        
+            # Salvei o screenshot no caminho especificado
             screenshot.save(caminho)
 
             ui.label_confirmacao_tirar_print.setText("✅")
-            #self.mensagem_alerta("Concluído",f"Print capturada!")
+
             self.atualizar_documentos_tabela()
         
         except:
+            # Em caso de erro, atualiza a tabela e exibe um alerta na interface
             self.atualizar_documentos_tabela()
             ui.label_confirmacao_tirar_print.setText("❌")
             self.mensagem_alerta("Erro",f"Não foi possível capturar a tela!")
 
-    def gerar_link_video_conferencia(self):
-        
-        pedido = ui.campo_pedido.text()
-        if not pedido:
-            pedido, ok = QInputDialog.getText(ui.centralwidget, "Criar LINK", "Digite o número do PEDIDO:")
-            if not ok:
-                return
-
-            # Obter o link
-            link = f"https://certisign.omotor.com.br/#/dossie-detail/{pedido}"
-            save_path, _ = QFileDialog.getSaveFileName(ui.centralwidget, "Salvar PDF", os.path.expanduser("~"), "Arquivos PDF (*.pdf)")
-
-            if not save_path:
-                return
-
-            save_dir = os.path.dirname(save_path)
-
-            default_file_name = "LINK VIDEO"
-
-            if not save_path.lower().endswith(".pdf"):
-                save_path = os.path.join(save_dir, f"{default_file_name}.pdf")
-            c = canvas.Canvas(save_path, pagesize=letter)
-            font_size = 14
-            x, y = 20, 680
-            c.setFont("Helvetica", font_size)
-            for line in link.split('\n'):
-                c.drawString(x, y, line)
-                y -= 15
-            c.save()
-            
-            return
-
-
-        if ui.campo_lista_modalidade.currentText() == "PRESENCIAL":
-            ui.label_confirmacao_criar_link_video.setText("❌")
-            self.atualizar_documentos_tabela()
-            self.mensagem_alerta("Erro","Não é possível gerar link na modalidade presencial!")
-            return
-
-
-        link = f"https://certisign.omotor.com.br/#/dossie-detail/{pedido}"
-
-        try:
-            default_file_name = "LINK VIDEO"
-            
-            # Obtém o caminho do arquivo diretamente do campo_pasta
-            save_path = ui.caminho_pasta.text()
-
-            if not save_path:
-
-                ui.label_confirmacao_criar_link_video.setText("❌")
-                self.mensagem_alerta("Pasta ausente","Crie a pasta do cliente!")
-
-                return
-
-            # Adiciona a extensão PDF se não estiver presente
-            if not save_path.lower().endswith(".pdf"):
-                save_path = os.path.join(save_path, f"{default_file_name}.pdf")
-            # Criar um arquivo PDF
-            c = canvas.Canvas(save_path, pagesize=letter)
-            # Definir o tamanho da fonte e a posição para começar a escrever o texto
-            font_size = 14
-            x, y = 20, 680  # Posição inicial
-            # Adicionar o texto ao PDF
-            c.setFont("Helvetica", font_size)
-            for line in link.split('\n'):
-                c.drawString(x, y, line)
-                y -= 15  # Espaçamento entre as linhas
-            # Salvar o arquivo PDF
-            c.save()
-            
-            ui.label_confirmacao_criar_link_video.setText("✅")
-            self.atualizar_documentos_tabela()
-            #self.mensagem_alerta("Concluído","Link salvo com sucesso!")
-
-        except:
-
-            ui.label_confirmacao_criar_link_video.setText("❌")
-            self.atualizar_documentos_tabela()
-            self.mensagem_alerta("Arquivo existente","Já existe um arquivo LINK_VIDEO na pasta!")
-
     def pasta_existe(self,diretorio, nome_pasta):
+        #transformei o texto em um diretório
         caminho_pasta = os.path.join(diretorio, nome_pasta)
         return os.path.exists(caminho_pasta)
 
@@ -536,6 +489,7 @@ class Funcoes_padrao:
             diretorio_padrão = ui.caminho_pasta_principal.text()
             pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
 
+            #Verifica se a pasta existe no diretório
             if not self.pasta_existe(diretorio_padrão, nome_pasta):
                 
                 os.mkdir(pasta_padrão)
@@ -543,22 +497,23 @@ class Funcoes_padrao:
                 ui.caminho_pasta.setText(pasta_padrão)
                 
                 status = ui.campo_lista_status.currentText()
+                #Se o status do pedido for Aprovado ou Cancelado, exclua a pasta
                 if status == "APROVADO" or status == "CANCELADO":
                     confirmacao = ""
                 else:
                     confirmacao = "✅"
 
                 ui.label_confirmacao_criar_pasta.setText(confirmacao)
-                #self.mensagem_alerta("Pasta Criada",f"Pasta do cliente {nome_pasta} criada com sucesso!")
                 self.acoes.analise_dados()
+            #Caso exista, abra
             else:
                 self.abrir_pasta_cliente()
         except Exception as e:
             print(e)
             ui.label_confirmacao_criar_pasta.setText("❌")
-            #self.mensagem_alerta("Erro","Pasta não criada")
 
     def procurar_cnh(self):
+        #Abre o link para consulta da CNH
         url = QUrl("https://portalservicos.senatran.serpro.gov.br/#/condutor/validar-cnh")
         QDesktopServices.openUrl(url)
         return
@@ -807,6 +762,7 @@ class Funcoes_padrao:
             ref = db.reference("/Pedidos")
             req = ref.get()
             
+            
             data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
             numero_inteiro_inicial = data_inicial.toordinal()
             data_final = datetime.datetime.strptime(ui.campo_data_ate.text(), "%d/%m/%Y")
@@ -834,7 +790,21 @@ class Funcoes_padrao:
                         except:
                             versao = ""
                             pass
-
+                        try:
+                            nome = req[cliente]['NOME']
+                        except:
+                            nome = ""
+                            pass
+                        try:
+                            telefone = req[cliente]['TELEFONE']
+                        except:
+                            telefone = ""
+                            pass
+                        try:
+                            email = req[cliente]['EMAIL']
+                        except:
+                            email = ""
+                            pass
                         try:
                             preco = req[cliente]['PRECO']
                             preco = preco.replace(',', '.')
@@ -843,14 +813,14 @@ class Funcoes_padrao:
                             preco = ""
                             pass
 
-
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
                         vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
-                        
 
-                        dados_selecionados.append((pedido, data_agendamento, versao, hora_agendamento,status_agendamento,vendido,modalidade,preco))   
+                        
+                        
+                        dados_selecionados.append((pedido,nome,telefone,email, data_agendamento, versao,hora_agendamento,status_agendamento,vendido,modalidade,preco))  
 
                     elif status_filtro == "TODAS":
 
@@ -860,37 +830,47 @@ class Funcoes_padrao:
                         data_agendamento = req[cliente]['DATA']
 
                         try:
+                            nome = req[cliente]['NOME']
+                        except:
+                            nome = ""
+                            pass
+                        try:
+                            telefone = req[cliente]['TELEFONE']
+                        except:
+                            telefone = ""
+                            pass
+                        try:
+                            email = req[cliente]['EMAIL']
+                        except:
+                            email = ""
+                            pass
+                        try:
                             versao = req[cliente]['VERSAO']
                         except:
                             versao = ""
                             pass
-
                         try:
                             preco = req[cliente]['PRECO']
                             preco = preco.replace(',', '.')
                             preco = float(preco)
-
                         except:
                             preco = ""
                             pass
-                        
-
-
                         
                         hora_agendamento = req[cliente]['HORA']    
                         status_agendamento = req[cliente]['STATUS']
                         vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
-                        
 
-                        dados_selecionados.append((pedido, data_agendamento, versao,hora_agendamento,status_agendamento,vendido,modalidade,preco)) 
+
+                        dados_selecionados.append((pedido,nome,telefone,email, data_agendamento, versao,hora_agendamento,status_agendamento,vendido,modalidade,preco)) 
             
             if x > 0:
                 root = tk.Tk()
                 root.withdraw()
                 caminho_arquivo = filedialog.askdirectory()
                 if caminho_arquivo:
-                    df=pd.DataFrame(dados_selecionados,columns=['Pedido','Data agendamento','Versão','hora','Status Pedido','Vendido por mim?','Modalidade','Preço'])
+                    df=pd.DataFrame(dados_selecionados,columns=['Pedido','Cliente','Telefone','E-mail','Data agendamento','Versão','hora','Status Pedido','Vendido por mim?','Modalidade','Preço'])
                     data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
                     data_final = ui.campo_data_ate.text()
                     data_inicial = ui.campo_data_de.text()
@@ -1022,7 +1002,6 @@ class Funcoes_padrao:
                 imagem = Image.open(image_path)
                 imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
             ui.label_confirmacao_converter_pdf.setText("✅")
-            #self.mensagem_alerta("Concluído","As imagens foram convertidas em PDF com sucesso!")
         except:
             ui.label_confirmacao_converter_pdf.setText("❌")
 
@@ -1044,9 +1023,6 @@ class Funcoes_padrao:
         except:
             self.atualizar_documentos_tabela()
             ui.label_confirmacao_converter_pdf.setText("❌")
-
-            
-        #self.mensagem_alerta("Concluído","Os PDFs foram convertidos em JPG com sucesso!")
 
     def texto_para_pdf(self):
         # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
@@ -1361,34 +1337,32 @@ class Funcoes_padrao:
     def abrir_janela_mensagem(self):
         self.abrir_nova_janela(janela)
 
-    def clique_btn1(self):
-        #################### CPF
-        agora = datetime.datetime.now().time()      
-        match agora:
-            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
-            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
-            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
+#COLUNA 1
+    def clique_btn1(self):  
+            mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
 
+            mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.' 
+    
+            pyperclip.copy(mensagem)                                                                                                                                    
+            return "APRESENTAÇÃO"
 
-        mensagem = f'{mensagem_inicial}, tudo bem?\n'\
-'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento. \n' \
-'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat uma foto completa do seu documento de identificação, *frente e verso*, podendo ser:\n'\
+    def clique_btn3(self):
+
+        mensagem = 'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat uma foto completa do seu documento de identificação, *frente e verso*, podendo ser:\n'\
 ' •CNH\n'\
 ' •RG\n'\
-' •OAB\n' \
+' •CREA\n'\
+' •OAB\n'\
 '\n '\
 'Observações: \n' \
 ' 1. Retire o documento de identificação do plástico e abra-o.\n' \
 ' 2. O verso do documento é onde está o QRcode.'
 
-
         pyperclip.copy(mensagem)                                                                                                                                    
         return "PEDIR DOCUMENTO PESSOAL"
     
-    def clique_btn3(self):
+    def clique_btn5(self):
         #################### CNPJ
                                                                                                                                             
         mensagem = 'Irei precisar também do Documento de Constituição da Empresa, podendo ser: \n'\
@@ -1400,16 +1374,67 @@ class Funcoes_padrao:
         #return mensagem
         return "PEDIR DOCUMENTO EMPRESA"
 
+    def clique_btn7(self):
+        mensagem = 'Obrigado! Um momento.'
+        QApplication.clipboard().setText(mensagem)
+        return 'OBRIGADO. UM MOMENTO.'
+
+    def clique_btn9(self):
+        mensagem = 'Podemos iniciar a vídeo-conferência?'
+        QApplication.clipboard().setText(mensagem)
+        return 'PODEMOS INICIAR A VÍDEO?'
+
+    def clique_btn11(self):
+        mensagem = 'Agradecemos pela disponibilidade!\n'\
+        '\n'\
+        'Em caso de dúvidas, contate o suporte através do número 4020-9735 ou pelo WhatsApp (11)96400-1221. \n'\
+        'Caso precise adquirir mais certificados, pode comprá-los através do link: \n'\
+        f'https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}. \n'\
+        '\n'\
+        'Até mais!'
+        pyperclip.copy(mensagem) 
+        return 'FINALIZADO COM SUCESSO'
+
+    def clique_btn13(self):
+        mensagem = 'Estou finalizando o chat devido à ausência de interação.\n'\
+        'Caso queira agendar um novo atendimento, pode fazê-lo pelo Whatsapp:(11)96400-1221.\n'\
+        'Até mais!'
+        pyperclip.copy(mensagem)
+        return 'FINALIZADO SEM SUCESSO'
+
+    def clique_btn15(self):
+        mensagem = 'Link para reembolso: https://www.certisign.com.br/reembolso'
+        QApplication.clipboard().setText(mensagem)
+        return 'LINK REEMBOLSO'
+
+    def clique_btn17(self):
+        mensagem = 'e-mail: paranagua@acbdigital.com.br'
+        QApplication.clipboard().setText(mensagem)
+        return 'PARANAGUA@ACBDIGITAL.COM.BR'
+
+
+
+#COLUNA 2
+    def clique_btn2(self):
+        #OBSERVAÇÕES
+
+        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
+                                                                                                                                            
+        mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+            'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.'\
+
+                                                                                                           
+        pyperclip.copy(mensagem) 
+        return f'{mensagem_inicial.upper()}! PODEMOS INICIAR?'
+
+    def clique_btn4(self):
+        mensagem = 'Link postos de atendimento: https://www.certisign.com.br/duvidas-suporte/certificado-digital/locais-atendimento - Basta digitar seu CEP e serão listados os postos mais próximos.'
+        QApplication.clipboard().setText(mensagem)
+        return 'LINK MAPA POSTOS DE ATENDIMENTO'
+
     def clique_btn6(self):
         #######################  OAB
-        agora = datetime.datetime.now().time()      
-        match agora:
-            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
-            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
-            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
+        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
                                                                                                                                             
         mensagem = f'{mensagem_inicial}, tudo bem? \n'\
         'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.\n'\
@@ -1420,115 +1445,32 @@ class Funcoes_padrao:
         pyperclip.copy(mensagem) 
         return "PEDIR OAB"
 
-    def clique_btn2(self):
-        #OBSERVAÇÕES
-
-        agora = datetime.datetime.now().time()      
-        match agora:
-            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
-            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
-            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
-                                                                                                                                            
-        mensagem = f'{mensagem_inicial}, tudo bem?\n'\
-            'Sou o Rafael Negrão, agente de registro da ACB Digital e farei seu atendimento.'\
-
-                                                                                                           
-        pyperclip.copy(mensagem) 
-        return f'{mensagem_inicial.upper()}! PODEMOS INICIAR?'
-
-    def clique_btn7(self):
-        mensagem = 'Agradecemos pela disponibilidade!\n'\
-        '\n'\
-        'Em caso de dúvidas, contate o suporte através do número 4020-9735 ou pelo WhatsApp (11)96400-1221. \n'\
-        'Caso precise adquirir mais certificados, pode comprá-los através do link: \n'\
-        f'https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}. \n'\
-        '\n'\
-        'Até mais!'
-        pyperclip.copy(mensagem) 
-        return 'FINALIZADO COM SUCESSO'
-    
-    def clique_btn5(self):
-        mensagem = 'Podemos iniciar a vídeo-conferência?'
+    def clique_btn8(self):
+        mensagem = f'Link para compra: https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}'
         QApplication.clipboard().setText(mensagem)
-        return 'PODEMOS INICIAR A VÍDEO?'
+        return 'LINK PADRÃO DE COMPRA'
   
     def clique_btn10(self):
         mensagem = 'Ainda está ai?'
         QApplication.clipboard().setText(mensagem)
         return 'AINDA ESTÁ AI?'
     
-    def clique_btn8(self):
-        mensagem = 'Estou finalizando o chat devido à ausência de interação.\n'\
-        'Caso queira agendar um novo atendimento, pode fazê-lo pelo Whatsapp:(11)96400-1221.\n'\
-        'Até mais!'
-        pyperclip.copy(mensagem)
-        return 'FINALIZADO SEM SUCESSO'
-
-    def clique_btn11(self):
-        mensagem = f'Link para compra: https://loja.certisign.com.br/?cod_rev={ui.campo_cod_rev.text()}'
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK PADRÃO DE COMPRA'
-
-    def clique_btn13(self):
-        mensagem = 'Link para reembolso: https://www.certisign.com.br/reembolso'
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK REEMBOLSO'
-
-    def clique_btn14(self):
-        agora = datetime.datetime.now().time()      
-        match agora:
-            case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
-            case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
-            case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
-                                                                                                                                            
-        mensagem = f'{mensagem_inicial}, tudo bem? \n'\
-        'Sou o Rafael Negrão, agente de registro da ACB Digital.\n'\
-        'Estou entrando em contato pois temos uma validação para seu certificado digital.\n' \
-        'Caso tenha dúvidas, fique a vontade para contatar no Whatsapp:(11)910419450 ou pelo e-mail:paranagua@acbdigital.com.br\n ' \
-        '\n'\
-        'att\n'\
-        'Rafael Negrão de Souza'
-                                                                                                           
-        pyperclip.copy(mensagem) 
-        return 'MENSAGEM ATENDIMENTO E-MAIL'
-
-    def clique_btn15(self):
-        mensagem = 'e-mail: paranagua@acbdigital.com.br'
-        QApplication.clipboard().setText(mensagem)
-        return 'PARANAGUA@ACBDIGITAL.COM.BR'
-
-    def clique_btn4(self):
-        mensagem = 'Link postos de atendimento: https://www.certisign.com.br/duvidas-suporte/certificado-digital/locais-atendimento - Basta digitar seu CEP e serão listados os postos mais próximos.'
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK MAPA POSTOS DE ATENDIMENTO'
-
-    def clique_btn16(self):
-        mensagem = 'Whatsapp:(11)91041-9450'
-        QApplication.clipboard().setText(mensagem)
-        return 'WHATSAPP:(11)91041-9450'
-        
     def clique_btn12(self):
         pedido = ui.campo_pedido.text()
         mensagem = str(f'https://gestaoar.certisign.com.br/GestaoAR/cliente/emissao/{pedido}')
         QApplication.clipboard().setText(mensagem)
         return 'LINK PARA INSTALAÇÃO DO CERTIFICADO'
     
-    def clique_btn9(self):
-        mensagem = 'Obrigado! Um momento.'
-        QApplication.clipboard().setText(mensagem)
-        return 'OBRIGADO. UM MOMENTO.'
-    
-    def clique_btn17(self):
-        mensagem = 'SUPORTE CLIENTE: 4020-9735'
+    def clique_btn14(self):
+        mensagem = 'SUPORTE CLIENTE: 4020-9735/WHATSAPP:(11) 96400-1221'
         QApplication.clipboard().setText(mensagem)
         return mensagem
     
+    def clique_btn16(self):
+        mensagem = 'Whatsapp:(11)91041-9450'
+        QApplication.clipboard().setText(mensagem)
+        return 'WHATSAPP:(11)91041-9450'
+        
     def clique_btn18(self):
         mensagem = 'ALÔ PARCEIRO: 4020-8326'
         QApplication.clipboard().setText(mensagem)
@@ -1625,21 +1567,23 @@ class Funcoes_padrao:
         clipboard.setMimeData(mime_data)
         self.nova_janela.close()
 
-    def mensagem_contato(self):
-        agora = datetime.datetime.now().time()      
-        match agora:
+    def determinar_hora(self,hora):
+        match hora:
             case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                mensagem_inicial = "Bom dia"
+                return "Bom dia"
             case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                mensagem_inicial = "Boa tarde"
+                return "Boa tarde"
             case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                mensagem_inicial = "Boa noite"
+                return "Boa noite"
+
+    def mensagem_contato(self):
+          
+        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
 
         texto, ok = QInputDialog.getItem(ui.centralwidget, "Mensagens Whatsapp", "Escolha a Mensagem:", ["INICIAR ATENDIMENTO", "ERRO NA VALIDAÇÃO","RENOVAÇÃO","OUTRO"], 0, False)
         
         if not ok or not texto:
-            return
-        
+            return 
         
         nome_completo = ui.campo_nome.text()
         if nome_completo != '':
@@ -1708,17 +1652,12 @@ f'Sou o Rafael Negrão, agente de registro da ACB Digital e temos um agendamento
         tipo_mensagem, ok = QInputDialog.getItem(ui.centralwidget, "Envio", "Escolha o conteúdo do E-mail:", ["INICIO DE ATENDIMENTO", "PROBLEMA DE PAGAMENTO"], 0, False)
         if not ok:
             return
+        
+        
 
         match tipo_mensagem:
             case 'INICIO DE ATENDIMENTO':
-                agora = datetime.datetime.now().time()      
-                match agora:
-                    case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                        mensagem_inicial = "Bom dia"
-                    case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                        mensagem_inicial = "Boa tarde"
-                    case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                        mensagem_inicial = "Boa noite"
+                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
 
                 assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"                                                                                                                           
                 corpo = f'''{mensagem_inicial}, tudo bem? 
@@ -1738,14 +1677,7 @@ Rafael Negrão de Souza'''
 
         
             case 'PROBLEMA DE PAGAMENTO':
-                agora = datetime.datetime.now().time()      
-                match agora:
-                    case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
-                        mensagem_inicial = "Bom dia"
-                    case tempo if datetime.datetime.strptime("12:00", "%H:%M").time() < tempo < datetime.datetime.strptime("17:59", "%H:%M").time():
-                        mensagem_inicial = "Boa tarde"
-                    case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
-                        mensagem_inicial = "Boa noite"
+                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
 
                 assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
                 corpo = f'''{mensagem_inicial}, Tudo bem?
@@ -1784,8 +1716,6 @@ Rafael Negrão de Souza'''
         except smtplib.SMTPException as e:
             self.mensagem_alerta("Erro",f"Erro ao enviar o e-mail: {e}")
             
-    # Exemplo de uso:
-
 class Acoes_banco_de_dados:
     def __init__(self,ui):
         self.ui = ui
@@ -1934,8 +1864,6 @@ class Acoes_banco_de_dados:
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_status_bd.setText("")
             ui.campo_preco_certificado.setText("")
-            ui.campo_valor_estimado.setText("")
-            ui.campo_valor_estimado_menor.setText("")
             ui.campo_cnpj_razao_social.setText("")
             ui.campo_rg_orgao.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("SP")
@@ -1983,8 +1911,6 @@ class Acoes_banco_de_dados:
             ui.campo_lista_modalidade.setCurrentText("")
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_preco_certificado.setText("")
-            ui.campo_valor_estimado.setText("")
-            ui.campo_valor_estimado_menor.setText("")
             ui.campo_cnpj_razao_social.setText("")
             ui.campo_rg_orgao.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("SP")
@@ -2201,16 +2127,24 @@ class Acoes_banco_de_dados:
     def preencher_tabela(self):
     #CORRIGIDO ---------------------------------------------------------
     #USO DE BANCO DE DADOS
+
+        # Converta as datas iniciais e finais para o formato do Firebase (timestamp)
+        data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
+        data_final = datetime.datetime.strptime(ui.campo_data_ate.text(), "%d/%m/%Y")
+
+        # Consulta no Firebase para todos os pedidos dentro do intervalo de datas
+        pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
+                         .start_at(data_inicial.strftime("%d/%m/%Y")) \
+                         .end_at(data_final.strftime("%d/%m/%Y"))
+        pedidos = pedidos_ref.get()
+
         for col in range(ui.tableWidget.columnCount()):
             ui.tableWidget.setColumnHidden(col, False)
         ui.tableWidget.setRowCount(0)
         valor_estimado = 0
         try:
             ui.tableWidget.clear()
-            
-            
-            pedidos = self.ref.get()
-            # Ordene a lista de acordo com a data em ordem decrescente
+
             pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%d/%m/%Y"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
 
             data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
@@ -2252,9 +2186,6 @@ class Acoes_banco_de_dados:
                         ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
                         ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
                         ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
-
-                     
-
                         # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
                         
                         try:
@@ -2262,28 +2193,22 @@ class Acoes_banco_de_dados:
                             if 'PRECO' in pedido_info:
                                 # Substitui a vírgula por um ponto no valor do preço
                                 preco = float(pedido_info['PRECO'])
-                                
+
                                 # Converte o valor para float e soma ao valor estimado
                                 valor_estimado += float(preco)
-                                valor_formatado = "{:.2f}".format(valor_estimado).replace('.', ',')
-                                valor_formatado_menor = "{:.2f}".format(valor_estimado * (1 - (ui.campo_desconto.value()/100))).replace('.', ',')
 
                                 if 'e-CNPJ' in pedido_info['VERSAO']:
                                     valor_cnpj = float(valor_cnpj) + preco
-                                    j+=1
-                                    
+                                    j+=1                                 
                                 elif 'e-CPF' in pedido_info['VERSAO']:
                                     valor_cpf = float(valor_cpf) + preco
-                                    f+=1
-                                
+                                    f+=1                            
                                 if pedido_info['VENDA'] == "SIM":
                                         venda += 1
                                 
                                 QApplication.processEvents()
                         except ValueError:
                             pass
-
-                        
 
                         for col in range(ui.tableWidget.columnCount()):
                             item = ui.tableWidget.item(row_position, col)
@@ -2316,16 +2241,15 @@ class Acoes_banco_de_dados:
                 
             ui.barra_progresso_consulta.setValue(100)
             
-            total = valor_cnpj + valor_cpf
+            total_venda = valor_cnpj + valor_cpf
             ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}].......R$ {valor_cnpj:.2f}
 (+)e-CPF [{f}].........R$ {valor_cpf:.2f}
-(=)Total [{j+f}].........R$ {total:.2f}
-(-) {ui.campo_desconto.text()}%..................R$ {total * (float(ui.campo_desconto.text()) / 100):.2f}
+(=)Total [{j+f}].........R$ {total_venda:.2f}
+(-) {ui.campo_desconto.text()}%..................R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
 ----------------------------------------------
-(=)Total Esperado....R$ {total * (1 - float(ui.campo_desconto.text()) / 100):.2f}
+(=)Total Esperado....R$ {total_venda * (1 - float(ui.campo_desconto.text()) / 100):.2f}
 Vendas.........{venda}
 ''')
-
 
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME", "VERSAO"])
@@ -2337,7 +2261,7 @@ Vendas.........{venda}
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
                 pass
-
+    
     def atualizar_documentos_tabela(self):
         # Limpar qualquer conteúdo existente na tabela
         self.ui.tabela_documentos.clearContents()

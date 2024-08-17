@@ -1,7 +1,5 @@
 comandos.txt
-interface.ui
 Auxiliar.spec
 credenciaisBd.py
-DIC.py
-teste.py
+__pycache__/
 
