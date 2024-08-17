@@ -13,6 +13,6 @@
   <img src="/img/tela3-minimizado.png" style="width: 24%; display: inline-block;">
 
   <h2>Transição</h2>
-  <img src="/img/tela-transicaop.gif" style="width: 24%; display: inline-block;">
+  <img src="/img/tela-transicaop.gif">
 
 </div>
