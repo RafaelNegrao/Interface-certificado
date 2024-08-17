@@ -11,10 +11,8 @@
   <img src="/img/tela2-minimizado.png" style="width: 24%; display: inline-block;">
   <h3>Pedido desatualizado no Banco de dados:</h3>
   <img src="/img/tela3-minimizado.png" style="width: 24%; display: inline-block;">
-<<<<<<< HEAD
 
   <h2>Transição</h2>
   <img src="/img/tela-transicao.gif" style="width: 24%; display: inline-block;">
-=======
->>>>>>> ba0cd89be39a20809ba256858f418333ce3152b9
+
 </div>
