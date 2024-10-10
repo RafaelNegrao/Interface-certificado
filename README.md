@@ -4,7 +4,7 @@
   <img src="/img/tela2-maximizado.png" style="width: 24%; display: inline-block;">
   <img src="/img/tela3-maximizado.png" style="width: 24%; display: inline-block;">
   <img src="/img/tela4-maximizado.png" style="width: 24%; display: inline-block;">
-  <img src="/img/tela5-maximizado.png" style="width: 24%; display: inline-block;">
+  <img src="/img/tela5-maximizada.png" style="width: 24%; display: inline-block;">
 
   <h2>Tela minimizada que mostra o status do pedido</h2>
   <img src="/img/tela1-minimizado.png" style="width: 24%; display: inline-block;">
@@ -13,7 +13,7 @@
   <h3>Pedido desatualizado no Banco de dados:</h3>
   <img src="/img/tela3-minimizado.png" style="width: 24%; display: inline-block;">
   <h3>Tela minimizada modo escuro:</h3>
-  <img src="/img/tela4-minimizado.png" style="width: 24%; display: inline-block;">
+  <img src="/img/tela4-minimizada.png" style="width: 24%; display: inline-block;">
 
   <h2>Transição</h2>
   <img src="/img/tela-transicaop.gif">
