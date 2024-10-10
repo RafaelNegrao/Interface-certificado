@@ -12,7 +12,7 @@
   <img src="/img/tela2-minimizado.png" style="width: 24%; display: inline-block;">
   <h3>Pedido desatualizado no Banco de dados:</h3>
   <img src="/img/tela3-minimizado.png" style="width: 24%; display: inline-block;">
-  <h3>Pedido desatualizado no Banco de dados:</h3>
+  <h3>Tela minimizada modo escuro:</h3>
   <img src="/img/tela4-minimizado.png" style="width: 24%; display: inline-block;">
 
   <h2>Transição</h2>
