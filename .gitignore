@@ -2,4 +2,6 @@ comandos.txt
 Auxiliar.spec
 credenciaisBd.py
 __pycache__/
+dist
+build
 

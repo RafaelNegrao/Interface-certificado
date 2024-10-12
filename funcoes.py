@@ -59,11 +59,11 @@ class Funcoes_padrao:
             
             if certificados_semana_1 >= meta_semanal:
                 # Se a meta foi atingida
-                ui.label_meta1.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta1.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta1.setText(f"Meta atingida! - R${certificados_semana_1} / R${meta_semanal}")
             else:
                 # Se não foi...
-                ui.label_meta1.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta1.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta1.setText(f"R${certificados_semana_1} / R${meta_semanal}")
 
             certificados_semana_2 = math.floor(float(ui.campo_certificados_semana_2.text().replace(',', '.')))
@@ -73,11 +73,11 @@ class Funcoes_padrao:
             
             if certificados_semana_2 >= meta_semanal:
                 #Meta atingida
-                ui.label_meta2.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta2.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta2.setText(f"Meta atingida! - R${certificados_semana_2} / R${meta_semanal}")
             else:
                 #Meta não atingida
-                ui.label_meta2.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta2.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta2.setText(f"R${certificados_semana_2} / R${meta_semanal}")
 
             certificados_semana_3 = math.floor(float(ui.campo_certificados_semana_3.text().replace(',', '.')))
@@ -85,11 +85,11 @@ class Funcoes_padrao:
             ui.barra_meta_semana_3.setValue(certificados_semana_3)  # Atualiza o valor da barra de progresso
             if certificados_semana_3 >= meta_semanal:
                 #Meta atingida
-                ui.label_meta3.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta3.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta3.setText(f"Meta atingida! - R${certificados_semana_3} / R${meta_semanal}")
             else:
                 #Meta não atingida
-                ui.label_meta3.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta3.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta3.setText(f"R${certificados_semana_3} / R${meta_semanal}")
 
             certificados_semana_4 = math.floor(float(ui.campo_certificados_semana_4.text().replace(',', '.')))
@@ -97,11 +97,11 @@ class Funcoes_padrao:
             ui.barra_meta_semana_4.setValue(certificados_semana_4)  # Atualiza o valor da barra de progresso
             if certificados_semana_4 >= meta_semanal:
                 #Meta atingida
-                ui.label_meta4.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta4.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta4.setText(f"Meta atingida! - R${certificados_semana_4} / R${meta_semanal}")
             else:
                 #Meta não atingida
-                ui.label_meta4.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta4.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta4.setText(f"R${certificados_semana_4} / R${meta_semanal}")
 
             certificados_semana_5 = math.floor(float(ui.campo_certificados_semana_5.text().replace(',', '.')))
@@ -109,11 +109,11 @@ class Funcoes_padrao:
             ui.barra_meta_semana_5.setValue(certificados_semana_5)  # Atualiza o valor da barra de progresso
             if certificados_semana_5 >= meta_semanal:
                 #Meta atingida
-                ui.label_meta5.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta5.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta5.setText(f"Meta atingida! - R${certificados_semana_5} / R${meta_semanal}")
             else:
                 #Meta não atingida
-                ui.label_meta5.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta5.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta5.setText(f"R${certificados_semana_5} / R${meta_semanal}")
 
             ui.barra_meta_mensal.setMaximum(meta_mensal)
@@ -121,11 +121,11 @@ class Funcoes_padrao:
             ui.label_meta_mes.setText(f"R${soma} / R${ui.campo_meta_mes.text()}")
             if soma >= meta_mensal:
                 #Meta atingida
-                ui.label_meta_mes.setStyleSheet('background-color: rgb(0, 173, 247);')
+                ui.label_meta_mes.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta_mes.setText(f"Meta atingida! - R${soma} / R${meta_mensal}")
             else:
                 #Meta não atingida
-                ui.label_meta_mes.setStyleSheet('background-color: rgba(255, 0, 0, 0);')
+                ui.label_meta_mes.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
         except:
             pass
@@ -461,10 +461,9 @@ class Funcoes_padrao:
             versao = ui.campo_lista_versao_certificado.currentText()
             hora = ui.campo_hora_agendamento.text()
             data = ui.campo_data_agendamento.text()
-            status = ui.campo_lista_status.currentText()
             modalidade = ui.campo_lista_modalidade.currentText()
 
-            if pedido == "" or hora == "00:00" or data == "01/01/2000" or status == "" or modalidade == "" or versao == "":
+            if pedido == "" or hora == "00:00" or data == "01/01/2000" or modalidade == "" or versao == "":
 
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
@@ -500,7 +499,7 @@ class Funcoes_padrao:
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
                 
-                status = ui.campo_lista_status.currentText()
+                status = banco_dados.alteracao_status()
                 #Se o status do pedido for Aprovado ou Cancelado, exclua a pasta
                 if status == "APROVADO" or status == "CANCELADO":
                     confirmacao = ""
@@ -508,7 +507,7 @@ class Funcoes_padrao:
                     confirmacao = "✅"
 
                 ui.label_confirmacao_criar_pasta.setText(confirmacao)
-                self.acoes.analise_dados()
+                self.acoes.salvar_pedido()
             #Caso exista, abra
             else:
                 self.abrir_pasta_cliente()
@@ -1067,7 +1066,7 @@ class Funcoes_padrao:
         ui.campo_data_meta.setDate(QDate.currentDate())
         self.ui.campo_status_bd.setText("")
         self.ui.campo_status_bd.setToolTip("")
-        ui.campo_status_verificacao.setText(str(banco_dados.contar_verificacao()))
+        banco_dados.contar_verificacao()
 
     def evento_ao_fechar(self,event):
 
@@ -1177,7 +1176,7 @@ class Funcoes_padrao:
             novo_valor = self.obter_valor_campo(campo_atual)
             campo_anterior = getattr(self.ui, campo_atual.objectName(), None)
 
-            if campo_anterior is not None:
+            if campo_anterior is not None and novo_valor is None:
                 valor_anterior = self.obter_valor_campo(campo_anterior)
 
                 if valor_anterior != novo_valor:
@@ -1209,25 +1208,6 @@ class Funcoes_padrao:
             ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Normal)
             ui.botao_ver_senha.setText("❌")
 
-    def verificar_texto_lista_status(self,campo):
-        
-        if campo == 1:
-            valor_campo = ui.campo_lista_status.currentText()
-            if valor_campo == "APROVADO":
-            # Alterar a fonte para verde
-                ui.label_status.setText("🟢")
-            elif valor_campo == "CANCELADO":
-                # Alterar a fonte para vermelha
-                ui.label_status.setText("🔴")
-            elif valor_campo == "VIDEO REALIZADA":
-                # Alterar a fonte para azul
-                ui.label_status.setText("🔵")
-            elif valor_campo == "VERIFICAÇÃO":
-                # Alterar a fonte para laranja
-                ui.label_status.setText("🟠")
-            else:
-                # Caso padrão, alterar a fonte para preta
-                ui.label_status.setText("")
       
     def carregar_lista_certificados(self):
        if ui.campo_lista_versao_certificado.currentText() == "":
@@ -1728,13 +1708,13 @@ class Acoes_banco_de_dados:
         self.ui = ui
         self.ref = db.reference("/Pedidos")
     
-    def analise_dados(self):
+    def salvar_pedido(self):
         # Analisa se os campos do pedido estão preenchidos
         try:
             if not self.analise_de_campos():
                 return
 
-            if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {ui.campo_lista_status.currentText()}?"):
+            if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
                 return
 
             ref = db.reference("/Pedidos")
@@ -1755,17 +1735,18 @@ class Acoes_banco_de_dados:
                         novo_pedido_ref.update(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
-                        self.limpar_campos_pedido()
                         self.mensagem_alerta("Sucesso","Pedido salvo!") 
-                        ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+                        self.contar_verificacao()
+                        self.limpar_campos_pedido()
 
                     #Pedido existente + gravado temporariamente
                     case 'TEMPORARIO':
                         novo_pedido_ref.update(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        self.mensagem_alerta("Sucesso","Pedido salvo!")
-                        ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+                        #self.mensagem_alerta("Sucesso","Pedido salvo!")
+                        self.contar_verificacao()
+                        
             
             #NOVO PEDIDO
             else:
@@ -1779,7 +1760,7 @@ class Acoes_banco_de_dados:
                         self.ui.campo_status_bd.setToolTip("")
                         self.limpar_campos_pedido()
                         self.mensagem_alerta("Sucesso","Pedido salvo!") 
-                        ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+                        self.contar_verificacao()
 
                     #Pedido existente + gravado temporariamente
                     case 'TEMPORARIO':
@@ -1787,8 +1768,8 @@ class Acoes_banco_de_dados:
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        self.mensagem_alerta("Sucesso","Pedido salvo!")
-                        ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+                        #self.mensagem_alerta("Sucesso","Pedido salvo!")
+                        self.contar_verificacao()
                         
         except:
             self.mensagem_alerta("Erro","Não foi possível salvar os dados. Tente novamente.")
@@ -1803,12 +1784,7 @@ class Acoes_banco_de_dados:
     def mensagem_alerta(self,titulo,mensagem):
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
 
-    def verificar_status(self):
-        # if ui.campo_lista_status.currentText() != "APROVADO" and ui.campo_lista_status.currentText() != "CANCELADO":
-        #     return"TEMPORARIO"
-        # else:
-        #     return"DEFINITIVO"
-        
+    def verificar_status(self):       
         for radiobutton in ui.groupBox_status.findChildren(QRadioButton):
             if radiobutton.isChecked():
                 if radiobutton.text() == "APROVADO" or radiobutton.text() == "CANCELADO":
@@ -1873,7 +1849,6 @@ class Acoes_banco_de_dados:
             ui.campo_pedido.setText("")
             ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
             ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
-            ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
             ui.campo_lista_venda.setCurrentText("NAO")
             ui.campo_lista_modalidade.setCurrentText("")
             ui.label_confirmacao_converter_pdf.setText("")
@@ -1925,7 +1900,6 @@ class Acoes_banco_de_dados:
             ui.campo_pedido.setText("")
             ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
             ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
-            ui.campo_lista_status.setCurrentText("DIGITAÇÃO")
             ui.campo_lista_venda.setCurrentText("NAO")
             ui.campo_lista_modalidade.setCurrentText("")
             ui.campo_lista_versao_certificado.setCurrentText("")
@@ -1942,7 +1916,7 @@ class Acoes_banco_de_dados:
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
             self.limpar_labels()
-            ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+            self.contar_verificacao()
         except Exception as e:
             print(e)
 
@@ -1954,8 +1928,7 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_criar_pasta.setText("")
         ui.label_confirmacao_mesclar_pdf.setText("")
         ui.label_confirmacao_tirar_print.setText("")
-        ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
-    
+         
     def dicionario_banco_de_dados(self):
            
         novos_dados = {
@@ -1971,7 +1944,7 @@ class Acoes_banco_de_dados:
                     "CNPJ":ui.campo_cnpj.text(),
                     "EMAIL":ui.campo_email.text(),
                     "NASCIMENTO":ui.campo_data_nascimento.text(),
-                    "STATUS":self.verificar_status_pedido(),
+                    "STATUS":self.alteracao_status(),
                     "PEDIDO":ui.campo_pedido.text() , 
                     "DATA":ui.campo_data_agendamento.text(), 
                     "HORA":ui.campo_hora_agendamento.text(),
@@ -2083,26 +2056,25 @@ class Acoes_banco_de_dados:
         match status:
             case "APROVADO":
                 ui.rb_aprovado.setChecked(True)
-                self.verificar_status_pedido()
+                self.alteracao_status()
             case "CANCELADO":
                 ui.rb_cancelado.setChecked(True)
-                self.verificar_status_pedido()
+                self.alteracao_status()
             case "VERIFICAÇÃO":
                 ui.rb_verificacao.setChecked(True)
-                self.verificar_status_pedido()
+                self.alteracao_status()
             case "DIGITACÃO":
                 ui.rb_digitacao.setChecked(True)
-                self.verificar_status_pedido()
+                self.alteracao_status()
             case "VIDEO REALIZADA":
                 ui.rb_videook.setChecked(True)
-                self.verificar_status_pedido()
+                self.alteracao_status()
 
     def preencher_dados(self,pedido_data):
         #CORRIGIDO------------------------------------------------------------
         #self.limpar_campos_pedido()
         try:
             status = pedido_data.get("STATUS")
-            #ui.campo_lista_status.setCurrentText(status)
             self.preencher_status(status)    
             data_nula = QDate(2000, 1, 1)  
             ui.campo_data_nascimento.setDate(data_nula)
@@ -2167,24 +2139,42 @@ class Acoes_banco_de_dados:
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
-        pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("VERIFICAÇÃO")
-        pedidos = pedidos_ref.get()
+        pedidos_verificacao = ref.child("Pedidos").order_by_child("STATUS").equal_to("VERIFICAÇÃO").get()
+        # Consulta no Firebase para pedidos com status "VIDEO REALIZADA"
+        pedidos_videook = ref.child("Pedidos").order_by_child("STATUS").equal_to("VIDEO REALIZADA").get()
 
         quantidade_verificacao = 0  # Contador de pedidos com status "VERIFICAÇÃO"
-        pedidos_info = []  # Variável para armazenar a data e o número do pedido
+        quantidade_videook = 0  # Contador de pedidos com status "VIDEO REALIZADA"
+        verificacao_info = []  # Variável para armazenar a data e o número do pedido de verificação
+        videook_info = []  # Variável para armazenar a data e o número do pedido de video realizada
 
-        if pedidos:
-            for pedido_info in pedidos.values():
-                quantidade_verificacao += 1  # Incrementa o contador para cada pedido em "VERIFICAÇÃO"
+        if pedidos_verificacao:
+            for pedido_info in pedidos_verificacao.values():
+                quantidade_verificacao += 1
                 data_pedido = pedido_info['DATA']
                 numero_pedido = pedido_info['PEDIDO']
-                pedidos_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+                verificacao_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+
+        if pedidos_videook:
+            for pedido_info in pedidos_videook.values():
+                quantidade_videook += 1
+                data_pedido = pedido_info['DATA']
+                numero_pedido = pedido_info['PEDIDO']
+                videook_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
 
         # Adiciona o setToolTip no ícone campo_status_bd_3
-        tooltip_text = "Quantidade de pedidos em verificação:\n" + '\n'.join(pedidos_info)
-        ui.campo_status_bd_3.setToolTip(tooltip_text)
+        tooltip_verificacao = f"Quantidade de pedidos em verificação:\n{quantidade_verificacao}\n\n"
+        tooltip_verificacao += '\n'.join(verificacao_info)
+        ui.campo_status_verificacao.setToolTip(f'<div style="color:white; background-color:black;">{tooltip_verificacao}</div>')
+        ui.campo_status_verificacao.setToolTip(tooltip_verificacao)
 
-        return quantidade_verificacao
+        tooltip_videook = f"Quantidade de pedidos com vídeo realizada:\n{quantidade_videook}\n\n"
+        tooltip_videook += '\n'.join(videook_info)
+        ui.campo_status_videook.setToolTip(f'<div style="color:white; background-color:black;">{tooltip_videook}</div>')
+        ui.campo_status_videook.setToolTip(tooltip_videook)
+
+        ui.campo_status_verificacao.setText(str(quantidade_verificacao))
+        ui.campo_status_videook.setText(str(quantidade_videook))
 
     def preencher_tabela(self):
     #CORRIGIDO ---------------------------------------------------------
@@ -2213,7 +2203,7 @@ class Acoes_banco_de_dados:
             numero_inteiro_inicial = data_inicial.toordinal()
             data_final = datetime.datetime.strptime(ui.campo_data_ate.text(), "%d/%m/%Y")
             numero_inteiro_final = data_final.toordinal()
-            status_filtro = ui.campo_lista_status_2.currentText()
+
 
 
             valor_cnpj = 0
@@ -2226,6 +2216,7 @@ class Acoes_banco_de_dados:
             ui.barra_progresso_consulta.setVisible(True)
             ui.barra_progresso_consulta.setValue(0)
             total_pedidos = len(pedidos)
+            status_filtro = ui.campo_lista_status_2.currentText()
            
             
             for pedido_info in pedidos:
@@ -2242,13 +2233,30 @@ class Acoes_banco_de_dados:
                     
                         row_position = ui.tableWidget.rowCount()
                         ui.tableWidget.insertRow(row_position)
-                        
-                        ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
-                        ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
-                        ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['DATA']))
-                        ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
-                        ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
-                        ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
+                        try:
+                            ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 0, QTableWidgetItem("-"))
+                        try:
+                            ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 1, QTableWidgetItem("-"))
+                        try:
+                            ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(pedido_info['DATA']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 2, QTableWidgetItem("-"))
+                        try:
+                            ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 3, QTableWidgetItem("-"))
+                        try:
+                            ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 4, QTableWidgetItem("-"))
+                        try:
+                            ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
+                        except:
+                            ui.tableWidget.setItem(row_position, 5, QTableWidgetItem("-"))
                         # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
                         
                         try:
@@ -2281,15 +2289,15 @@ class Acoes_banco_de_dados:
                             if item is not None:
                                 match status:
                                     case 'DIGITAÇÃO':
-                                        item.setBackground(QColor(204, 204, 204)) 
+                                        item.setForeground(QColor(113, 66, 230)) 
                                     case 'VIDEO REALIZADA':
-                                        item.setBackground(QColor(25, 200, 255))  # Amarelo
+                                        item.setForeground(QColor(25, 200, 255))  # Amarelo
                                     case 'VERIFICAÇÃO':
-                                        item.setBackground(QColor(255, 167, 91))  # Laranja claro
+                                        item.setForeground(QColor(255, 167, 91))  # Laranja claro
                                     case 'APROVADO':
-                                        item.setBackground(QColor(173, 255, 47))  # Verde limão
+                                        item.setForeground(QColor(173, 255, 47))  # Verde limão
                                     case 'CANCELADO':
-                                        item.setBackground(QColor(255, 30, 30))  # Vermelho claro   
+                                        item.setForeground(QColor(255, 30, 30))  # Vermelho claro   
 
                         y += 1
                         porcentagem = (y/total_pedidos)*100
@@ -2303,7 +2311,7 @@ class Acoes_banco_de_dados:
                 QApplication.processEvents()
                 
             ui.barra_progresso_consulta.setValue(100)
-            ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+            self.contar_verificacao()
 
             total_venda = valor_cnpj + valor_cpf
             ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}].......R$ {valor_cnpj:.2f}
@@ -2324,7 +2332,7 @@ Vendas.........{venda}
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME","VERSAO"])
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
-                ui.campo_status_verificacao.setText(str(self.contar_verificacao()))
+                self.contar_verificacao()
                 pass
     
     def atualizar_documentos_tabela(self):
@@ -2373,15 +2381,16 @@ Vendas.........{venda}
             # Definir o item na tabela
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
 
-    def verificar_status_pedido(self):      
-        
+    def alteracao_status(self):      
+        #AQUI VAI VERIFICAR SE
         if ui.rb_digitacao.isChecked():
             self.zerar_cor()
-            ui.rb_digitacao.setStyleSheet("border:none;color:rgb(170,170,170);")  # Cor verde para rb_digitacao
+            ui.rb_digitacao.setStyleSheet("border:none;color:rgb(113,66,230);")  # Cor verde para rb_digitacao
+
             return 'DIGITAÇÃO'
         elif ui.rb_videook.isChecked():
             self.zerar_cor()
-            ui.rb_videook.setStyleSheet("border:none;color: rgb(139,233,253);")  # Cor vermelha para rb_videook
+            ui.rb_videook.setStyleSheet("border:none;color: rgb(18,191,255);")  # Cor vermelha para rb_videook
             return 'VIDEO REALIZADA'
         elif ui.rb_verificacao.isChecked():
             self.zerar_cor()
@@ -2417,7 +2426,7 @@ class JanelaOculta:
         self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(517, 678)
+        self.animate_window_resize(525, 680)
         self.janela.atualizar_documentos_tabela()
 
     def leaveEvent(self, event):
@@ -2430,10 +2439,13 @@ class JanelaOculta:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
-                self.animate_window_resize(143, 52)
+                if int(ui.campo_status_videook.text()) == 0 and int(ui.campo_status_verificacao.text()) == 0:
+                    self.animate_window_resize(104, 53)
+                else:
+                    self.animate_window_resize(143, 53)
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(517,678)#469
+        self.animate_window_resize(525,680)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -2490,7 +2502,6 @@ ui.campo_cpf.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cpf)
 ui.campo_nome_mae.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome_mae))
 ui.campo_cnh.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnh))
 ui.campo_lista_modalidade.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_modalidade))
-ui.campo_lista_status.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_status))
 ui.campo_lista_venda.currentIndexChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_lista_venda))
 ui.campo_hora_agendamento.timeChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_hora_agendamento))
 ui.campo_data_agendamento.dateChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_data_agendamento))
@@ -2504,6 +2515,11 @@ ui.campo_pis.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_come
 ui.campo_telefone.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_telefone))
 ui.campo_preco_certificado.editingFinished.connect(lambda:funcoes_app.formatar_preco_certificado())
 ui.campo_oab.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab))
+ui.rb_aprovado.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_aprovado))
+ui.rb_cancelado.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_cancelado))
+ui.rb_digitacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_digitacao))
+ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verificacao))
+ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
 ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
@@ -2516,7 +2532,7 @@ ui.botao_consulta_cnpj.clicked.connect(lambda:funcoes_app.procurar_cnpj())
 ui.botao_consulta_cpf.clicked.connect(lambda:funcoes_app.procurar_cpf())
 ui.botao_consulta_cnh.clicked.connect(lambda:funcoes_app.procurar_cnh())
 ui.botao_consulta_rg.clicked.connect(lambda:funcoes_app.procurar_rg())
-ui.botao_salvar.clicked.connect(lambda:banco_dados.analise_dados())
+ui.botao_salvar.clicked.connect(lambda:banco_dados.salvar_pedido())
 ui.botao_junta.clicked.connect(lambda:funcoes_app.procurar_junta())
 ui.botao_print_direto_na_pasta.clicked.connect(lambda:funcoes_app.print_tela())
 ui.botao_print_direto_na_pasta.setFlat(True)
@@ -2530,19 +2546,17 @@ ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
 ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
 ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
-ui.campo_lista_status.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status(1))
-ui.campo_lista_status_2.currentIndexChanged.connect(lambda : funcoes_app.verificar_texto_lista_status(2))
 ui.botao_menagem.clicked.connect(lambda:funcoes_app.abrir_janela_mensagem())
 ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))
 ui.botao_telefone.clicked.connect((lambda:funcoes_app.contato_telefone()))
 ui.botao_consulta_oab.clicked.connect((lambda:funcoes_app.procurar_oab()))
 ui.botao_enviar_email.clicked.connect((lambda:funcoes_app.envio_de_email()))
-ui.rb_aprovado.clicked.connect(lambda:banco_dados.verificar_status_pedido())
-ui.rb_cancelado.clicked.connect(lambda:banco_dados.verificar_status_pedido())
-ui.rb_videook.clicked.connect(lambda:banco_dados.verificar_status_pedido())
-ui.rb_verificacao.clicked.connect(lambda:banco_dados.verificar_status_pedido())
-ui.rb_digitacao.clicked.connect(lambda:banco_dados.verificar_status_pedido())
+ui.rb_aprovado.clicked.connect(lambda:banco_dados.alteracao_status())
+ui.rb_cancelado.clicked.connect(lambda:banco_dados.alteracao_status())
+ui.rb_videook.clicked.connect(lambda:banco_dados.alteracao_status())
+ui.rb_verificacao.clicked.connect(lambda:banco_dados.alteracao_status())
+ui.rb_digitacao.clicked.connect(lambda:banco_dados.alteracao_status())
 
 #Campos de formatação
 ui.campo_cnpj_municipio.setReadOnly(True)
@@ -2588,7 +2602,7 @@ ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
 ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
 ui.botao_menagem.setToolTip("Mensagens")
 ui.botao_enviar_email.setToolTip("Enviar e-mail para cliente")
-ui.campo_status_bd_3.setToolTip("Quantidade de pedidos em VERIFICAÇÃO")
+ui.campo_status_bd_3.setToolTip("Quantidade de pedidos AGUARDANDO intervenção")
 
 #Validador
 regex = QRegExp("[0-9.]*")
@@ -2617,7 +2631,7 @@ y = (screen_rect.height() - janela.height()) // 5
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(143, 52)           
+janela.setFixedSize(143, 53)           
 janela.show()
 
 
