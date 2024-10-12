@@ -6024,7 +6024,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <string/>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>744</x>
@@ -6151,14 +6151,9 @@ QLineEdit:disabled, QLineEdit:!focus {
     </layout>
    </widget>
    <zorder>layoutWidget</zorder>
+   <zorder>layoutWidget</zorder>
    <zorder>tabWidget</zorder>
    <zorder>label_confirmacao_criar_link_video</zorder>
-   <zorder>campo_certificados_mes</zorder>
-   <zorder>campo_certificados_semana_3</zorder>
-   <zorder>campo_certificados_semana_5</zorder>
-   <zorder>campo_certificados_semana_1</zorder>
-   <zorder>campo_certificados_semana_4</zorder>
-   <zorder>campo_certificados_semana_2</zorder>
    <zorder>label_5</zorder>
    <zorder>botao_salvar</zorder>
    <zorder>campo_status_bd_2</zorder>
@@ -6179,13 +6174,13 @@ QLineEdit:disabled, QLineEdit:!focus {
   </widget>
  </widget>
  <tabstops>
-  <tabstop>campo_preco_certificado</tabstop>
   <tabstop>campo_pedido</tabstop>
   <tabstop>campo_data_agendamento</tabstop>
   <tabstop>campo_hora_agendamento</tabstop>
   <tabstop>campo_lista_versao_certificado</tabstop>
   <tabstop>campo_lista_modalidade</tabstop>
   <tabstop>campo_lista_venda</tabstop>
+  <tabstop>campo_preco_certificado</tabstop>
   <tabstop>campo_nome</tabstop>
   <tabstop>campo_email</tabstop>
   <tabstop>campo_data_nascimento</tabstop>
@@ -6199,6 +6194,7 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>campo_pis</tabstop>
   <tabstop>campo_telefone</tabstop>
   <tabstop>campo_cnpj</tabstop>
+  <tabstop>campo_lista_junta_comercial</tabstop>
   <tabstop>campo_comentario</tabstop>
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
@@ -6206,6 +6202,7 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>campo_data_meta</tabstop>
   <tabstop>campo_meta_semanal</tabstop>
   <tabstop>campo_meta_mes</tabstop>
+  <tabstop>campo_nome_agente</tabstop>
   <tabstop>caminho_pasta_principal</tabstop>
   <tabstop>caminho_pasta</tabstop>
   <tabstop>campo_email_empresa</tabstop>
@@ -6219,8 +6216,6 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>campo_desconto_validacao</tabstop>
   <tabstop>campo_desconto</tabstop>
   <tabstop>campo_cod_rev</tabstop>
-  <tabstop>campo_certificados_semana_1</tabstop>
-  <tabstop>campo_certificados_semana_2</tabstop>
   <tabstop>campo_certificados_semana_3</tabstop>
   <tabstop>campo_certificados_semana_5</tabstop>
   <tabstop>campo_certificados_semana_4</tabstop>
@@ -6235,7 +6230,7 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>botao_procurar</tabstop>
   <tabstop>botao_definir_cor</tabstop>
   <tabstop>botao_atualizar_meta</tabstop>
-  <tabstop>campo_lista_junta_comercial</tabstop>
+  <tabstop>campo_certificados_semana_2</tabstop>
   <tabstop>campo_verifica_tela_cheia</tabstop>
   <tabstop>botao_consultar</tabstop>
   <tabstop>botao_telefone</tabstop>
@@ -6277,6 +6272,11 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>rb_verificacao</tabstop>
   <tabstop>rb_aprovado</tabstop>
   <tabstop>rb_cancelado</tabstop>
+  <tabstop>campo_preco_certificado_cheio</tabstop>
+  <tabstop>botao_link_venda</tabstop>
+  <tabstop>botao_envio_massa</tabstop>
+  <tabstop>botao_ocultar_senha</tabstop>
+  <tabstop>campo_certificados_semana_1</tabstop>
  </tabstops>
  <resources/>
  <connections/>

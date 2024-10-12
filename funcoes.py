@@ -29,6 +29,7 @@ from credenciaisBd import *
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from datetime import timedelta
 
 
 #Referência raiz do banco de dados
@@ -812,7 +813,6 @@ class Funcoes_padrao:
         except Exception as e:
             print(e)
             self.mensagem_alerta("Arquivo não salvo", f"Arquivo não gerado!\nmotivo: {e}")
-
 
     def copiar_pedido_tabela(self,event):
         # Obtém a célula atualmente selecionada na tabela
@@ -1702,20 +1702,6 @@ Atenciosamente,
                     except smtplib.SMTPException as e:
                         self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail: {e}")
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     def mostrar_senha(self):
         if ui.campo_senha_email.echoMode() == QLineEdit.Password:
             ui.campo_senha_email.setEchoMode(QLineEdit.Normal)
@@ -1724,57 +1710,118 @@ Atenciosamente,
 
     def envio_em_massa(self):
         if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?"):
-                return
-        
-        data_inicial = banco_dados.data_para_iso(QDateTime(ui.campo_data_de.date()))
-        data_final = banco_dados.data_para_iso(QDateTime(ui.campo_data_ate.date()))
-        
-        # Variável para definir o tamanho e cor da fonte
-        tamanho_fonte = "20px"  # Ajuste o tamanho da fonte conforme necessário
-        cor_fonte = "#333333"   # Definir a cor da fonte explicitamente (preto suave)
-
-        # Consulte o banco de dados usando as datas no formato ISO
-        pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
-                        .start_at(data_inicial) \
-                        .end_at(data_final)
-        pedidos = pedidos_ref.get()
-        
-        if not pedidos:
-            self.mensagem_alerta("Erro", "Nenhum pedido encontrado para as datas selecionadas.")
             return
 
-        # Configurar a barra de progresso
+        ui.tableWidget.setRowCount(0)  # Limpa a tabela
+        ui.tableWidget.setColumnCount(3)  # Define o número de colunas
+        ui.tableWidget.setHorizontalHeaderLabels(["EMAIL", "ENVIADO?", "RETORNO"])
+        ui.tableWidget.setColumnWidth(0, 167)
+        ui.tableWidget.setColumnWidth(1, 167)
+        ui.tableWidget.setColumnWidth(2, 167)
+
+        data_inicial = banco_dados.data_para_iso(QDateTime(ui.campo_data_de.date()))
+        data_final = banco_dados.data_para_iso(QDateTime(ui.campo_data_ate.date()))
+        pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
+            .start_at(data_inicial) \
+            .end_at(data_final)
+        pedidos = pedidos_ref.get()
+
+        if not pedidos:
+            self.mensagem_alerta("Erro", "Nenhum pedido encontrado para as datas selecionadas.")
+            QApplication.processEvents()  # Atualiza a tela
+            return
+
         total_pedidos = len(pedidos)
         progresso_atual = 0
-        ui.barra_progresso_consulta.setMaximum(total_pedidos)  # Define o valor máximo da barra de progresso
+        ui.barra_progresso_consulta.setMaximum(total_pedidos)
+        QApplication.processEvents()  # Atualiza a barra de progresso
 
         nome = ui.campo_nome_agente.text()
         ref_link_venda = db.reference(f"/Certificados/")
         lista_certificados = ref_link_venda.get()
-
         ui.barra_progresso_consulta.setVisible(True)
-    
+        ui.barra_progresso_consulta.setValue(0)
+        data_atual = datetime.datetime.now()
+
         for pedido_info in pedidos.values():
-            if pedido_info["VERSAO"] not in lista_certificados or pedido_info["STATUS"] != "APROVADO":
+            data_validacao = datetime.datetime.strptime(pedido_info["DATA"], "%Y-%m-%dT%H:%M:%SZ")
+            validade = pedido_info["VERSAO"]
+            diferenca = data_atual - data_validacao
+            meses_diferenca = diferenca.days // 30
+            cliente_email = pedido_info["EMAIL"]
+
+            if not cliente_email:
+                enviado = "❌"
+                motivo = "SEM EMAIL CADASTRADO"
+                enviar_email = False
+            elif not pedido_info["VERSAO"]:
+                enviado = "❌"
+                motivo = "LONGE DO VENCIMENTO"
+                enviar_email = False
+            elif pedido_info["STATUS"] != "APROVADO":
+                enviado = "❌"
+                motivo = "PEDIDO NÃO APROVADO"
+                enviar_email = False
+            elif "12" in validade and 10 <= meses_diferenca <= 13:
+                enviado = "✅"
+                motivo = "ENVIADO COM SUCESSO"
+                enviar_email = True
+            elif "18" in validade and 16 <= meses_diferenca <= 19:
+                enviado = "✅"
+                motivo = "ENVIADO COM SUCESSO"
+                enviar_email = True
+            elif "24" in validade and 22 <= meses_diferenca <= 25:
+                enviado = "✅"
+                motivo = "ENVIADO COM SUCESSO"
+                enviar_email = True
+            elif "36" in validade and 34 <= meses_diferenca <= 37:
+                enviado = "✅"
+                motivo = "ENVIADO COM SUCESSO"
+                enviar_email = True
+            else:
+                enviado = "❌"
+                motivo = "FORA DO INTERVALO DE RENOVAÇÃO"
+                enviar_email = False
+
+            # Adiciona os dados na QTableWidget
+            row_position = ui.tableWidget.rowCount()
+            ui.tableWidget.insertRow(row_position)
+
+            # Configura a célula de "EMAIL"
+            email_item = QTableWidgetItem(cliente_email)
+            email_item.setTextAlignment(Qt.AlignCenter)
+            ui.tableWidget.setItem(row_position, 0, email_item)
+
+            # Configura a célula de "ENVIADO?"
+            enviado_item = QTableWidgetItem(enviado)
+            enviado_item.setTextAlignment(Qt.AlignCenter)
+            ui.tableWidget.setItem(row_position, 1, enviado_item)
+
+            # Configura a célula de "MOTIVO"
+            motivo_item = QTableWidgetItem(motivo)
+            motivo_item.setTextAlignment(Qt.AlignCenter)
+            ui.tableWidget.setItem(row_position, 2, motivo_item)
+
+            # Atualiza a tela após cada adição
+            QApplication.processEvents()
+
+            if not enviar_email or pedido_info["VERSAO"] not in lista_certificados:
                 progresso_atual += 1
-                ui.label_msg_copiado.setText("❌")
                 ui.barra_progresso_consulta.setValue(progresso_atual)
-                
+                QApplication.processEvents()  # Atualiza a barra de progresso
             else:
                 link_venda_base = f'{lista_certificados[pedido_info["VERSAO"]]["LINK VENDA"]}/{ui.campo_cod_rev.text()}'
                 mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                 email = pedido_info["EMAIL"]
                 assunto = f"Renovação Certificado Digital Certisign"
-                
+
                 if email:
                     remetente = ui.campo_email_empresa.text()
                     destinatarios = pedido_info['EMAIL']
                     senha = ui.campo_senha_email.text()
-                    
                     primeiro_nome = pedido_info['NOME'].split()[0]
                     link_venda = f"{link_venda_base}"
-                    
-                    # Corpo do e-mail em HTML, com a cor da fonte ajustada
+
                     corpo_html = (
                         f"<!DOCTYPE html>"
                         f"<html lang='pt-BR'>"
@@ -1782,13 +1829,13 @@ Atenciosamente,
                         f"<meta charset='UTF-8'>"
                         f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
                         f"<style>"
-                        f"  body {{ font-family: Arial, sans-serif; color: {cor_fonte}; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }}"  # Aplicando a cor da fonte explicitamente
+                        f"  body {{ font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: 20px; }}"
                         f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }}"
                         f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }}"
-                        f"  .header h1 {{ margin: 0; font-size: 24px; color: white; }}"  # Garantindo que o título também esteja com a cor correta
+                        f"  .header h1 {{ margin: 0; font-size: 24px; color: white; }}"
                         f"  .content {{ padding: 20px; text-align: center; }}"
-                        f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: {cor_fonte}; }}"  # Aplicando a cor da fonte explicitamente para os parágrafos
-                        f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: rgb(89, 62, 255) !important; color: #FFFFFF !important; text-decoration: none; border-radius: 5px; font-weight: bold; }}"  # Cor do botão com fonte branca e !important
+                        f"  .content p {{ font-size: 20px; line-height: 1.6; color: #333333; }}"
+                        f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: rgb(89, 62, 255) !important; color: #FFFFFF !important; text-decoration: none; border-radius: 5px; font-weight: bold; }}"
                         f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 12px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }}"
                         f"</style>"
                         f"</head>"
@@ -1812,39 +1859,34 @@ Atenciosamente,
                         f"</body>"
                         f"</html>"
                     )
-                    
+
                     try:
-                        # Usar MIMEMultipart para enviar HTML corretamente
+                        QApplication.processEvents() 
                         msg = MIMEMultipart("alternative")
                         msg['Subject'] = assunto
                         msg['From'] = remetente
                         msg['To'] = destinatarios
-                        
                         parte_html = MIMEText(corpo_html, "html")
                         msg.attach(parte_html)
-                        
+
                         with smtplib.SMTP_SSL('email-ssl.com.br', 465) as smtp_server:
                             smtp_server.login(remetente, senha)
                             smtp_server.sendmail(remetente, destinatarios, msg.as_string())
-                        
-                        # Incrementar a barra de progresso após o envio de cada e-mail
-                        progresso_atual += 1
-                        ui.label_msg_copiado.setText("✅")
-                        ui.barra_progresso_consulta.setValue(progresso_atual)
 
-                    
-                        
+                        progresso_atual += 1
+                        ui.barra_progresso_consulta.setValue(progresso_atual)
+                        QApplication.processEvents()  # Atualiza a barra de progresso
+
                     except smtplib.SMTPException as e:
                         ui.barra_progresso_consulta.setVisible(False)
+                        QApplication.processEvents()  # Atualiza a barra de progresso
                         self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail para {pedido_info['EMAIL']}: {e}")
-
+            QApplication.processEvents() 
         ui.barra_progresso_consulta.setVisible(False)
         ui.label_msg_copiado.setText("")
-        self.mensagem_alerta("Sucesso", f"E-mail's enviados com sucesso!")
-        
+        banco_dados.mensagem_alerta("FINALIZADO","PROCESSO FINALIZADO!")
 
-
-
+    
 
 
 
@@ -2018,6 +2060,12 @@ class Acoes_banco_de_dados:
             ui.campo_preco_certificado_cheio.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
+            ui.tableWidget.setRowCount(0)
+            ui.tableWidget.setColumnCount(6)
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+            for col in range(ui.tableWidget.columnCount()):
+                    ui.tableWidget.setColumnWidth(col, 83)
+
 
            
         except Exception as e:
@@ -2065,6 +2113,13 @@ class Acoes_banco_de_dados:
             ui.campo_preco_certificado_cheio.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
+            ui.tableWidget.setRowCount(0)
+            ui.tableWidget.setColumnCount(6)
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+            for col in range(ui.tableWidget.columnCount()):
+                    ui.tableWidget.setColumnWidth(col, 83)
+
+
             self.limpar_labels()
             self.contar_verificacao()
         except Exception as e:
@@ -2328,9 +2383,6 @@ class Acoes_banco_de_dados:
         ui.campo_status_videook.setText(str(quantidade_videook))
 
     def preencher_tabela(self):
-    #CORRIGIDO ---------------------------------------------------------
-    #USO DE BANCO DE DADOS
-
         # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
         data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
         data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
@@ -2341,21 +2393,21 @@ class Acoes_banco_de_dados:
                         .end_at(data_final)
         pedidos = pedidos_ref.get()
 
-
         for col in range(ui.tableWidget.columnCount()):
-             ui.tableWidget.setColumnHidden(col, False)
+            ui.tableWidget.setColumnHidden(col, False)
         ui.tableWidget.setRowCount(0)
+        ui.tableWidget.setColumnCount(6)
+        ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+        for col in range(ui.tableWidget.columnCount()):
+                ui.tableWidget.setColumnWidth(col, 83)
+
+
         valor_estimado = 0
         try:
-            #ui.tableWidget.clear()
+            pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), 
+                                                            datetime.datetime.strptime(x['HORA'], "%H:%M")))
 
-            pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), datetime.datetime.strptime(x['HORA'], "%H:%M")))
-
-            # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
-            data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
-
-            data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
             numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
 
             valor_cnpj = 0
@@ -2365,24 +2417,26 @@ class Acoes_banco_de_dados:
             j = 0
             f = 0
             venda = 0
-            ui.barra_progresso_consulta.setVisible(True)
-            ui.barra_progresso_consulta.setValue(0)
             total_pedidos = len(pedidos)
+            for col in range(ui.tableWidget.columnCount()):
+                ui.tableWidget.setColumnWidth(col, 83)
+            ui.barra_progresso_consulta.setVisible(False)
+            
+            # Configura a barra de progresso corretamente
+            ui.barra_progresso_consulta.setVisible(True)
+            ui.barra_progresso_consulta.setMaximum(total_pedidos)  # Máximo é o total de pedidos
+            ui.barra_progresso_consulta.setValue(0)
+            
             status_filtro = ui.campo_lista_status_2.currentText()
-           
             
             for pedido_info in pedidos:
-                
                 data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
                 numero_inteiro_bd = data_bd.toordinal()
                 status_servidor = pedido_info['STATUS']
-               
-                if (numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final) :
-
+                
+                if numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final:
                     if status_filtro == status_servidor or status_filtro == "TODAS":
-                    
                         x += 1
-                    
                         row_position = ui.tableWidget.rowCount()
                         ui.tableWidget.insertRow(row_position)
                         try:
@@ -2409,60 +2463,46 @@ class Acoes_banco_de_dados:
                             ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
                         except:
                             ui.tableWidget.setItem(row_position, 5, QTableWidgetItem("-"))
-                        # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
-                        
-                        try:
-                            # Verifica se a chave 'PREÇO' existe no dicionário e se o valor associado a ela pode ser convertido para float
-                            if 'PRECO' in pedido_info:
-                                # Substitui a vírgula por um ponto no valor do preço
-                                preco = float(pedido_info['PRECO'])
 
-                                # Converte o valor para float e soma ao valor estimado
-                                valor_estimado += float(preco)
+                        try:
+                            if 'PRECO' in pedido_info:
+                                preco = float(pedido_info['PRECO'])
+                                valor_estimado += preco
 
                                 if 'e-CNPJ' in pedido_info['VERSAO']:
-                                    valor_cnpj = float(valor_cnpj) + preco
-                                    j+=1                                 
+                                    valor_cnpj += preco
+                                    j += 1
                                 elif 'e-CPF' in pedido_info['VERSAO']:
-                                    valor_cpf = float(valor_cpf) + preco
-                                    f+=1                            
+                                    valor_cpf += preco
+                                    f += 1
                                 if pedido_info['VENDA'] == "SIM":
-                                        venda += 1
-                                
-                                QApplication.processEvents()
+                                    venda += 1
+                            QApplication.processEvents()
                         except ValueError:
                             pass
 
                         for col in range(ui.tableWidget.columnCount()):
                             item = ui.tableWidget.item(row_position, col)
-
-                            status = ui.tableWidget.item(row_position,0).text()
-
+                            status = ui.tableWidget.item(row_position, 0).text()
                             if item is not None:
                                 match status:
                                     case 'DIGITAÇÃO':
-                                        item.setForeground(QColor(113, 66, 230)) 
+                                        item.setForeground(QColor(113, 66, 230))
                                     case 'VIDEO REALIZADA':
-                                        item.setForeground(QColor(25, 200, 255))  # Amarelo
+                                        item.setForeground(QColor(25, 200, 255))
                                     case 'VERIFICAÇÃO':
-                                        item.setForeground(QColor(255, 167, 91))  # Laranja claro
+                                        item.setForeground(QColor(255, 167, 91))
                                     case 'APROVADO':
-                                        item.setForeground(QColor(173, 255, 47))  # Verde limão
+                                        item.setForeground(QColor(173, 255, 47))
                                     case 'CANCELADO':
-                                        item.setForeground(QColor(255, 30, 30))  # Vermelho claro   
+                                        item.setForeground(QColor(255, 30, 30))
 
                         y += 1
-                        porcentagem = (y/total_pedidos)*100
-                        ui.barra_progresso_consulta.setValue(int(porcentagem))
+                        # Atualiza a barra de progresso de acordo com o total de pedidos
+                        ui.barra_progresso_consulta.setValue(y)
                         QApplication.processEvents()
-                        
-            total = 100
-            while porcentagem <= total:
-                ui.barra_progresso_consulta.setValue(int(porcentagem))
-                porcentagem +=1
-                QApplication.processEvents()
-                
-            ui.barra_progresso_consulta.setValue(100)
+
+            ui.barra_progresso_consulta.setValue(total_pedidos)  # Finaliza a barra de progresso no valor máximo
             self.contar_verificacao()
 
             total_venda = valor_cnpj + valor_cpf
@@ -2475,22 +2515,20 @@ class Acoes_banco_de_dados:
 Vendas.........{venda}
 ''')
 
+            ui.barra_progresso_consulta.setVisible(False)
             ui.label_quantidade_bd.setText(f"{x} registro(s)")
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME", "VERSAO"])
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+            
+        except Exception as e:
+            print(e)
+            ui.campo_relatorio.setPlainText("")
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnWidth(col, 83)
+            ui.label_quantidade_bd.setText(f"{x} registro(s)")
             ui.barra_progresso_consulta.setVisible(False)
-        except Exception as e:
-                print(e)
-                ui.campo_relatorio.setPlainText("")
-                ui.tableWidget.setHorizontalHeaderLabels(["STATUS","PEDIDO", "DATA","HORA", "NOME","VERSAO"])
-                for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col,83 )
-                ui.label_quantidade_bd.setText(f"{x} registro(s)")
-                ui.barra_progresso_consulta.setVisible(False)
-                self.contar_verificacao()
-                pass
-    
+            self.contar_verificacao()
+ 
     def atualizar_documentos_tabela(self):
         # Limpar qualquer conteúdo existente na tabela
         self.ui.tabela_documentos.clearContents()
