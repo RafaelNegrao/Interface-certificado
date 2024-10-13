@@ -157,6 +157,8 @@ class Funcoes_padrao:
                 ui.campo_cod_rev.setText(configs['COD REV'])
                 ui.campo_senha_email.setText(configs['SENHA EMAIL'])
                 ui.campo_nome_agente.setText(configs['AGENTE'])
+                ui.campo_dias_renovacao.setValue(configs['RNG RENOVACAO'])
+
 
             except Exception as e:
                 print(e)
@@ -187,6 +189,7 @@ class Funcoes_padrao:
         campo_cod_rev = ui.campo_cod_rev.text()
         senha_email = ui.campo_senha_email.text()
         atendente = ui.campo_nome_agente.text()
+        renovacao = ui.campo_dias_renovacao.value()
         # Cria um dicionário com as novas configurações
         nova_config = {
             "DIRETORIO-RAIZ": diretorio,
@@ -200,6 +203,7 @@ class Funcoes_padrao:
             "COD REV":campo_cod_rev,
             "SENHA EMAIL":senha_email,
             "AGENTE":atendente,
+            "RNG RENOVACAO": renovacao,
             }
 
         try:
@@ -782,6 +786,11 @@ class Funcoes_padrao:
                         telefone = req[cliente].get('TELEFONE', "")
                         email = req[cliente].get('EMAIL', "")
                         preco = req[cliente].get('PRECO', "").replace(',', '.')
+                        if status_servidor == "APROVADO":
+                            validade = datetime.datetime.strptime(req[cliente]["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+                        else:
+                            validade = "-"
+
                         try:
                             preco = float(preco)
                         except ValueError:
@@ -790,15 +799,19 @@ class Funcoes_padrao:
                         status_agendamento = req[cliente]['STATUS']
                         vendido = req[cliente]['VENDA']
                         modalidade = req[cliente]['MODALIDADE']
+                        if status_servidor == "APROVADO":
+                            validade = datetime.datetime.strptime(req[cliente]["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+                        else:
+                            validade = "-"
 
-                        dados_selecionados.append((pedido, nome, telefone, email, data_agendamento, versao, hora_agendamento, status_agendamento, vendido, modalidade, preco))
+                        dados_selecionados.append((pedido, nome, telefone, email, data_agendamento, versao, hora_agendamento, status_agendamento, vendido, modalidade, preco,validade))
 
             if x > 0:
                 root = tk.Tk()
                 root.withdraw()
                 caminho_arquivo = filedialog.askdirectory()
                 if caminho_arquivo:
-                    df = pd.DataFrame(dados_selecionados, columns=['Pedido', 'Cliente', 'Telefone', 'E-mail', 'Data agendamento', 'Versão', 'Hora', 'Status Pedido', 'Vendido por mim?', 'Modalidade', 'Preço'])
+                    df = pd.DataFrame(dados_selecionados, columns=['Pedido', 'Cliente', 'Telefone', 'E-mail', 'Data agendamento', 'Versão', 'Hora', 'Status Pedido', 'Vendido por mim?', 'Modalidade', 'Comissão','Válido até'])
                     data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
                     data_final_text = ui.campo_data_ate.text()
                     data_inicial_text = ui.campo_data_de.text()
@@ -1713,18 +1726,19 @@ Atenciosamente,
             return
 
         ui.tableWidget.setRowCount(0)  # Limpa a tabela
-        ui.tableWidget.setColumnCount(3)  # Define o número de colunas
-        ui.tableWidget.setHorizontalHeaderLabels(["EMAIL", "ENVIADO?", "RETORNO"])
-        ui.tableWidget.setColumnWidth(0, 167)
-        ui.tableWidget.setColumnWidth(1, 167)
-        ui.tableWidget.setColumnWidth(2, 167)
+        ui.tableWidget.setColumnCount(4)  # Altera o número de colunas para 4
+        ui.tableWidget.setHorizontalHeaderLabels(["EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"])  # Adiciona a nova coluna
+        ui.tableWidget.setColumnWidth(0, 126)
+        ui.tableWidget.setColumnWidth(1, 126)
+        ui.tableWidget.setColumnWidth(2, 126)
+        ui.tableWidget.setColumnWidth(3, 126)  # Define a largura da nova coluna
 
-        data_inicial = banco_dados.data_para_iso(QDateTime(ui.campo_data_de.date()))
-        data_final = banco_dados.data_para_iso(QDateTime(ui.campo_data_ate.date()))
-        pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
-            .start_at(data_inicial) \
-            .end_at(data_final)
+        pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
         pedidos = pedidos_ref.get()
+
+        ref_link_venda = db.reference(f"/Certificados/")
+        lista_certificados = ref_link_venda.get()
+        range_validacao = ui.campo_dias_renovacao.value()
 
         if not pedidos:
             self.mensagem_alerta("Erro", "Nenhum pedido encontrado para as datas selecionadas.")
@@ -1737,50 +1751,61 @@ Atenciosamente,
         QApplication.processEvents()  # Atualiza a barra de progresso
 
         nome = ui.campo_nome_agente.text()
-        ref_link_venda = db.reference(f"/Certificados/")
-        lista_certificados = ref_link_venda.get()
+
         ui.barra_progresso_consulta.setVisible(True)
         ui.barra_progresso_consulta.setValue(0)
         data_atual = datetime.datetime.now()
+        env = 0
+        ne = 0
+        erro = 0
+
 
         for pedido_info in pedidos.values():
-            data_validacao = datetime.datetime.strptime(pedido_info["DATA"], "%Y-%m-%dT%H:%M:%SZ")
-            validade = pedido_info["VERSAO"]
-            diferenca = data_atual - data_validacao
-            meses_diferenca = diferenca.days // 30
+            try:
+                data_validade = datetime.datetime.strptime(pedido_info["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ")
+            except:
+                erro += 1
+                enviado = "❌"
+                motivo = "LONGE DO VENCIMENTO"
+                enviar_email = False
+                
+            data_atual = datetime.datetime.now()
+
+            diferenca = (data_validade - data_atual).days
+            if diferenca < 0:
+                msg_diferenca = f'Venceu há {abs(diferenca)} dias'
+            elif diferenca > 0:
+                msg_diferenca = f'Restam {diferenca} dias'
+            else:
+                msg_diferenca = 'Vence hoje.'
+
             cliente_email = pedido_info["EMAIL"]
+            data_formatada_validacao = banco_dados.iso_para_data(pedido_info["DATA"]).toString("dd/MM/yyyy")
 
             if not cliente_email:
                 enviado = "❌"
                 motivo = "SEM EMAIL CADASTRADO"
+                ne += 1
                 enviar_email = False
             elif not pedido_info["VERSAO"]:
                 enviado = "❌"
                 motivo = "LONGE DO VENCIMENTO"
+                ne += 1
                 enviar_email = False
             elif pedido_info["STATUS"] != "APROVADO":
                 enviado = "❌"
                 motivo = "PEDIDO NÃO APROVADO"
+                ne += 1
                 enviar_email = False
-            elif "12" in validade and 10 <= meses_diferenca <= 13:
+            elif -range_validacao <= diferenca <= range_validacao:
                 enviado = "✅"
                 motivo = "ENVIADO COM SUCESSO"
-                enviar_email = True
-            elif "18" in validade and 16 <= meses_diferenca <= 19:
-                enviado = "✅"
-                motivo = "ENVIADO COM SUCESSO"
-                enviar_email = True
-            elif "24" in validade and 22 <= meses_diferenca <= 25:
-                enviado = "✅"
-                motivo = "ENVIADO COM SUCESSO"
-                enviar_email = True
-            elif "36" in validade and 34 <= meses_diferenca <= 37:
-                enviado = "✅"
-                motivo = "ENVIADO COM SUCESSO"
+                env += 1
                 enviar_email = True
             else:
                 enviado = "❌"
                 motivo = "FORA DO INTERVALO DE RENOVAÇÃO"
+                ne += 1
                 enviar_email = False
 
             # Adiciona os dados na QTableWidget
@@ -1802,6 +1827,11 @@ Atenciosamente,
             motivo_item.setTextAlignment(Qt.AlignCenter)
             ui.tableWidget.setItem(row_position, 2, motivo_item)
 
+            # Configura a célula de "PRAZO RESTANTE"
+            prazo_item = QTableWidgetItem(str(msg_diferenca))  # Adiciona a variável 'diferenca' na nova coluna
+            prazo_item.setTextAlignment(Qt.AlignCenter)
+            ui.tableWidget.setItem(row_position, 3, prazo_item)
+
             # Atualiza a tela após cada adição
             QApplication.processEvents()
 
@@ -1811,7 +1841,6 @@ Atenciosamente,
                 QApplication.processEvents()  # Atualiza a barra de progresso
             else:
                 link_venda_base = f'{lista_certificados[pedido_info["VERSAO"]]["LINK VENDA"]}/{ui.campo_cod_rev.text()}'
-                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                 email = pedido_info["EMAIL"]
                 assunto = f"Renovação Certificado Digital Certisign"
 
@@ -1822,21 +1851,28 @@ Atenciosamente,
                     primeiro_nome = pedido_info['NOME'].split()[0]
                     link_venda = f"{link_venda_base}"
 
+                    tamanho_fonte = "18px"
+                    cor_botao_fundo = "rgb(89, 62, 255)"
+                    cor_botao_texto = "#FFFFFF"
+                    tamanho_fonte_footer = "12px"
+
                     corpo_html = (
                         f"<!DOCTYPE html>"
                         f"<html lang='pt-BR'>"
                         f"<head>"
                         f"<meta charset='UTF-8'>"
                         f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                        f"<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap' rel='stylesheet'>"
                         f"<style>"
-                        f"  body {{ font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: 20px; }}"
-                        f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }}"
-                        f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }}"
-                        f"  .header h1 {{ margin: 0; font-size: 24px; color: white; }}"
-                        f"  .content {{ padding: 20px; text-align: center; }}"
-                        f"  .content p {{ font-size: 20px; line-height: 1.6; color: #333333; }}"
-                        f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: rgb(89, 62, 255) !important; color: #FFFFFF !important; text-decoration: none; border-radius: 5px; font-weight: bold; }}"
-                        f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 12px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }}"
+                        f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }} "
+                        f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }} "
+                        f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
+                        f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; }} "
+                        f"  .content {{ padding: 20px; text-align: center; }} "
+                        f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; }} "
+                        f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; }} "
+                        f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                        f"  .align-left {{ text-align: left; font-size: 18px; }} "
                         f"</style>"
                         f"</head>"
                         f"<body>"
@@ -1845,15 +1881,22 @@ Atenciosamente,
                         f"      <h1>Renovação do Certificado Digital Certisign</h1>"
                         f"    </div>"
                         f"    <div class='content'>"
-                        f"      <p>Olá {primeiro_nome}, tudo bem?</p>"
+                        f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
                         f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
-                        f"      <p>Verificamos que a validade do seu certificado digital está próxima do <b>vencimento</b>.</p>"
-                        f"      <p>Para manter a continuidade dos serviços digitais em sua organização, gostaríamos de oferecer a renovação do seu certificado digital.</p>"
+                        f"      <p>Fizemos a validação para seu certificado digital, modelo"
+                        f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
+                        f"      <p>Verifiquei que ele está próximo ao <b>vencimento</b> e entendemos a importância do certificado digital para seus negócios.</p>"
+                        f"      <p>Desse modo, oferecemos a renovação através do botão abaixo.</p>"
                         f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
+                        f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
+                        f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
                         f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
+                        f"      <br>" 
+                        f"      <p>Atenciosamente,</p>"
+                        f"      <p>{nome}</p>"
                         f"    </div>"
                         f"    <div class='footer'>"
-                        f"      <p>ACB Digital &copy; 2024. Todos os direitos reservados.</p>"
+                        f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
                         f"    </div>"
                         f"  </div>"
                         f"</body>"
@@ -1881,14 +1924,14 @@ Atenciosamente,
                         ui.barra_progresso_consulta.setVisible(False)
                         QApplication.processEvents()  # Atualiza a barra de progresso
                         self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail para {pedido_info['EMAIL']}: {e}")
-            QApplication.processEvents() 
+        QApplication.processEvents() 
         ui.barra_progresso_consulta.setVisible(False)
-        ui.label_msg_copiado.setText("")
-        banco_dados.mensagem_alerta("FINALIZADO","PROCESSO FINALIZADO!")
+        ui.campo_relatorio.setPlainText(f"Processo finalizado!\nEnviados: {env}\nNão enviado: {ne}\nErro: {erro}")
+
 
     
 
-
+ 
 
 
 
@@ -2135,7 +2178,23 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_tirar_print.setText("")
          
     def dicionario_banco_de_dados(self):
-           
+        data_validacao = datetime.datetime.strptime(ui.campo_data_agendamento.date().toString("yyyy-MM-dd"), "%Y-%m-%d")
+        certificado_12 = data_validacao + datetime.timedelta(days=365)
+        certificado_18 = data_validacao + datetime.timedelta(days=540)
+        certificado_24 = data_validacao + datetime.timedelta(days=720)
+        certificado_36 = data_validacao + datetime.timedelta(days=1080)
+
+        # Duração do certificado em meses (pode ser 12, 18, 24, 36 meses)
+        certificado = ui.campo_lista_versao_certificado.currentText()
+        if "12" in certificado:
+            duracao_certificado = certificado_12
+        elif "18" in certificado:
+            duracao_certificado = certificado_18
+        elif "24" in certificado:
+            duracao_certificado = certificado_24
+        elif "36" in certificado:
+            duracao_certificado = certificado_36
+     
         novos_dados = {
                     "PASTA":ui.caminho_pasta.text(),
                     "MUNICIPIO": ui.campo_cnpj_municipio.text(),
@@ -2161,8 +2220,10 @@ class Acoes_banco_de_dados:
                     "ORGAO RG":ui.campo_rg_orgao.text(),
                     "PIS":ui.campo_pis.text(),
                     "TELEFONE":ui.campo_telefone.text(),
-                    "OAB":ui.campo_oab.text()
+                    "OAB":ui.campo_oab.text(),
+                    "VALIDO ATE":""
                     }
+        
         if self.verificar_status() == "DEFINITIVO":
             novos_dados.update({
                     "PASTA": None,
@@ -2178,6 +2239,7 @@ class Acoes_banco_de_dados:
                     "ORGAO RG": None,
                     "PIS": None,
                     "OAB": None,
+                    "VALIDO ATE":duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ"),
                     })
 
         return novos_dados
@@ -2632,7 +2694,7 @@ class JanelaOculta:
         self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(525, 680)
+        self.animate_window_resize(525, 683)
         self.janela.atualizar_documentos_tabela()
 
     def leaveEvent(self, event):
@@ -2651,7 +2713,7 @@ class JanelaOculta:
                     self.animate_window_resize(143, 53)
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(525,680)#469
+        self.animate_window_resize(525,683)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width

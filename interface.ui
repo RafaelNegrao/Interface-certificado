@@ -2700,7 +2700,7 @@ color:rgb(90,54,247);
        <rect>
         <x>48</x>
         <y>564</y>
-        <width>173</width>
+        <width>197</width>
         <height>25</height>
        </rect>
       </property>
@@ -3243,9 +3243,9 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
      <widget class="QPushButton" name="botao_envio_massa">
       <property name="geometry">
        <rect>
-        <x>236</x>
+        <x>256</x>
         <y>564</y>
-        <width>137</width>
+        <width>117</width>
         <height>29</height>
        </rect>
       </property>
@@ -3263,11 +3263,11 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
 background-color:rgb(120, 0, 190);
-color:rgb(170,170,247);
+color:rgb(205,205,205);
 </string>
       </property>
       <property name="text">
-       <string>ENVIO EM MASSA</string>
+       <string>RENOVAÇÃO</string>
       </property>
      </widget>
      <zorder>botao_procurar</zorder>
@@ -5214,6 +5214,72 @@ QLineEdit:disabled, QLineEdit:!focus {
        <string>👁️</string>
       </property>
      </widget>
+     <widget class="QSpinBox" name="campo_dias_renovacao">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>400</y>
+        <width>86</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QSpinBox {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(40, 42, 54);
+}
+
+QSpinBox:disabled, QSpinBox:!focus {
+    border-bottom: 1px solid rgb(68, 71, 90);
+}
+</string>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::NoButtons</enum>
+      </property>
+      <property name="minimum">
+       <number>0</number>
+      </property>
+      <property name="maximum">
+       <number>255</number>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_41">
+      <property name="geometry">
+       <rect>
+        <x>200</x>
+        <y>388</y>
+        <width>85</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>7</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(40,42, 54);color:rgb(150,150,150)</string>
+      </property>
+      <property name="text">
+       <string>DIAS RENOVAÇÃO</string>
+      </property>
+     </widget>
      <zorder>caminho_pasta</zorder>
      <zorder>campo_verifica_tela_cheia</zorder>
      <zorder>caminho_pasta_principal</zorder>
@@ -5248,6 +5314,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <zorder>campo_nome_agente</zorder>
      <zorder>label_30</zorder>
      <zorder>botao_ocultar_senha</zorder>
+     <zorder>campo_dias_renovacao</zorder>
+     <zorder>label_41</zorder>
     </widget>
    </widget>
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
