@@ -3,7 +3,6 @@ import pandas as pd
 import tkinter as tk
 import os
 import time
-import shutil
 import psutil
 import requests
 import PyPDF2
@@ -29,7 +28,8 @@ from credenciaisBd import *
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from datetime import timedelta
+import send2trash
+
 
 
 #Referência raiz do banco de dados
@@ -1160,12 +1160,14 @@ class Funcoes_padrao:
         try:
             ref = db.reference(f"/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
             certificado = ref.get()
+            link_venda = certificado["LINK VENDA"]
+            rev = str(ui.campo_cod_rev.text())
 
             if certificado:
-                link = f'{certificado["LINK VENDA"]}/{ui.campo_cod_rev.text()}'
-                pyperclip.copy(link)
-        except Exception as e:
-            print(f"Erro ao pegar o link de venda: {e}")
+                link = f"{link_venda}{rev}"
+                pyperclip.copy(str(link))
+        except:
+            pass
 
     def buscar_preco_certificado(self):        
         ref = db.reference("/Certificados")        
@@ -1645,7 +1647,7 @@ Atenciosamente,
                 ref_link_venda = db.reference(f"/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
                 certificado = ref_link_venda.get()
                 primeiro_nome = ui.campo_nome.text().split()[0]
-                link_venda = f'{certificado["LINK VENDA"]}/{ui.campo_cod_rev.text()}'
+                link_venda = f'{certificado["LINK VENDA"]}{ui.campo_cod_rev.text()}'
                 mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                 assunto = f"Renovação Certificado Digital Certisign"
                 
@@ -1840,7 +1842,7 @@ Atenciosamente,
                 ui.barra_progresso_consulta.setValue(progresso_atual)
                 QApplication.processEvents()  # Atualiza a barra de progresso
             else:
-                link_venda_base = f'{lista_certificados[pedido_info["VERSAO"]]["LINK VENDA"]}/{ui.campo_cod_rev.text()}'
+                link_venda_base = f'{lista_certificados[pedido_info["VERSAO"]]["LINK VENDA"]}{ui.campo_cod_rev.text()}'
                 email = pedido_info["EMAIL"]
                 assunto = f"Renovação Certificado Digital Certisign"
 
@@ -1923,7 +1925,6 @@ Atenciosamente,
                     except smtplib.SMTPException as e:
                         ui.barra_progresso_consulta.setVisible(False)
                         QApplication.processEvents()  # Atualiza a barra de progresso
-                        self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail para {pedido_info['EMAIL']}: {e}")
         QApplication.processEvents() 
         ui.barra_progresso_consulta.setVisible(False)
         ui.campo_relatorio.setPlainText(f"Processo finalizado!\nEnviados: {env}\nNão enviado: {ne}\nErro: {erro}")
@@ -2244,21 +2245,28 @@ class Acoes_banco_de_dados:
 
         return novos_dados
 
-    def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
+    def forcar_fechamento_de_arquivo_e_deletar_pasta(self, folder_path):
         for _ in range(3):  # Tentar até três vezes
             try:
-                shutil.rmtree(folder_path)
-                self.mensagem_alerta(" ","Pasta excluída com sucesso")
+                send2trash.send2trash(folder_path)  # Tentar mover para a lixeira
+                self.mensagem_alerta(" ", "Pasta movida para a lixeira")
                 break
             except PermissionError as e:
                 # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
                 self.fechar_arquivo_em_uso(folder_path)
+            except OSError as e:
+                # Captura erros de sistema operacional, como o WinError específico
+                if e.winerror == -2144927704:
+                    self.fechar_arquivo_em_uso(folder_path)  # Tentar fechar arquivos novamente
+                else:
+                    self.mensagem_alerta(" ", f"Erro inesperado: {e}")
+                    break
             except Exception as e:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                     break
-                self.mensagem_alerta(" ","Erro ao excluir pasta do cliente")
+                self.mensagem_alerta(" ", f"Erro ao mover pasta do cliente para a lixeira: {e}")
                 break
-   
+    
     def fechar_arquivo_em_uso(self,folder_path):
         processes = psutil.process_iter(['pid', 'name', 'open_files'])
         for process in processes:
