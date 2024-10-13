@@ -2259,12 +2259,10 @@ class Acoes_banco_de_dados:
                 if e.winerror == -2144927704:
                     self.fechar_arquivo_em_uso(folder_path)  # Tentar fechar arquivos novamente
                 else:
-                    self.mensagem_alerta(" ", f"Erro inesperado: {e}")
                     break
             except Exception as e:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                     break
-                self.mensagem_alerta(" ", f"Erro ao mover pasta do cliente para a lixeira: {e}")
                 break
     
     def fechar_arquivo_em_uso(self,folder_path):
