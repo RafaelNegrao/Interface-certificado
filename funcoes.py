@@ -28,7 +28,7 @@ from credenciaisBd import *
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import send2trash
+import shutil
 
 
 
@@ -1964,11 +1964,11 @@ class Acoes_banco_de_dados:
                 match condic:
                     #Pedido existente + gravado Definitivo
                     case 'DEFINITIVO':
-                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
+                        
                         novo_pedido_ref.update(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
-                        self.mensagem_alerta("Sucesso","Pedido salvo!") 
+                        self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
                         self.contar_verificacao()
                         self.limpar_campos_pedido()
 
@@ -1992,7 +1992,7 @@ class Acoes_banco_de_dados:
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
                         self.limpar_campos_pedido()
-                        self.mensagem_alerta("Sucesso","Pedido salvo!") 
+                        self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
                         self.contar_verificacao()
 
                     #Pedido existente + gravado temporariamente
@@ -2245,26 +2245,22 @@ class Acoes_banco_de_dados:
 
         return novos_dados
 
-    def forcar_fechamento_de_arquivo_e_deletar_pasta(self, folder_path):
+    def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
         for _ in range(3):  # Tentar até três vezes
             try:
-                send2trash.send2trash(folder_path)  # Tentar mover para a lixeira
-                self.mensagem_alerta(" ", "Pasta movida para a lixeira")
-                break
+                shutil.rmtree(folder_path)
+                return "Pasta excluída com sucesso"
+                
             except PermissionError as e:
                 # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
                 self.fechar_arquivo_em_uso(folder_path)
-            except OSError as e:
-                # Captura erros de sistema operacional, como o WinError específico
-                if e.winerror == -2144927704:
-                    self.fechar_arquivo_em_uso(folder_path)  # Tentar fechar arquivos novamente
-                else:
-                    break
             except Exception as e:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
-                    break
-                break
-    
+                    return ""
+                return "Erro ao excluir pasta do cliente"
+                
+
+            
     def fechar_arquivo_em_uso(self,folder_path):
         processes = psutil.process_iter(['pid', 'name', 'open_files'])
         for process in processes:
