@@ -1,12 +1,11 @@
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Ui_janela(object):
     def setupUi(self, janela):
         janela.setObjectName("janela")
-        janela.resize(525, 678)
+        janela.resize(523, 678)
         janela.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
         janela.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
         palette = QtGui.QPalette()
@@ -830,6 +829,7 @@ class Ui_janela(object):
         font.setWeight(50)
         self.campo_preco_certificado.setFont(font)
         self.campo_preco_certificado.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_preco_certificado.setToolTipDuration(999999999)
         self.campo_preco_certificado.setStyleSheet("QLineEdit {\n"
 "    border: none;\n"
 "    border-bottom: 1px solid rgb(90, 54, 247);\n"
@@ -1054,6 +1054,8 @@ class Ui_janela(object):
         self.tabela_documentos.setFont(font)
         self.tabela_documentos.setStyleSheet("border-radius:7px;\n"
 "border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);")
+        self.tabela_documentos.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.tabela_documentos.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.tabela_documentos.setColumnCount(1)
         self.tabela_documentos.setObjectName("tabela_documentos")
         self.tabela_documentos.setRowCount(0)
@@ -1460,6 +1462,7 @@ class Ui_janela(object):
 "}")
         self.campo_lista_status_2.setEditable(False)
         self.campo_lista_status_2.setObjectName("campo_lista_status_2")
+        self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
@@ -3021,6 +3024,7 @@ class Ui_janela(object):
         font.setBold(True)
         font.setWeight(75)
         self.campo_status_verificacao.setFont(font)
+        self.campo_status_verificacao.setToolTipDuration(999999999)
         self.campo_status_verificacao.setStyleSheet("color: orange")
         self.campo_status_verificacao.setText("")
         self.campo_status_verificacao.setObjectName("campo_status_verificacao")
@@ -3032,6 +3036,7 @@ class Ui_janela(object):
         font.setBold(True)
         font.setWeight(75)
         self.campo_status_videook.setFont(font)
+        self.campo_status_videook.setToolTipDuration(999999999)
         self.campo_status_videook.setStyleSheet("color: rgb(18,191,255)")
         self.campo_status_videook.setText("")
         self.campo_status_videook.setObjectName("campo_status_videook")
@@ -3113,6 +3118,28 @@ class Ui_janela(object):
         self.campo_certificados_mes.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_certificados_mes.setObjectName("campo_certificados_mes")
         self.formLayout.setWidget(5, QtWidgets.QFormLayout.LabelRole, self.campo_certificados_mes)
+        self.campo_email_enviado = QtWidgets.QLineEdit(self.centralwidget)
+        self.campo_email_enviado.setGeometry(QtCore.QRect(630, 560, 133, 31))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setWeight(50)
+        self.campo_email_enviado.setFont(font)
+        self.campo_email_enviado.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_email_enviado.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(40, 42, 54);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(68, 71, 90);\n"
+"}\n"
+"")
+        self.campo_email_enviado.setText("")
+        self.campo_email_enviado.setObjectName("campo_email_enviado")
         self.layoutWidget.raise_()
         self.layoutWidget.raise_()
         self.tabWidget.raise_()
@@ -3134,6 +3161,7 @@ class Ui_janela(object):
         self.campo_status_bd_3.raise_()
         self.campo_status_verificacao.raise_()
         self.campo_status_videook.raise_()
+        self.campo_email_enviado.raise_()
         janela.setCentralWidget(self.centralwidget)
 
         self.retranslateUi(janela)
@@ -3348,6 +3376,7 @@ class Ui_janela(object):
         self.campo_lista_status_2.setItemText(3, _translate("janela", "VERIFICAÇÃO"))
         self.campo_lista_status_2.setItemText(4, _translate("janela", "APROVADO"))
         self.campo_lista_status_2.setItemText(5, _translate("janela", "CANCELADO"))
+        self.campo_lista_status_2.setItemText(6, _translate("janela", "PROX VENCIMENTO"))
         self.label_19.setText(_translate("janela", " DE:"))
         self.label_21.setText(_translate("janela", " STATUS"))
         self.label_20.setText(_translate("janela", " ATÉ:"))

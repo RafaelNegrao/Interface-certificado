@@ -43,94 +43,45 @@ class Funcoes_padrao:
 
     def atualizar_barras_metas(self):
         try:
-            # Calcula a soma dos valores das semanas
-            soma = math.floor(float(ui.campo_certificados_semana_1.text().replace(',', '.'))) + \
-                math.floor(float(ui.campo_certificados_semana_2.text().replace(',', '.'))) + \
-                math.floor(float(ui.campo_certificados_semana_3.text().replace(',', '.'))) + \
-                math.floor(float(ui.campo_certificados_semana_4.text().replace(',', '.'))) + \
-                math.floor(float(ui.campo_certificados_semana_5.text().replace(',', '.')))
+            def atualizar_semana(semana_num, certificados, meta_semanal):
+                barra = getattr(ui, f"barra_meta_semana_{semana_num}")
+                label = getattr(ui, f"label_meta{semana_num}")
+                certificados_semana = math.floor(float(certificados.replace(',', '.')))
+                
+                barra.setMaximum(meta_semanal)
+                barra.setValue(certificados_semana)
+                
+                if certificados_semana >= meta_semanal:
+                    label.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
+                    label.setText(f"Meta atingida! - R${certificados_semana} / R${meta_semanal}")
+                else:
+                    label.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
+                    label.setText(f"R${certificados_semana} / R${meta_semanal}")
+                return certificados_semana
 
             # Recupera as metas mensal e semanal, convertendo os valores para inteiro
-            meta_mensal = int(float(ui.campo_meta_mes.text().replace(',', '.')))  # Convertido para inteiro
-            meta_semanal = int(float(ui.campo_meta_semanal.text().replace(',', '.')))  # Convertido para inteiro
+            meta_mensal = int(float(ui.campo_meta_mes.text().replace(',', '.')))
+            meta_semanal = int(float(ui.campo_meta_semanal.text().replace(',', '.')))
 
-            # Atualiza a barra de progresso e o label para a semana 1
-            certificados_semana_1 = math.floor(float(ui.campo_certificados_semana_1.text().replace(',', '.')))
-            ui.barra_meta_semana_1.setMaximum(meta_semanal)
-            ui.barra_meta_semana_1.setValue(certificados_semana_1)  # Atualiza o valor da barra de progresso
-            
-            if certificados_semana_1 >= meta_semanal:
-                # Se a meta foi atingida
-                ui.label_meta1.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230);')
-                ui.label_meta1.setText(f"Meta atingida! - R${certificados_semana_1} / R${meta_semanal}")
-            else:
-                # Se não foi...
-                ui.label_meta1.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                ui.label_meta1.setText(f"R${certificados_semana_1} / R${meta_semanal}")
+            # Calcula a soma dos valores das semanas e atualiza as barras e labels de cada uma
+            soma = sum(
+                atualizar_semana(i, getattr(ui, f"campo_certificados_semana_{i}").text(), meta_semanal) 
+                for i in range(1, 6)
+            )
 
-            certificados_semana_2 = math.floor(float(ui.campo_certificados_semana_2.text().replace(',', '.')))
-            # Repete o processo para as semanas 2 a 5# ...# Código para atualizar as outras semanas (igual ao trecho anterior)# ...# Atualiza a barra de progresso e o label para a meta mensal
-            ui.barra_meta_semana_2.setMaximum(meta_semanal)
-            ui.barra_meta_semana_2.setValue(certificados_semana_2)  # Atualiza o valor da barra de progresso
-            
-            if certificados_semana_2 >= meta_semanal:
-                #Meta atingida
-                ui.label_meta2.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                ui.label_meta2.setText(f"Meta atingida! - R${certificados_semana_2} / R${meta_semanal}")
-            else:
-                #Meta não atingida
-                ui.label_meta2.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                ui.label_meta2.setText(f"R${certificados_semana_2} / R${meta_semanal}")
-
-            certificados_semana_3 = math.floor(float(ui.campo_certificados_semana_3.text().replace(',', '.')))
-            ui.barra_meta_semana_3.setMaximum(meta_semanal)
-            ui.barra_meta_semana_3.setValue(certificados_semana_3)  # Atualiza o valor da barra de progresso
-            if certificados_semana_3 >= meta_semanal:
-                #Meta atingida
-                ui.label_meta3.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                ui.label_meta3.setText(f"Meta atingida! - R${certificados_semana_3} / R${meta_semanal}")
-            else:
-                #Meta não atingida
-                ui.label_meta3.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                ui.label_meta3.setText(f"R${certificados_semana_3} / R${meta_semanal}")
-
-            certificados_semana_4 = math.floor(float(ui.campo_certificados_semana_4.text().replace(',', '.')))
-            ui.barra_meta_semana_4.setMaximum(meta_semanal)
-            ui.barra_meta_semana_4.setValue(certificados_semana_4)  # Atualiza o valor da barra de progresso
-            if certificados_semana_4 >= meta_semanal:
-                #Meta atingida
-                ui.label_meta4.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                ui.label_meta4.setText(f"Meta atingida! - R${certificados_semana_4} / R${meta_semanal}")
-            else:
-                #Meta não atingida
-                ui.label_meta4.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                ui.label_meta4.setText(f"R${certificados_semana_4} / R${meta_semanal}")
-
-            certificados_semana_5 = math.floor(float(ui.campo_certificados_semana_5.text().replace(',', '.')))
-            ui.barra_meta_semana_5.setMaximum(meta_semanal)
-            ui.barra_meta_semana_5.setValue(certificados_semana_5)  # Atualiza o valor da barra de progresso
-            if certificados_semana_5 >= meta_semanal:
-                #Meta atingida
-                ui.label_meta5.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                ui.label_meta5.setText(f"Meta atingida! - R${certificados_semana_5} / R${meta_semanal}")
-            else:
-                #Meta não atingida
-                ui.label_meta5.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                ui.label_meta5.setText(f"R${certificados_semana_5} / R${meta_semanal}")
-
+            # Atualiza a barra de progresso e o label para a meta mensal
             ui.barra_meta_mensal.setMaximum(meta_mensal)
-            ui.barra_meta_mensal.setValue(soma)  # Atualiza o valor da barra de progresso
+            ui.barra_meta_mensal.setValue(soma)
             ui.label_meta_mes.setText(f"R${soma} / R${ui.campo_meta_mes.text()}")
+
             if soma >= meta_mensal:
-                #Meta atingida
                 ui.label_meta_mes.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
                 ui.label_meta_mes.setText(f"Meta atingida! - R${soma} / R${meta_mensal}")
             else:
-                #Meta não atingida
                 ui.label_meta_mes.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
                 ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
-        except:
-            pass
+        except Exception as e:
+            print(f"Erro: {e}")
 
     def trazer_configuracoes(self):
         #CORRIGIDO ------------------------------------------------------------------
@@ -963,37 +914,6 @@ class Funcoes_padrao:
             self.atualizar_documentos_tabela()
             ui.label_confirmacao_converter_pdf.setText("❌")
 
-    def texto_para_pdf(self):
-        # Obter o texto que você deseja converter em PDF (substitua esta linha pelo seu texto)
-        try:
-            texto = ui.campo_link_video.text()
-            default_file_name = "LINK VIDEO"
-            # Abrir o explorador de arquivos para selecionar o local de salvamento do PDF
-            save_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF Files", "*.pdf")],initialfile=default_file_name,title="Local de download")
-            # Verificar se o usuário selecionou um local de salvamento
-            if not save_path:
-                return
-            
-            # Criar um arquivo PDF
-            c = canvas.Canvas(save_path, pagesize=letter)
-            
-            # Definir o tamanho da fonte e a posição para começar a escrever o texto
-            font_size = 14
-            x, y = 20, 680  # Posição inicial
-            
-            # Adicionar o texto ao PDF
-            c.setFont("Helvetica", font_size)
-            for line in texto.split('\n'):
-                c.drawString(x, y, line)
-                y -= 15  # Espaçamento entre as linhas
-            
-            # Salvar o arquivo PDF
-            c.save()
-            ui.campo_link_video.setText("")
-            self.mensagem_alerta("Concluído","Texto salvo com sucesso!")
-        except:
-            self.mensagem_alerta("Erro","Feche o arquivo PDF!")
-
     def evento_ao_abrir(self,event):
         self.trazer_configuracoes()
         self.trazer_metas()
@@ -1020,77 +940,42 @@ class Funcoes_padrao:
         else:
             event.ignore()
 
-    def copiar_campo(self,nome_campo):
+    def copiar_campo(self, nome_campo):
+        # LISTA DE CAMPOS QUE SERÃO COPIADOS
+        campos = [
+            'campo_oab',
+            'campo_cnh',
+            'campo_cnpj',
+            'campo_pedido',
+            'campo_cpf',
+            'campo_seguranca_cnh',
+            'campo_rg',
+            'campo_nome_mae',
+            'campo_nome',
+            'campo_pis',
+        ]
+
+        # VERIFICAR SE O NOME DO CAMPO ESTA NA LISTA
+        if nome_campo in campos:
+            try:
+                # OBTER O CAMPO RELACIONADO AO NOME
+                campo = getattr(ui, nome_campo)
+
+                # SE O CAMPO FOR 'campo_cnpj' OU 'campo_cpf', REMOVER CARACTERES ESPECIAIS
+                if nome_campo in ['campo_cnpj', 'campo_cpf']:
+                    texto = campo.text().replace('.', '').replace('-', '').replace('/', '')
+                else:
+                    texto = campo.text()
+
+                # COPIAR O TEXTO PARA A AREA DE TRANSFERENCIA
+                QApplication.clipboard().setText(texto)
+
+                # SELECIONAR TODO O TEXTO DO CAMPO
+                campo.selectAll()
+            except Exception as e:
+                # TRATAR ERRO AO COPIAR
+                print(f"Erro ao copiar o campo {nome_campo}: {e}")
         
-        match nome_campo:
-            
-            case 'campo_oab':
-                try:
-                    QApplication.clipboard().setText(ui.campo_oab.text())
-                    ui.campo_oab.selectAll()
-                except:
-                    pass
-            case 'campo_cnh':
-                try:
-                    QApplication.clipboard().setText(ui.campo_cnh.text())
-                    ui.campo_cnh.selectAll()
-                except:
-                    pass
-            case'campo_cnpj':
-                try:
-                    QApplication.clipboard().setText(ui.campo_cnpj.text().replace('.','').replace('-','').replace('/',''))
-                    ui.campo_cnpj.selectAll()
-                except:
-                    pass
-            case'campo_pedido':
-                try:
-                    QApplication.clipboard().setText(ui.campo_pedido.text())
-                    ui.campo_pedido.selectAll()
-                except:
-                    pass
-            case'campo_cpf':
-                try:
-                    QApplication.clipboard().setText(ui.campo_cpf.text().replace('.','').replace('-',''))
-                    ui.campo_cpf.selectAll()
-                except:
-                    pass
-            case'campo_seguranca_cnh':
-                try:
-                    QApplication.clipboard().setText(ui.campo_seguranca_cnh.text())
-                    ui.campo_seguranca_cnh.selectAll()
-                except:
-                    pass
-            case'campo_rg':
-                try:
-                    QApplication.clipboard().setText(ui.campo_rg.text())
-                    ui.campo_rg.selectAll()
-                except:
-                    pass
-            case'campo_nome_mae':
-                try:
-                    QApplication.clipboard().setText(ui.campo_nome_mae.text())
-                    ui.campo_nome_mae.selectAll()
-                except:
-                    pass
-            case'campo_nome':
-                try:
-                    QApplication.clipboard().setText(ui.campo_nome.text())
-                    ui.campo_nome.selectAll()
-                except:
-                    pass
-            case'campo_pis':
-                try:
-                    QApplication.clipboard().setText(ui.campo_pis.text())
-                    ui.campo_pis.selectAll()
-                except:
-                    pass
-            case'campo_oab':
-                try:
-                    QApplication.clipboard().setText(ui.campo_oab.text())
-                    ui.campo_oab.selectAll()
-                except:
-                    pass
-            
     def manter_tela_aberta(self):
         if ui.campo_verifica_tela_cheia.text() == "SIM":
             ui.campo_verifica_tela_cheia.setText("NAO")
@@ -1547,23 +1432,18 @@ Endereço: '''
           
         mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
 
-        texto, ok = QInputDialog.getItem(ui.centralwidget, "Mensagens Whatsapp", "Escolha a Mensagem:", ["INICIAR ATENDIMENTO", "ERRO NA VALIDAÇÃO","OUTRO"], 0, False)
+        texto, ok = QInputDialog.getItem(ui.centralwidget, "Mensagens Whatsapp", "Escolha a Mensagem:", ["INICIAR ATENDIMENTO","PROBLEMA PAGAMENTO","ERRO NA VALIDAÇÃO","OUTRO"], 0, False)
         
         if not ok or not texto:
             return 
         
-        nome_completo = ui.campo_nome.text()
-        if nome_completo != '':
-            primeiro_nome = nome_completo.split()[0]
-            primeiro_nome = primeiro_nome.capitalize()
-        else:
-            pass
+        nome = ui.campo_nome_agente.text()
         
         if texto == 'OUTRO':
                 mensagem = f'{mensagem_inicial}, tudo bem?\n'\
 
         if texto == 'INICIAR ATENDIMENTO':
-             nome = ui.campo_nome_agente.text()
+             
              mensagem = f'{mensagem_inicial}, tudo bem?\n'\
 f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para seu certificado digital às {ui.campo_hora_agendamento.text()}. \n' \
 'Podemos Iniciar o atendimento?'
@@ -1572,9 +1452,15 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             mensagem = f'{mensagem_inicial}, tudo bem?\n'\
 f'Sou o {nome} que fez a validação do seu certificado digital.\n'\
 'Estou entrando em contato pois ocorreu um erro na validação do seu pedido.'
-            
-        numero = ui.campo_telefone.text()  # substitua pelo número de telefone desejado
-        mensagem = mensagem.replace(' ', '%20')  # substitui espaços por %20
+
+        elif texto == 'PROBLEMA PAGAMENTO':
+            mensagem = f'{mensagem_inicial}, tudo bem?\n'\
+f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para seu certificado digital às *{ui.campo_hora_agendamento.text()}*. \n' \
+'Porém, verifiquei que o pagamento para seu pedido ainda *não foi reconhecido no sistema*.\n'\
+'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato com o suporte pelo contato *4020-9735* para que possam fazer a liberação do pedido.'
+
+        numero = ui.campo_telefone.text()  
+        mensagem = mensagem.replace(' ', '%20')  
         url_mensagem = QUrl(f'https://api.whatsapp.com/send?phone={numero}&text={mensagem}')
         QDesktopServices.openUrl(url_mensagem)
 
@@ -1724,16 +1610,18 @@ Atenciosamente,
             ui.campo_senha_email.setEchoMode(QLineEdit.Password)
 
     def envio_em_massa(self):
-        if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?"):
+        if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
+
             return
 
         ui.tableWidget.setRowCount(0)  # Limpa a tabela
-        ui.tableWidget.setColumnCount(4)  # Altera o número de colunas para 4
-        ui.tableWidget.setHorizontalHeaderLabels(["EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"])  # Adiciona a nova coluna
-        ui.tableWidget.setColumnWidth(0, 126)
-        ui.tableWidget.setColumnWidth(1, 126)
-        ui.tableWidget.setColumnWidth(2, 126)
-        ui.tableWidget.setColumnWidth(3, 126)  # Define a largura da nova coluna
+        ui.tableWidget.setColumnCount(5)  # Altera o número de colunas para 4
+        ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"])  # Adiciona a nova coluna
+        ui.tableWidget.setColumnWidth(0, 70)
+        ui.tableWidget.setColumnWidth(1, 100)
+        ui.tableWidget.setColumnWidth(2, 50)
+        ui.tableWidget.setColumnWidth(3, 100)
+        ui.tableWidget.setColumnWidth(4, 180)  # Define a largura da nova coluna
 
         pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
         pedidos = pedidos_ref.get()
@@ -1763,6 +1651,7 @@ Atenciosamente,
 
 
         for pedido_info in pedidos.values():
+            
             try:
                 data_validade = datetime.datetime.strptime(pedido_info["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ")
             except:
@@ -1772,76 +1661,90 @@ Atenciosamente,
                 enviar_email = False
                 
             data_atual = datetime.datetime.now()
-
             diferenca = (data_validade - data_atual).days
-            if diferenca < 0:
-                msg_diferenca = f'Venceu há {abs(diferenca)} dias'
-            elif diferenca > 0:
-                msg_diferenca = f'Restam {diferenca} dias'
-            else:
-                msg_diferenca = 'Vence hoje.'
-
-            cliente_email = pedido_info["EMAIL"]
+            cliente_email = pedido_info.get("EMAIL", "")
             data_formatada_validacao = banco_dados.iso_para_data(pedido_info["DATA"]).toString("dd/MM/yyyy")
 
+            # Verificar se o campo "EMAIL RENOVACAO" existe; se não, inicializá-lo
+            email_ja_enviado = pedido_info.get("EMAIL RENOVACAO")
+
+            # Definir a mensagem sobre a diferença de dias
+            data_validade_formatada = data_validade.strftime("%d/%m/%Y")
+
+# Mensagem que inclui a diferença de dias e a data de validade
+            msg_diferenca = (
+                f'Venceu há {abs(diferenca)} dias.\nVence em: {data_validade_formatada}' if diferenca < 0 else 
+                f'Restam {diferenca} dias.\nVence em: {data_validade_formatada}' if diferenca > 0 else 
+                f'Vence em: {data_validade_formatada}'      
+            )
+
+            # Verificações para determinar se o email pode ser enviado
+            motivo = ""
+            enviado = "❌"
+            enviar_email = False
+
             if not cliente_email:
-                enviado = "❌"
                 motivo = "SEM EMAIL CADASTRADO"
                 ne += 1
-                enviar_email = False
-            elif not pedido_info["VERSAO"]:
-                enviado = "❌"
-                motivo = "LONGE DO VENCIMENTO"
+            elif not pedido_info.get("VERSAO"):
+                motivo = "SEM PRODUTO CADASTRADO"
                 ne += 1
-                enviar_email = False
             elif pedido_info["STATUS"] != "APROVADO":
-                enviado = "❌"
                 motivo = "PEDIDO NÃO APROVADO"
                 ne += 1
-                enviar_email = False
-            elif -range_validacao <= diferenca <= range_validacao:
-                enviado = "✅"
-                motivo = "ENVIADO COM SUCESSO"
-                env += 1
-                enviar_email = True
-            else:
-                enviado = "❌"
-                motivo = "FORA DO INTERVALO DE RENOVAÇÃO"
+            elif not (0 <= diferenca <= range_validacao):
+                motivo = "FORA DO PRAZO DE RENOVAÇÃO"
                 ne += 1
-                enviar_email = False
+            elif email_ja_enviado == "SIM":
+                motivo = "EMAIL JÁ ENVIADO"
+                ne += 1
+            else:
+                motivo = "ENVIADO COM SUCESSO"
+                enviado = "✅"
+                enviar_email = True
+                env += 1
+                # Atualizar campo "EMAIL RENOVACAO" para "SIM"
+                ref.child("Pedidos").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
 
             # Adiciona os dados na QTableWidget
             row_position = ui.tableWidget.rowCount()
             ui.tableWidget.insertRow(row_position)
 
+            pedido_item = QTableWidgetItem(str(pedido_info.get("PEDIDO", "")))
+            pedido_item.setTextAlignment(Qt.AlignCenter)
+            ui.tableWidget.setItem(row_position, 0, pedido_item)
+
             # Configura a célula de "EMAIL"
             email_item = QTableWidgetItem(cliente_email)
             email_item.setTextAlignment(Qt.AlignCenter)
-            ui.tableWidget.setItem(row_position, 0, email_item)
+            ui.tableWidget.setItem(row_position, 1, email_item)
 
             # Configura a célula de "ENVIADO?"
             enviado_item = QTableWidgetItem(enviado)
             enviado_item.setTextAlignment(Qt.AlignCenter)
-            ui.tableWidget.setItem(row_position, 1, enviado_item)
+            ui.tableWidget.setItem(row_position, 2, enviado_item)
 
             # Configura a célula de "MOTIVO"
             motivo_item = QTableWidgetItem(motivo)
             motivo_item.setTextAlignment(Qt.AlignCenter)
-            ui.tableWidget.setItem(row_position, 2, motivo_item)
+            ui.tableWidget.setItem(row_position, 3, motivo_item)
 
             # Configura a célula de "PRAZO RESTANTE"
             prazo_item = QTableWidgetItem(str(msg_diferenca))  # Adiciona a variável 'diferenca' na nova coluna
             prazo_item.setTextAlignment(Qt.AlignCenter)
-            ui.tableWidget.setItem(row_position, 3, prazo_item)
+            ui.tableWidget.setItem(row_position, 4, prazo_item)
 
             # Atualiza a tela após cada adição
             QApplication.processEvents()
-
+            
+            # VERIFICA SE ENVIA OU NÃO O EMAIL
             if not enviar_email or pedido_info["VERSAO"] not in lista_certificados:
                 progresso_atual += 1
                 ui.barra_progresso_consulta.setValue(progresso_atual)
                 QApplication.processEvents()  # Atualiza a barra de progresso
+            
             else:
+                
                 link_venda_base = f'{lista_certificados[pedido_info["VERSAO"]]["LINK VENDA"]}{ui.campo_cod_rev.text()}'
                 email = pedido_info["EMAIL"]
                 assunto = f"Renovação Certificado Digital Certisign"
@@ -1858,52 +1761,103 @@ Atenciosamente,
                     cor_botao_texto = "#FFFFFF"
                     tamanho_fonte_footer = "12px"
 
-                    corpo_html = (
-                        f"<!DOCTYPE html>"
-                        f"<html lang='pt-BR'>"
-                        f"<head>"
-                        f"<meta charset='UTF-8'>"
-                        f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
-                        f"<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap' rel='stylesheet'>"
-                        f"<style>"
-                        f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }} "
-                        f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }} "
-                        f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
-                        f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; }} "
-                        f"  .content {{ padding: 20px; text-align: center; }} "
-                        f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; }} "
-                        f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; }} "
-                        f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
-                        f"  .align-left {{ text-align: left; font-size: 18px; }} "
-                        f"</style>"
-                        f"</head>"
-                        f"<body>"
-                        f"  <div class='container'>"
-                        f"    <div class='header'>"
-                        f"      <h1>Renovação do Certificado Digital Certisign</h1>"
-                        f"    </div>"
-                        f"    <div class='content'>"
-                        f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
-                        f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
-                        f"      <p>Fizemos a validação para seu certificado digital, modelo"
-                        f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
-                        f"      <p>Verifiquei que ele está próximo ao <b>vencimento</b> e entendemos a importância do certificado digital para seus negócios.</p>"
-                        f"      <p>Desse modo, oferecemos a renovação através do botão abaixo.</p>"
-                        f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
-                        f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                        f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
-                        f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
-                        f"      <br>" 
-                        f"      <p>Atenciosamente,</p>"
-                        f"      <p>{nome}</p>"
-                        f"    </div>"
-                        f"    <div class='footer'>"
-                        f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
-                        f"    </div>"
-                        f"  </div>"
-                        f"</body>"
-                        f"</html>"
-                    )
+                    if diferenca > 0:
+                        # CERTIFICADO VÁLIDO
+                        corpo_html = (
+                            f"<!DOCTYPE html>"
+                            f"<html lang='pt-BR'>"
+                            f"<head>"
+                            f"<meta charset='UTF-8'>"
+                            f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                            f"<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap' rel='stylesheet'>"
+                            f"<style>"
+                            f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }} "
+                            f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }} "
+                            f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
+                            f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; }} "
+                            f"  .content {{ padding: 20px; text-align: center; }} "
+                            f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; }} "
+                            f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; }} "
+                            f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                            f"  .align-left {{ text-align: left; font-size: 18px; }} "
+                            f"</style>"
+                            f"</head>"
+                            f"<body>"
+                            f"  <div class='container'>"
+                            f"    <div class='header'>"
+                            f"      <h1>Renovação do Certificado Digital Certisign</h1>"
+                            f"    </div>"
+                            f"    <div class='content'>"
+                            f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
+                            f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
+                            f"      <p>Fizemos a validação para seu certificado digital, modelo"
+                            f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
+                            f"      <p>Verifiquei que ele está próximo à data <b>vencimento</b> e entendemos a importância do certificado digital para seus negócios.</p>"
+                            f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
+                            f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
+                            f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
+                            f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
+                            f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
+                            f"      <br>" 
+                            f"      <p>Atenciosamente,</p>"
+                            f"      <p>{nome}</p>"
+                            f"    </div>"
+                            f"    <div class='footer'>"
+                            f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
+                            f"    </div>"
+                            f"  </div>"
+                            f"</body>"
+                            f"</html>"
+                        )
+                    
+                    elif diferenca == 0:
+                        # VENCE HOJE
+                        corpo_html = (
+                            f"<!DOCTYPE html>"
+                            f"<html lang='pt-BR'>"
+                            f"<head>"
+                            f"<meta charset='UTF-8'>"
+                            f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                            f"<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap' rel='stylesheet'>"
+                            f"<style>"
+                            f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }} "
+                            f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }} "
+                            f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
+                            f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; }} "
+                            f"  .content {{ padding: 20px; text-align: center; }} "
+                            f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; }} "
+                            f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; }} "
+                            f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                            f"  .align-left {{ text-align: left; font-size: 18px; }} "
+                            f"</style>"
+                            f"</head>"
+                            f"<body>"
+                            f"  <div class='container'>"
+                            f"    <div class='header'>"
+                            f"      <h1>Renovação do Certificado Digital Certisign</h1>"
+                            f"    </div>"
+                            f"    <div class='content'>"
+                            f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
+                            f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
+                            f"      <p>Fizemos a validação para seu certificado digital, modelo"
+                            f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
+                            f"      <p>Verifiquei que ele vence <b>Hoje</b> e entendemos a importância do certificado digital para seus negócios.</p>"
+                            f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
+                            f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
+                            f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
+                            f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
+                            f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
+                            f"      <br>" 
+                            f"      <p>Atenciosamente,</p>"
+                            f"      <p>{nome}</p>"
+                            f"    </div>"
+                            f"    <div class='footer'>"
+                            f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
+                            f"    </div>"
+                            f"  </div>"
+                            f"</body>"
+                            f"</html>"
+                        )
 
                     try:
                         QApplication.processEvents() 
@@ -1918,6 +1872,9 @@ Atenciosamente,
                             smtp_server.login(remetente, senha)
                             smtp_server.sendmail(remetente, destinatarios, msg.as_string())
 
+                        
+
+
                         progresso_atual += 1
                         ui.barra_progresso_consulta.setValue(progresso_atual)
                         QApplication.processEvents()  # Atualiza a barra de progresso
@@ -1927,14 +1884,9 @@ Atenciosamente,
                         QApplication.processEvents()  # Atualiza a barra de progresso
         QApplication.processEvents() 
         ui.barra_progresso_consulta.setVisible(False)
-        ui.campo_relatorio.setPlainText(f"Processo finalizado!\nEnviados: {env}\nNão enviado: {ne}\nErro: {erro}")
-
-
-    
+        ui.campo_relatorio.setPlainText(f"Processo finalizado!\nEnviados: {env}\nNão enviado: {ne}\nErro: {erro}")  
 
  
-
-
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -2006,8 +1958,7 @@ class Acoes_banco_de_dados:
                         
         except Exception as e:
             print(e)
-            #self.mensagem_alerta("Erro","Não foi possível salvar os dados. Tente novamente.")
-        
+                
     def mensagem_confirmacao(self,titulo,mensagem):
         resposta = QMessageBox.question(ui.centralwidget, titulo, mensagem, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
@@ -2102,6 +2053,7 @@ class Acoes_banco_de_dados:
             ui.campo_oab.setText("")
             ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
+            ui.campo_email_enviado.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
             ui.tableWidget.setRowCount(0)
@@ -2155,6 +2107,7 @@ class Acoes_banco_de_dados:
             ui.campo_oab.setText("")
             ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
+            ui.campo_email_enviado.setText("")
             for col in range(ui.tableWidget.columnCount()):
                 ui.tableWidget.setColumnHidden(col, False)
             ui.tableWidget.setRowCount(0)
@@ -2195,7 +2148,13 @@ class Acoes_banco_de_dados:
             duracao_certificado = certificado_24
         elif "36" in certificado:
             duracao_certificado = certificado_36
-     
+
+
+        if ui.campo_email_enviado.text() == "SIM":
+            renova = "SIM"
+        else:
+            renova = "NAO"
+
         novos_dados = {
                     "PASTA":ui.caminho_pasta.text(),
                     "MUNICIPIO": ui.campo_cnpj_municipio.text(),
@@ -2222,7 +2181,8 @@ class Acoes_banco_de_dados:
                     "PIS":ui.campo_pis.text(),
                     "TELEFONE":ui.campo_telefone.text(),
                     "OAB":ui.campo_oab.text(),
-                    "VALIDO ATE":""
+                    "VALIDO ATE":"",
+                    "EMAIL RENOVACAO":renova
                     }
         
         if self.verificar_status() == "DEFINITIVO":
@@ -2241,6 +2201,7 @@ class Acoes_banco_de_dados:
                     "PIS": None,
                     "OAB": None,
                     "VALIDO ATE":duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "EMAIL RENOVACAO":renova
                     })
 
         return novos_dados
@@ -2258,9 +2219,7 @@ class Acoes_banco_de_dados:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                     return ""
                 return "Erro ao excluir pasta do cliente"
-                
-
-            
+                     
     def fechar_arquivo_em_uso(self,folder_path):
         processes = psutil.process_iter(['pid', 'name', 'open_files'])
         for process in processes:
@@ -2392,6 +2351,10 @@ class Acoes_banco_de_dados:
                 pass
             try:
                 ui.campo_oab.setText(pedido_data.get("OAB"))
+            except:
+                pass
+            try:
+                ui.campo_email_enviado.setText(pedido_data.get("EMAIL RENOVACAO"))
             except:
                 pass
             
@@ -2877,6 +2840,8 @@ ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
 ui.botao_menagem.setToolTip("Mensagens")
 ui.botao_enviar_email.setToolTip("Enviar e-mail para cliente")
 ui.campo_status_bd_3.setToolTip("Quantidade de pedidos AGUARDANDO intervenção")
+ui.campo_dias_renovacao.setToolTip("Define o intervalo de dias para o envio de emails de renovação. Por exemplo, se definir 15 , serão considerados os próximos 15 dias a partir de hoje.")
+
 
 #Validador
 regex = QRegExp("[0-9.]*")

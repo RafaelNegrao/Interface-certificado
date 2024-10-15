@@ -1707,6 +1707,9 @@ QComboBox::drop-down {
       <property name="cursor">
        <cursorShape>IBeamCursor</cursorShape>
       </property>
+      <property name="toolTipDuration">
+       <number>999999999</number>
+      </property>
       <property name="styleSheet">
        <string notr="true">QLineEdit {
     border: none;
@@ -2142,6 +2145,12 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="styleSheet">
        <string notr="true">border-radius:7px;
 border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <property name="columnCount">
        <number>1</number>
@@ -6061,6 +6070,9 @@ QSpinBox:disabled, QSpinBox:!focus {
       <bold>true</bold>
      </font>
     </property>
+    <property name="toolTipDuration">
+     <number>999999999</number>
+    </property>
     <property name="styleSheet">
      <string notr="true">color: orange</string>
     </property>
@@ -6084,6 +6096,9 @@ QSpinBox:disabled, QSpinBox:!focus {
       <weight>75</weight>
       <bold>true</bold>
      </font>
+    </property>
+    <property name="toolTipDuration">
+     <number>999999999</number>
     </property>
     <property name="styleSheet">
      <string notr="true">color: rgb(18,191,255)</string>
@@ -6218,6 +6233,43 @@ QSpinBox:disabled, QSpinBox:!focus {
      </item>
     </layout>
    </widget>
+   <widget class="QLineEdit" name="campo_email_enviado">
+    <property name="geometry">
+     <rect>
+      <x>630</x>
+      <y>560</y>
+      <width>133</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <pointsize>12</pointsize>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="cursor">
+     <cursorShape>IBeamCursor</cursorShape>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(40, 42, 54);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(68, 71, 90);
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>tabWidget</zorder>
@@ -6239,6 +6291,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <zorder>campo_status_bd_3</zorder>
    <zorder>campo_status_verificacao</zorder>
    <zorder>campo_status_videook</zorder>
+   <zorder>campo_email_enviado</zorder>
   </widget>
  </widget>
  <tabstops>
