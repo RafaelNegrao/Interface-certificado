@@ -1,39 +1,9 @@
-import datetime
-import pandas as pd
-import tkinter as tk
-import os
-import time
-import psutil
-import requests
-import PyPDF2
-import fitz
-import pyautogui
-import sys
-import subprocess
-import math
-import pyperclip
-from tkinter import filedialog
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
-from reportlab.lib.utils import ImageReader
-from PIL import Image
-from PyQt5 import QtGui, QtWidgets,QtCore,Qt
-from PyQt5.QtWidgets import QTableWidgetItem,QTableWidget,QApplication,QMessageBox,QDesktopWidget,QInputDialog,QMainWindow,QFileDialog,QRadioButton,QVBoxLayout,QPushButton,QDialog, QLineEdit,QScrollArea,QWidget,QGridLayout
-from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp,QMimeData, QDateTime
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QGuiApplication
-from Interface import Ui_janela
-from firebase_admin import db
-from requests.exceptions import RequestException
-from credenciaisBd import *
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-import shutil
-
-
+from imports import *
 
 #Referência raiz do banco de dados
+
 ref = db.reference("/")
+
 
 class Funcoes_padrao:
     def __init__(self,ui,parent=None):
@@ -182,52 +152,55 @@ class Funcoes_padrao:
         ui.campo_meta_mes.setValue(int(valor_mensal))
 
     def atualizar_meta_clientes(self):
-        if ui.tabWidget.currentIndex() == 2:
-            ref = db.reference("/Pedidos")
-            Pedidos = ref.get()
-            
-            # Inicializando contadores para cada semana
-            semanas = [0, 0, 0, 0, 0]
-            
-            # Obter a data do campo ui.campo_data_meta
-            mes_meta = ui.campo_data_meta.date().month()
-            ano_meta = ui.campo_data_meta.date().year()
-            
-            for pedido_info in Pedidos:
-                if Pedidos[pedido_info]['STATUS'] == "APROVADO":
-                    data_pedido = Pedidos[pedido_info]['DATA']
-                    data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
-                    
-                    if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
-                        semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
+        try:
+            if ui.tabWidget.currentIndex() == 2:
+                ref = db.reference("/Pedidos")
+                Pedidos = ref.get()
+                
+                # Inicializando contadores para cada semana
+                semanas = [0, 0, 0, 0, 0]
+                
+                # Obter a data do campo ui.campo_data_meta
+                mes_meta = ui.campo_data_meta.date().month()
+                ano_meta = ui.campo_data_meta.date().year()
+                
+                for pedido_info in Pedidos:
+                    if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                        data_pedido = Pedidos[pedido_info]['DATA']
+                        data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
                         
-                        if semana_do_mes in range(1, 6):
-                            try:
-                                preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                                desconto = 1 - (ui.campo_desconto.value() / 100)
-                                semanas[semana_do_mes - 1] += preco * desconto
-                            except:
-                                pass
-            
-            # Atualiza os campos da interface gráfica com os valores calculados
-            ui.campo_certificados_semana_1.setText(str(semanas[0]))
-            ui.campo_certificados_semana_2.setText(str(semanas[1]))
-            ui.campo_certificados_semana_3.setText(str(semanas[2]))
-            ui.campo_certificados_semana_4.setText(str(semanas[3]))
-            ui.campo_certificados_semana_5.setText(str(semanas[4]))
-            
-            ui.barra_meta_semana_1.setValue(int(semanas[0]))
-            ui.barra_meta_semana_2.setValue(int(semanas[1]))
-            ui.barra_meta_semana_3.setValue(int(semanas[2]))
-            ui.barra_meta_semana_4.setValue(int(semanas[3]))
-            ui.barra_meta_semana_5.setValue(int(semanas[4]))
-            
-            total = sum(semanas)
-            ui.barra_meta_mensal.setValue(int(total))
-            ui.barra_meta_mensal.setMaximum(int(float(ui.campo_meta_mes.text().replace(',', '.'))))
-            ui.campo_certificados_mes.setText(str(total))
-            
-            self.atualizar_barras_metas()
+                        if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
+                            semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
+                            
+                            if semana_do_mes in range(1, 6):
+                                try:
+                                    preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
+                                    desconto = 1 - (ui.campo_desconto.value() / 100)
+                                    semanas[semana_do_mes - 1] += preco * desconto
+                                except:
+                                    pass
+                
+                # Atualiza os campos da interface gráfica com os valores calculados
+                ui.campo_certificados_semana_1.setText(str(semanas[0]))
+                ui.campo_certificados_semana_2.setText(str(semanas[1]))
+                ui.campo_certificados_semana_3.setText(str(semanas[2]))
+                ui.campo_certificados_semana_4.setText(str(semanas[3]))
+                ui.campo_certificados_semana_5.setText(str(semanas[4]))
+                
+                ui.barra_meta_semana_1.setValue(int(semanas[0]))
+                ui.barra_meta_semana_2.setValue(int(semanas[1]))
+                ui.barra_meta_semana_3.setValue(int(semanas[2]))
+                ui.barra_meta_semana_4.setValue(int(semanas[3]))
+                ui.barra_meta_semana_5.setValue(int(semanas[4]))
+                
+                total = sum(semanas)
+                ui.barra_meta_mensal.setValue(int(total))
+                ui.barra_meta_mensal.setMaximum(int(float(ui.campo_meta_mes.text().replace(',', '.'))))
+                ui.campo_certificados_mes.setText(str(total))
+                
+                self.atualizar_barras_metas()
+        except:
+            pass
 
     def definir_cor(self):
         # Define a cor da borda interna superior da interface
@@ -412,7 +385,7 @@ class Funcoes_padrao:
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
                 return
-         
+        
             self.formatar_nome()
             tipo = ui.campo_lista_tipo_criar_pasta.currentText()
             if tipo == "NOME":
@@ -784,7 +757,7 @@ class Funcoes_padrao:
         coluna = item.column()
         # Verifica se há um item selecionado
         if item is not None:
-            # Obtém o texto da célula
+            # Pega o texto da célula
             valor_celula = item.text()
 
             # Copia o valor da célula para a área de transferência
@@ -915,6 +888,7 @@ class Funcoes_padrao:
             ui.label_confirmacao_converter_pdf.setText("❌")
 
     def evento_ao_abrir(self,event):
+        
         self.trazer_configuracoes()
         self.trazer_metas()
         self.definir_cor()
@@ -1054,7 +1028,7 @@ class Funcoes_padrao:
         except:
             pass
 
-    def buscar_preco_certificado(self):        
+    def buscar_preco_certificado(self):
         ref = db.reference("/Certificados")        
         lista_certificados = ref.get()        
         certificado = ui.campo_lista_versao_certificado.currentText()        
@@ -1184,11 +1158,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e farei seu atendimento.'
 
     def clique_btn3(self):
 
-        mensagem = 'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat uma foto completa do seu documento de identificação, *frente e verso*, podendo ser:\n'\
+        mensagem = 'Para prosseguirmos com a validação, preciso que o Sr(a) me encaminhe aqui pelo Chat uma foto do seu documento de identificação, *Frente e Verso*, podendo ser:\n'\
 ' •CNH\n'\
+' •CNH digital\n'\
 ' •RG\n'\
 ' •CREA\n'\
 ' •OAB\n'\
+' •PASSAPORTE\n'\
 '\n '\
 'Observações: \n' \
 ' 1. Retire o documento de identificação do plástico e abra-o.\n' \
@@ -1200,7 +1176,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e farei seu atendimento.'
     def clique_btn5(self):
         #################### CNPJ
                                                                                                                                             
-        mensagem = 'Irei precisar também do Documento de Constituição da Empresa, podendo ser: \n'\
+        mensagem = 'Vou precisar também do Documento de Constituição da Empresa, podendo ser: \n'\
 ' •Contrato Social\n'\
 ' •Certidão de inteiro teor\n'\
 ' •Estatuto social\n'\
@@ -1270,11 +1246,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e farei seu atendimento.'
         nome = ui.campo_nome_agente.text()
         mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
                                                                                                                                             
-        mensagem = f'{mensagem_inicial}, tudo bem? \n'\
-        f'Sou o {nome}, agente de registro da ACB Digital e farei seu atendimento.\n'\
-        'Para prosseguirmos com a validação, preciso que o Sr(a). me encaminhe aqui pelo Chat:\n' \
-        '\n ' \
-        '•Uma foto completa do seu documento de identificação *OAB*, frente e verso.'
+        mensagem = 'Para prosseguirmos com a validação, preciso que o Sr(a) me encaminhe aqui pelo Chat, uma foto do seu documento de identificação *OAB*, frente e verso'
                                                                                                            
         pyperclip.copy(mensagem) 
         return "PEDIR OAB"
@@ -1491,48 +1463,95 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         if not ok:
             return
         
-        
+        tamanho_fonte = "17px"
+        cor_botao_fundo = "rgb(89, 62, 255)"
+        cor_botao_texto = "#FFFFFF"
+        tamanho_fonte_footer = "12px"
+        primeiro_nome = ui.campo_nome.text().split()[0]
 
         match tipo_mensagem:
             case 'INICIO DE ATENDIMENTO':
-                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
-                assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"                                                                                                                           
-                corpo = f'''{mensagem_inicial}, tudo bem? 
-
-Sou o {nome}, agente de registro da ACB Digital.
-
-Estou entrando em contato pois temos uma validação para seu certificado digital às {ui.campo_hora_agendamento.text()} do dia {ui.campo_data_agendamento.text()}.
-
-
-atenciosamente,
-
-{nome}'''
-
-        
-            case 'PROBLEMA DE PAGAMENTO':
-                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time() )
+                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                 assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
-                corpo = f'''{mensagem_inicial}, Tudo bem?
+                
+                corpo_html = (
+                    f"<!DOCTYPE html>"
+                    f"<html lang='pt-BR'>"
+                    f"<head>"
+                    f"<meta charset='UTF-8'>"
+                    f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                    f"<style>"
+                    f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: left; font-size: {tamanho_fonte}; }} "
+                    f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: left; }} "
+                    f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; }} "
+                    f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; text-align: center; }} "
+                    f"  .content {{ padding: 20px; text-align: left; }} "
+                    f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; text-align: left; }} "
+                    f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; text-align: left; }} "
+                    f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                    f"  .align-left {{ text-align: left; font-size: 18px; }} "
+                    f"</style>"
+                    f"</head>"
+                    f"<body>"
+                    f"  <div class='container'>"
+                    f"    <div class='header'><h1>Validação Certisign</h1></div>"
+                    f"    <div class='content'>"
+                    f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
+                    f"      <p>Esperado que esteja bem.</p>"
+                    f"      <P>Sou {nome} e sou agente de registro da ACB Digital.</p>"
+                    f"      <p>Estou entrando em contato para informar que temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
+                    f"      <p>Atenciosamente,<br>{nome}</p>"
+                    f"    </div>"
+                    f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                    f"  </div>"
+                    f"</body>"
+                    f"</html>"
+                )
 
-Sou {nome}, agente de registro da ACB Digital. Estou entrando em contato para informar que temos uma validação agendada para o seu certificado digital às {ui.campo_hora_agendamento.text()} do dia {ui.campo_data_agendamento.text()}. 
-
-No entanto, verifiquei que o pagamento ainda não foi reconhecido em nosso sistema.
-
-Para que possamos prosseguir com a validação, é necessário que o pagamento seja confirmado. 
-
-Peço que entre em contato com o suporte pelo telefone 4020-9735 para que possam verificar e regularizar a situação.
-
-Agradeço a compreensão.
-
-
-Atenciosamente,
-
-{nome}'''
+            case 'PROBLEMA DE PAGAMENTO':
+                mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
+                assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
+                
+                corpo_html = (
+                    f"<!DOCTYPE html>"
+                    f"<html lang='pt-BR'>"
+                    f"<head>"
+                    f"<meta charset='UTF-8'>"
+                    f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                    f"<style>"
+                    f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: left; font-size: {tamanho_fonte}; }} "
+                    f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: left; }} "
+                    f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; }} "
+                    f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; text-align: center; }} "
+                    f"  .content {{ padding: 20px; text-align: left; }} "
+                    f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; text-align: left; }} "
+                    f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; text-align: left; }} "
+                    f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                    f"  .align-left {{ text-align: left; font-size: 18px; }} "
+                    f"</style>"
+                    f"</head>"
+                    f"<body>"
+                    f"  <div class='container'>"
+                    f"    <div class='header'><h1>Validação Certisign</h1></div>"
+                    f"    <div class='content'>"
+                    f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
+                    f"      <p>Esperado que esteja bem.</p>"
+                    f"      <P>Sou {nome} e sou agente de registro da ACB Digital.</p>"
+                    f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
+                    f"      <p>No entanto, o pagamento ainda não foi reconhecido em nosso sistema. Para prosseguirmos com a validação, é necessário que o pagamento seja confirmado.</p>"
+                    f"      <p>Peço que entre em contato com o suporte pelo telefone 4020-9735 para regularizar a situação.</p>"
+                    f"      <p>Agradeço a compreensão.</p>"
+                    f"      <p><br>Atenciosamente,<br>{nome}</p>"
+                    f"    </div>"
+                    f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                    f"  </div>"
+                    f"</body>"
+                    f"</html>"
+                )
                 
             case 'RENOVAÇÃO':
                 ref_link_venda = db.reference(f"/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
                 certificado = ref_link_venda.get()
-                primeiro_nome = ui.campo_nome.text().split()[0]
                 link_venda = f'{certificado["LINK VENDA"]}{ui.campo_cod_rev.text()}'
                 mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                 assunto = f"Renovação Certificado Digital Certisign"
@@ -1545,14 +1564,15 @@ Atenciosamente,
                     f"<meta charset='UTF-8'>"
                     f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
                     f"<style>"
-                    f"  body {{ font-family: Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; }}"
-                    f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }}"
-                    f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }}"
-                    f"  .header h1 {{ margin: 0; font-size: 24px; color: white; }}"
-                    f"  .content {{ padding: 20px; text-align: center; }}"
-                    f"  .content p {{ font-size: 18px; line-height: 1.6; }}"
-                    f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: rgb(89, 62, 255) !important; color: #FFFFFF !important; text-decoration: none; border-radius: 5px; font-weight: bold; }}"
-                    f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 12px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }}"
+                    f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; text-align: center; font-size: {tamanho_fonte}; }} "
+                    f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); text-align: center; }} "
+                    f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
+                    f"  .header h1 {{ margin: 0; font-size: 24px; color: white; font-family: 'Poppins', Arial, sans-serif; }} "
+                    f"  .content {{ padding: 20px; text-align: center; }} "
+                    f"  .content p {{ font-size: {tamanho_fonte}; line-height: 1.6; color: #333333; }} "
+                    f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: {cor_botao_fundo} !important; color: {cor_botao_texto} !important; text-decoration: none; border-radius: 5px; font-weight: bold; font-family: 'Montserrat', Arial, sans-serif; }} "
+                    f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: {tamanho_fonte_footer}; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; font-family: 'Poppins', Arial, sans-serif; }} "
+                    f"  .align-left {{ text-align: left; font-size: 18px; }} "
                     f"</style>"
                     f"</head>"
                     f"<body>"
@@ -1561,7 +1581,8 @@ Atenciosamente,
                     f"      <h1>Renovação do Certificado Digital</h1>"
                     f"    </div>"
                     f"    <div class='content'>"
-                    f"      <p>{mensagem_inicial} {primeiro_nome}, Tudo bem?</p>"
+                    f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}</p>"
+                    f"      <p>Esperado que esteja bem.</p>"
                     f"      <p>Meu nome é {nome} e sou Agente de Registro da ACB Digital.</p>"
                     f"      <p>Verificamos que a validade do seu certificado digital está próxima do <b>vencimento</b>.</p>"
                     f"      <p>Compreendemos a importância de manter a continuidade dos serviços digitais em sua organização. Portanto, gostaríamos de oferecer a renovação do seu certificado.</p>"
@@ -1579,29 +1600,34 @@ Atenciosamente,
                     f"</html>"
                 )
 
-                # Verifica se o e-mail foi inserido
-                if ui.campo_email.text():
-                    remetente = ui.campo_email_empresa.text()
-                    destinatarios = ui.campo_email.text()
-                    senha = ui.campo_senha_email.text()
+        # Verifica se o e-mail foi inserido
+        if ui.campo_email.text():
+            remetente = ui.campo_email_empresa.text()
+            destinatarios = ui.campo_email.text()
+            senha = ui.campo_senha_email.text()
 
-                    # Usar MIMEMultipart para enviar HTML corretamente
-                    msg = MIMEMultipart("alternative")
-                    msg['Subject'] = assunto
-                    msg['From'] = remetente
-                    msg['To'] = destinatarios
+            # Usar MIMEMultipart para enviar HTML corretamente
+            msg = MIMEMultipart("alternative")
+            msg['Subject'] = assunto
+            msg['From'] = remetente
+            msg['To'] = destinatarios
 
-                    parte_html = MIMEText(corpo_html, "html")
-                    msg.attach(parte_html)
+            # Confirmacao de leitura
+            #msg.add_header('Disposition-Notification-To', remetente) 
+            # Confirmacao de entrega
+            #msg.add_header('Return-Receipt-To', remetente) 
 
-                    try:
-                        # Envio do e-mail
-                        with smtplib.SMTP_SSL('email-ssl.com.br', 465) as smtp_server:
-                            smtp_server.login(remetente, senha)
-                            smtp_server.sendmail(remetente, destinatarios, msg.as_string())
-                            self.mensagem_alerta("Sucesso", "E-mail enviado com sucesso!")
-                    except smtplib.SMTPException as e:
-                        self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail: {e}")
+            parte_html = MIMEText(corpo_html, "html")
+            msg.attach(parte_html)
+
+            try:
+                # Envio do e-mail
+                with smtplib.SMTP_SSL('email-ssl.com.br', 465) as smtp_server:
+                    smtp_server.login(remetente, senha)
+                    smtp_server.sendmail(remetente, destinatarios, msg.as_string())
+                    self.mensagem_alerta("Sucesso", "E-mail enviado com sucesso!")
+            except smtplib.SMTPException as e:
+                self.mensagem_alerta("Erro", f"Erro ao enviar o e-mail: {e}")
 
     def mostrar_senha(self):
         if ui.campo_senha_email.echoMode() == QLineEdit.Password:
@@ -1788,7 +1814,8 @@ Atenciosamente,
                             f"      <h1>Renovação do Certificado Digital Certisign</h1>"
                             f"    </div>"
                             f"    <div class='content'>"
-                            f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
+                            f"      <p>Olá {primeiro_nome.capitalize()}</p>"
+                            f"      <p>Esperado que esteja bem.</p>"
                             f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                             f"      <p>Fizemos a validação para seu certificado digital, modelo"
                             f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
@@ -1837,7 +1864,8 @@ Atenciosamente,
                             f"      <h1>Renovação do Certificado Digital Certisign</h1>"
                             f"    </div>"
                             f"    <div class='content'>"
-                            f"      <p>Olá {primeiro_nome.capitalize()}, tudo bem?</p>"
+                            f"      <p>Olá {primeiro_nome.capitalize()}!</p>"
+                            f"      <p>Esperado que esteja bem.</p>"
                             f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                             f"      <p>Fizemos a validação para seu certificado digital, modelo"
                             f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
@@ -2108,14 +2136,13 @@ class Acoes_banco_de_dados:
             ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
-            for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnHidden(col, False)
-            ui.tableWidget.setRowCount(0)
-            ui.tableWidget.setColumnCount(6)
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
-
+            # for col in range(ui.tableWidget.columnCount()):
+            #     ui.tableWidget.setColumnHidden(col, False)
+            # ui.tableWidget.setRowCount(0)
+            # ui.tableWidget.setColumnCount(6)
+            # ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+            # for col in range(ui.tableWidget.columnCount()):
+            #         ui.tableWidget.setColumnWidth(col, 83)
 
             self.limpar_labels()
             self.contar_verificacao()
@@ -2132,77 +2159,58 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_tirar_print.setText("")
          
     def dicionario_banco_de_dados(self):
-        data_validacao = datetime.datetime.strptime(ui.campo_data_agendamento.date().toString("yyyy-MM-dd"), "%Y-%m-%d")
-        certificado_12 = data_validacao + datetime.timedelta(days=365)
-        certificado_18 = data_validacao + datetime.timedelta(days=540)
-        certificado_24 = data_validacao + datetime.timedelta(days=720)
-        certificado_36 = data_validacao + datetime.timedelta(days=1080)
-
-        # Duração do certificado em meses (pode ser 12, 18, 24, 36 meses)
-        certificado = ui.campo_lista_versao_certificado.currentText()
-        if "12" in certificado:
-            duracao_certificado = certificado_12
-        elif "18" in certificado:
-            duracao_certificado = certificado_18
-        elif "24" in certificado:
-            duracao_certificado = certificado_24
-        elif "36" in certificado:
-            duracao_certificado = certificado_36
-
-
-        if ui.campo_email_enviado.text() == "SIM":
-            renova = "SIM"
-        else:
-            renova = "NAO"
-
-        novos_dados = {
-                    "PASTA":ui.caminho_pasta.text(),
-                    "MUNICIPIO": ui.campo_cnpj_municipio.text(),
-                    "DIRETORIO":ui.campo_comentario.toPlainText(),
-                    "CODIGO DE SEG CNH":ui.campo_seguranca_cnh.text(),
-                    "NOME":ui.campo_nome.text(),
-                    "RG":ui.campo_rg.text(),
-                    "CPF":ui.campo_cpf.text(),
-                    "CNH":ui.campo_cnh.text(),
-                    "MAE":ui.campo_nome_mae.text() ,
-                    "CNPJ":ui.campo_cnpj.text(),
-                    "EMAIL":ui.campo_email.text(),
-                    "NASCIMENTO":ui.campo_data_nascimento.text(),
-                    "STATUS":self.alteracao_status(),
-                    "PEDIDO":ui.campo_pedido.text() , 
-                    "DATA": self.data_para_iso(QDateTime(ui.campo_data_agendamento.date())),
-                    "HORA":ui.campo_hora_agendamento.text(),
-                    "VENDA":ui.campo_lista_venda.currentText(),
-                    "MODALIDADE":ui.campo_lista_modalidade.currentText(),
-                    "VERSAO":ui.campo_lista_versao_certificado.currentText(),
-                    "PRECO":ui.campo_preco_certificado.text(),
-                    "RAZAO SOCIAL":ui.campo_cnpj_razao_social.text(),
-                    "ORGAO RG":ui.campo_rg_orgao.text(),
-                    "PIS":ui.campo_pis.text(),
-                    "TELEFONE":ui.campo_telefone.text(),
-                    "OAB":ui.campo_oab.text(),
-                    "VALIDO ATE":"",
-                    "EMAIL RENOVACAO":renova
-                    }
+        # Mapeia as durações dos certificados em um dicionário
+        duracoes_certificado = {
+            "12": datetime.timedelta(days=365),
+            "18": datetime.timedelta(days=540),
+            "24": datetime.timedelta(days=720),
+            "36": datetime.timedelta(days=1080)
+        }
         
+        # Obtenção da data de agendamento e cálculo da validade
+        data_validacao = datetime.datetime.strptime(ui.campo_data_agendamento.date().toString("yyyy-MM-dd"), "%Y-%m-%d")
+        certificado_duracao = duracoes_certificado.get(ui.campo_lista_versao_certificado.currentText(), datetime.timedelta(days=0))
+        duracao_certificado = data_validacao + certificado_duracao
+
+        # Define o status de renovação
+        renova = "SIM" if ui.campo_email_enviado.text() == "SIM" else "NAO"
+
+        # Dados principais
+        novos_dados = {
+            "PASTA": ui.caminho_pasta.text(),
+            "MUNICIPIO": ui.campo_cnpj_municipio.text(),
+            "DIRETORIO": ui.campo_comentario.toPlainText(),
+            "CODIGO DE SEG CNH": ui.campo_seguranca_cnh.text(),
+            "NOME": ui.campo_nome.text(),
+            "RG": ui.campo_rg.text(),
+            "CPF": ui.campo_cpf.text(),
+            "CNH": ui.campo_cnh.text(),
+            "MAE": ui.campo_nome_mae.text(),
+            "CNPJ": ui.campo_cnpj.text(),
+            "EMAIL": ui.campo_email.text(),
+            "NASCIMENTO": ui.campo_data_nascimento.text(),
+            "STATUS": self.alteracao_status(),
+            "PEDIDO": ui.campo_pedido.text(),
+            "DATA": self.data_para_iso(QDateTime(ui.campo_data_agendamento.date())),
+            "HORA": ui.campo_hora_agendamento.text(),
+            "VENDA": ui.campo_lista_venda.currentText(),
+            "MODALIDADE": ui.campo_lista_modalidade.currentText(),
+            "VERSAO": ui.campo_lista_versao_certificado.currentText(),
+            "PRECO": ui.campo_preco_certificado.text(),
+            "RAZAO SOCIAL": ui.campo_cnpj_razao_social.text(),
+            "ORGAO RG": ui.campo_rg_orgao.text(),
+            "PIS": ui.campo_pis.text(),
+            "TELEFONE": ui.campo_telefone.text(),
+            "OAB": ui.campo_oab.text(),
+            "VALIDO ATE": "",
+            "EMAIL RENOVACAO": renova
+        }
+
+        # Limpa dos dados se o status for "DEFINITIVO"
         if self.verificar_status() == "DEFINITIVO":
-            novos_dados.update({
-                    "PASTA": None,
-                    "MUNICIPIO": None,
-                    "CODIGO DE SEG CNH": None,
-                    "RG": None,
-                    "CPF": None,
-                    "CNH": None,
-                    "MAE": None,
-                    "CNPJ": None,
-                    "NASCIMENTO": None,
-                    "RAZAO SOCIAL": None,
-                    "ORGAO RG": None,
-                    "PIS": None,
-                    "OAB": None,
-                    "VALIDO ATE":duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ"),
-                    "EMAIL RENOVACAO":renova
-                    })
+            campos_para_limpar = ["PASTA", "MUNICIPIO", "CODIGO DE SEG CNH", "RG", "CPF", "CNH", "MAE", "CNPJ", "NASCIMENTO", "RAZAO SOCIAL", "ORGAO RG", "PIS", "OAB"]
+            novos_dados.update({campo: None for campo in campos_para_limpar})
+            novos_dados["VALIDO ATE"] = duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ")
 
         return novos_dados
 
@@ -2215,6 +2223,7 @@ class Acoes_banco_de_dados:
             except PermissionError as e:
                 # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
                 self.fechar_arquivo_em_uso(folder_path)
+
             except Exception as e:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                     return ""
@@ -2298,77 +2307,55 @@ class Acoes_banco_de_dados:
                 ui.rb_videook.setChecked(True)
                 self.alteracao_status()
 
-    def preencher_dados(self,pedido_data):
-        #CORRIGIDO------------------------------------------------------------
-        #self.limpar_campos_pedido()
+    def preencher_dados(self, pedido_data):
         try:
-            status = pedido_data.get("STATUS")
-            self.preencher_status(status)    
-            data_nula = QDate(2000, 1, 1)  
-            ui.campo_data_nascimento.setDate(data_nula)
-            ui.campo_nome.setText(pedido_data.get("NOME")) 
-            ui.campo_rg.setText(pedido_data.get("RG"))   
-            ui.campo_cpf.setText(pedido_data.get("CPF"))   
-            ui.campo_cnh.setText(pedido_data.get("CNH"))  
-            ui.campo_cnpj.setText(pedido_data.get("CNPJ"))  
-            ui.campo_email.setText(pedido_data.get("EMAIL"))  
-            ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO"), "dd/MM/yyyy"))  
-            ui.campo_pedido.setText(pedido_data.get("PEDIDO")) 
+            self.limpar_campos_pedido()
+            campos = [
+                (ui.campo_nome, pedido_data.get("NOME", "")),
+                (ui.campo_rg, pedido_data.get("RG", "")),
+                (ui.campo_cpf, pedido_data.get("CPF", "")),
+                (ui.campo_cnh, pedido_data.get("CNH", "")),
+                (ui.campo_cnpj, pedido_data.get("CNPJ", "")),
+                (ui.campo_email, pedido_data.get("EMAIL", "")),
+                (ui.campo_pedido, pedido_data.get("PEDIDO", "")),
+                (ui.campo_seguranca_cnh, pedido_data.get("CODIGO DE SEG CNH", "")),
+                (ui.campo_nome_mae, pedido_data.get("MAE", "")),
+                (ui.campo_comentario, pedido_data.get("DIRETORIO", "")),
+                (ui.campo_cnpj_municipio, pedido_data.get("MUNICIPIO", "")),
+                (ui.caminho_pasta, pedido_data.get("PASTA", "")),
+                (ui.campo_lista_venda, pedido_data.get("VENDA", "")),
+                (ui.campo_lista_modalidade, pedido_data.get("MODALIDADE", "")),
+                (ui.campo_lista_versao_certificado, pedido_data.get("VERSAO", "")),
+                (ui.campo_rg_orgao, pedido_data.get("ORGAO RG", "")),
+                (ui.campo_cnpj_razao_social, pedido_data.get("RAZAO SOCIAL", "")),
+                (ui.campo_pis, pedido_data.get("PIS", "")),
+                (ui.campo_preco_certificado, pedido_data.get("PRECO", "")),
+                (ui.campo_telefone, pedido_data.get("TELEFONE", "")),
+                (ui.campo_oab, pedido_data.get("OAB", "")),
+                (ui.campo_email_enviado, pedido_data.get("EMAIL RENOVACAO", ""))
+            ]
+
+            # Preencher campos de texto e combobox
+            for campo, valor in campos:
+                if isinstance(campo, QComboBox):
+                    campo.setCurrentText(valor)  # Para combobox
+                else:
+                    campo.setText(valor)  # Para campos de texto
+
+            # Preencher campos de data
+            ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO", ""), "dd/MM/yyyy"))
             ui.campo_data_agendamento.setDate(self.iso_para_data(pedido_data.get("DATA")).date())
-            ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA"), "hh:mm"))
-            ui.campo_lista_venda.setCurrentText("NAO")
-            ui.campo_lista_venda.setCurrentText(pedido_data.get("VENDA"))
-            ui.campo_lista_modalidade.setCurrentText(pedido_data.get("MODALIDADE"))
-            ui.campo_pedido.setReadOnly(True)
-            ui.campo_seguranca_cnh.setText(pedido_data.get("CODIGO DE SEG CNH"))
-            ui.campo_nome_mae.setText(pedido_data.get("MAE"))
-            ui.campo_comentario.setText(pedido_data.get("DIRETORIO"))
-            ui.campo_cnpj_municipio.setText(pedido_data.get("MUNICIPIO"))
-            ui.caminho_pasta.setText(pedido_data.get("PASTA"))
-            try:
-                ui.campo_lista_versao_certificado.setCurrentText(pedido_data.get("VERSAO"))
-            except:
-                pass
-            try:
-                ui.campo_rg_orgao.setText(pedido_data.get("ORGAO RG"))
-            except:
-                pass
-            try:
-                ui.campo_cnpj_razao_social.setText(pedido_data.get("RAZAO SOCIAL"))
-            except:
-                pass
-            try:
-                ui.campo_pis.setText(pedido_data.get("PIS"))
-            except:
-                pass
-            try:
-                ui.campo_preco_certificado.setText(pedido_data.get("PRECO"))
-            except:
-                pass
-            try:
-                ui.campo_telefone.setText(pedido_data.get("TELEFONE"))
-            except:
-                pass
-            try:
-                ui.campo_oab.setText(pedido_data.get("OAB"))
-            except:
-                pass
-            try:
-                ui.campo_email_enviado.setText(pedido_data.get("EMAIL RENOVACAO"))
-            except:
-                pass
-            
+            ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA", ""), "hh:mm"))
+
+            # Atualizar status visual
             ui.campo_status_bd.setText("✅")
             ui.campo_status_bd.setToolTip("Pedido Atualizado")
-            pasta = ui.caminho_pasta.text()
 
-            if pasta != "": 
+            if ui.caminho_pasta.text():
                 ui.label_confirmacao_criar_pasta.setText("✅")
 
-            
         except Exception as e:
-            print(e)
-            pass
+            print(f"Erro durante preenchimento: {e}")
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
@@ -2410,151 +2397,154 @@ class Acoes_banco_de_dados:
         ui.campo_status_videook.setText(str(quantidade_videook))
 
     def preencher_tabela(self):
-        # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
-        data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
-        data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
-
-        # Consulte o banco de dados usando as datas no formato ISO
-        pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
-                        .start_at(data_inicial) \
-                        .end_at(data_final)
-        pedidos = pedidos_ref.get()
-
-        for col in range(ui.tableWidget.columnCount()):
-            ui.tableWidget.setColumnHidden(col, False)
-        ui.tableWidget.setRowCount(0)
-        ui.tableWidget.setColumnCount(6)
-        ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-        for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 83)
-
-
-        valor_estimado = 0
         try:
-            pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), 
-                                                            datetime.datetime.strptime(x['HORA'], "%H:%M")))
+            # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
+            data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
+            data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
 
-            numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
-            numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
+            # Consulte o banco de dados usando as datas no formato ISO
+            pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
+                            .start_at(data_inicial) \
+                            .end_at(data_final)
+            pedidos = pedidos_ref.get()
 
-            valor_cnpj = 0
-            valor_cpf = 0
-            x = 0
-            y = 0
-            j = 0
-            f = 0
-            venda = 0
-            total_pedidos = len(pedidos)
             for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 83)
-            ui.barra_progresso_consulta.setVisible(False)
-            
-            # Configura a barra de progresso corretamente
-            ui.barra_progresso_consulta.setVisible(True)
-            ui.barra_progresso_consulta.setMaximum(total_pedidos)  # Máximo é o total de pedidos
-            ui.barra_progresso_consulta.setValue(0)
-            
-            status_filtro = ui.campo_lista_status_2.currentText()
-            
-            for pedido_info in pedidos:
-                data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
-                numero_inteiro_bd = data_bd.toordinal()
-                status_servidor = pedido_info['STATUS']
+                ui.tableWidget.setColumnHidden(col, False)
+            ui.tableWidget.setRowCount(0)
+            ui.tableWidget.setColumnCount(6)
+            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+            for col in range(ui.tableWidget.columnCount()):
+                    ui.tableWidget.setColumnWidth(col, 83)
+
+
+            valor_estimado = 0
+            try:
+                pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), 
+                                                                datetime.datetime.strptime(x['HORA'], "%H:%M")))
+
+                numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
+                numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
+
+                valor_cnpj = 0
+                valor_cpf = 0
+                x = 0
+                y = 0
+                j = 0
+                f = 0
+                venda = 0
+                total_pedidos = len(pedidos)
+                for col in range(ui.tableWidget.columnCount()):
+                    ui.tableWidget.setColumnWidth(col, 83)
+                ui.barra_progresso_consulta.setVisible(False)
                 
-                if numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final:
-                    if status_filtro == status_servidor or status_filtro == "TODAS":
-                        x += 1
-                        row_position = ui.tableWidget.rowCount()
-                        ui.tableWidget.insertRow(row_position)
-                        try:
-                            ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
-                        except:
-                            ui.tableWidget.setItem(row_position, 0, QTableWidgetItem("-"))
-                        try:
-                            ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
-                        except:
-                            ui.tableWidget.setItem(row_position, 1, QTableWidgetItem("-"))
-                        try:
-                            ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")))
-                        except:
-                            ui.tableWidget.setItem(row_position, 2, QTableWidgetItem("-"))
-                        try:
-                            ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
-                        except:
-                            ui.tableWidget.setItem(row_position, 3, QTableWidgetItem("-"))
-                        try:
-                            ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
-                        except:
-                            ui.tableWidget.setItem(row_position, 4, QTableWidgetItem("-"))
-                        try:
-                            ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
-                        except:
-                            ui.tableWidget.setItem(row_position, 5, QTableWidgetItem("-"))
+                # Configura a barra de progresso corretamente
+                ui.barra_progresso_consulta.setVisible(True)
+                ui.barra_progresso_consulta.setMaximum(total_pedidos)  # Máximo é o total de pedidos
+                ui.barra_progresso_consulta.setValue(0)
+                
+                status_filtro = ui.campo_lista_status_2.currentText()
+                
+                for pedido_info in pedidos:
+                    data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
+                    numero_inteiro_bd = data_bd.toordinal()
+                    status_servidor = pedido_info['STATUS']
+                    
+                    if numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final:
+                        if status_filtro == status_servidor or status_filtro == "TODAS":
+                            x += 1
+                            row_position = ui.tableWidget.rowCount()
+                            ui.tableWidget.insertRow(row_position)
+                            try:
+                                ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
+                            except:
+                                ui.tableWidget.setItem(row_position, 0, QTableWidgetItem("-"))
+                            try:
+                                ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
+                            except:
+                                ui.tableWidget.setItem(row_position, 1, QTableWidgetItem("-"))
+                            try:
+                                ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")))
+                            except:
+                                ui.tableWidget.setItem(row_position, 2, QTableWidgetItem("-"))
+                            try:
+                                ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
+                            except:
+                                ui.tableWidget.setItem(row_position, 3, QTableWidgetItem("-"))
+                            try:
+                                ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
+                            except:
+                                ui.tableWidget.setItem(row_position, 4, QTableWidgetItem("-"))
+                            try:
+                                ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
+                            except:
+                                ui.tableWidget.setItem(row_position, 5, QTableWidgetItem("-"))
 
-                        try:
-                            if 'PRECO' in pedido_info:
-                                preco = float(pedido_info['PRECO'])
-                                valor_estimado += preco
+                            try:
+                                if 'PRECO' in pedido_info:
+                                    preco = float(pedido_info['PRECO'])
+                                    valor_estimado += preco
 
-                                if 'e-CNPJ' in pedido_info['VERSAO']:
-                                    valor_cnpj += preco
-                                    j += 1
-                                elif 'e-CPF' in pedido_info['VERSAO']:
-                                    valor_cpf += preco
-                                    f += 1
-                                if pedido_info['VENDA'] == "SIM":
-                                    venda += 1
+                                    if 'e-CNPJ' in pedido_info['VERSAO']:
+                                        valor_cnpj += preco
+                                        j += 1
+                                    elif 'e-CPF' in pedido_info['VERSAO']:
+                                        valor_cpf += preco
+                                        f += 1
+                                    if pedido_info['VENDA'] == "SIM":
+                                        venda += 1
+                                QApplication.processEvents()
+                            except ValueError:
+                                pass
+
+                            for col in range(ui.tableWidget.columnCount()):
+                                item = ui.tableWidget.item(row_position, col)
+                                status = ui.tableWidget.item(row_position, 0).text()
+                                if item is not None:
+                                    match status:
+                                        case 'DIGITAÇÃO':
+                                            item.setForeground(QColor(113, 66, 230))
+                                        case 'VIDEO REALIZADA':
+                                            item.setForeground(QColor(25, 200, 255))
+                                        case 'VERIFICAÇÃO':
+                                            item.setForeground(QColor(255, 167, 91))
+                                        case 'APROVADO':
+                                            item.setForeground(QColor(173, 255, 47))
+                                        case 'CANCELADO':
+                                            item.setForeground(QColor(255, 30, 30))
+
+                            y += 1
+                            # Atualiza a barra de progresso de acordo com o total de pedidos
+                            ui.barra_progresso_consulta.setValue(y)
                             QApplication.processEvents()
-                        except ValueError:
-                            pass
 
-                        for col in range(ui.tableWidget.columnCount()):
-                            item = ui.tableWidget.item(row_position, col)
-                            status = ui.tableWidget.item(row_position, 0).text()
-                            if item is not None:
-                                match status:
-                                    case 'DIGITAÇÃO':
-                                        item.setForeground(QColor(113, 66, 230))
-                                    case 'VIDEO REALIZADA':
-                                        item.setForeground(QColor(25, 200, 255))
-                                    case 'VERIFICAÇÃO':
-                                        item.setForeground(QColor(255, 167, 91))
-                                    case 'APROVADO':
-                                        item.setForeground(QColor(173, 255, 47))
-                                    case 'CANCELADO':
-                                        item.setForeground(QColor(255, 30, 30))
+                ui.barra_progresso_consulta.setValue(total_pedidos)  # Finaliza a barra de progresso no valor máximo
+                self.contar_verificacao()
 
-                        y += 1
-                        # Atualiza a barra de progresso de acordo com o total de pedidos
-                        ui.barra_progresso_consulta.setValue(y)
-                        QApplication.processEvents()
-
-            ui.barra_progresso_consulta.setValue(total_pedidos)  # Finaliza a barra de progresso no valor máximo
-            self.contar_verificacao()
-
-            total_venda = valor_cnpj + valor_cpf
-            ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}].......R$ {valor_cnpj:.2f}
+                total_venda = valor_cnpj + valor_cpf
+                ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}]........R$ {valor_cnpj:.2f}
 (+)e-CPF [{f}].........R$ {valor_cpf:.2f}
 (=)Total [{j+f}].........R$ {total_venda:.2f}
-(-) {ui.campo_desconto.text()}%..................R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
------------------------------------
+(-) {ui.campo_desconto.text()}%...............R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
+----------------------------------
 (=)Total Esperado....R$ {total_venda * (1 - float(ui.campo_desconto.text()) / 100):.2f}
-Vendas.........{venda}
+Vendas..........{venda}
 ''')
 
-            ui.barra_progresso_consulta.setVisible(False)
-            ui.label_quantidade_bd.setText(f"{x} registro(s)")
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            
-        except Exception as e:
-            print(e)
-            ui.campo_relatorio.setPlainText("")
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 83)
-            ui.label_quantidade_bd.setText(f"{x} registro(s)")
-            ui.barra_progresso_consulta.setVisible(False)
-            self.contar_verificacao()
+                ui.barra_progresso_consulta.setVisible(False)
+                ui.label_quantidade_bd.setText(f"{x} registro(s)")
+                ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+                
+            except Exception as e:
+                print(e)
+                ui.campo_relatorio.setPlainText("")
+                ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+                for col in range(ui.tableWidget.columnCount()):
+                    ui.tableWidget.setColumnWidth(col, 83)
+                ui.label_quantidade_bd.setText(f"{x} registro(s)")
+                ui.barra_progresso_consulta.setVisible(False)
+                self.contar_verificacao()
+        except:
+            pass
  
     def atualizar_documentos_tabela(self):
         # Limpar qualquer conteúdo existente na tabela
@@ -2602,7 +2592,7 @@ Vendas.........{venda}
             # Definir o item na tabela
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
 
-    def alteracao_status(self):      
+    def alteracao_status(self):
         #AQUI VAI VERIFICAR SE
         if ui.rb_digitacao.isChecked():
             self.zerar_cor()
@@ -2665,6 +2655,8 @@ class JanelaOculta:
     def leaveEvent(self, event):
         self.janela.atualizar_documentos_tabela()
         if not ui.campo_verifica_tela_cheia.text()=="SIM":
+            
+            # COLOCAR A 
             cursor_pos = QtGui.QCursor.pos()
             window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
             window_rect = QRect(window_pos, self.parent.size())
@@ -2672,8 +2664,10 @@ class JanelaOculta:
             mouse_dentro_da_janela = window_rect.contains(cursor_pos)
 
             if not mouse_dentro_da_janela:
+
                 if int(ui.campo_status_videook.text()) == 0 and int(ui.campo_status_verificacao.text()) == 0:
                     self.animate_window_resize(104, 53)
+
                 else:
                     self.animate_window_resize(143, 53)
         

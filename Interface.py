@@ -1,4 +1,3 @@
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -1462,7 +1461,6 @@ class Ui_janela(object):
 "}")
         self.campo_lista_status_2.setEditable(False)
         self.campo_lista_status_2.setObjectName("campo_lista_status_2")
-        self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
         self.campo_lista_status_2.addItem("")
@@ -3376,7 +3374,6 @@ class Ui_janela(object):
         self.campo_lista_status_2.setItemText(3, _translate("janela", "VERIFICAÇÃO"))
         self.campo_lista_status_2.setItemText(4, _translate("janela", "APROVADO"))
         self.campo_lista_status_2.setItemText(5, _translate("janela", "CANCELADO"))
-        self.campo_lista_status_2.setItemText(6, _translate("janela", "PROX VENCIMENTO"))
         self.label_19.setText(_translate("janela", " DE:"))
         self.label_21.setText(_translate("janela", " STATUS"))
         self.label_20.setText(_translate("janela", " ATÉ:"))
