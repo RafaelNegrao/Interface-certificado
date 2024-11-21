@@ -8,7 +8,7 @@ class Funcoes_padrao:
         self.ui = ui
         self.acoes = Acoes_banco_de_dados(ui)
         self.parent = parent
-        self.dicionario = self.carregar_mensagens()
+        self.dicionario = db.reference("/Mensagens").get()
 
     def atualizar_barras_metas(self):
         try:
@@ -1138,13 +1138,8 @@ class Funcoes_padrao:
     def abrir_janela_mensagem(self):
         self.abrir_nova_janela(janela)
 
-    def carregar_mensagens(self):
-        """Carregar mensagens do arquivo JSON."""
-        with open('messages.json', 'r', encoding='utf-8') as file:
-            return json.load(file)
-
     def clique_btn1(self):  
-
+            
         mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
         nome = ui.campo_nome_agente.text()
         mensagem = self.dicionario["clique_btn1"]["mensagem"].replace("{{mensagem_inicial}}", mensagem_inicial).replace("{{nome}}", nome)
@@ -1931,8 +1926,9 @@ class Acoes_banco_de_dados:
                 match condic:
                     #Pedido existente + gravado Definitivo
                     case 'DEFINITIVO':
-                        
-                        novo_pedido_ref.update(self.dicionario_banco_de_dados())
+                        # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
+                        # Caso queira retornar, é só mudar para update
+                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
                         self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
@@ -1940,14 +1936,15 @@ class Acoes_banco_de_dados:
                         self.limpar_campos_pedido()
 
                     #Pedido existente + gravado temporariamente
+                    # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
+                    # Caso queira retornar, é só mudar 
                     case 'TEMPORARIO':
-                        novo_pedido_ref.update(self.dicionario_banco_de_dados())
+                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                         #self.mensagem_alerta("Sucesso","Pedido salvo!")
                         self.contar_verificacao()
                         
-            
             #NOVO PEDIDO
             else:
                 condic = self.verificar_status()
@@ -1968,7 +1965,6 @@ class Acoes_banco_de_dados:
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        #self.mensagem_alerta("Sucesso","Pedido salvo!")
                         self.contar_verificacao()
                         
         except Exception as e:
@@ -2123,13 +2119,7 @@ class Acoes_banco_de_dados:
             ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
-            # for col in range(ui.tableWidget.columnCount()):
-            #     ui.tableWidget.setColumnHidden(col, False)
-            # ui.tableWidget.setRowCount(0)
-            # ui.tableWidget.setColumnCount(6)
-            # ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            # for col in range(ui.tableWidget.columnCount()):
-            #         ui.tableWidget.setColumnWidth(col, 83)
+
 
             self.limpar_labels()
             self.contar_verificacao()
@@ -2146,7 +2136,6 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_tirar_print.setText("")
          
     def dicionario_banco_de_dados(self):
-        # Mapeia as durações dos certificados em um dicionário
         duracoes_certificado = {
             "12": datetime.timedelta(days=365),
             "18": datetime.timedelta(days=540),
@@ -2154,15 +2143,12 @@ class Acoes_banco_de_dados:
             "36": datetime.timedelta(days=1080)
         }
         
-        # Obtenção da data de agendamento e cálculo da validade
         data_validacao = datetime.datetime.strptime(ui.campo_data_agendamento.date().toString("yyyy-MM-dd"), "%Y-%m-%d")
         certificado_duracao = duracoes_certificado.get(ui.campo_lista_versao_certificado.currentText(), datetime.timedelta(days=0))
         duracao_certificado = data_validacao + certificado_duracao
 
-        # Define o status de renovação
         renova = "SIM" if ui.campo_email_enviado.text() == "SIM" else "NAO"
 
-        # Dados principais
         novos_dados = {
             "PASTA": ui.caminho_pasta.text(),
             "MUNICIPIO": ui.campo_cnpj_municipio.text(),
@@ -2199,7 +2185,10 @@ class Acoes_banco_de_dados:
             novos_dados.update({campo: None for campo in campos_para_limpar})
             novos_dados["VALIDO ATE"] = duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        return novos_dados
+        # Filtrar chaves não vazias
+        dados_filtrados = {chave: valor for chave, valor in novos_dados.items() if valor not in [None, ""]}
+
+        return dados_filtrados
 
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
         for _ in range(3):  # Tentar até três vezes
@@ -2295,67 +2284,100 @@ class Acoes_banco_de_dados:
                 self.alteracao_status()
 
     def preencher_dados(self, pedido_data):
+        self.limpar_campos_pedido()  # Limpa os campos antes de começar a preencher
+
+        campos = [
+            (ui.campo_nome, "NOME"),
+            (ui.campo_rg, "RG"),
+            (ui.campo_cpf, "CPF"),
+            (ui.campo_cnh, "CNH"),
+            (ui.campo_cnpj, "CNPJ"),
+            (ui.campo_email, "EMAIL"),
+            (ui.campo_pedido, "PEDIDO"),
+            (ui.campo_seguranca_cnh, "CODIGO DE SEG CNH"),
+            (ui.campo_nome_mae, "MAE"),
+            (ui.campo_comentario, "DIRETORIO"),
+            (ui.campo_cnpj_municipio, "MUNICIPIO"),
+            (ui.caminho_pasta, "PASTA"),
+            (ui.campo_lista_venda, "VENDA"),
+            (ui.campo_lista_modalidade, "MODALIDADE"),
+            (ui.campo_lista_versao_certificado, "VERSAO"),
+            (ui.campo_rg_orgao, "ORGAO RG"),
+            (ui.campo_cnpj_razao_social, "RAZAO SOCIAL"),
+            (ui.campo_pis, "PIS"),
+            (ui.campo_preco_certificado, "PRECO"),
+            (ui.campo_telefone, "TELEFONE"),
+            (ui.campo_oab, "OAB"),
+            (ui.campo_email_enviado, "EMAIL RENOVACAO")
+        ]
+
+        # Preencher campos principais
+        for campo, chave in campos:
+            try:
+                valor = pedido_data.get(chave)
+                if valor:  # Preencher apenas se o valor não for vazio ou None
+                    if isinstance(campo, QComboBox):
+                        campo.setCurrentText(valor)
+                    else:
+                        campo.setText(valor)
+            except Exception as e:
+                print(f"Erro ao preencher o campo '{chave}': {e}")
+
+        # Preencher campos de data e hora separadamente
         try:
-            self.limpar_campos_pedido()
-            campos = [
-                (ui.campo_nome, pedido_data.get("NOME", "")),
-                (ui.campo_rg, pedido_data.get("RG", "")),
-                (ui.campo_cpf, pedido_data.get("CPF", "")),
-                (ui.campo_cnh, pedido_data.get("CNH", "")),
-                (ui.campo_cnpj, pedido_data.get("CNPJ", "")),
-                (ui.campo_email, pedido_data.get("EMAIL", "")),
-                (ui.campo_pedido, pedido_data.get("PEDIDO", "")),
-                (ui.campo_seguranca_cnh, pedido_data.get("CODIGO DE SEG CNH", "")),
-                (ui.campo_nome_mae, pedido_data.get("MAE", "")),
-                (ui.campo_comentario, pedido_data.get("DIRETORIO", "")),
-                (ui.campo_cnpj_municipio, pedido_data.get("MUNICIPIO", "")),
-                (ui.caminho_pasta, pedido_data.get("PASTA", "")),
-                (ui.campo_lista_venda, pedido_data.get("VENDA", "")),
-                (ui.campo_lista_modalidade, pedido_data.get("MODALIDADE", "")),
-                (ui.campo_lista_versao_certificado, pedido_data.get("VERSAO", "")),
-                (ui.campo_rg_orgao, pedido_data.get("ORGAO RG", "")),
-                (ui.campo_cnpj_razao_social, pedido_data.get("RAZAO SOCIAL", "")),
-                (ui.campo_pis, pedido_data.get("PIS", "")),
-                (ui.campo_preco_certificado, pedido_data.get("PRECO", "")),
-                (ui.campo_telefone, pedido_data.get("TELEFONE", "")),
-                (ui.campo_oab, pedido_data.get("OAB", "")),
-                (ui.campo_email_enviado, pedido_data.get("EMAIL RENOVACAO", ""))
-            ]
+            nascimento = pedido_data.get("NASCIMENTO")
+            if nascimento:
+                ui.campo_data_nascimento.setDate(QDate.fromString(nascimento, "dd/MM/yyyy"))
+        except Exception as e:
+            print(f"Erro ao preencher data de nascimento: {e}")
 
-            # Preencher campos de texto e combobox
-            for campo, valor in campos:
-                if isinstance(campo, QComboBox):
-                    campo.setCurrentText(valor)  # Para combobox
-                else:
-                    campo.setText(valor)  # Para campos de texto
+        try:
+            data = pedido_data.get("DATA")
+            if data:
+                ui.campo_data_agendamento.setDate(self.iso_para_data(data).date())
+        except Exception as e:
+            print(f"Erro ao preencher data de agendamento: {e}")
 
-            # Preencher campos de data
-            ui.campo_data_nascimento.setDate(QDate.fromString(pedido_data.get("NASCIMENTO", ""), "dd/MM/yyyy"))
-            ui.campo_data_agendamento.setDate(self.iso_para_data(pedido_data.get("DATA")).date())
-            ui.campo_hora_agendamento.setTime(QTime.fromString(pedido_data.get("HORA", ""), "hh:mm"))
+        try:
+            hora = pedido_data.get("HORA")
+            if hora:
+                ui.campo_hora_agendamento.setTime(QTime.fromString(hora, "hh:mm"))
+        except Exception as e:
+            print(f"Erro ao preencher hora de agendamento: {e}")
 
-            # Atualizar status visual
-            ui.campo_status_bd.setText("✅")
-            ui.campo_status_bd.setToolTip("Pedido Atualizado")
+        # Atualizar o status do pedido
+        try:
+            status = pedido_data.get("STATUS")
+            if status:
+                if status == "DIGITAÇÃO":
+                    self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_digitacao").setChecked(True)
+                    self.alteracao_status()
+                elif status == "VIDEO REALIZADA":
+                    self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_videook").setChecked(True)
+                    self.alteracao_status()
+                elif status == "VERIFICAÇÃO":
+                    self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_verificacao").setChecked(True)
+                    self.alteracao_status()
+                elif status == "APROVADO":
+                    self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_aprovado").setChecked(True)
+                    self.alteracao_status()
+                elif status == "CANCELADO":
+                    self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_cancelado").setChecked(True)
+                    self.alteracao_status()
 
-            status = pedido_data.get("STATUS", "") # Preencher campos de texto e combobox 
-            if status == "DIGITAÇÃO":
-                self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_digitacao").setChecked(True)
-            elif status == "VIDEO REALIZADA":
-                self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_videook").setChecked(True)
-            elif status == "VERIFICAÇÃO":
-                self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_verificacao").setChecked(True)
-            elif status == "APROVADO":
-                self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_aprovado").setChecked(True)
-            elif status == "CANCELADO":
-                self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_cancelado").setChecked(True)
+            ui.campo_status_bd.setText('✅')
 
-            self.alteracao_status()
+            
+        except Exception as e:
+            print(f"Erro ao atualizar o status: {e}")
+
+        # Atualizar o campo de confirmação de pasta
+        try:
             if ui.caminho_pasta.text():
                 ui.label_confirmacao_criar_pasta.setText("✅")
-
         except Exception as e:
-            print(f"Erro durante preenchimento: {e}")
+            print(f"Erro ao atualizar confirmação de pasta: {e}")
+
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
