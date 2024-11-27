@@ -13,42 +13,57 @@ class Funcoes_padrao:
     def atualizar_barras_metas(self):
         try:
             def atualizar_semana(semana_num, certificados, meta_semanal):
+                # Obtém os widgets da barra e do label dinamicamente
                 barra = getattr(ui, f"barra_meta_semana_{semana_num}")
                 label = getattr(ui, f"label_meta{semana_num}")
+                
                 certificados_semana = math.floor(float(certificados.replace(',', '.')))
                 
                 barra.setMaximum(meta_semanal)
                 barra.setValue(certificados_semana)
                 
+
                 if certificados_semana >= meta_semanal:
-                    label.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                    label.setText(f"Meta atingida! - R${certificados_semana} / R${meta_semanal}")
+                    label.setStyleSheet('color: rgb(113,66,230); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')  # Azul
+                    label.setText(f"Semana {semana_num} | Meta atingida! - R${certificados_semana} / R${meta_semanal}")
                 else:
-                    label.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
-                    label.setText(f"R${certificados_semana} / R${meta_semanal}")
+                    label.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
+                    label.setText(f"Semana {semana_num} | R${certificados_semana} / R${meta_semanal}")
+                
                 return certificados_semana
 
-            # Recupera as metas mensal e semanal, convertendo os valores para inteiro
             meta_mensal = int(float(ui.campo_meta_mes.text().replace(',', '.')))
             meta_semanal = int(float(ui.campo_meta_semanal.text().replace(',', '.')))
 
-            # Calcula a soma dos valores das semanas e atualiza as barras e labels de cada uma
-            soma = sum(
-                atualizar_semana(i, getattr(ui, f"campo_certificados_semana_{i}").text(), meta_semanal) 
-                for i in range(1, 6)
-            )
+            soma = 0
+
+            for i in range(1, 6):
+                certificados_semana = atualizar_semana(
+                    i, 
+                    getattr(ui, f"campo_certificados_semana_{i}").text(), 
+                    meta_semanal
+                )
+                soma += certificados_semana  # Acumula os certificados
 
             # Atualiza a barra de progresso e o label para a meta mensal
             ui.barra_meta_mensal.setMaximum(meta_mensal)
             ui.barra_meta_mensal.setValue(soma)
-            ui.label_meta_mes.setText(f"R${soma} / R${ui.campo_meta_mes.text()}")
 
+            # Define o texto e o estilo do label da meta mensal
             if soma >= meta_mensal:
-                ui.label_meta_mes.setStyleSheet('background-color: rgb(0, 173, 247);color:rgb(113,66,230)')
-                ui.label_meta_mes.setText(f"Meta atingida! - R${soma} / R${meta_mensal}")
+                ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')
+                ui.label_meta_mes.setText(f"Meta mensal atingida! - R${soma} / R${meta_mensal}")
             else:
-                ui.label_meta_mes.setStyleSheet('background-color: rgba(255, 0, 0, 0);color:rgb(113,66,230)')
+                ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
                 ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
+
+            # Aplica a borda às labels (1 a 5 e a mensal), com fundo transparente
+            # for i in range(1, 6):
+            #     label = getattr(ui, f"label_meta{i}")
+            #     label.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
+
+            # ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
+
         except Exception as e:
             print(f"Erro: {e}")
 
@@ -141,10 +156,8 @@ class Funcoes_padrao:
     def trazer_metas(self):
         #CORRIGIDO ----------------------------------------------------------
         ref = db.reference("/Metas")
-        # Faz uma solicitação GET para obter as configurações do banco de dados
         Metas = ref.get()
     
-        # Carrega as metas na interface gráfica
         valor_semanal = Metas['SEMANAL']
         valor_mensal = Metas['MENSAL']
         ui.campo_meta_semanal.setValue(int(valor_semanal))
@@ -152,25 +165,37 @@ class Funcoes_padrao:
 
     def atualizar_meta_clientes(self):
         try:
+            # Zerar o QWidget `campo_grafico`
+            layout = ui.campo_grafico.layout()
+            if layout:
+                for i in reversed(range(layout.count())):
+                    widget = layout.itemAt(i).widget()
+                    if widget is not None:
+                        widget.deleteLater()  # Remover widgets antigos
+                QtWidgets.QWidget().setLayout(layout)  # Limpar o layout atual
+
             if ui.tabWidget.currentIndex() == 2:
                 ref = db.reference("/Pedidos")
                 Pedidos = ref.get()
-                
+
                 # Inicializando contadores para cada semana
                 semanas = [0, 0, 0, 0, 0]
-                
+
                 # Obter a data do campo ui.campo_data_meta
                 mes_meta = ui.campo_data_meta.date().month()
                 ano_meta = ui.campo_data_meta.date().year()
-                
+
+                # Identificar o último dia do mês dinamicamente
+                ultimo_dia = calendar.monthrange(ano_meta, mes_meta)[1]
+
                 for pedido_info in Pedidos:
                     if Pedidos[pedido_info]['STATUS'] == "APROVADO":
                         data_pedido = Pedidos[pedido_info]['DATA']
                         data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
-                        
+
                         if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
                             semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
-                            
+
                             if semana_do_mes in range(1, 6):
                                 try:
                                     preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
@@ -178,28 +203,127 @@ class Funcoes_padrao:
                                     semanas[semana_do_mes - 1] += preco * desconto
                                 except:
                                     pass
-                
+
                 # Atualiza os campos da interface gráfica com os valores calculados
                 ui.campo_certificados_semana_1.setText(str(semanas[0]))
                 ui.campo_certificados_semana_2.setText(str(semanas[1]))
                 ui.campo_certificados_semana_3.setText(str(semanas[2]))
                 ui.campo_certificados_semana_4.setText(str(semanas[3]))
                 ui.campo_certificados_semana_5.setText(str(semanas[4]))
-                
+
                 ui.barra_meta_semana_1.setValue(int(semanas[0]))
                 ui.barra_meta_semana_2.setValue(int(semanas[1]))
                 ui.barra_meta_semana_3.setValue(int(semanas[2]))
                 ui.barra_meta_semana_4.setValue(int(semanas[3]))
                 ui.barra_meta_semana_5.setValue(int(semanas[4]))
-                
+
                 total = sum(semanas)
                 ui.barra_meta_mensal.setValue(int(total))
                 ui.barra_meta_mensal.setMaximum(int(float(ui.campo_meta_mes.text().replace(',', '.'))))
                 ui.campo_certificados_mes.setText(str(total))
-                
+
                 self.atualizar_barras_metas()
-        except:
-            pass
+
+                dias_do_mes = range(1, ultimo_dia + 1)
+                categorias_por_dia = {"CPF": defaultdict(int), "CNPJ": defaultdict(int)}
+                valores_por_dia = {"CPF": defaultdict(float), "CNPJ": defaultdict(float)}
+
+                for pedido_info in Pedidos:
+                    if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                        data_pedido = Pedidos[pedido_info]['DATA']
+                        data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
+
+                        if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
+                            dia = data_formatada.day
+                            versao = Pedidos[pedido_info].get('VERSAO', '') 
+                            preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
+                            desconto = 1 - (ui.campo_desconto.value() / 100)
+                            valor_com_desconto = preco * desconto
+
+                            if "CPF" in versao:
+                                categorias_por_dia["CPF"][dia] += 1
+                                valores_por_dia["CPF"][dia] += valor_com_desconto
+                            elif "CNPJ" in versao:
+                                categorias_por_dia["CNPJ"][dia] += 1
+                                valores_por_dia["CNPJ"][dia] += valor_com_desconto
+
+                cpf_counts = [categorias_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
+                cnpj_counts = [categorias_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+                cpf_totals = [valores_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
+                cnpj_totals = [valores_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+
+                total_counts = [cpf_counts[i] + cnpj_counts[i] for i in range(len(dias_do_mes))]
+
+                # Obter apenas os dias úteis do mês
+                dias_uteis = pd.bdate_range(start=f"{ano_meta}-{mes_meta:02d}-01", 
+                                            end=f"{ano_meta}-{mes_meta:02d}-{ultimo_dia:02d}").day.tolist()
+                                            
+                
+                media_cumulativa = np.cumsum([total_counts[i - 1] for i in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
+                media_cumulativa_cpf = np.cumsum([cpf_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
+                media_cumulativa_cnpj = np.cumsum([cnpj_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
+
+                soma_maxima = max(total_counts)
+                max_y = max(soma_maxima, max(media_cumulativa)) + 2
+
+                fig, ax = plt.subplots(figsize=(14, 8))
+                fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
+
+                campo_cor_r = 40
+                campo_cor_g = 42
+                campo_cor_b = 54
+
+                fig.patch.set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+                ax.set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+
+                bar_width = 0.6
+
+                ax.bar(dias_do_mes, cnpj_counts, width=bar_width, label="CNPJ", color="orange")
+                ax.bar(dias_do_mes, cpf_counts, width=bar_width, bottom=cnpj_counts, label="CPF", color="blue")
+
+                ax.plot(dias_uteis, media_cumulativa, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
+                ax.plot(dias_uteis, media_cumulativa_cnpj, color="yellow", linestyle="-", linewidth=1, label="Média Acumulada CNPJ")
+                ax.plot(dias_uteis, media_cumulativa_cpf, color="cyan", linestyle="-", linewidth=1, label="Média Acumulada CPF")
+
+                fonte_cor = (150/255, 150/255, 150/255)
+
+                ax.set_xlabel("Dias do Mês", fontsize=6, color=fonte_cor)
+                ax.set_ylabel("Quantidade de Pedidos", fontsize=6, color=fonte_cor)
+                ax.set_xticks(range(1, ultimo_dia + 1))
+                ax.set_ylim(0, max_y)
+                ax.set_yticks(range(0, int(max_y) + 1, 1))
+
+                for y in range(0, int(max_y), 2):
+                    ax.axhline(y=y, color="gray", linestyle="-", alpha=0.4, linewidth=0.7)
+
+                leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
+                leg.get_frame().set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+                leg.get_frame().set_edgecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+
+                ax.tick_params(axis='x', labelsize=6, colors=fonte_cor)
+                ax.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+
+                cursor = mplcursors.cursor(ax, hover=True)
+                cursor.connect("add", lambda sel: sel.annotation.set_text(
+                    f'Dia: {int(sel.target[0])}\n'
+                    f'CPF: {cpf_counts[int(sel.target[0]) - 1]}  Valor: R$ {cpf_totals[int(sel.target[0]) - 1]:,.2f}\n'
+                    f'CNPJ: {cnpj_counts[int(sel.target[0]) - 1]}  Valor: R$ {cnpj_totals[int(sel.target[0]) - 1]:,.2f}\n'
+                    f'TOTAL: R$ {cpf_totals[int(sel.target[0]) - 1] + cnpj_totals[int(sel.target[0]) - 1]:,.2f}'
+                ))
+
+
+
+                cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
+
+                new_layout = QtWidgets.QVBoxLayout()
+                new_layout.addWidget(FigureCanvas(fig))
+                ui.campo_grafico.setLayout(new_layout)
+
+        except Exception as e:
+            print (e)
+
+
+
 
     def definir_cor(self):
         # Define a cor da borda interna superior da interface
@@ -1175,13 +1299,22 @@ class Funcoes_padrao:
         return 'PODEMOS INICIAR A VÍDEO?'
 
     def clique_btn11(self):
-        
-        nome = ui.campo_nome.text()
+        try:
+            nome = ui.campo_nome.text().split()[0].capitalize()
+        except:
+            nome = ""
+            
         rev = ui.campo_cod_rev.text()
 
-        mensagem = self.dicionario["clique_btn11"]["mensagem"].replace("{{nome}}",nome).replace("{{cod_rev}}",rev)
-        pyperclip.copy(mensagem)
+        mensagem_firebase = self.dicionario["clique_btn11"]["mensagem"]
+
+        mensagem_formatada = mensagem_firebase.replace("{{nome}}", nome).replace("{{cod_rev}}", rev)
+
+        mensagem_com_quebras = mensagem_formatada.replace("\\n", "\n")
+
+        pyperclip.copy(mensagem_com_quebras)
         return 'FINALIZADO COM SUCESSO'
+
     
     def clique_btn13(self):
         mensagem = self.dicionario["clique_btn13"]["mensagem"]
@@ -1897,6 +2030,22 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         except:
             pass
 
+    def limpar_tabela(self):
+        ui.campo_relatorio.setPlainText("")
+        ui.tableWidget.setRowCount(0)
+
+        for col in range(ui.tableWidget.columnCount()):
+            ui.tableWidget.setColumnHidden(col, False)
+        ui.tableWidget.setRowCount(0)
+        ui.tableWidget.setColumnCount(6)
+        self.ajuste_largura_col()
+
+    def ajuste_largura_col(self):
+        ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
+        for col in range(ui.tableWidget.columnCount()):
+                ui.tableWidget.setColumnWidth(col, 83)
+
+
 
 class Acoes_banco_de_dados:
     def __init__(self,ui):
@@ -1934,6 +2083,7 @@ class Acoes_banco_de_dados:
                         self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
                         self.contar_verificacao()
                         self.limpar_campos_pedido()
+                        funcoes_app.ajuste_largura_col()
 
                     #Pedido existente + gravado temporariamente
                     # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
@@ -1944,6 +2094,7 @@ class Acoes_banco_de_dados:
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                         #self.mensagem_alerta("Sucesso","Pedido salvo!")
                         self.contar_verificacao()
+                        funcoes_app.ajuste_largura_col()
                         
             #NOVO PEDIDO
             else:
@@ -1958,6 +2109,7 @@ class Acoes_banco_de_dados:
                         self.limpar_campos_pedido()
                         self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
                         self.contar_verificacao()
+                        funcoes_app.ajuste_largura_col()
 
                     #Pedido existente + gravado temporariamente
                     case 'TEMPORARIO':
@@ -1966,6 +2118,7 @@ class Acoes_banco_de_dados:
                         self.ui.campo_status_bd.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                         self.contar_verificacao()
+                        funcoes_app.ajuste_largura_col()
                         
         except Exception as e:
             print(e)
@@ -2039,7 +2192,6 @@ class Acoes_banco_de_dados:
             ui.campo_seguranca_cnh.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("")
             ui.label_quantidade_bd.setText("")
-            ui.tableWidget.setRowCount(0)
             ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
             ui.campo_pedido.setReadOnly(False)
             ui.campo_pedido.setText("")
@@ -2062,19 +2214,10 @@ class Acoes_banco_de_dados:
             ui.campo_pis.setText("")
             ui.campo_telefone.setText("")
             ui.campo_oab.setText("")
-            ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
-            for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnHidden(col, False)
-            ui.tableWidget.setRowCount(0)
-            ui.tableWidget.setColumnCount(6)
-            ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
 
-
-           
+        
         except Exception as e:
             print(e)
 
@@ -2098,7 +2241,6 @@ class Acoes_banco_de_dados:
             ui.campo_seguranca_cnh.setText("")
             ui.campo_lista_junta_comercial.setCurrentText("")
             ui.label_quantidade_bd.setText("")
-            ui.tableWidget.setRowCount(0)
             ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
             ui.campo_pedido.setReadOnly(False)
             ui.campo_pedido.setText("")
@@ -2116,7 +2258,6 @@ class Acoes_banco_de_dados:
             ui.campo_pis.setText("")
             ui.campo_telefone.setText("")
             ui.campo_oab.setText("")
-            ui.campo_relatorio.setPlainText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
 
@@ -2366,6 +2507,10 @@ class Acoes_banco_de_dados:
                     self.alteracao_status()
 
             ui.campo_status_bd.setText('✅')
+            
+            ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
+            for i in range(ui.tableWidget.columnCount()): 
+                ui.tableWidget.horizontalHeader().resizeSection(i, 83)
 
             
         except Exception as e:
@@ -2377,7 +2522,6 @@ class Acoes_banco_de_dados:
                 ui.label_confirmacao_criar_pasta.setText("✅")
         except Exception as e:
             print(f"Erro ao atualizar confirmação de pasta: {e}")
-
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
@@ -2400,7 +2544,7 @@ class Acoes_banco_de_dados:
         if pedidos_videook:
             for pedido_info in pedidos_videook.values():
                 quantidade_videook += 1
-                data_pedido = pedido_info['DATA']
+                data_pedido = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
                 numero_pedido = pedido_info['PEDIDO']
                 videook_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
 
@@ -2419,6 +2563,7 @@ class Acoes_banco_de_dados:
         ui.campo_status_videook.setText(str(quantidade_videook))
 
     def preencher_tabela(self):
+        #Evento disparado quando clico no botão procurar na aba 'Consulta'
         try:
             # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
@@ -2509,9 +2654,11 @@ class Acoes_banco_de_dados:
                                     if 'e-CNPJ' in pedido_info['VERSAO']:
                                         valor_cnpj += preco
                                         j += 1
+
                                     elif 'e-CPF' in pedido_info['VERSAO']:
                                         valor_cpf += preco
                                         f += 1
+                                        
                                     if pedido_info['VENDA'] == "SIM":
                                         venda += 1
                                 QApplication.processEvents()
@@ -2546,7 +2693,7 @@ class Acoes_banco_de_dados:
                 ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}]........R$ {valor_cnpj:.2f}
 (+)e-CPF [{f}].........R$ {valor_cpf:.2f}
 (=)Total [{j+f}].........R$ {total_venda:.2f}
-(-) {ui.campo_desconto.text()}%...............R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
+(-){ui.campo_desconto.text()}%...............R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
 ----------------------------------
 (=)Total Esperado....R$ {total_venda * (1 - float(ui.campo_desconto.text()) / 100):.2f}
 Vendas..........{venda}
@@ -2670,7 +2817,7 @@ class JanelaOculta:
         self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(525, 683)
+        self.animate_window_resize(529, 700)
         self.janela.atualizar_documentos_tabela()
 
     def leaveEvent(self, event):
@@ -2693,7 +2840,7 @@ class JanelaOculta:
                     self.animate_window_resize(143, 53)
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(525,683)#469
+        self.animate_window_resize(529,700)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -2770,6 +2917,7 @@ ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verifi
 ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
+ui.botao_excluir_dados_tabela.clicked.connect(lambda:funcoes_app.limpar_tabela())
 ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())

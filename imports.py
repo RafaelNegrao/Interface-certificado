@@ -48,4 +48,14 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import shutil
 import json
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from collections import Counter,defaultdict
+import numpy as np
+import mplcursors
+import calendar  # Para identificar o último dia do mês
+
+
+
+
 
