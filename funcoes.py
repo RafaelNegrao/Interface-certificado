@@ -21,7 +21,6 @@ class Funcoes_padrao:
                 
                 barra.setMaximum(meta_semanal)
                 barra.setValue(certificados_semana)
-                
 
                 if certificados_semana >= meta_semanal:
                     label.setStyleSheet('color: rgb(113,66,230); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')  # Azul
@@ -56,13 +55,6 @@ class Funcoes_padrao:
             else:
                 ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
                 ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
-
-            # Aplica a borda às labels (1 a 5 e a mensal), com fundo transparente
-            # for i in range(1, 6):
-            #     label = getattr(ui, f"label_meta{i}")
-            #     label.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
-
-            # ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
 
         except Exception as e:
             print(f"Erro: {e}")
@@ -320,7 +312,7 @@ class Funcoes_padrao:
                 ui.campo_grafico.setLayout(new_layout)
 
         except Exception as e:
-            print (e)
+            print (f'Erro: {e}')
 
 
 
@@ -1315,7 +1307,6 @@ class Funcoes_padrao:
         pyperclip.copy(mensagem_com_quebras)
         return 'FINALIZADO COM SUCESSO'
 
-    
     def clique_btn13(self):
         mensagem = self.dicionario["clique_btn13"]["mensagem"]
         pyperclip.copy(mensagem)
@@ -1426,26 +1417,27 @@ class Funcoes_padrao:
         ui.campo_data_ate.setDate(QDate.currentDate()) 
 
     def abrir_nova_janela(self, janela_pai):
+        
+        if hasattr(self, 'nova_janela') and self.nova_janela.isVisible():
+            self.nova_janela.raise_()  #
+            return
+
         self.nova_janela = QDialog(janela_pai)
-        self.nova_janela.setFixedSize(484, 670)  # Ajuste o tamanho da janela para acomodar duas colunas
+        self.nova_janela.setFixedSize(484, 670)  
         self.nova_janela.setWindowTitle('Mensagens')
         self.nova_janela.setStyleSheet(f"color: #{'%02x%02x%02x' % (ui.campo_cor_R.value(), ui.campo_cor_G.value(), ui.campo_cor_B.value())};")
 
-        # Obtém a posição da janela raiz
+        
         pos = janela_pai.pos()
-
-        # Posiciona a nova janela à esquerda da janela raiz e na mesma altura
+        
         self.nova_janela.move(pos.x() - self.nova_janela.width() - 8, pos.y())
-
-        # Cria uma área de rolagem
+       
         scroll = QScrollArea(self.nova_janela)
-        scroll.setFixedSize(484, 670)  # Ajuste o tamanho da área de rolagem para acomodar duas colunas
-
-        # Cria um widget para conter os botões
+        scroll.setFixedSize(484, 670)  
+       
         widget = QWidget()
-        layout = QGridLayout()  # Mude para QGridLayout
+        layout = QGridLayout() 
 
-        # Lista de funções para obter os textos dos botões
         funcoes = [
             self.clique_btn1,
             self.clique_btn2,
