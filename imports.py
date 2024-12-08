@@ -57,5 +57,22 @@ import calendar  # Para identificar o último dia do mês
 
 
 
+ref = db.reference("/")
 
 
+from acoes_banco_dados import Acoes_banco_de_dados
+from funcoes_padrao import Funcoes_padrao
+from hideWindow import JanelaOculta
+
+
+
+app = QtWidgets.QApplication(sys.argv)
+janela = QtWidgets.QMainWindow()
+desktop = QDesktopWidget()
+ui = Ui_janela()
+ui.setupUi(janela)
+
+
+helper = JanelaOculta(janela,ui)
+banco_dados = Acoes_banco_de_dados(ui)
+funcoes_app = Funcoes_padrao(ui)

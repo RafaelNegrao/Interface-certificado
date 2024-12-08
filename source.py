@@ -85,6 +85,8 @@ class Funcoes_padrao:
                 ui.campo_senha_email.setText(configs['SENHA EMAIL'])
                 ui.campo_nome_agente.setText(configs['AGENTE'])
                 ui.campo_dias_renovacao.setValue(configs['RNG RENOVACAO'])
+                ui.checkBox_transparecer.setChecked(configs['CHECKBOX TRANSP'])
+                ui.campo_porcentagem_transparencia.setValue(configs['VALOR TRANS'])
 
 
             except Exception as e:
@@ -117,6 +119,8 @@ class Funcoes_padrao:
         senha_email = ui.campo_senha_email.text()
         atendente = ui.campo_nome_agente.text()
         renovacao = ui.campo_dias_renovacao.value()
+        transparencia = ui.checkBox_transparecer.isChecked()
+        valor_transparencia = ui.campo_porcentagem_transparencia.value()
         # Cria um dicionário com as novas configurações
         nova_config = {
             "DIRETORIO-RAIZ": diretorio,
@@ -131,6 +135,8 @@ class Funcoes_padrao:
             "SENHA EMAIL":senha_email,
             "AGENTE":atendente,
             "RNG RENOVACAO": renovacao,
+            "CHECKBOX TRANSP": transparencia,
+            "VALOR TRANS":valor_transparencia
             }
 
         try:
@@ -279,14 +285,14 @@ class Funcoes_padrao:
 
                 fonte_cor = (150/255, 150/255, 150/255)
 
-                ax.set_xlabel("Dias do Mês", fontsize=6, color=fonte_cor)
-                ax.set_ylabel("Quantidade de Pedidos", fontsize=6, color=fonte_cor)
+                ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
+                ax.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
                 ax.set_xticks(range(1, ultimo_dia + 1))
                 ax.set_ylim(0, max_y)
                 ax.set_yticks(range(0, int(max_y) + 1, 1))
 
-                for y in range(0, int(max_y), 2):
-                    ax.axhline(y=y, color="gray", linestyle="-", alpha=0.4, linewidth=0.7)
+                for y in range(0, int(max_y)):
+                    ax.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
 
                 leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
                 leg.get_frame().set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
@@ -408,6 +414,7 @@ class Funcoes_padrao:
     def print_tela(self):
         # Tira o print da tela
         try:
+            hora_atual = datetime.datetime.now().strftime("%H_%M_%S")
             caminho = ui.caminho_pasta.text()
 
             if not caminho:
@@ -441,33 +448,28 @@ class Funcoes_padrao:
                 if not nome_documento:
                     return
                 
-                # Define o caminho completo com o nome do arquivo
                 caminho = f"{caminho}/{nome_documento}.png"
 
-            # Obtém a janela principal que será escondida durante o screenshot
             janela_principal = self.obter_janela_principal(ui.centralwidget)
 
             if janela_principal:
 
                 janela_principal.setWindowOpacity(0)
-            # Aguarda meio segundo para continuar
+
             time.sleep(0.5)
 
-            # Tira um screenshot da tela
             screenshot = pyautogui.screenshot()
 
-            # Restaura a janela principal (opcional)
             if janela_principal:
-                #janela_principal.showNormal()
+
                 janela_principal.setWindowOpacity(1)
 
-            # Salvei o screenshot no caminho especificado
             screenshot.save(caminho)
 
             ui.label_confirmacao_tirar_print.setText("✅")
 
             self.atualizar_documentos_tabela()
-        
+    
         except:
             # Em caso de erro, atualiza a tabela e exibe um alerta na interface
             self.atualizar_documentos_tabela()
@@ -520,7 +522,7 @@ class Funcoes_padrao:
                     return
                 nome_pasta = f'{str(ui.campo_pedido.text())}-{ui.campo_nome.text()}'
 
-            # Tente criar a pasta no diretório padrão
+            # Tenta criar a pasta no diretório padrão
             diretorio_padrão = ui.caminho_pasta_principal.text()
             pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
 
@@ -556,11 +558,28 @@ class Funcoes_padrao:
     def mensagem_alerta(self,titulo,mensagem):
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
 
-    def procurar_oab(self):
+    def procurar_funcional(self):
 
-        url = QUrl("https://cna.oab.org.br/")
-        QDesktopServices.openUrl(url)
-        return
+        nome_pesquisa, ok = QInputDialog.getItem(ui.centralwidget, "Site pesquisa", "Escolha o site de pesquisa:", ["OAB", "CREA","CRM"], 0, False)
+
+        if not ok or not nome_pesquisa:
+            return
+
+        match nome_pesquisa:
+            case "OAB":
+                url = QUrl("https://cna.oab.org.br/")
+                QDesktopServices.openUrl(url)
+                return
+            
+            case "CREA":
+                url = QUrl("https://consultaprofissional.confea.org.br/")
+                QDesktopServices.openUrl(url)
+                return
+
+            case "CRM":
+                url = QUrl("https://portal.cfm.org.br/busca-medicos")
+                QDesktopServices.openUrl(url)
+                return
 
     def procurar_rg(self):
         url = QUrl("https://acertid.net.br/acertid/")
@@ -894,18 +913,15 @@ class Funcoes_padrao:
             if nome_documento == "OUTRO":
                 nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:")
             
-            # Verificar se o usuário cancelou a operação ou não forneceu um nome
             if not ok or not nome_documento:
                 return
 
-            # Criar um objeto PdfMerger para mesclar os PDFs
             pdf_merger = PyPDF2.PdfMerger()
 
             try:
-                # Tentar abrir o diretório especificado
+
                 file_paths, _ = QFileDialog.getOpenFileNames(ui.centralwidget, "Selecionar PDFs para Mesclar", folder_to_open_raw, "Arquivos PDF (*.pdf);;Todos os arquivos (*)")
 
-                # Verificar se o usuário cancelou a seleção ou não escolheu nenhum arquivo
                 if not file_paths:
                     return
 
@@ -937,11 +953,11 @@ class Funcoes_padrao:
             ui.label_confirmacao_mesclar_pdf.setText("❌")
             pdf_merger.close()
             self.atualizar_documentos_tabela()
-            # Lidar com exceções (você pode adicionar mais detalhes aqui, se necessário)
+
             return
 
     def escolher_conversao(self):
-        # Criação da janela de diálogo
+
         dialog = QDialog(ui.centralwidget)
         dialog.setWindowTitle("Selecione o tipo de conversão")
         
@@ -959,12 +975,12 @@ class Funcoes_padrao:
 
 
         def confirmar():
-            # Verificar qual RadioButton foi selecionado
+
             if radio_jpg_to_pdf.isChecked():
-                # Chamar a função converter_jpg_to_pdf
+
                 self.converter_jpg_para_pdf()
             elif radio_pdf_to_jpg.isChecked():
-                # Chamar a função converter_pdf_to_jpg
+
                 self.converter_pdf_para_jpg()
             dialog.accept()
         botao_confirmar.clicked.connect(confirmar)
@@ -1044,25 +1060,21 @@ class Funcoes_padrao:
             'campo_pis',
         ]
 
-        # VERIFICAR SE O NOME DO CAMPO ESTA NA LISTA
         if nome_campo in campos:
             try:
-                # OBTER O CAMPO RELACIONADO AO NOME
+
                 campo = getattr(ui, nome_campo)
 
-                # SE O CAMPO FOR 'campo_cnpj' OU 'campo_cpf', REMOVER CARACTERES ESPECIAIS
                 if nome_campo in ['campo_cnpj', 'campo_cpf']:
                     texto = campo.text().replace('.', '').replace('-', '').replace('/', '')
                 else:
                     texto = campo.text()
 
-                # COPIAR O TEXTO PARA A AREA DE TRANSFERENCIA
                 QApplication.clipboard().setText(texto)
 
-                # SELECIONAR TODO O TEXTO DO CAMPO
                 campo.selectAll()
             except Exception as e:
-                # TRATAR ERRO AO COPIAR
+
                 print(f"Erro ao copiar o campo {nome_campo}: {e}")
         
     def manter_tela_aberta(self):
@@ -1116,9 +1128,9 @@ class Funcoes_padrao:
             ref = db.reference("/Certificados")
             certificados = ref.get()
 
-            ui.campo_lista_versao_certificado.clear()  # Limpar qualquer item existente no combobox
+            ui.campo_lista_versao_certificado.clear()  
             ui.campo_lista_versao_certificado.addItem("")
-            ui.campo_lista_versao_certificado.addItems(certificados.keys())  # Adicionar as chaves do dicionário ao combobox
+            ui.campo_lista_versao_certificado.addItems(certificados.keys()) 
 
             ui.campo_lista_versao_certificado.insertItem(1,'e-CNPJ - no computador - 12 meses')
             ui.campo_lista_versao_certificado.insertItem(2,'e-CPF - no computador - 12 meses')
@@ -1190,308 +1202,163 @@ class Funcoes_padrao:
             return False
         
     def atualizar_documentos_tabela(self):
-        # Limpar qualquer conteúdo existente na tabela
+
         self.ui.tabela_documentos.clearContents()
 
-        # Obter o caminho da pasta do cliente
         pasta_cliente = self.ui.caminho_pasta.text()
 
-        # Verificar se o caminho da pasta existe
         if not os.path.exists(pasta_cliente):
             return
 
-        # Obter uma lista de arquivos na pasta do cliente
         documentos = os.listdir(pasta_cliente)
 
-        # Separar os documentos em PDFs e outros documentos
         pdfs = [doc for doc in documentos if doc.lower().endswith('.pdf')]
         outros_documentos = [doc for doc in documentos if not doc.lower().endswith('.pdf')]
 
-        # Preencher a tabela com os PDFs
         num_documentos = len(pdfs)
         self.ui.tabela_documentos.setRowCount(num_documentos)
 
         for i, documento in enumerate(pdfs):
-            # Criar um item de tabela para o nome do documento
+
             item_nome_documento = QTableWidgetItem(documento)
 
-            # Definir a cor do texto como preta para PDFs
             item_nome_documento.setForeground(QColor(90, 54, 247))
 
-            # Definir o item na tabela
             self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
 
-        # Preencher a tabela com os outros documentos
         num_outros_documentos = len(outros_documentos)
         self.ui.tabela_documentos.setRowCount(num_documentos + num_outros_documentos)
 
         for i, documento in enumerate(outros_documentos):
-            # Criar um item de tabela para o nome do documento
+
             item_nome_documento = QTableWidgetItem(documento)
 
-            # Definir a cor do texto como cinza para outros documentos
             item_nome_documento.setForeground(QColor(128, 128, 128))
 
-            # Definir o item na tabela
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
 
+
     def abrir_documento_para_edicao(self):
-        # Obter o item clicado da tabela
         item = self.ui.tabela_documentos.currentItem()
 
-        # Verificar se um item foi realmente clicado (pode ser None se o usuário clicar em uma célula vazia)
         if item is not None:
-            # Obter o nome do documento clicado
             nome_documento = item.text()
 
-            # Obter o caminho completo do documento
             caminho_documento = os.path.join(self.ui.caminho_pasta.text(), nome_documento)
-            if os.name == 'nt':  # Verificar se o sistema operacional é Windows
-                os.startfile(caminho_documento)  # Abrir o arquivo no Windows
+            if os.name == 'nt':  
+                os.startfile(caminho_documento)  
             else:
                 subprocess.Popen(['xdg-open', caminho_documento])
+
 
     def abrir_janela_mensagem(self):
         self.abrir_nova_janela(janela)
 
-    def clique_btn1(self):  
-            
-        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
-        nome = ui.campo_nome_agente.text()
-        mensagem = self.dicionario["clique_btn1"]["mensagem"].replace("{{mensagem_inicial}}", mensagem_inicial).replace("{{nome}}", nome)
-        
-        pyperclip.copy(mensagem)
-        return "APRESENTAÇÃO"
 
-    def clique_btn3(self):
-        mensagem = self.dicionario["clique_btn3"]["mensagem"]
-
-        pyperclip.copy(mensagem)                                                                                                                                    
-        return "PEDIR DOCUMENTO PESSOAL"
-    
-    def clique_btn5(self):
-
-        mensagem = self.dicionario["clique_btn5"]["mensagem"]   
-
-        pyperclip.copy(mensagem) 
-        return "PEDIR DOCUMENTO EMPRESA"
-
-    def clique_btn7(self):
-
-        mensagem = self.dicionario["clique_btn7"]["mensagem"]
-
-        QApplication.clipboard().setText(mensagem)
-        return 'OBRIGADO. UM MOMENTO.'
-
-    def clique_btn9(self):
-        
-        mensagem = self.dicionario["clique_btn9"]["mensagem"]
-
-        QApplication.clipboard().setText(mensagem)
-        return 'PODEMOS INICIAR A VÍDEO?'
-
-    def clique_btn11(self):
-        try:
-            nome = ui.campo_nome.text().split()[0].capitalize()
-        except:
-            nome = ""
-            
-        rev = ui.campo_cod_rev.text()
-
-        mensagem_firebase = self.dicionario["clique_btn11"]["mensagem"]
-
-        mensagem_formatada = mensagem_firebase.replace("{{nome}}", nome).replace("{{cod_rev}}", rev)
-
-        mensagem_com_quebras = mensagem_formatada.replace("\\n", "\n")
-
-        pyperclip.copy(mensagem_com_quebras)
-        return 'FINALIZADO COM SUCESSO'
-
-    def clique_btn13(self):
-        mensagem = self.dicionario["clique_btn13"]["mensagem"]
-        pyperclip.copy(mensagem)
-        return 'FINALIZADO SEM SUCESSO'
-
-    def clique_btn15(self):
-        mensagem = self.dicionario["clique_btn15"]["mensagem"]
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK REEMBOLSO'
-
-    def clique_btn17(self):
-        mensagem = self.dicionario["clique_btn17"]["mensagem"]
-        QApplication.clipboard().setText(mensagem)
-        return 'PARANAGUA@ACBDIGITAL.COM.BR'
-
-    def clique_btn2(self):
-    # Observações
-        midia = ''
-        certificado = ui.campo_lista_versao_certificado.currentText().lower()
-
-        if 'cartão' in certificado:
-            midia = 'CARTÃO'
-        elif 'token' in certificado: 
-            midia = 'TOKEN'
-        
-        mensagem = self.dicionario["clique_btn2"]["mensagem"].replace("{{midia}}",midia)
-                                                                                    
-        pyperclip.copy(mensagem) 
-        return 'RETIRADA OU ENVIO?'
-
-    def clique_btn4(self):
-        mensagem = self.dicionario["clique_btn4"]["mensagem"]
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK MAPA POSTOS DE ATENDIMENTO'
-
-    def clique_btn6(self):
-                                                                                                                                            
-        mensagem = self.dicionario["clique_btn6"]["mensagem"]
-                                                                                                           
-        pyperclip.copy(mensagem) 
-        return "PEDIR OAB"
-
-    def clique_btn8(self):
-        rev = ui.campo_cod_rev.text()
-
-        mensagem = self.dicionario["clique_btn8"]["mensagem"].replace("{{cod_rev}}",rev)
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK PADRÃO DE COMPRA'
-  
-    def clique_btn10(self):
-
-        mensagem = self.dicionario["clique_btn10"]["mensagem"]
-
-        QApplication.clipboard().setText(mensagem)
-        return 'AINDA ESTÁ AI?'
-    
-    def clique_btn12(self):
-        pedido = ui.campo_pedido.text()
-
-        mensagem = self.dicionario["clique_btn12"]["mensagem"].replace("{{pedido}}",pedido)
-        QApplication.clipboard().setText(mensagem)
-        return 'LINK PARA INSTALAÇÃO DO CERTIFICADO'
-    
-    def clique_btn14(self):
-
-        mensagem = self.dicionario["clique_btn14"]["mensagem"]
-        
-        QApplication.clipboard().setText(mensagem)
-        return mensagem
-    
-    def clique_btn16(self):
-        
-        mensagem = self.dicionario["clique_btn16"]["mensagem"]
-        
-        QApplication.clipboard().setText(mensagem)
-        return 'PROBLEMA PAGAMENTO'
-        
-    def clique_btn18(self):
-
-        certificado = ui.campo_lista_versao_certificado.currentText()
-        cliente = ui.campo_nome.text()
-        pedido = ui.campo_pedido.text()
-
-        midia = ""
-        if "token" in certificado:
-            midia = "TOKEN"
-        elif "cartão" in certificado:
-            midia = "CARTÃO"
-
-        mensagem = self.dicionario["clique_btn18"]["mensagem"].replace("{{cliente}}",cliente).replace("{{pedido}}",pedido).replace("{{midia}}",midia)
-        
-        QApplication.clipboard().setText(mensagem)
-        return 'E-MAIL ENVIO MÍDIA'
-       
     def ocultar_aba_tabela(self):
         ui.tableWidget.setColumnHidden(0, True)
         ui.tableWidget.setColumnHidden(1, True)
         ui.tableWidget.setColumnHidden(2, True)
         ui.tableWidget.setColumnHidden(3, True)
         ui.tableWidget.setColumnHidden(9, True)
-    
+
+
     def reexibir_aba_tabela(self):
         for col in range(ui.tableWidget.columnCount()):
             ui.tableWidget.setColumnHidden(col, False)
+
 
     def definir_hoje(self):
         ui.campo_data_de.setDate(QDate.currentDate())
         ui.campo_data_ate.setDate(QDate.currentDate()) 
 
+
     def abrir_nova_janela(self, janela_pai):
-        
-        if hasattr(self, 'nova_janela') and self.nova_janela.isVisible():
-            self.nova_janela.raise_()  #
-            return
+        #verifica se a janela de mensagens está aberta
+        if hasattr(self, 'nova_janela') and self.nova_janela is not None:
+            if self.nova_janela.isVisible():
+                return 
 
         self.nova_janela = QDialog(janela_pai)
-        self.nova_janela.setFixedSize(484, 670)  
+        self.nova_janela.setFixedSize(484, 673)
         self.nova_janela.setWindowTitle('Mensagens')
-        self.nova_janela.setStyleSheet(f"color: #{'%02x%02x%02x' % (ui.campo_cor_R.value(), ui.campo_cor_G.value(), ui.campo_cor_B.value())};")
 
-        
         pos = janela_pai.pos()
-        
         self.nova_janela.move(pos.x() - self.nova_janela.width() - 8, pos.y())
-       
+
         scroll = QScrollArea(self.nova_janela)
-        scroll.setFixedSize(484, 670)  
-       
+        scroll.setFixedSize(484, 673)
+
         widget = QWidget()
-        layout = QGridLayout() 
+        layout = QGridLayout()
 
-        funcoes = [
-            self.clique_btn1,
-            self.clique_btn2,
-            self.clique_btn3,
-            self.clique_btn4,
-            self.clique_btn5,
-            self.clique_btn6,
-            self.clique_btn7,
-            self.clique_btn8,
-            self.clique_btn9,
-            self.clique_btn10,
-            self.clique_btn11,
-            self.clique_btn12,
-            self.clique_btn13,
-            self.clique_btn14,
-            self.clique_btn15,
-            self.clique_btn16,
-            self.clique_btn17,
-            self.clique_btn18
-        ]
+        if not hasattr(self, 'dicionario') or not self.dicionario:
+            print("Dicionário de mensagens não está carregado.")
+            return
 
-        # Obtém as mensagens chamando cada função
-        nomes = [func() for func in funcoes]
+        for i, (chave, valor) in enumerate(self.dicionario.items()):
+            titulo = valor.get("titulo")
+            if titulo:
+                botao = QPushButton()
+                botao.setFixedSize(228, 66)
+                botao.setStyleSheet("QPushButton { text-align: justify; }")
+                linhas = [titulo[j:j+40] for j in range(0, len(titulo), 40)]
+                botao.setText('\n'.join(linhas))
 
-        # Cria 13 botões
-        for i, botao_texto in enumerate(nomes):
-            if botao_texto is not None:  # Verifica se o texto do botão não é None
-                botao = QPushButton()  # Cria um botão sem texto
-                botao.setFixedSize(228, 66)  # Define o tamanho do botão
-                botao.setStyleSheet("QPushButton { text-align: justify; }")  # Alinha o texto do botão à esquerda
-
-                # Dividir o texto em linhas para caber no botão
-                linhas = [botao_texto[j:j+40] for j in range(0, len(botao_texto), 40)]
-                botao.setText('\n'.join(linhas))  # Define o texto do botão como várias linhas
-
-                botao.clicked.connect(lambda _, b=botao: self.copiar_e_fechar(b))  # Conecta o sinal clicked ao slot copiar_e_fechar
-                layout.addWidget(botao, i // 2, i % 2)  # Adiciona o botão no layout em duas colunas
-
-                # Conecta o botão à função correspondente
-                func_name = f'clique_btn{i+1}'
-                if hasattr(self, func_name):
-                    botao.clicked.connect(getattr(self, func_name))
+                # Conecta o botão à função genérica de tratamento
+                botao.clicked.connect(lambda _, c=chave: self.copiar_com_tratamento(c))
+                layout.addWidget(botao, i // 2, i % 2)
 
         widget.setLayout(layout)
         scroll.setWidget(widget)
-
         self.nova_janela.show()
 
-    def copiar_e_fechar(self, botao):
-        clipboard = QGuiApplication.clipboard()
-        mime_data = QMimeData()
-        mime_data.setText(botao.text())
-        clipboard.setMimeData(mime_data)
-        self.nova_janela.close()
+
+    def copiar_com_tratamento(self, chave):
+
+        mensagem_firebase = self.dicionario[chave].get("mensagem", "")
+        titulo = self.dicionario[chave].get("titulo", "")
+
+        if chave == "clique_btn1":
+            mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
+            nome = ui.campo_nome_agente.text()
+            mensagem = mensagem_firebase.replace("{{mensagem_inicial}}", mensagem_inicial).replace("{{nome}}", nome)
+
+        elif chave == "clique_btn2":
+            certificado = ui.campo_lista_versao_certificado.currentText().lower()
+            midia = "CARTÃO" if "cartão" in certificado else "TOKEN" if "token" in certificado else ""
+            mensagem = mensagem_firebase.replace("{{midia}}", midia)
+
+        elif chave == "clique_btn11":
+            nome = ui.campo_nome.text().split()[0].capitalize() if ui.campo_nome.text() else ""
+            rev = ui.campo_cod_rev.text()
+            mensagem = mensagem_firebase.replace("{{nome}}", nome).replace("{{cod_rev}}", rev).replace("\\n", "\n")
+
+        elif chave == "clique_btn12":
+            pedido = ui.campo_pedido.text()
+            mensagem = mensagem_firebase.replace("{{pedido}}", pedido)
+
+        elif chave == "clique_btn18":
+            certificado = ui.campo_lista_versao_certificado.currentText()
+            cliente = ui.campo_nome.text()
+            pedido = ui.campo_pedido.text()
+            midia = "TOKEN" if "token" in certificado else "CARTÃO" if "cartão" in certificado else ""
+            mensagem = mensagem_firebase.replace("{{cliente}}", cliente).replace("{{pedido}}", pedido).replace("{{midia}}", midia)
+
+        else:
+            # Mensagens que não necessitam de tratamento específico
+            mensagem = mensagem_firebase
+
+        clipboard = QApplication.clipboard()
+        clipboard.setText(mensagem)
+
+        if hasattr(self, 'nova_janela') and self.nova_janela is not None:
+            if self.nova_janela.isVisible():  
+                self.nova_janela.close()
+
+            self.nova_janela.deleteLater()
+            self.nova_janela = None  
+
 
     def determinar_hora(self,hora):
         match hora:
@@ -1501,6 +1368,7 @@ class Funcoes_padrao:
                 return "Boa tarde"
             case tempo if tempo >= datetime.datetime.strptime("18:00", "%H:%M").time():
                 return "Boa noite"
+
 
     def mensagem_contato(self):
           
@@ -1537,6 +1405,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         mensagem = mensagem.replace(' ', '%20')  
         url_mensagem = QUrl(f'https://api.whatsapp.com/send?phone={numero}&text={mensagem}')
         QDesktopServices.openUrl(url_mensagem)
+
 
     def envio_de_email(self):
         try:
@@ -1703,22 +1572,15 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                         f"</html>"
                     )
 
-            # Verifica se o e-mail foi inserido
             if ui.campo_email.text():
                 remetente = ui.campo_email_empresa.text()
                 destinatarios = ui.campo_email.text()
                 senha = ui.campo_senha_email.text()
 
-                # Usar MIMEMultipart para enviar HTML corretamente
                 msg = MIMEMultipart("alternative")
                 msg['Subject'] = assunto
                 msg['From'] = remetente
                 msg['To'] = destinatarios
-
-                # Confirmacao de leitura
-                #msg.add_header('Disposition-Notification-To', remetente) 
-                # Confirmacao de entrega
-                #msg.add_header('Return-Receipt-To', remetente) 
 
                 parte_html = MIMEText(corpo_html, "html")
                 msg.attach(parte_html)
@@ -1734,11 +1596,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         except:
             pass
 
+
     def mostrar_senha(self):
         if ui.campo_senha_email.echoMode() == QLineEdit.Password:
             ui.campo_senha_email.setEchoMode(QLineEdit.Normal)
         else:
             ui.campo_senha_email.setEchoMode(QLineEdit.Password)
+
 
     def envio_em_massa(self):
         try:
@@ -1746,14 +1610,14 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 
                 return
 
-            ui.tableWidget.setRowCount(0)  # Limpa a tabela
-            ui.tableWidget.setColumnCount(5)  # Altera o número de colunas para 4
-            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"])  # Adiciona a nova coluna
-            ui.tableWidget.setColumnWidth(0, 70)
-            ui.tableWidget.setColumnWidth(1, 100)
-            ui.tableWidget.setColumnWidth(2, 50)
-            ui.tableWidget.setColumnWidth(3, 100)
-            ui.tableWidget.setColumnWidth(4, 180)  # Define a largura da nova coluna
+            ui.tableWidget.setRowCount(0)  
+            ui.tableWidget.setColumnCount(5) 
+            ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"]) 
+            ui.tableWidget.setColumnWidth(0, 102)
+            ui.tableWidget.setColumnWidth(1, 145)
+            ui.tableWidget.setColumnWidth(2, 72)
+            ui.tableWidget.setColumnWidth(3, 145)
+            ui.tableWidget.setColumnWidth(4, 264)  
 
             pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
@@ -1764,13 +1628,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 
             if not pedidos:
                 self.mensagem_alerta("Erro", "Nenhum pedido encontrado para as datas selecionadas.")
-                QApplication.processEvents()  # Atualiza a tela
+                QApplication.processEvents() 
                 return
 
             total_pedidos = len(pedidos)
             progresso_atual = 0
             ui.barra_progresso_consulta.setMaximum(total_pedidos)
-            QApplication.processEvents()  # Atualiza a barra de progresso
+            QApplication.processEvents()  
 
             nome = ui.campo_nome_agente.text()
 
@@ -1797,20 +1661,16 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 cliente_email = pedido_info.get("EMAIL", "")
                 data_formatada_validacao = banco_dados.iso_para_data(pedido_info["DATA"]).toString("dd/MM/yyyy")
 
-                # Verificar se o campo "EMAIL RENOVACAO" existe; se não, inicializá-lo
                 email_ja_enviado = pedido_info.get("EMAIL RENOVACAO")
 
-                # Definir a mensagem sobre a diferença de dias
                 data_validade_formatada = data_validade.strftime("%d/%m/%Y")
 
-    # Mensagem que inclui a diferença de dias e a data de validade
                 msg_diferenca = (
                     f'Venceu há {abs(diferenca)} dias.\nVence em: {data_validade_formatada}' if diferenca < 0 else 
                     f'Restam {diferenca} dias.\nVence em: {data_validade_formatada}' if diferenca > 0 else 
                     f'Vence em: {data_validade_formatada}'      
                 )
 
-                # Verificações para determinar se o email pode ser enviado
                 motivo = ""
                 enviado = "❌"
                 enviar_email = False
@@ -1862,7 +1722,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 ui.tableWidget.setItem(row_position, 3, motivo_item)
 
                 # Configura a célula de "PRAZO RESTANTE"
-                prazo_item = QTableWidgetItem(str(msg_diferenca))  # Adiciona a variável 'diferenca' na nova coluna
+                prazo_item = QTableWidgetItem(str(msg_diferenca))  
                 prazo_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 4, prazo_item)
 
@@ -1873,7 +1733,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 if not enviar_email or pedido_info["VERSAO"] not in lista_certificados:
                     progresso_atual += 1
                     ui.barra_progresso_consulta.setValue(progresso_atual)
-                    QApplication.processEvents()  # Atualiza a barra de progresso
+                    QApplication.processEvents()  
                 
                 else:
                     
@@ -2022,9 +1882,12 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         except:
             pass
 
+
     def limpar_tabela(self):
         ui.campo_relatorio.setPlainText("")
+        ui.campo_lista_status_2.setCurrentText("TODAS")
         ui.tableWidget.setRowCount(0)
+        ui.label_quantidade_bd.setText("")
 
         for col in range(ui.tableWidget.columnCount()):
             ui.tableWidget.setColumnHidden(col, False)
@@ -2032,10 +1895,11 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
         ui.tableWidget.setColumnCount(6)
         self.ajuste_largura_col()
 
+
     def ajuste_largura_col(self):
         ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
         for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 83)
+                ui.tableWidget.setColumnWidth(col, 121)
 
 
 
@@ -2047,6 +1911,7 @@ class Acoes_banco_de_dados:
     def salvar_pedido(self):
         # Analisa se os campos do pedido estão preenchidos
         try:
+            pasta_cliente = ui.caminho_pasta.text()
             if not self.analise_de_campos():
                 return
 
@@ -2072,9 +1937,10 @@ class Acoes_banco_de_dados:
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
-                        self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
+                        self.apagar_campos_pedido(0)
+                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(pasta_cliente)
+                        ui.label_confirmacao_salvar.setText("✅")
                         self.contar_verificacao()
-                        self.limpar_campos_pedido()
                         funcoes_app.ajuste_largura_col()
 
                     #Pedido existente + gravado temporariamente
@@ -2083,6 +1949,7 @@ class Acoes_banco_de_dados:
                     case 'TEMPORARIO':
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
+                        ui.label_confirmacao_salvar.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                         #self.mensagem_alerta("Sucesso","Pedido salvo!")
                         self.contar_verificacao()
@@ -2098,8 +1965,9 @@ class Acoes_banco_de_dados:
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
-                        self.limpar_campos_pedido()
-                        self.mensagem_alerta("Sucesso",f"Pedido salvo!\n{self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())}") 
+                        self.apagar_campos_pedido(0)
+                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(pasta_cliente)
+                        ui.label_confirmacao_salvar.setText("✅")
                         self.contar_verificacao()
                         funcoes_app.ajuste_largura_col()
 
@@ -2108,6 +1976,7 @@ class Acoes_banco_de_dados:
 
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("✅")
+                        ui.label_confirmacao_salvar.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
                         self.contar_verificacao()
                         funcoes_app.ajuste_largura_col()
@@ -2141,10 +2010,8 @@ class Acoes_banco_de_dados:
         versao = ui.campo_lista_versao_certificado.currentText()
         modalidade = ui.campo_lista_modalidade.currentText()
      
-        # Lista de variáveis
         variaveis = [pedido,hora,data,versao,modalidade]
 
-        # Mapeia os nomes das variáveis para mensagens correspondentes
         nomes_mensagens = {
             "pedido": "Pedido",
             "hora": "Hora",
@@ -2153,69 +2020,20 @@ class Acoes_banco_de_dados:
             "modalidade":"Atendimento"
         }
 
-        # Verifica se há alguma variável vazia, exceto para data e hora
         campos_vazios = [nomes_mensagens[nome_variavel] for nome_variavel, valor in zip(["pedido","hora","data","versao","modalidade"], variaveis) if (isinstance(valor, str) and valor == "") or (nome_variavel == "hora" and valor == "00:00") or (nome_variavel == "data" and valor == "01/01/2000")]
 
-        # Verifica se há campos vazios e exibe a mensagem de alerta
         if campos_vazios:
             campos_faltando = "\n⭐ ".join(campos_vazios)
             mensagem_alerta = f"Preencha os seguintes campos para salvar o pedido!\n⭐{campos_faltando}"
             self.mensagem_alerta("Erro no envio", mensagem_alerta)
+            ui.label_confirmacao_salvar.setText("❌")
             return False
         return True
 
-    def limpar_campos_pedido(self):
-        try:
-            #Dados pedido  
-            ui.rb_digitacao.setChecked(True)
-            self.zerar_cor()
-            ui.tableWidget.horizontalHeader().setDefaultSectionSize(70)
-            ui.caminho_pasta.setText("")
-            ui.campo_cnpj_municipio.setText("")
-            ui.campo_comentario.setPlainText("")
-            ui.campo_nome.setText("")
-            ui.campo_rg.setText("")
-            ui.campo_cpf.setText("")
-            ui.campo_cnh.setText("")
-            ui.campo_nome_mae.setText("") 
-            ui.campo_cnpj.setText("")
-            ui.campo_email.setText("")
-            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
-            ui.campo_seguranca_cnh.setText("")
-            ui.campo_lista_junta_comercial.setCurrentText("")
-            ui.label_quantidade_bd.setText("")
-            ui.campo_data_nascimento.setDate(QDate(2000, 1, 1))
-            ui.campo_pedido.setReadOnly(False)
-            ui.campo_pedido.setText("")
-            ui.campo_data_agendamento.setDate(QDate(2000, 1, 1))
-            ui.campo_hora_agendamento.setTime(QTime.fromString('00:00', "hh:mm"))
-            ui.campo_lista_venda.setCurrentText("NAO")
-            ui.campo_lista_modalidade.setCurrentText("")
-            ui.label_confirmacao_converter_pdf.setText("")
-            ui.label_confirmacao_criar_pasta.setText("")
-            ui.label_confirmacao_tirar_print.setText("")
-            ui.label_confirmacao_mesclar_pdf.setText("")
-            ui.campo_lista_versao_certificado.setCurrentText("")
-            ui.campo_status_bd.setText("")
-            ui.campo_preco_certificado.setText("")
-            ui.campo_cnpj_razao_social.setText("")
-            ui.campo_rg_orgao.setText("")
-            ui.campo_lista_junta_comercial.setCurrentText("SP")
-            ui.tabela_documentos.clearContents()
-            ui.tabela_documentos.setRowCount(0)
-            ui.campo_pis.setText("")
-            ui.campo_telefone.setText("")
-            ui.campo_oab.setText("")
-            ui.campo_preco_certificado_cheio.setText("")
-            ui.campo_email_enviado.setText("")
-
-        
-        except Exception as e:
-            print(e)
-
-    def apagar_campos_pedido(self):
-        if not self.mensagem_confirmacao("","Apagar dados?"):
-            return
+    def apagar_campos_pedido(self,origem):
+        if origem == 1:
+            if not self.mensagem_confirmacao("","Apagar dados?"):
+                return
         try:
             #Dados pedido  
             ui.tableWidget.horizontalHeader().setDefaultSectionSize(70)
@@ -2249,13 +2067,13 @@ class Acoes_banco_de_dados:
             ui.tabela_documentos.setRowCount(0)
             ui.campo_pis.setText("")
             ui.campo_telefone.setText("")
-            ui.campo_oab.setText("")
+            ui.campo_funcional.setText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
-
-
             self.limpar_labels()
             self.contar_verificacao()
+
+
         except Exception as e:
             print(e)
 
@@ -2267,6 +2085,8 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_criar_pasta.setText("")
         ui.label_confirmacao_mesclar_pdf.setText("")
         ui.label_confirmacao_tirar_print.setText("")
+        ui.label_confirmacao_salvar.setText("")
+        ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);color:orange")
          
     def dicionario_banco_de_dados(self):
         duracoes_certificado = {
@@ -2307,7 +2127,7 @@ class Acoes_banco_de_dados:
             "ORGAO RG": ui.campo_rg_orgao.text(),
             "PIS": ui.campo_pis.text(),
             "TELEFONE": ui.campo_telefone.text(),
-            "OAB": ui.campo_oab.text(),
+            "OAB": ui.campo_funcional.text(),
             "VALIDO ATE": "",
             "EMAIL RENOVACAO": renova
         }
@@ -2324,7 +2144,7 @@ class Acoes_banco_de_dados:
         return dados_filtrados
 
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
-        for _ in range(3):  # Tentar até três vezes
+        for _ in range(3):  # Tenta fehar por 3 vezes
             try:
                 shutil.rmtree(folder_path)
                 return "Pasta excluída com sucesso"
@@ -2362,15 +2182,13 @@ class Acoes_banco_de_dados:
             if num_pedido == "":
                 return
 
-            #Referência para o nó /Pedidos
             self.ref = db.reference("/Pedidos")
 
-            # Verifica se o nó com o número do pedido existe
             pedido_ref = self.ref.child(num_pedido)
             pedido_data = pedido_ref.get()
 
             if pedido_data:
-                # Se existir, o pedido foi encontrado
+
                 self.preencher_dados(pedido_data)
                
             else:  
@@ -2381,7 +2199,7 @@ class Acoes_banco_de_dados:
 
     def pegar_valor_tabela(self):
    #evento disparado ao dar double click na tabela
-        #Pega o item selecionado
+
         item = ui.tableWidget.currentItem() 
         pedido = item.text()
         try:
@@ -2417,7 +2235,7 @@ class Acoes_banco_de_dados:
                 self.alteracao_status()
 
     def preencher_dados(self, pedido_data):
-        self.limpar_campos_pedido()  # Limpa os campos antes de começar a preencher
+        self.apagar_campos_pedido(0)  # Limpa os campos antes de começar a preencher
 
         campos = [
             (ui.campo_nome, "NOME"),
@@ -2440,15 +2258,14 @@ class Acoes_banco_de_dados:
             (ui.campo_pis, "PIS"),
             (ui.campo_preco_certificado, "PRECO"),
             (ui.campo_telefone, "TELEFONE"),
-            (ui.campo_oab, "OAB"),
+            (ui.campo_funcional, "OAB"),
             (ui.campo_email_enviado, "EMAIL RENOVACAO")
         ]
 
-        # Preencher campos principais
         for campo, chave in campos:
             try:
                 valor = pedido_data.get(chave)
-                if valor:  # Preencher apenas se o valor não for vazio ou None
+                if valor:  
                     if isinstance(campo, QComboBox):
                         campo.setCurrentText(valor)
                     else:
@@ -2456,7 +2273,6 @@ class Acoes_banco_de_dados:
             except Exception as e:
                 print(f"Erro ao preencher o campo '{chave}': {e}")
 
-        # Preencher campos de data e hora separadamente
         try:
             nascimento = pedido_data.get("NASCIMENTO")
             if nascimento:
@@ -2478,7 +2294,6 @@ class Acoes_banco_de_dados:
         except Exception as e:
             print(f"Erro ao preencher hora de agendamento: {e}")
 
-        # Atualizar o status do pedido
         try:
             status = pedido_data.get("STATUS")
             if status:
@@ -2502,7 +2317,7 @@ class Acoes_banco_de_dados:
             
             ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
             for i in range(ui.tableWidget.columnCount()): 
-                ui.tableWidget.horizontalHeader().resizeSection(i, 83)
+                ui.tableWidget.horizontalHeader().resizeSection(i, 121)
 
             
         except Exception as e:
@@ -2518,13 +2333,14 @@ class Acoes_banco_de_dados:
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
         pedidos_verificacao = ref.child("Pedidos").order_by_child("STATUS").equal_to("VERIFICAÇÃO").get()
+        
         # Consulta no Firebase para pedidos com status "VIDEO REALIZADA"
         pedidos_videook = ref.child("Pedidos").order_by_child("STATUS").equal_to("VIDEO REALIZADA").get()
 
-        quantidade_verificacao = 0  # Contador de pedidos com status "VERIFICAÇÃO"
-        quantidade_videook = 0  # Contador de pedidos com status "VIDEO REALIZADA"
-        verificacao_info = []  # Variável para armazenar a data e o número do pedido de verificação
-        videook_info = []  # Variável para armazenar a data e o número do pedido de video realizada
+        quantidade_verificacao = 0  
+        quantidade_videook = 0 
+        verificacao_info = []  
+        videook_info = []  
 
         if pedidos_verificacao:
             for pedido_info in pedidos_verificacao.values():
@@ -2555,7 +2371,8 @@ class Acoes_banco_de_dados:
         ui.campo_status_videook.setText(str(quantidade_videook))
 
     def preencher_tabela(self):
-        #Evento disparado quando clico no botão procurar na aba 'Consulta'
+    #Evento disparado quando clico no botão procurar na aba 'Consulta'
+        
         try:
             # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
@@ -2573,14 +2390,12 @@ class Acoes_banco_de_dados:
             ui.tableWidget.setColumnCount(6)
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
             for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
-
+                    ui.tableWidget.setColumnWidth(col, 121)
 
             valor_estimado = 0
             try:
                 pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), 
                                                                 datetime.datetime.strptime(x['HORA'], "%H:%M")))
-
                 numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
                 numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
 
@@ -2593,7 +2408,7 @@ class Acoes_banco_de_dados:
                 venda = 0
                 total_pedidos = len(pedidos)
                 for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
+                    ui.tableWidget.setColumnWidth(col, 121)
                 ui.barra_progresso_consulta.setVisible(False)
                 
                 # Configura a barra de progresso corretamente
@@ -2674,11 +2489,10 @@ class Acoes_banco_de_dados:
                                             item.setForeground(QColor(255, 30, 30))
 
                             y += 1
-                            # Atualiza a barra de progresso de acordo com o total de pedidos
                             ui.barra_progresso_consulta.setValue(y)
                             QApplication.processEvents()
 
-                ui.barra_progresso_consulta.setValue(total_pedidos)  # Finaliza a barra de progresso no valor máximo
+                ui.barra_progresso_consulta.setValue(total_pedidos)  
                 self.contar_verificacao()
 
                 total_venda = valor_cnpj + valor_cpf
@@ -2700,7 +2514,7 @@ Vendas..........{venda}
                 ui.campo_relatorio.setPlainText("")
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
                 for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
+                    ui.tableWidget.setColumnWidth(col, 121)
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
                 self.contar_verificacao()
@@ -2711,74 +2525,64 @@ Vendas..........{venda}
         # Limpar qualquer conteúdo existente na tabela
         self.ui.tabela_documentos.clearContents()
 
-        # Obter o caminho da pasta do cliente
         pasta_cliente = self.ui.caminho_pasta.text()
 
-        # Verificar se o caminho da pasta existe
         if not os.path.exists(pasta_cliente):
             return
 
-        # Obter uma lista de arquivos na pasta do cliente
         documentos = os.listdir(pasta_cliente)
 
-        # Separar os documentos em PDFs e outros documentos
         pdfs = [doc for doc in documentos if doc.lower().endswith('.pdf')]
         outros_documentos = [doc for doc in documentos if not doc.lower().endswith('.pdf')]
 
-        # Preencher a tabela com os PDFs
         num_documentos = len(pdfs)
         self.ui.tabela_documentos.setRowCount(num_documentos)
 
         for i, documento in enumerate(pdfs):
-            # Criar um item de tabela para o nome do documento
+
             item_nome_documento = QTableWidgetItem(documento)
 
-            # Definir a cor do texto como preta para PDFs
             item_nome_documento.setForeground(QColor(90, 54, 247))
 
-            # Definir o item na tabela
             self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
 
-        # Preencher a tabela com os outros documentos
         num_outros_documentos = len(outros_documentos)
         self.ui.tabela_documentos.setRowCount(num_documentos + num_outros_documentos)
 
         for i, documento in enumerate(outros_documentos):
-            # Criar um item de tabela para o nome do documento
+
             item_nome_documento = QTableWidgetItem(documento)
 
-            # Definir a cor do texto como cinza para outros documentos
             item_nome_documento.setForeground(QColor(128, 128, 128))
 
-            # Definir o item na tabela
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
 
     def alteracao_status(self):
         #AQUI VAI VERIFICAR SE
         if ui.rb_digitacao.isChecked():
             self.zerar_cor()
-            ui.rb_digitacao.setStyleSheet("border:none;color:rgb(113,66,230);")  # Cor verde para rb_digitacao
+            ui.rb_digitacao.setStyleSheet("border:none;color:rgb(113,66,230);")  
             return 'DIGITAÇÃO'
         elif ui.rb_videook.isChecked():
             self.zerar_cor()
-            ui.rb_videook.setStyleSheet("border:none;color: rgb(18,191,255);")  # Cor vermelha para rb_videook
+            ui.rb_videook.setStyleSheet("border:none;color: rgb(18,191,255);")  
             return 'VIDEO REALIZADA'
         elif ui.rb_verificacao.isChecked():
             self.zerar_cor()
-            ui.rb_verificacao.setStyleSheet("border:none;color: orange;")  # Cor azul para rb_verificacao
+            ui.rb_verificacao.setStyleSheet("border:none;color: orange;")  
             return 'VERIFICAÇÃO'
         elif ui.rb_aprovado.isChecked():
             self.zerar_cor()
-            ui.rb_aprovado.setStyleSheet("border:none;color:rgb(173, 255, 47);")  # Cor laranja para rb_aprovado
+            ui.rb_aprovado.setStyleSheet("border:none;color:rgb(173, 255, 47);")  
             return 'APROVADO'
         elif ui.rb_cancelado.isChecked():
             self.zerar_cor()
-            ui.rb_cancelado.setStyleSheet("border:none;color: red;")  # Cor amarela para rb_cancelado
+            ui.rb_cancelado.setStyleSheet("border:none;color: red;")  
             return 'CANCELADO'
         
     def zerar_cor(self):
         
-        ui.rb_digitacao.setStyleSheet("border:none; color:rgb(170,170,170);")  # Cor verde para rb_digitacao
+        ui.rb_digitacao.setStyleSheet("border:none; color:rgb(170,170,170);")  
         ui.rb_videook.setStyleSheet("border:none; color:rgb(170,170,170);")
         ui.rb_verificacao.setStyleSheet("border:none; color:rgb(170,170,170);")
         ui.rb_aprovado.setStyleSheet("border:none; color:rgb(170,170,170);")
@@ -2809,14 +2613,16 @@ class JanelaOculta:
         self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(529, 700)
+        self.animate_window_resize(769, 705)
         self.janela.atualizar_documentos_tabela()
+        self.parent.setWindowOpacity(1.0)  
 
     def leaveEvent(self, event):
         self.janela.atualizar_documentos_tabela()
-        if not ui.campo_verifica_tela_cheia.text()=="SIM":
-            
-            # COLOCAR A 
+
+
+        if not ui.campo_verifica_tela_cheia.text() == "SIM":
+
             cursor_pos = QtGui.QCursor.pos()
             window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
             window_rect = QRect(window_pos, self.parent.size())
@@ -2826,13 +2632,27 @@ class JanelaOculta:
             if not mouse_dentro_da_janela:
 
                 if int(ui.campo_status_videook.text()) == 0 and int(ui.campo_status_verificacao.text()) == 0:
-                    self.animate_window_resize(104, 53)
-
+                    self.animate_window_resize(108, 53)
                 else:
-                    self.animate_window_resize(143, 53)
+                    self.animate_window_resize(151, 53)
+        else:
+            cursor_pos = QtGui.QCursor.pos()
+            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
+            window_rect = QRect(window_pos, self.parent.size())
+            transparencia = ui.campo_porcentagem_transparencia.value() / 100
+            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+
+            if not mouse_dentro_da_janela:
+                if ui.checkBox_transparecer.isChecked(): 
+                    self.parent.setWindowOpacity(transparencia)  
+                else:
+                    self.parent.setWindowOpacity(1.0)  
+            else:
+                self.parent.setWindowOpacity(1.0)  
+
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(529,700)#469
+        self.animate_window_resize(769,705)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -2901,7 +2721,7 @@ ui.campo_lista_versao_certificado.currentIndexChanged.connect(lambda:funcoes_app
 ui.campo_pis.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_comentario))
 ui.campo_telefone.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_telefone))
 ui.campo_preco_certificado.editingFinished.connect(lambda:funcoes_app.formatar_preco_certificado())
-ui.campo_oab.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_oab))
+ui.campo_funcional.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_funcional))
 ui.rb_aprovado.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_aprovado))
 ui.rb_cancelado.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_cancelado))
 ui.rb_digitacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_digitacao))
@@ -2914,7 +2734,7 @@ ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())
 ui.botao_consultar.clicked.connect(lambda:banco_dados.preencher_tabela())
-ui.botao_excluir_dados.clicked.connect(lambda:banco_dados.apagar_campos_pedido())
+ui.botao_excluir_dados.clicked.connect(lambda:banco_dados.apagar_campos_pedido(1))
 ui.botao_procurar.clicked.connect(lambda:funcoes_app.exportar_excel())
 ui.botao_consulta_cnpj.clicked.connect(lambda:funcoes_app.procurar_cnpj())
 ui.botao_consulta_cpf.clicked.connect(lambda:funcoes_app.procurar_cpf())
@@ -2938,7 +2758,7 @@ ui.botao_menagem.clicked.connect(lambda:funcoes_app.abrir_janela_mensagem())
 ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))
 ui.botao_telefone.clicked.connect((lambda:funcoes_app.contato_telefone()))
-ui.botao_consulta_oab.clicked.connect((lambda:funcoes_app.procurar_oab()))
+ui.botao_consulta_funcional.clicked.connect((lambda:funcoes_app.procurar_funcional()))
 ui.botao_enviar_email.clicked.connect((lambda:funcoes_app.envio_de_email()))
 ui.rb_aprovado.clicked.connect(lambda:banco_dados.alteracao_status())
 ui.rb_cancelado.clicked.connect(lambda:banco_dados.alteracao_status())
@@ -2950,7 +2770,6 @@ ui.botao_link_venda.clicked.connect(lambda:funcoes_app.pegar_link_venda())
 ui.botao_envio_massa.clicked.connect(lambda:funcoes_app.envio_em_massa())
 
 #Campos de formatação
-ui.campo_cnpj_municipio.setReadOnly(True)
 ui.caminho_pasta_principal.setReadOnly(True)
 ui.campo_relatorio.setReadOnly(True)
 ui.caminho_pasta.setReadOnly(True)
@@ -2979,9 +2798,9 @@ ui.campo_nome_mae.mousePressEvent = lambda event: funcoes_app.copiar_campo("camp
 ui.campo_nome.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_nome")
 ui.campo_pis.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pis")
 ui.campo_telefone.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_telefone")
-ui.campo_oab.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_oab")
+ui.campo_funcional.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_funcional")
 ui.campo_preco_certificado.setReadOnly(False)
-ui.campo_cnpj_razao_social.setReadOnly(True)
+#ui.campo_cnpj_razao_social.setReadOnly(True)
 ui.campo_preco_certificado_cheio.setReadOnly(True)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
@@ -3027,7 +2846,7 @@ y = (screen_rect.height() - janela.height()) // 5
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(143, 53)           
+janela.setFixedSize(151, 53)           
 janela.show()
 
 
