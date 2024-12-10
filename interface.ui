@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>768</width>
-    <height>705</height>
+    <width>528</width>
+    <height>727</height>
    </rect>
   </property>
   <property name="palette">
@@ -48,7 +48,7 @@
    </palette>
   </property>
   <property name="focusPolicy">
-   <enum>Qt::NoFocus</enum>
+   <enum>Qt::StrongFocus</enum>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
@@ -65,7 +65,7 @@
      <rect>
       <x>-5</x>
       <y>54</y>
-      <width>861</width>
+      <width>625</width>
       <height>678</height>
      </rect>
     </property>
@@ -83,9 +83,10 @@
     </property>
     <property name="font">
      <font>
-      <family>Consolas</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
       <weight>50</weight>
+      <italic>false</italic>
       <bold>false</bold>
      </font>
     </property>
@@ -112,7 +113,7 @@ QTabBar {
 /* Estiliza o conteúdo das abas */
 QWidget {
     background-color: rgb(40, 42,54); /* Cor do conteúdo */
-    color: rgb(170, 170, 170);
+    color: rgb(200, 200, 200);
     border: none;
 }
 
@@ -150,16 +151,16 @@ QHeaderView::section {
      <widget class="QLabel" name="label">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>59</y>
+        <x>16</x>
+        <y>50</y>
         <width>49</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -176,14 +177,14 @@ QHeaderView::section {
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>63</y>
+        <y>53</y>
         <width>119</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -238,15 +239,15 @@ QDateEdit::down-button {
      <widget class="QLineEdit" name="campo_pedido">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>63</y>
-        <width>129</width>
-        <height>36</height>
+        <x>15</x>
+        <y>53</y>
+        <width>134</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -276,14 +277,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>328</x>
-        <y>63</y>
-        <width>107</width>
-        <height>36</height>
+        <y>53</y>
+        <width>116</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -309,15 +310,15 @@ QTimeEdit:disabled, QTimeEdit:!focus {
       <property name="geometry">
        <rect>
         <x>328</x>
-        <y>59</y>
+        <y>50</y>
         <width>49</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -334,15 +335,15 @@ QTimeEdit:disabled, QTimeEdit:!focus {
       <property name="geometry">
        <rect>
         <x>200</x>
-        <y>59</y>
+        <y>50</y>
         <width>41</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -359,14 +360,14 @@ QTimeEdit:disabled, QTimeEdit:!focus {
       <property name="geometry">
        <rect>
         <x>192</x>
-        <y>175</y>
+        <y>137</y>
         <width>81</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -440,15 +441,15 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>192</x>
-        <y>171</y>
+        <y>134</y>
         <width>57</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -464,16 +465,16 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_23">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>171</y>
+        <x>16</x>
+        <y>134</y>
         <width>77</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -489,15 +490,15 @@ QComboBox::drop-down {
      <widget class="QComboBox" name="campo_lista_modalidade">
       <property name="geometry">
        <rect>
-        <x>17</x>
-        <y>175</y>
-        <width>166</width>
-        <height>36</height>
+        <x>16</x>
+        <y>138</y>
+        <width>167</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -546,15 +547,15 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>284</y>
+        <y>224</y>
         <width>37</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -571,15 +572,15 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>416</x>
-        <y>284</y>
+        <y>224</y>
         <width>61</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -596,7 +597,7 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>288</x>
-        <y>351</y>
+        <y>272</y>
         <width>17</width>
         <height>25</height>
        </rect>
@@ -627,14 +628,14 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>514</y>
+        <y>410</y>
         <width>189</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -667,14 +668,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>346</y>
+        <y>272</y>
         <width>145</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -708,15 +709,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>342</y>
+        <y>268</y>
         <width>21</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -733,15 +734,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>510</y>
+        <y>406</y>
         <width>29</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -758,14 +759,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>416</x>
-        <y>288</y>
+        <y>228</y>
         <width>105</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -810,14 +811,14 @@ QDateEdit::down-button {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>234</y>
+        <y>184</y>
         <width>505</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -850,7 +851,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>184</x>
-        <y>518</y>
+        <y>410</y>
         <width>21</width>
         <height>25</height>
        </rect>
@@ -881,7 +882,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>404</y>
+        <y>318</y>
         <width>21</width>
         <height>25</height>
        </rect>
@@ -912,19 +913,22 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>230</y>
+        <y>180</y>
         <width>77</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
        </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">background-color:rgb(40,42, 54);color:rgb(150,150,150)</string>
@@ -937,14 +941,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>400</y>
+        <y>318</y>
         <width>145</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -974,15 +978,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>342</y>
+        <y>268</y>
         <width>25</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -999,15 +1003,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>396</y>
+        <y>314</y>
         <width>25</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1024,7 +1028,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>140</x>
-        <y>350</y>
+        <y>272</y>
         <width>21</width>
         <height>25</height>
        </rect>
@@ -1055,15 +1059,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>154</x>
-        <y>63</y>
-        <width>35</width>
-        <height>35</height>
+        <y>53</y>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Consolas</family>
-        <pointsize>20</pointsize>
+        <pointsize>16</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1090,14 +1094,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>288</y>
+        <y>228</y>
         <width>389</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -1131,14 +1135,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>346</y>
+        <y>272</y>
         <width>137</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1171,15 +1175,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>455</y>
+        <y>360</y>
         <width>80</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1196,14 +1200,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>459</y>
+        <y>363</y>
         <width>145</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1233,14 +1237,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>218</x>
-        <y>514</y>
+        <y>410</y>
         <width>213</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1273,15 +1277,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>218</x>
-        <y>510</y>
+        <y>406</y>
         <width>77</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1297,16 +1301,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_27">
       <property name="geometry">
        <rect>
-        <x>536</x>
-        <y>338</y>
+        <x>16</x>
+        <y>498</y>
         <width>61</width>
-        <height>10</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1325,15 +1329,15 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QTextEdit" name="campo_comentario">
       <property name="geometry">
        <rect>
-        <x>536</x>
-        <y>345</y>
-        <width>225</width>
-        <height>259</height>
+        <x>16</x>
+        <y>503</y>
+        <width>272</width>
+        <height>137</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
        </font>
       </property>
@@ -1355,15 +1359,15 @@ color:orange</string>
        <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
 &lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
 p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Consolas'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Segoe UI'; font-size:10pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Consolas'; font-size:9pt;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QPushButton" name="botao_consulta_cnpj">
       <property name="geometry">
        <rect>
         <x>166</x>
-        <y>518</y>
+        <y>410</y>
         <width>17</width>
         <height>25</height>
        </rect>
@@ -1394,14 +1398,14 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>442</x>
-        <y>514</y>
-        <width>75</width>
-        <height>36</height>
+        <y>410</y>
+        <width>79</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1570,15 +1574,15 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>442</x>
-        <y>510</y>
+        <y>406</y>
         <width>41</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1595,7 +1599,7 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>498</x>
-        <y>518</y>
+        <y>408</y>
         <width>17</width>
         <height>25</height>
        </rect>
@@ -1622,8 +1626,8 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_confirmacao_criar_pasta">
       <property name="geometry">
        <rect>
-        <x>172</x>
-        <y>62</y>
+        <x>170</x>
+        <y>52</y>
         <width>17</width>
         <height>17</height>
        </rect>
@@ -1644,15 +1648,15 @@ QComboBox::drop-down {
      <widget class="QComboBox" name="campo_lista_versao_certificado">
       <property name="geometry">
        <rect>
-        <x>18</x>
-        <y>117</y>
-        <width>503</width>
-        <height>36</height>
+        <x>16</x>
+        <y>95</y>
+        <width>505</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1685,16 +1689,16 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_40">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>113</y>
+        <x>16</x>
+        <y>92</y>
         <width>53</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1714,14 +1718,14 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>408</x>
-        <y>175</y>
+        <y>137</y>
         <width>113</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1757,15 +1761,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>408</x>
-        <y>171</y>
+        <y>134</y>
         <width>53</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1782,14 +1786,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>356</x>
-        <y>459</y>
-        <width>161</width>
-        <height>36</height>
+        <y>363</y>
+        <width>165</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1819,15 +1823,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>356</x>
-        <y>455</y>
+        <y>360</y>
         <width>49</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1844,7 +1848,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>492</x>
-        <y>464</y>
+        <y>362</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -1875,14 +1879,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>567</y>
-        <width>501</width>
-        <height>36</height>
+        <y>455</y>
+        <width>505</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1915,15 +1919,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>560</y>
+        <y>452</y>
         <width>105</width>
-        <height>8</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -1940,14 +1944,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>320</x>
-        <y>346</y>
+        <y>272</y>
         <width>97</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -1980,15 +1984,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>320</x>
-        <y>342</y>
+        <y>268</y>
         <width>57</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2005,14 +2009,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>459</y>
+        <y>363</y>
         <width>173</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -2042,15 +2046,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>455</y>
+        <y>360</y>
         <width>45</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2067,7 +2071,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>324</x>
-        <y>464</y>
+        <y>362</y>
         <width>21</width>
         <height>25</height>
        </rect>
@@ -2098,14 +2102,14 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>400</y>
-        <width>347</width>
-        <height>36</height>
+        <y>318</y>
+        <width>349</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -2135,15 +2139,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>172</x>
-        <y>396</y>
+        <y>314</y>
         <width>65</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2159,16 +2163,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QTableWidget" name="tabela_documentos">
       <property name="geometry">
        <rect>
-        <x>538</x>
-        <y>64</y>
-        <width>223</width>
-        <height>259</height>
+        <x>300</x>
+        <y>502</y>
+        <width>221</width>
+        <height>138</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>9</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>8</pointsize>
        </font>
       </property>
       <property name="focusPolicy">
@@ -2209,7 +2213,7 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
        <bool>false</bool>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
-       <number>15</number>
+       <number>12</number>
       </attribute>
       <attribute name="verticalHeaderHighlightSections">
        <bool>false</bool>
@@ -2226,16 +2230,16 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
      <widget class="QLabel" name="label_44">
       <property name="geometry">
        <rect>
-        <x>538</x>
-        <y>56</y>
+        <x>296</x>
+        <y>496</y>
         <width>101</width>
-        <height>10</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2254,15 +2258,15 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
      <widget class="QLineEdit" name="campo_funcional">
       <property name="geometry">
        <rect>
-        <x>428</x>
-        <y>346</y>
+        <x>430</x>
+        <y>272</y>
         <width>91</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -2295,7 +2299,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>498</x>
-        <y>351</y>
+        <y>272</y>
         <width>17</width>
         <height>25</height>
        </rect>
@@ -2325,16 +2329,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_50">
       <property name="geometry">
        <rect>
-        <x>428</x>
-        <y>342</y>
-        <width>90</width>
-        <height>9</height>
+        <x>430</x>
+        <y>268</y>
+        <width>55</width>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2351,7 +2355,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>376</x>
-        <y>288</y>
+        <y>228</y>
         <width>25</width>
         <height>25</height>
        </rect>
@@ -2381,10 +2385,10 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QGroupBox" name="groupBox_status">
       <property name="geometry">
        <rect>
-        <x>18</x>
-        <y>12</y>
-        <width>744</width>
-        <height>33</height>
+        <x>16</x>
+        <y>10</y>
+        <width>503</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
@@ -2403,16 +2407,16 @@ background-color:rgb(40, 42, 54);</string>
       <widget class="QRadioButton" name="rb_digitacao">
        <property name="geometry">
         <rect>
-         <x>20</x>
-         <y>9</y>
-         <width>100</width>
+         <x>10</x>
+         <y>7</y>
+         <width>79</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>10</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -2435,16 +2439,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_videook">
        <property name="geometry">
         <rect>
-         <x>154</x>
-         <y>8</y>
-         <width>146</width>
+         <x>96</x>
+         <y>6</y>
+         <width>118</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>10</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -2460,16 +2464,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_verificacao">
        <property name="geometry">
         <rect>
-         <x>332</x>
-         <y>8</y>
-         <width>100</width>
+         <x>220</x>
+         <y>6</y>
+         <width>91</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>10</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -2485,16 +2489,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_aprovado">
        <property name="geometry">
         <rect>
-         <x>486</x>
-         <y>8</y>
-         <width>100</width>
+         <x>324</x>
+         <y>6</y>
+         <width>81</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>10</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -2510,16 +2514,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_cancelado">
        <property name="geometry">
         <rect>
-         <x>634</x>
-         <y>8</y>
-         <width>100</width>
+         <x>410</x>
+         <y>6</y>
+         <width>89</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>10</pointsize>
+         <family>Segoe UI</family>
+         <pointsize>8</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -2540,14 +2544,14 @@ color:rgb(113,66,230)</string>
       <property name="geometry">
        <rect>
         <x>282</x>
-        <y>175</y>
+        <y>137</y>
         <width>117</width>
-        <height>36</height>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -2580,15 +2584,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>282</x>
-        <y>171</y>
+        <y>134</y>
         <width>53</width>
-        <height>9</height>
+        <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2604,10 +2608,10 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_link_venda">
       <property name="geometry">
        <rect>
-        <x>496</x>
-        <y>120</y>
-        <width>25</width>
-        <height>28</height>
+        <x>494</x>
+        <y>96</y>
+        <width>23</width>
+        <height>23</height>
        </rect>
       </property>
       <property name="font">
@@ -2640,15 +2644,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="geometry">
        <rect>
         <x>18</x>
-        <y>8</y>
+        <y>6</y>
         <width>45</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>7</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2664,16 +2668,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_salvar">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>63</y>
-        <width>35</width>
-        <height>35</height>
+        <x>452</x>
+        <y>52</y>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Consolas</family>
-        <pointsize>20</pointsize>
+        <pointsize>16</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2705,16 +2709,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_excluir_dados">
       <property name="geometry">
        <rect>
-        <x>446</x>
-        <y>63</y>
-        <width>35</width>
-        <height>35</height>
+        <x>490</x>
+        <y>52</y>
+        <width>30</width>
+        <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Consolas</family>
-        <pointsize>20</pointsize>
+        <pointsize>16</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2740,8 +2744,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_confirmacao_salvar">
       <property name="geometry">
        <rect>
-        <x>510</x>
-        <y>60</y>
+        <x>466</x>
+        <y>50</y>
         <width>17</width>
         <height>17</height>
        </rect>
@@ -2837,22 +2841,26 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_procurar">
       <property name="geometry">
        <rect>
-        <x>614</x>
-        <y>584</y>
-        <width>141</width>
+        <x>456</x>
+        <y>608</y>
+        <width>62</width>
         <height>29</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Century Gothic</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
@@ -2861,21 +2869,21 @@ color:rgb(90,54,247);
 </string>
       </property>
       <property name="text">
-       <string>EXPORTAR EXCEL</string>
+       <string> EXCEL</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_quantidade_bd">
       <property name="geometry">
        <rect>
-        <x>174</x>
-        <y>584</y>
-        <width>305</width>
+        <x>100</x>
+        <y>610</y>
+        <width>226</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Century Gothic</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -2900,16 +2908,16 @@ color:rgb(90,54,247);
      <widget class="QTableWidget" name="tableWidget">
       <property name="geometry">
        <rect>
-        <x>24</x>
+        <x>17</x>
         <y>156</y>
-        <width>729</width>
-        <height>414</height>
+        <width>503</width>
+        <height>443</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>9</pointsize>
+        <family>Segoe UI</family>
+        <pointsize>8</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
@@ -2985,7 +2993,7 @@ color:rgb(90,54,247);
      <widget class="QPushButton" name="botao_consultar">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>188</x>
         <y>104</y>
         <width>31</width>
         <height>31</height>
@@ -3003,6 +3011,9 @@ color:rgb(90,54,247);
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
@@ -3017,15 +3028,15 @@ color:rgb(90,54,247);
      <widget class="QDateEdit" name="campo_data_ate">
       <property name="geometry">
        <rect>
-        <x>26</x>
+        <x>18</x>
         <y>60</y>
-        <width>173</width>
+        <width>160</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3064,15 +3075,15 @@ QDateEdit::down-button {
      <widget class="QComboBox" name="campo_lista_status_2">
       <property name="geometry">
        <rect>
-        <x>26</x>
+        <x>18</x>
         <y>104</y>
-        <width>173</width>
+        <width>160</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3136,7 +3147,7 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_19">
       <property name="geometry">
        <rect>
-        <x>22</x>
+        <x>14</x>
         <y>8</y>
         <width>21</width>
         <height>9</height>
@@ -3161,9 +3172,9 @@ QComboBox::drop-down {
      <widget class="QProgressBar" name="barra_progresso_consulta">
       <property name="geometry">
        <rect>
-        <x>24</x>
+        <x>18</x>
         <y>144</y>
-        <width>725</width>
+        <width>503</width>
         <height>6</height>
        </rect>
       </property>
@@ -3191,7 +3202,7 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_21">
       <property name="geometry">
        <rect>
-        <x>22</x>
+        <x>14</x>
         <y>96</y>
         <width>45</width>
         <height>9</height>
@@ -3216,15 +3227,15 @@ QComboBox::drop-down {
      <widget class="QDateEdit" name="campo_data_de">
       <property name="geometry">
        <rect>
-        <x>26</x>
+        <x>18</x>
         <y>16</y>
-        <width>173</width>
+        <width>160</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3263,7 +3274,7 @@ QDateEdit::down-button {
      <widget class="QLabel" name="label_20">
       <property name="geometry">
        <rect>
-        <x>22</x>
+        <x>14</x>
         <y>52</y>
         <width>25</width>
         <height>9</height>
@@ -3288,8 +3299,8 @@ QDateEdit::down-button {
      <widget class="QLabel" name="label_msg_copiado">
       <property name="geometry">
        <rect>
-        <x>24</x>
-        <y>584</y>
+        <x>18</x>
+        <y>608</y>
         <width>29</width>
         <height>25</height>
        </rect>
@@ -3321,7 +3332,7 @@ QDateEdit::down-button {
      <widget class="QPushButton" name="botao_hoje">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>188</x>
         <y>60</y>
         <width>31</width>
         <height>31</height>
@@ -3339,6 +3350,9 @@ QDateEdit::down-button {
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
@@ -3353,15 +3367,15 @@ QDateEdit::down-button {
      <widget class="QTextEdit" name="campo_relatorio">
       <property name="geometry">
        <rect>
-        <x>474</x>
+        <x>246</x>
         <y>16</y>
-        <width>277</width>
+        <width>273</width>
         <height>121</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>9</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3385,8 +3399,8 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
      <widget class="QLabel" name="label_26">
       <property name="geometry">
        <rect>
-        <x>474</x>
-        <y>12</y>
+        <x>254</x>
+        <y>10</y>
         <width>61</width>
         <height>9</height>
        </rect>
@@ -3410,22 +3424,26 @@ border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);</string>
      <widget class="QPushButton" name="botao_envio_massa">
       <property name="geometry">
        <rect>
-        <x>490</x>
-        <y>584</y>
+        <x>332</x>
+        <y>608</y>
         <width>117</width>
         <height>29</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Century Gothic</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
-        <weight>75</weight>
-        <bold>true</bold>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
@@ -3440,7 +3458,7 @@ color:rgb(205,205,205);
      <widget class="QPushButton" name="botao_excluir_dados_tabela">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>188</x>
         <y>16</y>
         <width>31</width>
         <height>31</height>
@@ -3457,6 +3475,9 @@ color:rgb(205,205,205);
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
@@ -3494,7 +3515,7 @@ color:rgb(205,205,205);
      <widget class="QLabel" name="label_36">
       <property name="geometry">
        <rect>
-        <x>146</x>
+        <x>42</x>
         <y>16</y>
         <width>61</width>
         <height>8</height>
@@ -3522,7 +3543,7 @@ color:rgb(205,205,205);
       </property>
       <property name="geometry">
        <rect>
-        <x>146</x>
+        <x>42</x>
         <y>22</y>
         <width>103</width>
         <height>31</height>
@@ -3530,7 +3551,7 @@ color:rgb(205,205,205);
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>14</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -3571,7 +3592,7 @@ QDateEdit::down-button {
      <widget class="QLabel" name="label_70">
       <property name="geometry">
        <rect>
-        <x>264</x>
+        <x>160</x>
         <y>16</y>
         <width>85</width>
         <height>9</height>
@@ -3596,7 +3617,7 @@ QDateEdit::down-button {
      <widget class="QPushButton" name="botao_atualizar_meta">
       <property name="geometry">
        <rect>
-        <x>496</x>
+        <x>390</x>
         <y>22</y>
         <width>111</width>
         <height>31</height>
@@ -3604,11 +3625,11 @@ QDateEdit::down-button {
       </property>
       <property name="font">
        <font>
-        <family>Century Gothic</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
-        <weight>75</weight>
+        <weight>50</weight>
         <italic>false</italic>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="cursor">
@@ -3627,7 +3648,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_71">
       <property name="geometry">
        <rect>
-        <x>366</x>
+        <x>262</x>
         <y>16</y>
         <width>75</width>
         <height>9</height>
@@ -3652,7 +3673,7 @@ color:rgb(90,54,247);
      <widget class="QSpinBox" name="campo_meta_semanal">
       <property name="geometry">
        <rect>
-        <x>264</x>
+        <x>160</x>
         <y>22</y>
         <width>90</width>
         <height>31</height>
@@ -3660,7 +3681,7 @@ color:rgb(90,54,247);
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -3692,7 +3713,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_meta_mes">
       <property name="geometry">
        <rect>
-        <x>366</x>
+        <x>262</x>
         <y>22</y>
         <width>90</width>
         <height>31</height>
@@ -3700,7 +3721,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -3732,15 +3753,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta1">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>70</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3760,15 +3781,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta3">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>142</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3788,15 +3809,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta4">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>178</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3816,15 +3837,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta2">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>106</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3844,15 +3865,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta5">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>214</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3872,15 +3893,15 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta_mes">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>250</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3900,9 +3921,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_mensal">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>250</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -3934,9 +3955,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_4">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>178</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -3965,9 +3986,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_5">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>214</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -3996,9 +4017,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_2">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>106</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -4027,9 +4048,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_1">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>70</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -4058,9 +4079,9 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_3">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>40</x>
         <y>142</y>
-        <width>650</width>
+        <width>460</width>
         <height>25</height>
        </rect>
       </property>
@@ -4090,9 +4111,9 @@ QSpinBox:disabled, QSpinBox:!focus {
       <property name="geometry">
        <rect>
         <x>5</x>
-        <y>248</y>
-        <width>779</width>
-        <height>381</height>
+        <y>247</y>
+        <width>544</width>
+        <height>406</height>
        </rect>
       </property>
      </widget>
@@ -4127,7 +4148,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>160</y>
         <width>448</width>
         <height>30</height>
@@ -4135,7 +4156,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4168,7 +4189,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>216</y>
         <width>156</width>
         <height>30</height>
@@ -4176,7 +4197,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4209,7 +4230,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>105</y>
         <width>411</width>
         <height>30</height>
@@ -4217,7 +4238,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4247,7 +4268,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>96</y>
         <width>137</width>
         <height>9</height>
@@ -4272,7 +4293,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_8">
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>149</y>
         <width>157</width>
         <height>13</height>
@@ -4297,7 +4318,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>207</y>
         <width>61</width>
         <height>9</height>
@@ -4322,7 +4343,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_altera_pasta_principal">
       <property name="geometry">
        <rect>
-        <x>573</x>
+        <x>461</x>
         <y>105</y>
         <width>33</width>
         <height>30</height>
@@ -4340,6 +4361,9 @@ QLineEdit:disabled, QLineEdit:!focus {
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
@@ -4354,7 +4378,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_33">
       <property name="geometry">
        <rect>
-        <x>324</x>
+        <x>212</x>
         <y>207</y>
         <width>41</width>
         <height>9</height>
@@ -4382,7 +4406,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>324</x>
+        <x>212</x>
         <y>216</y>
         <width>283</width>
         <height>30</height>
@@ -4390,7 +4414,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4420,23 +4444,26 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_atualizar_configuracoes">
       <property name="geometry">
        <rect>
-        <x>403</x>
-        <y>528</y>
+        <x>291</x>
+        <y>598</y>
         <width>201</width>
         <height>31</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Century Gothic</family>
+        <family>Segoe UI</family>
         <pointsize>10</pointsize>
-        <weight>75</weight>
+        <weight>50</weight>
         <italic>false</italic>
-        <bold>true</bold>
+        <bold>false</bold>
        </font>
       </property>
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">border-radius:10px;
@@ -4451,7 +4478,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_37">
       <property name="geometry">
        <rect>
-        <x>158</x>
+        <x>46</x>
         <y>315</y>
         <width>17</width>
         <height>13</height>
@@ -4476,7 +4503,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_38">
       <property name="geometry">
        <rect>
-        <x>252</x>
+        <x>140</x>
         <y>315</y>
         <width>16</width>
         <height>13</height>
@@ -4501,7 +4528,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_39">
       <property name="geometry">
        <rect>
-        <x>343</x>
+        <x>231</x>
         <y>315</y>
         <width>17</width>
         <height>13</height>
@@ -4526,7 +4553,7 @@ color:rgb(90,54,247);
      <widget class="QSpinBox" name="campo_cor_R">
       <property name="geometry">
        <rect>
-        <x>157</x>
+        <x>45</x>
         <y>327</y>
         <width>86</width>
         <height>30</height>
@@ -4534,7 +4561,7 @@ color:rgb(90,54,247);
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4567,7 +4594,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_cor_G">
       <property name="geometry">
        <rect>
-        <x>252</x>
+        <x>140</x>
         <y>327</y>
         <width>77</width>
         <height>30</height>
@@ -4575,7 +4602,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4608,7 +4635,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_cor_B">
       <property name="geometry">
        <rect>
-        <x>343</x>
+        <x>231</x>
         <y>328</y>
         <width>76</width>
         <height>30</height>
@@ -4616,7 +4643,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4649,7 +4676,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QPushButton" name="botao_definir_cor">
       <property name="geometry">
        <rect>
-        <x>427</x>
+        <x>315</x>
         <y>327</y>
         <width>31</width>
         <height>30</height>
@@ -4667,6 +4694,9 @@ QSpinBox:disabled, QSpinBox:!focus {
       <property name="cursor">
        <cursorShape>PointingHandCursor</cursorShape>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="layoutDirection">
        <enum>Qt::LeftToRight</enum>
       </property>
@@ -4681,7 +4711,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_45">
       <property name="geometry">
        <rect>
-        <x>157</x>
+        <x>45</x>
         <y>380</y>
         <width>100</width>
         <height>9</height>
@@ -4706,7 +4736,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_porcentagem_validacao">
       <property name="geometry">
        <rect>
-        <x>157</x>
+        <x>45</x>
         <y>389</y>
         <width>100</width>
         <height>30</height>
@@ -4714,7 +4744,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4750,7 +4780,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_imposto_validacao">
       <property name="geometry">
        <rect>
-        <x>377</x>
+        <x>265</x>
         <y>389</y>
         <width>100</width>
         <height>30</height>
@@ -4758,7 +4788,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4794,7 +4824,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_51">
       <property name="geometry">
        <rect>
-        <x>377</x>
+        <x>265</x>
         <y>380</y>
         <width>100</width>
         <height>9</height>
@@ -4819,7 +4849,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_52">
       <property name="geometry">
        <rect>
-        <x>158</x>
+        <x>46</x>
         <y>432</y>
         <width>100</width>
         <height>9</height>
@@ -4844,7 +4874,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QDoubleSpinBox" name="campo_desconto_validacao">
       <property name="geometry">
        <rect>
-        <x>158</x>
+        <x>46</x>
         <y>441</y>
         <width>100</width>
         <height>30</height>
@@ -4852,7 +4882,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4891,7 +4921,7 @@ QDoubleSpinBox:disabled, QDoubleSpinBox:!focus {
      <widget class="QComboBox" name="campo_lista_tipo_criar_pasta">
       <property name="geometry">
        <rect>
-        <x>157</x>
+        <x>45</x>
         <y>272</y>
         <width>157</width>
         <height>30</height>
@@ -4899,7 +4929,7 @@ QDoubleSpinBox:disabled, QDoubleSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4948,7 +4978,7 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_42">
       <property name="geometry">
        <rect>
-        <x>158</x>
+        <x>46</x>
         <y>263</y>
         <width>69</width>
         <height>9</height>
@@ -4973,7 +5003,7 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_53">
       <property name="geometry">
        <rect>
-        <x>267</x>
+        <x>155</x>
         <y>380</y>
         <width>100</width>
         <height>9</height>
@@ -4998,7 +5028,7 @@ QComboBox::drop-down {
      <widget class="QSpinBox" name="campo_desconto">
       <property name="geometry">
        <rect>
-        <x>267</x>
+        <x>155</x>
         <y>389</y>
         <width>100</width>
         <height>30</height>
@@ -5006,7 +5036,7 @@ QComboBox::drop-down {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5042,7 +5072,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_29">
       <property name="geometry">
        <rect>
-        <x>378</x>
+        <x>266</x>
         <y>432</y>
         <width>49</width>
         <height>9</height>
@@ -5070,7 +5100,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>378</x>
+        <x>266</x>
         <y>442</y>
         <width>100</width>
         <height>30</height>
@@ -5078,7 +5108,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5111,7 +5141,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>324</x>
+        <x>212</x>
         <y>271</y>
         <width>281</width>
         <height>30</height>
@@ -5119,7 +5149,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5149,7 +5179,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_34">
       <property name="geometry">
        <rect>
-        <x>324</x>
+        <x>212</x>
         <y>261</y>
         <width>69</width>
         <height>13</height>
@@ -5177,7 +5207,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>46</y>
         <width>445</width>
         <height>30</height>
@@ -5185,7 +5215,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5215,7 +5245,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_30">
       <property name="geometry">
        <rect>
-        <x>159</x>
+        <x>47</x>
         <y>38</y>
         <width>49</width>
         <height>9</height>
@@ -5240,7 +5270,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_ocultar_senha">
       <property name="geometry">
        <rect>
-        <x>577</x>
+        <x>465</x>
         <y>274</y>
         <width>25</width>
         <height>21</height>
@@ -5272,7 +5302,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QSpinBox" name="campo_dias_renovacao">
       <property name="geometry">
        <rect>
-        <x>267</x>
+        <x>155</x>
         <y>441</y>
         <width>100</width>
         <height>30</height>
@@ -5280,7 +5310,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5313,7 +5343,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_41">
       <property name="geometry">
        <rect>
-        <x>267</x>
+        <x>155</x>
         <y>432</y>
         <width>100</width>
         <height>16</height>
@@ -5338,11 +5368,14 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QCheckBox" name="checkBox_transparecer">
       <property name="geometry">
        <rect>
-        <x>558</x>
+        <x>446</x>
         <y>394</y>
         <width>18</width>
         <height>17</height>
        </rect>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="styleSheet">
        <string notr="true">background-color:rgb(40,42, 54);color:rgb(150,150,150)</string>
@@ -5354,7 +5387,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_porcentagem_transparencia">
       <property name="geometry">
        <rect>
-        <x>486</x>
+        <x>374</x>
         <y>389</y>
         <width>92</width>
         <height>30</height>
@@ -5362,7 +5395,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Segoe UI</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5398,7 +5431,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_32">
       <property name="geometry">
        <rect>
-        <x>486</x>
+        <x>374</x>
         <y>378</y>
         <width>92</width>
         <height>13</height>
@@ -5464,7 +5497,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
     <property name="geometry">
      <rect>
-      <x>592</x>
+      <x>358</x>
       <y>-2</y>
       <width>46</width>
       <height>56</height>
@@ -5500,7 +5533,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <rect>
       <x>-92</x>
       <y>-8</y>
-      <width>873</width>
+      <width>680</width>
       <height>65</height>
      </rect>
     </property>
@@ -5556,7 +5589,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QPushButton" name="botao_agrupar_PDF">
     <property name="geometry">
      <rect>
-      <x>702</x>
+      <x>468</x>
       <y>6</y>
       <width>46</width>
       <height>43</height>
@@ -5589,7 +5622,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
     <property name="geometry">
      <rect>
-      <x>646</x>
+      <x>412</x>
       <y>10</y>
       <width>49</width>
       <height>41</height>
@@ -5655,7 +5688,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QLabel" name="label_confirmacao_tirar_print">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>386</x>
       <y>12</y>
       <width>16</width>
       <height>16</height>
@@ -5692,7 +5725,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QLabel" name="label_confirmacao_converter_pdf">
     <property name="geometry">
      <rect>
-      <x>670</x>
+      <x>436</x>
       <y>10</y>
       <width>16</width>
       <height>16</height>
@@ -5711,7 +5744,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QLabel" name="label_confirmacao_mesclar_pdf">
     <property name="geometry">
      <rect>
-      <x>728</x>
+      <x>494</x>
       <y>10</y>
       <width>16</width>
       <height>16</height>
@@ -5760,7 +5793,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QPushButton" name="botao_duplicar_pedido">
     <property name="geometry">
      <rect>
-      <x>536</x>
+      <x>302</x>
       <y>4</y>
       <width>46</width>
       <height>47</height>
@@ -5794,7 +5827,7 @@ QSpinBox:disabled, QSpinBox:!focus {
    <widget class="QPushButton" name="botao_menagem">
     <property name="geometry">
      <rect>
-      <x>484</x>
+      <x>250</x>
       <y>7</y>
       <width>46</width>
       <height>43</height>

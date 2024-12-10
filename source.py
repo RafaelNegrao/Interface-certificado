@@ -1095,6 +1095,7 @@ class Funcoes_padrao:
         self.atualizar_documentos_tabela()
         if campo_atual is not None:
             self.ui.campo_status_bd.setText("❌")
+            self.ui.label_confirmacao_salvar.setText("")
             self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
 
             nome_campo_atual = campo_atual.objectName()
@@ -1613,11 +1614,11 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             ui.tableWidget.setRowCount(0)  
             ui.tableWidget.setColumnCount(5) 
             ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"]) 
-            ui.tableWidget.setColumnWidth(0, 102)
-            ui.tableWidget.setColumnWidth(1, 145)
-            ui.tableWidget.setColumnWidth(2, 72)
-            ui.tableWidget.setColumnWidth(3, 145)
-            ui.tableWidget.setColumnWidth(4, 264)  
+            ui.tableWidget.setColumnWidth(0, 72)
+            ui.tableWidget.setColumnWidth(1, 103)
+            ui.tableWidget.setColumnWidth(2, 51)
+            ui.tableWidget.setColumnWidth(3, 103)
+            ui.tableWidget.setColumnWidth(4, 171)  
 
             pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
@@ -1899,7 +1900,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
     def ajuste_largura_col(self):
         ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
         for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 121)
+                ui.tableWidget.setColumnWidth(col, 83)
 
 
 
@@ -1913,9 +1914,6 @@ class Acoes_banco_de_dados:
         try:
             pasta_cliente = ui.caminho_pasta.text()
             if not self.analise_de_campos():
-                return
-
-            if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
                 return
 
             ref = db.reference("/Pedidos")
@@ -1932,13 +1930,15 @@ class Acoes_banco_de_dados:
                 match condic:
                     #Pedido existente + gravado Definitivo
                     case 'DEFINITIVO':
+                        if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
+                            return
                         # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
                         # Caso queira retornar, é só mudar para update
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
-                        self.apagar_campos_pedido(0)
                         self.forcar_fechamento_de_arquivo_e_deletar_pasta(pasta_cliente)
+                        self.apagar_campos_pedido(0)
                         ui.label_confirmacao_salvar.setText("✅")
                         self.contar_verificacao()
                         funcoes_app.ajuste_largura_col()
@@ -1951,7 +1951,6 @@ class Acoes_banco_de_dados:
                         self.ui.campo_status_bd.setText("✅")
                         ui.label_confirmacao_salvar.setText("✅")
                         self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        #self.mensagem_alerta("Sucesso","Pedido salvo!")
                         self.contar_verificacao()
                         funcoes_app.ajuste_largura_col()
                         
@@ -1961,12 +1960,14 @@ class Acoes_banco_de_dados:
                 match condic:
                     #Pedido existente + gravado Definitivo
                     case 'DEFINITIVO':
-                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
+                        if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
+                            return
+                        
                         novo_pedido_ref.set(self.dicionario_banco_de_dados())
                         self.ui.campo_status_bd.setText("")
                         self.ui.campo_status_bd.setToolTip("")
+                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
                         self.apagar_campos_pedido(0)
-                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(pasta_cliente)
                         ui.label_confirmacao_salvar.setText("✅")
                         self.contar_verificacao()
                         funcoes_app.ajuste_largura_col()
@@ -2317,7 +2318,7 @@ class Acoes_banco_de_dados:
             
             ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
             for i in range(ui.tableWidget.columnCount()): 
-                ui.tableWidget.horizontalHeader().resizeSection(i, 121)
+                ui.tableWidget.horizontalHeader().resizeSection(i, 83)
 
             
         except Exception as e:
@@ -2390,7 +2391,7 @@ class Acoes_banco_de_dados:
             ui.tableWidget.setColumnCount(6)
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
             for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 121)
+                    ui.tableWidget.setColumnWidth(col, 83)
 
             valor_estimado = 0
             try:
@@ -2408,7 +2409,7 @@ class Acoes_banco_de_dados:
                 venda = 0
                 total_pedidos = len(pedidos)
                 for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 121)
+                    ui.tableWidget.setColumnWidth(col, 83)
                 ui.barra_progresso_consulta.setVisible(False)
                 
                 # Configura a barra de progresso corretamente
@@ -2514,7 +2515,7 @@ Vendas..........{venda}
                 ui.campo_relatorio.setPlainText("")
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
                 for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 121)
+                    ui.tableWidget.setColumnWidth(col, 83)
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
                 ui.barra_progresso_consulta.setVisible(False)
                 self.contar_verificacao()
@@ -2613,7 +2614,7 @@ class JanelaOculta:
         self.janela = Funcoes_padrao(ui)
 
     def enterEvent(self, event):
-        self.animate_window_resize(769, 705)
+        self.animate_window_resize(530, 730)
         self.janela.atualizar_documentos_tabela()
         self.parent.setWindowOpacity(1.0)  
 
@@ -2652,7 +2653,7 @@ class JanelaOculta:
 
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(769,705)#469
+        self.animate_window_resize(530,730)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width

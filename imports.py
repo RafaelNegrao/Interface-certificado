@@ -62,7 +62,7 @@ ref = db.reference("/")
 
 from acoes_banco_dados import Acoes_banco_de_dados
 from funcoes_padrao import Funcoes_padrao
-from hideWindow import JanelaOculta
+from hide_window import JanelaOculta
 
 
 
