@@ -38,7 +38,7 @@ QWidget,
 QGridLayout,
 QComboBox
 )
-from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime,QPropertyAnimation
+from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
 from Interface import Ui_janela
 from firebase_admin import db
@@ -54,10 +54,11 @@ from collections import Counter,defaultdict
 import numpy as np
 import mplcursors
 import calendar  # Para identificar o último dia do mês
-
+from interfaceUpdates import AlteracoesInterface
 
 
 ref = db.reference("/")
+
 
 
 class FuncoesPadrao:
@@ -220,6 +221,7 @@ class FuncoesPadrao:
         valor_mensal = Metas['MENSAL']
         ui.campo_meta_semanal.setValue(int(valor_semanal))
         ui.campo_meta_mes.setValue(int(valor_mensal))
+
 
     def atualizar_meta_clientes(self):
         try:
@@ -455,7 +457,7 @@ class FuncoesPadrao:
 
                     # Fecha o arquivo PDF
                     pdf.save()
-            ui.label_confirmacao_converter_pdf.setText("✅")
+            AlteracoesInterface.confirmar_label_converter_pdf(self)
             self.atualizar_documentos_tabela()
         else:
             # Chama a Função de escolher o tipo de conversão de imagem
@@ -528,15 +530,14 @@ class FuncoesPadrao:
                 janela_principal.setWindowOpacity(1)
 
             screenshot.save(caminho)
-
-            ui.label_confirmacao_tirar_print.setText("✅")
+            AlteracoesInterface.confirmar_label_captura_tela(self)
 
             self.atualizar_documentos_tabela()
     
         except:
-            # Em caso de erro, atualiza a tabela e exibe um alerta na interface
+
             self.atualizar_documentos_tabela()
-            ui.label_confirmacao_tirar_print.setText("❌")
+            AlteracoesInterface.negar_label_captura_tela(self)
             self.mensagem_alerta("Erro",f"Não foi possível capturar a tela!")
 
 
@@ -549,12 +550,11 @@ class FuncoesPadrao:
     def abrir_pasta_cliente(self):
         try:
             QDesktopServices.openUrl(QUrl.fromLocalFile(ui.caminho_pasta.text()))
-            ui.label_confirmacao_criar_pasta.setText('✅')
-            self.animar_label(self.ui.label_confirmacao_criar_pasta)
+            AlteracoesInterface.confirmar_label_criar_pasta(self)
+
             
         except:
-            ui.label_confirmacao_criar_pasta.setText('❌')
-            self.animar_label(self.ui.label_confirmacao_criar_pasta)
+            AlteracoesInterface.negar_label_criar_pasta(self)
             return
 
 
@@ -568,9 +568,9 @@ class FuncoesPadrao:
 
             if pedido == "" or hora == "00:00" or data == "01/01/2000" or modalidade == "" or versao == "":
 
-                ui.label_confirmacao_criar_pasta.setText("❌")
+                AlteracoesInterface.negar_label_criar_pasta(self)
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
-                self.animar_label(self.ui.label_confirmacao_criar_pasta)
+
                 return
 
             self.formatar_nome()
@@ -578,8 +578,8 @@ class FuncoesPadrao:
             if tipo == "NOME":
                 if ui.campo_nome.text() == "":
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
-                    ui.label_confirmacao_criar_pasta.setText("❌")
-                    self.animar_label(self.ui.label_confirmacao_criar_pasta)
+                    
+                    AlteracoesInterface.negar_label_criar_pasta(self)
 
                     return
                 nome_pasta = f'{ui.campo_nome.text()}'
@@ -590,17 +590,15 @@ class FuncoesPadrao:
             elif tipo == "PEDIDO-NOME":
                 if ui.campo_nome.text() == "":
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
-                    ui.label_confirmacao_criar_pasta.setText("❌")
-                    self.animar_label(self.ui.label_confirmacao_criar_pasta)
+                    AlteracoesInterface.negar_label_criar_pasta(self)
 
                     return
                 nome_pasta = f'{str(ui.campo_pedido.text())}-{ui.campo_nome.text()}'
 
-            # Tenta criar a pasta no diretório padrão
             diretorio_padrão = ui.caminho_pasta_principal.text()
             pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
 
-            #Verifica se a pasta existe no diretório
+
             if not self.pasta_existe(diretorio_padrão, nome_pasta):
                 
                 os.mkdir(pasta_padrão)
@@ -608,21 +606,19 @@ class FuncoesPadrao:
                 ui.caminho_pasta.setText(pasta_padrão)
                 
                 status = banco_dados.alteracao_status()
-                #Se o status do pedido for Aprovado ou Cancelado, exclua a pasta
-                if status == "APROVADO" or status == "CANCELADO":
-                    confirmacao = ""
-                else:
-                    confirmacao = "✅"
 
-                ui.label_confirmacao_criar_pasta.setText(confirmacao)
+                if status == "APROVADO" or status == "CANCELADO":
+                    AlteracoesInterface.zerar_label_criar_pasta(self)
+                else:
+                    AlteracoesInterface.confirmar_label_criar_pasta(self)
+
                 self.acoes.salvar_pedido()
             #Caso exista, abra
             else:
                 self.abrir_pasta_cliente()
         except Exception as e:
             print(e)
-            ui.label_confirmacao_criar_pasta.setText("❌")
-            self.animar_label(self.ui.label_confirmacao_criar_pasta)
+            AlteracoesInterface.negar_label_criar_pasta(self)
 
 
     def procurar_cnh(self):
@@ -1039,13 +1035,13 @@ class FuncoesPadrao:
 
             pdf_merger.close()
 
-            ui.label_confirmacao_mesclar_pdf.setText("✅")
+            AlteracoesInterface.confirmar_label_mesclar_pdf(self)
             #self.mensagem_alerta("Concluído","Os arquivos PDF foram mesclados com sucesso!")
             self.atualizar_documentos_tabela()
 
 
         except:
-            ui.label_confirmacao_mesclar_pdf.setText("❌")
+            AlteracoesInterface.negar_label_mesclar_pdf(self)
             pdf_merger.close()
             self.atualizar_documentos_tabela()
 
@@ -1092,9 +1088,9 @@ class FuncoesPadrao:
                 nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
                 imagem = Image.open(image_path)
                 imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
-            ui.label_confirmacao_converter_pdf.setText("✅")
+            AlteracoesInterface.confirmar_label_converter_pdf(self)
         except:
-            ui.label_confirmacao_converter_pdf.setText("❌")
+            AlteracoesInterface.negar_label_converter_pdf(self)
 
 
     def converter_pdf_para_jpg(self):
@@ -1109,12 +1105,12 @@ class FuncoesPadrao:
                 imagem = primeira_pagina.get_pixmap()
                 imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
                 imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
-            ui.label_confirmacao_converter_pdf.setText("✅")
+            AlteracoesInterface.confirmar_label_converter_pdf(self)
             self.atualizar_documentos_tabela()
 
         except:
             self.atualizar_documentos_tabela()
-            ui.label_confirmacao_converter_pdf.setText("❌")
+            AlteracoesInterface.negar_label_converter_pdf(self)
 
 
     def evento_ao_abrir(self,event):
@@ -1124,7 +1120,7 @@ class FuncoesPadrao:
         self.definir_cor()
         self.carregar_lista_certificados()
         ui.campo_data_meta.setDate(QDate.currentDate())
-        self.ui.campo_status_bd.setText("")
+        AlteracoesInterface.apagar_label_status_bd(self)
         self.ui.campo_status_bd.setToolTip("")
         banco_dados.contar_verificacao()
 
@@ -1195,39 +1191,18 @@ class FuncoesPadrao:
             pass
 
 
-    def animar_label(self, label):
-        anim = QPropertyAnimation(label, b"geometry")
-        anim.setDuration(800)  
-
-        start_geometry = label.geometry()
-        end_geometry = QRect(start_geometry.x(), start_geometry.y() - 5, start_geometry.width(), start_geometry.height())
-
-        # Configurando os quadros de animação para pular duas vezes
-        anim.setKeyValueAt(0.0, start_geometry)
-        anim.setKeyValueAt(0.25, end_geometry)
-        anim.setKeyValueAt(0.5, start_geometry)
-        anim.setKeyValueAt(0.75, end_geometry)
-        anim.setKeyValueAt(1.0, start_geometry)
-
-        anim.start()
-        self.anim = anim 
-
-
     def valor_alterado(self, campo_atual):
         self.atualizar_documentos_tabela()
         if campo_atual is not None:
-            self.ui.campo_status_bd.setText("❌")
+            AlteracoesInterface.label_status_bd_desatualizado(self)
+            
             self.ui.label_confirmacao_salvar.setText("")
             self.ui.label_confirmacao_excluir.setText("")
-            self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
-
-            self.animar_label(self.ui.label_confirmacao_salvar)
-            self.animar_label(self.ui.label_confirmacao_excluir)
+            
 
             nome_campo_atual = campo_atual.objectName()
             if nome_campo_atual == "campo_lista_versao_certificado":
                 self.buscar_preco_certificado()
-
 
 
     def obter_valor_campo(self, campo):
@@ -1295,7 +1270,7 @@ class FuncoesPadrao:
             valor_final = ((valor_do_certificado * porcentagem_validacao) * imposto_de_renda) - desconto_validacao            
             if valor_final < 0:                
                 valor_final = 0            
-            valor_final_formatado = "{:.2f}".format(valor_final)  # Formatar o valor para duas casas decimais
+            valor_final_formatado = "{:.2f}".format(valor_final) 
             
             # Atualizar apenas o ToolTip
             tooltip_text = (
@@ -1330,7 +1305,8 @@ class FuncoesPadrao:
             self.acoes.limpar_labels()
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_preco_certificado.setText('')
-            ui.campo_status_bd.setText('❌')
+            AlteracoesInterface.label_status_bd_desatualizado(self)
+
             return True
         else:
             return False
@@ -1828,10 +1804,10 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                     enviado = "✅"
                     enviar_email = True
                     env += 1
-                    # Atualizar campo "EMAIL RENOVACAO" para "SIM"
+
                     ref.child("Pedidos").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
 
-                # Adiciona os dados na QTableWidget
+
                 row_position = ui.tableWidget.rowCount()
                 ui.tableWidget.insertRow(row_position)
 
@@ -1839,27 +1815,22 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 pedido_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 0, pedido_item)
 
-                # Configura a célula de "EMAIL"
                 email_item = QTableWidgetItem(cliente_email)
                 email_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 1, email_item)
 
-                # Configura a célula de "ENVIADO?"
                 enviado_item = QTableWidgetItem(enviado)
                 enviado_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 2, enviado_item)
 
-                # Configura a célula de "MOTIVO"
                 motivo_item = QTableWidgetItem(motivo)
                 motivo_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 3, motivo_item)
 
-                # Configura a célula de "PRAZO RESTANTE"
                 prazo_item = QTableWidgetItem(str(msg_diferenca))  
                 prazo_item.setTextAlignment(Qt.AlignCenter)
                 ui.tableWidget.setItem(row_position, 4, prazo_item)
 
-                # Atualiza a tela após cada adição
                 QApplication.processEvents()
                 
                 # VERIFICA SE ENVIA OU NÃO O EMAIL
@@ -2069,14 +2040,11 @@ class AcoesBancoDeDados:
 
     def salvar_temporario(self, novo_pedido_ref):
         novo_pedido_ref.set(self.dicionario_banco_de_dados())
-        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
 
 
     def salvar_definitivo(self, novo_pedido_ref):
         self.forcar_fechamento_de_arquivo_e_deletar_pasta(self.ui.caminho_pasta.text())
         novo_pedido_ref.set(self.dicionario_banco_de_dados())
-        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
-        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
 
 
     def atualizar_ui(self, condic, pedido_existente):
@@ -2084,14 +2052,14 @@ class AcoesBancoDeDados:
             self.ui.campo_status_bd.setText("")
             self.ui.campo_status_bd.setToolTip("")
             self.apagar_campos_pedido(0)
-            self.ui.label_confirmacao_excluir.setText("⬇️")
-            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
+            AlteracoesInterface.lixeira_label_criar_pasta(self)
+
         else:
-            self.ui.campo_status_bd.setText("✅")
+            AlteracoesInterface.label_status_bd_atualizado(self)
             self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
 
-        self.ui.label_confirmacao_salvar.setText("✅")
-        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
+        AlteracoesInterface.confirmar_label_salvar(self)
+
         self.contar_verificacao()
         funcoes_app.ajuste_largura_col()
         
@@ -2141,8 +2109,8 @@ class AcoesBancoDeDados:
             campos_faltando = "\n⭐ ".join(campos_vazios)
             mensagem_alerta = f"Preencha os seguintes campos para salvar o pedido!\n⭐{campos_faltando}"
             self.mensagem_alerta("Erro no envio", mensagem_alerta)
-            ui.label_confirmacao_salvar.setText("❌")
-            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
+            AlteracoesInterface.negar_label_salvar(self)
+
             return False
         return True
 
@@ -2189,8 +2157,8 @@ class AcoesBancoDeDados:
             ui.campo_email_enviado.setText("")
             self.limpar_labels()
             self.contar_verificacao()
-            self.ui.label_confirmacao_excluir.setText("⬇️")
-            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
+            AlteracoesInterface.confirmar_label_excluir(self)
+
 
         except Exception as e:
             print(e)
@@ -2337,7 +2305,8 @@ class AcoesBancoDeDados:
                     ui.tabWidget.setCurrentIndex(0)  
                     self.limpar_labels()
                     self.preencher_dados(pedido_data)
-                    ui.campo_status_bd.setText("✅")
+                    AlteracoesInterface.label_status_bd_atualizado(self)
+
                     return             
         except :
             pass
@@ -2441,7 +2410,8 @@ class AcoesBancoDeDados:
                     self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_cancelado").setChecked(True)
                     self.alteracao_status()
 
-            ui.campo_status_bd.setText('✅')
+            AlteracoesInterface.label_status_bd_atualizado(self)
+
             
             ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
             for i in range(ui.tableWidget.columnCount()): 
@@ -2454,7 +2424,7 @@ class AcoesBancoDeDados:
         # Atualizar o campo de confirmação de pasta
         try:
             if ui.caminho_pasta.text():
-                ui.label_confirmacao_criar_pasta.setText("✅")
+                AlteracoesInterface.confirmar_label_criar_pasta(self)
         except Exception as e:
             print(f"Erro ao atualizar confirmação de pasta: {e}")
 
@@ -2504,11 +2474,10 @@ class AcoesBancoDeDados:
     #Evento disparado quando clico no botão procurar na aba 'Consulta'
         
         try:
-            # Convertendo as datas do QDateEdit para QDateTime e, em seguida, para o formato ISO
+
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
 
-            # Consulte o banco de dados usando as datas no formato ISO
             pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
                             .start_at(data_inicial) \
                             .end_at(data_final)
@@ -2737,87 +2706,85 @@ Vendas..........{venda}
 
 
 
-
 class JanelaOculta:
-    def __init__(self, parent):
-        self.parent = parent
-        self.animation_timer = QTimer()
-        self.animation_timer.timeout.connect(self.update_window_size)
-        self.animation_step = 5  # Ajustei para diminuir a animação
-        self.animation_duration = 2  # Duração da animação em milissegundos
-        self.animation_target_width = 0
-        self.animation_target_height = 0
+    def __init__(self, pai):
+        self.pai = pai
+        self.temporizador_animacao = QTimer()
+        self.temporizador_animacao.timeout.connect(self.atualizar_tamanho_janela)
+        self.passo_animacao = 5  # Ajustei para diminuir a animação
+        self.duracao_animacao = 2  # Duração da animação em milissegundos
+        self.largura_destino_animacao = 0
+        self.altura_destino_animacao = 0
         self.janela = FuncoesPadrao(ui)
-        self.x = 578
-        self.y = 712
+        self.largura = 578
+        self.altura = 712
 
-    def enterEvent(self, event):
-        self.animate_window_resize(self.x, self.y)
+    def evento_entrada(self, evento):
+        self.redimensionar_janela_animacao(self.largura, self.altura)
         self.janela.atualizar_documentos_tabela()
-        self.parent.setWindowOpacity(1.0)  
+        self.pai.setWindowOpacity(1.0)  
 
-    def leaveEvent(self, event):
+    def evento_saida(self, evento):
         self.janela.atualizar_documentos_tabela()
-
 
         if not ui.campo_verifica_tela_cheia.text() == "SIM":
 
-            cursor_pos = QtGui.QCursor.pos()
-            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
-            window_rect = QRect(window_pos, self.parent.size())
+            posicao_cursor = QtGui.QCursor.pos()
+            posicao_janela = self.pai.mapToGlobal(QtCore.QPoint(0, 0))
+            retangulo_janela = QRect(posicao_janela, self.pai.size())
 
-            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+            mouse_dentro_janela = retangulo_janela.contains(posicao_cursor)
 
-            if not mouse_dentro_da_janela:
+            if not mouse_dentro_janela:
 
                 if int(ui.campo_status_videook.text()) == 0 and int(ui.campo_status_verificacao.text()) == 0:
-                    self.animate_window_resize(108, 53)
+                    self.redimensionar_janela_animacao(108, 53)
                 else:
-                    self.animate_window_resize(151, 53)
+                    self.redimensionar_janela_animacao(151, 53)
         else:
-            cursor_pos = QtGui.QCursor.pos()
-            window_pos = self.parent.mapToGlobal(QtCore.QPoint(0, 0))
-            window_rect = QRect(window_pos, self.parent.size())
+            posicao_cursor = QtGui.QCursor.pos()
+            posicao_janela = self.pai.mapToGlobal(QtCore.QPoint(0, 0))
+            retangulo_janela = QRect(posicao_janela, self.pai.size())
             transparencia = ui.campo_porcentagem_transparencia.value() / 100
-            mouse_dentro_da_janela = window_rect.contains(cursor_pos)
+            mouse_dentro_janela = retangulo_janela.contains(posicao_cursor)
 
-            if not mouse_dentro_da_janela:
+            if not mouse_dentro_janela:
                 if ui.checkBox_transparecer.isChecked(): 
-                    self.parent.setWindowOpacity(transparencia)  
+                    self.pai.setWindowOpacity(transparencia)  
                 else:
-                    self.parent.setWindowOpacity(1.0)  
+                    self.pai.setWindowOpacity(1.0)  
             else:
-                self.parent.setWindowOpacity(1.0)  
+                self.pai.setWindowOpacity(1.0)  
 
         
-    def mousePressEvent(self, event):
-        self.animate_window_resize(self.x, self.y)#469
+    def evento_clique_mouse(self, evento):
+        self.redimensionar_janela_animacao(self.largura, self.altura)  # 469
 
-    def animate_window_resize(self, target_width, target_height):
-        self.animation_target_width = target_width
-        self.animation_target_height = target_height
-        self.animation_timer.stop()
-        self.animation_timer.start(int(self.animation_duration / self.animation_step))
+    def redimensionar_janela_animacao(self, largura_destino, altura_destino):
+        self.largura_destino_animacao = largura_destino
+        self.altura_destino_animacao = altura_destino
+        self.temporizador_animacao.stop()
+        self.temporizador_animacao.start(int(self.duracao_animacao / self.passo_animacao))
 
-    def update_window_size(self):
-        current_width = self.parent.width()
-        current_height = self.parent.height()
+    def atualizar_tamanho_janela(self):
+        largura_atual = self.pai.width()
+        altura_atual = self.pai.height()
 
-        width_difference = self.animation_target_width - current_width
-        height_difference = self.animation_target_height - current_height
+        diferenca_largura = self.largura_destino_animacao - largura_atual
+        diferenca_altura = self.altura_destino_animacao - altura_atual
 
-        width_step = width_difference / self.animation_step
-        height_step = height_difference / self.animation_step
+        passo_largura = diferenca_largura / self.passo_animacao
+        passo_altura = diferenca_altura / self.passo_animacao
 
-        new_width = current_width + width_step
-        new_height = current_height + height_step
+        nova_largura = largura_atual + passo_largura
+        nova_altura = altura_atual + passo_altura
 
-        self.parent.setFixedSize(int(new_width), int(new_height))
+        self.pai.setFixedSize(int(nova_largura), int(nova_altura))
 
-        if (width_step > 0 and new_width >= self.animation_target_width) or \
-           (width_step < 0 and new_width <= self.animation_target_width):
-            self.animation_timer.stop()
-            self.parent.setFixedSize(self.animation_target_width, self.animation_target_height)
+        if (passo_largura > 0 and nova_largura >= self.largura_destino_animacao) or \
+           (passo_largura < 0 and nova_largura <= self.largura_destino_animacao):
+            self.temporizador_animacao.stop()
+            self.pai.setFixedSize(self.largura_destino_animacao, self.altura_destino_animacao)
 
 
 app = QtWidgets.QApplication(sys.argv)
@@ -2830,10 +2797,12 @@ helper = JanelaOculta(janela)
 banco_dados = AcoesBancoDeDados(ui)
 funcoes_app = FuncoesPadrao(ui)
 
+
+
 #Manipulações
-janela.enterEvent = helper.enterEvent
-janela.leaveEvent = helper.leaveEvent
-janela.mousePressEvent = helper.mousePressEvent
+janela.enterEvent = helper.evento_entrada
+janela.leaveEvent = helper.evento_saida
+janela.mousePressEvent = helper.evento_clique_mouse
 janela.closeEvent = funcoes_app.evento_ao_fechar
 janela.showEvent = funcoes_app.evento_ao_abrir
 
