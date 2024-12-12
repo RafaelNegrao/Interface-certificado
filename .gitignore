@@ -4,6 +4,3 @@ credenciaisBd.py
 __pycache__/
 dist
 build
-acoes_banco_dados.py
-funcoes_padrao.py
-hideWindow.py

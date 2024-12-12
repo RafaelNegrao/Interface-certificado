@@ -1,12 +1,69 @@
-from imports import *
+import os
+import psutil
+import shutil
+import datetime
+import pandas as pd
+import tkinter as tk
+import time
+import requests
+import PyPDF2
+import fitz
+import pyautogui
+import sys
+import subprocess
+import math
+import pyperclip
+from tkinter import filedialog
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from reportlab.lib.utils import ImageReader
+from PIL import Image
+from PyQt5 import QtGui, QtWidgets,QtCore,Qt
+from PyQt5.QtWidgets import (
+QTableWidgetItem,
+QTableWidget,
+QApplication,
+QMessageBox,
+QDesktopWidget,
+QInputDialog,
+QMainWindow,
+QFileDialog,
+QRadioButton,
+QVBoxLayout,
+QPushButton,
+QDialog, 
+QLineEdit,
+QScrollArea,
+QWidget,
+QGridLayout,
+QComboBox
+)
+from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime,QPropertyAnimation
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
+from Interface import Ui_janela
+from firebase_admin import db
+from requests.exceptions import RequestException
+from credenciaisBd import *
+import smtplib
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import json
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from collections import Counter,defaultdict
+import numpy as np
+import mplcursors
+import calendar  # Para identificar o último dia do mês
+
+
 
 ref = db.reference("/")
 
 
-class Funcoes_padrao:
+class FuncoesPadrao:
     def __init__(self,ui,parent=None):
         self.ui = ui
-        self.acoes = Acoes_banco_de_dados(ui)
+        self.acoes = AcoesBancoDeDados(ui)
         self.parent = parent
         self.dicionario = db.reference("/Mensagens").get()
 
@@ -59,6 +116,7 @@ class Funcoes_padrao:
         except Exception as e:
             print(f"Erro: {e}")
 
+
     def trazer_configuracoes(self):
         #CORRIGIDO ------------------------------------------------------------------
         try:
@@ -94,6 +152,7 @@ class Funcoes_padrao:
                 pass
         except:
             pass
+
 
     def atualizar_configuracoes(self):
         # CORRIGIDO --------------------------------------------------
@@ -150,6 +209,7 @@ class Funcoes_padrao:
             except Exception as e:
                 # Caso dê erro...
                 print(f"Erro ao atualizar ou adicionar metas: {e}")
+
 
     def trazer_metas(self):
         #CORRIGIDO ----------------------------------------------------------
@@ -321,8 +381,6 @@ class Funcoes_padrao:
             print (f'Erro: {e}')
 
 
-
-
     def definir_cor(self):
         # Define a cor da borda interna superior da interface
         cor_R = ui.campo_cor_R.value()
@@ -332,6 +390,7 @@ class Funcoes_padrao:
     
         # Aplicando a folha de estilo à label
         ui.label_5.setStyleSheet(f"background-color:rgb({cor_R},{cor_G}, {cor_B})")
+
 
     def Atualizar_meta(self):
         #CORRIGIDO
@@ -356,6 +415,7 @@ class Funcoes_padrao:
             except Exception as e:
                 print(f"Erro ao atualizar ou adicionar metas: {e}")
    
+
     def atualizar_diretorio_raiz(self):
         widget_pai = ui.centralwidget
         # Abrir o explorer para selecionar a pasta raiz
@@ -371,6 +431,7 @@ class Funcoes_padrao:
             ui.caminho_pasta_principal.setText(diretorio_selecionado)
         else:
             pass
+
 
     def converter_todas_imagens_para_pdf(self):
         caminho_pasta = ui.caminho_pasta.text()
@@ -403,6 +464,7 @@ class Funcoes_padrao:
             # Atualiza a lista de documentos na tabela da janela 'Dados Pedido'
             self.atualizar_documentos_tabela()
 
+
     def obter_janela_principal(self,widget):
         # Função para recuperar a janela principal a partir de um widget
         while widget:
@@ -410,6 +472,7 @@ class Funcoes_padrao:
                 return widget
             widget = widget.parent()
         return None
+
 
     def print_tela(self):
         # Tira o print da tela
@@ -476,18 +539,24 @@ class Funcoes_padrao:
             ui.label_confirmacao_tirar_print.setText("❌")
             self.mensagem_alerta("Erro",f"Não foi possível capturar a tela!")
 
+
     def pasta_existe(self,diretorio, nome_pasta):
         #transformei o texto em um diretório
         caminho_pasta = os.path.join(diretorio, nome_pasta)
         return os.path.exists(caminho_pasta)
 
+
     def abrir_pasta_cliente(self):
         try:
             QDesktopServices.openUrl(QUrl.fromLocalFile(ui.caminho_pasta.text()))
             ui.label_confirmacao_criar_pasta.setText('✅')
+            self.animar_label(self.ui.label_confirmacao_criar_pasta)
+            
         except:
             ui.label_confirmacao_criar_pasta.setText('❌')
+            self.animar_label(self.ui.label_confirmacao_criar_pasta)
             return
+
 
     def criar_pasta_cliente(self):
         try:
@@ -501,14 +570,17 @@ class Funcoes_padrao:
 
                 ui.label_confirmacao_criar_pasta.setText("❌")
                 self.mensagem_alerta("Pasta não criada","Adicione os itens com 🌟 para criar a pasta do cliente!")
+                self.animar_label(self.ui.label_confirmacao_criar_pasta)
                 return
-        
+
             self.formatar_nome()
             tipo = ui.campo_lista_tipo_criar_pasta.currentText()
             if tipo == "NOME":
                 if ui.campo_nome.text() == "":
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
                     ui.label_confirmacao_criar_pasta.setText("❌")
+                    self.animar_label(self.ui.label_confirmacao_criar_pasta)
+
                     return
                 nome_pasta = f'{ui.campo_nome.text()}'
             
@@ -519,6 +591,8 @@ class Funcoes_padrao:
                 if ui.campo_nome.text() == "":
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
                     ui.label_confirmacao_criar_pasta.setText("❌")
+                    self.animar_label(self.ui.label_confirmacao_criar_pasta)
+
                     return
                 nome_pasta = f'{str(ui.campo_pedido.text())}-{ui.campo_nome.text()}'
 
@@ -548,6 +622,8 @@ class Funcoes_padrao:
         except Exception as e:
             print(e)
             ui.label_confirmacao_criar_pasta.setText("❌")
+            self.animar_label(self.ui.label_confirmacao_criar_pasta)
+
 
     def procurar_cnh(self):
         #Abre o link para consulta da CNH
@@ -555,8 +631,10 @@ class Funcoes_padrao:
         QDesktopServices.openUrl(url)
         return
 
+
     def mensagem_alerta(self,titulo,mensagem):
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
+
 
     def procurar_funcional(self):
 
@@ -581,19 +659,23 @@ class Funcoes_padrao:
                 QDesktopServices.openUrl(url)
                 return
 
+
     def procurar_rg(self):
         url = QUrl("https://acertid.net.br/acertid/")
         QDesktopServices.openUrl(url)
         return
     
+
     def procurar_pis(self):
         url = QUrl("https://sal.rfb.gov.br/PortalSalInternet/faces/pages/calcContribuicoesCI/filiadosAntes/selecionarOpcoesCalculoAntes.xhtml")
         QDesktopServices.openUrl(url)
         return
 
+
     def formatar_orgao_rg(self):
         orgao = ui.campo_rg_orgao.text().rstrip()
         ui.campo_rg_orgao.setText(orgao.upper())
+
 
     def contato_telefone(self):
         if ui.campo_telefone.text() == '':
@@ -601,10 +683,12 @@ class Funcoes_padrao:
 
         self.mensagem_contato()
 
+
     def procurar_cnpj(self):
         cnpj = ui.campo_cnpj.text()
         url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
         QDesktopServices.openUrl(url_receita)
+
 
     def dados_cnpj(self):
         ui.campo_cnpj_municipio.setText("") 
@@ -660,6 +744,7 @@ class Funcoes_padrao:
             self.atualizar_documentos_tabela()
             self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
             return
+
 
     def procurar_junta(self):
 
@@ -728,13 +813,16 @@ class Funcoes_padrao:
         url_junta = QUrl(link_consulta)
         QDesktopServices.openUrl(url_junta)
 
+
     def formatar_nome(self):
         nome = ui.campo_nome.text().rstrip()  # Obtenha o texto do campo_nome_mae
         ui.campo_nome.setText(nome.upper())
 
+
     def formatar_nome_mae(self):
         texto_mae = ui.campo_nome_mae.text()  # Obtenha o texto do campo_nome_mae
         ui.campo_nome_mae.setText(texto_mae.upper())
+
 
     def formatar_preco_certificado(self):
         if not ui.campo_preco_certificado.text() =="":
@@ -742,6 +830,7 @@ class Funcoes_padrao:
             preco = float(texto)
             preco = "{:.2f}".format(preco)
             ui.campo_preco_certificado.setText(str(preco))
+
 
     def procurar_cpf(self):
         
@@ -757,6 +846,7 @@ class Funcoes_padrao:
             QDesktopServices.openUrl(url)
             self.atualizar_documentos_tabela()
             return
+
 
     def formatar_cpf(self):
         cpf = ui.campo_cpf.text()
@@ -784,7 +874,8 @@ class Funcoes_padrao:
             
         elif len(novo_cpf)== "":
             return   
-            
+
+
     def formatar_data_agendamento(self):
         data_agendamento = ui.campo_data_agendamento.date()
         data_atual = QDate.currentDate()
@@ -793,7 +884,8 @@ class Funcoes_padrao:
             ui.campo_data_agendamento.setStyleSheet("color: red")
         else:
             ui.campo_data_agendamento.setStyleSheet("color: black")
-            
+
+
     def formatar_cnpj(self):
         cnpj = ui.campo_cnpj.text()
         cnpj_sp = cnpj.replace(".","").replace("/","").replace("-","")
@@ -810,6 +902,7 @@ class Funcoes_padrao:
             pass
         else:
             ui.campo_cnpj_municipio.setText('')
+
 
     def exportar_excel(self):
         try:
@@ -885,6 +978,7 @@ class Funcoes_padrao:
             print(e)
             self.mensagem_alerta("Arquivo não salvo", f"Arquivo não gerado!\nmotivo: {e}")
 
+
     def copiar_pedido_tabela(self,event):
         # Obtém a célula atualmente selecionada na tabela
         item = ui.tableWidget.currentItem()
@@ -901,6 +995,7 @@ class Funcoes_padrao:
         else:
             ui.label_msg_copiado.setText("")
         
+
     def mesclar_pdf(self):
         try:
             folder_to_open_directory = ui.caminho_pasta.text()
@@ -956,6 +1051,7 @@ class Funcoes_padrao:
 
             return
 
+
     def escolher_conversao(self):
 
         dialog = QDialog(ui.centralwidget)
@@ -986,6 +1082,7 @@ class Funcoes_padrao:
         botao_confirmar.clicked.connect(confirmar)
         dialog.exec_()
 
+
     def converter_jpg_para_pdf(self):
         try:
             image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
@@ -998,6 +1095,7 @@ class Funcoes_padrao:
             ui.label_confirmacao_converter_pdf.setText("✅")
         except:
             ui.label_confirmacao_converter_pdf.setText("❌")
+
 
     def converter_pdf_para_jpg(self):
         try:
@@ -1018,6 +1116,7 @@ class Funcoes_padrao:
             self.atualizar_documentos_tabela()
             ui.label_confirmacao_converter_pdf.setText("❌")
 
+
     def evento_ao_abrir(self,event):
         
         self.trazer_configuracoes()
@@ -1028,6 +1127,7 @@ class Funcoes_padrao:
         self.ui.campo_status_bd.setText("")
         self.ui.campo_status_bd.setToolTip("")
         banco_dados.contar_verificacao()
+
 
     def evento_ao_fechar(self,event):
 
@@ -1044,6 +1144,7 @@ class Funcoes_padrao:
                 
         else:
             event.ignore()
+
 
     def copiar_campo(self, nome_campo):
         # LISTA DE CAMPOS QUE SERÃO COPIADOS
@@ -1076,7 +1177,8 @@ class Funcoes_padrao:
             except Exception as e:
 
                 print(f"Erro ao copiar o campo {nome_campo}: {e}")
-        
+
+
     def manter_tela_aberta(self):
         if ui.campo_verifica_tela_cheia.text() == "SIM":
             ui.campo_verifica_tela_cheia.setText("NAO")
@@ -1085,22 +1187,48 @@ class Funcoes_padrao:
             ui.campo_verifica_tela_cheia.setText("SIM")
             ui.botao_tela_cheia.setText("🔒")
 
+
     def atualizar_aba(self):
         if ui.tabWidget.currentIndex() == 2:
             self.atualizar_meta_clientes()    
         else:
             pass
 
+
+    def animar_label(self, label):
+        anim = QPropertyAnimation(label, b"geometry")
+        anim.setDuration(800)  
+
+        start_geometry = label.geometry()
+        end_geometry = QRect(start_geometry.x(), start_geometry.y() - 5, start_geometry.width(), start_geometry.height())
+
+        # Configurando os quadros de animação para pular duas vezes
+        anim.setKeyValueAt(0.0, start_geometry)
+        anim.setKeyValueAt(0.25, end_geometry)
+        anim.setKeyValueAt(0.5, start_geometry)
+        anim.setKeyValueAt(0.75, end_geometry)
+        anim.setKeyValueAt(1.0, start_geometry)
+
+        anim.start()
+        self.anim = anim 
+
+
     def valor_alterado(self, campo_atual):
         self.atualizar_documentos_tabela()
         if campo_atual is not None:
             self.ui.campo_status_bd.setText("❌")
             self.ui.label_confirmacao_salvar.setText("")
+            self.ui.label_confirmacao_excluir.setText("")
             self.ui.campo_status_bd.setToolTip("Pedido desatualizado")
+
+            self.animar_label(self.ui.label_confirmacao_salvar)
+            self.animar_label(self.ui.label_confirmacao_excluir)
 
             nome_campo_atual = campo_atual.objectName()
             if nome_campo_atual == "campo_lista_versao_certificado":
                 self.buscar_preco_certificado()
+
+
 
     def obter_valor_campo(self, campo):
         if isinstance(campo, QtWidgets.QLineEdit):
@@ -1116,6 +1244,7 @@ class Funcoes_padrao:
         else:
             return None
 
+
     def visualizar_senha(self):
         if ui.campo_senha_email_empresa.echoMode() == QLineEdit.Normal:
             ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Password)
@@ -1124,6 +1253,7 @@ class Funcoes_padrao:
             ui.campo_senha_email_empresa.setEchoMode(QLineEdit.Normal)
             ui.botao_ver_senha.setText("❌")
     
+
     def carregar_lista_certificados(self):
        if ui.campo_lista_versao_certificado.currentText() == "":
             ref = db.reference("/Certificados")
@@ -1135,6 +1265,7 @@ class Funcoes_padrao:
 
             ui.campo_lista_versao_certificado.insertItem(1,'e-CNPJ - no computador - 12 meses')
             ui.campo_lista_versao_certificado.insertItem(2,'e-CPF - no computador - 12 meses')
+
 
     def pegar_link_venda(self):
         try:
@@ -1148,6 +1279,7 @@ class Funcoes_padrao:
                 pyperclip.copy(str(link))
         except:
             pass
+
 
     def buscar_preco_certificado(self):
         ref = db.reference("/Certificados")        
@@ -1185,6 +1317,7 @@ class Funcoes_padrao:
             ui.campo_preco_certificado.setToolTip(tooltip_text)
             ui.campo_preco_certificado.setText(valor_final_formatado)
 
+
     def duplicar_pedido(self):
         resposta = QMessageBox.question(ui.centralwidget,'Duplicar pedido', 'Duplicar pedido atual?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
@@ -1202,6 +1335,7 @@ class Funcoes_padrao:
         else:
             return False
         
+
     def atualizar_documentos_tabela(self):
 
         self.ui.tabela_documentos.clearContents()
@@ -1275,7 +1409,7 @@ class Funcoes_padrao:
 
 
     def abrir_nova_janela(self, janela_pai):
-        #verifica se a janela de mensagens está aberta
+        # Verifica se a janela de mensagens está aberta
         if hasattr(self, 'nova_janela') and self.nova_janela is not None:
             if self.nova_janela.isVisible():
                 return 
@@ -1297,7 +1431,7 @@ class Funcoes_padrao:
             print("Dicionário de mensagens não está carregado.")
             return
 
-        for i, (chave, valor) in enumerate(self.dicionario.items()):
+        for chave, valor in sorted(self.dicionario.items(), key=lambda x: x[1].get('posicao', 0)):
             titulo = valor.get("titulo")
             if titulo:
                 botao = QPushButton()
@@ -1308,7 +1442,9 @@ class Funcoes_padrao:
 
                 # Conecta o botão à função genérica de tratamento
                 botao.clicked.connect(lambda _, c=chave: self.copiar_com_tratamento(c))
-                layout.addWidget(botao, i // 2, i % 2)
+
+                posicao = valor.get('posicao', 0) - 1
+                layout.addWidget(botao, posicao % 9, posicao // 9)  # 1ª coluna: 0-8; 2ª coluna: 9-17
 
         widget.setLayout(layout)
         scroll.setWidget(widget)
@@ -1316,49 +1452,45 @@ class Funcoes_padrao:
 
 
     def copiar_com_tratamento(self, chave):
-
         mensagem_firebase = self.dicionario[chave].get("mensagem", "")
-        titulo = self.dicionario[chave].get("titulo", "")
 
-        if chave == "clique_btn1":
+        mensagem = mensagem_firebase
+        if "{{mensagem_inicial}}" in mensagem:
             mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
-            nome = ui.campo_nome_agente.text()
-            mensagem = mensagem_firebase.replace("{{mensagem_inicial}}", mensagem_inicial).replace("{{nome}}", nome)
+            mensagem = mensagem.replace("{{mensagem_inicial}}", mensagem_inicial)
 
-        elif chave == "clique_btn2":
+        if "{{nome}}" in mensagem:
+            nome = ui.campo_nome_agente.text()
+            mensagem = mensagem.replace("{{nome}}", nome)
+
+        if "{{midia}}" in mensagem:
             certificado = ui.campo_lista_versao_certificado.currentText().lower()
             midia = "CARTÃO" if "cartão" in certificado else "TOKEN" if "token" in certificado else ""
-            mensagem = mensagem_firebase.replace("{{midia}}", midia)
+            mensagem = mensagem.replace("{{midia}}", midia)
 
-        elif chave == "clique_btn11":
-            nome = ui.campo_nome.text().split()[0].capitalize() if ui.campo_nome.text() else ""
+        if "{{cod_rev}}" in mensagem:
             rev = ui.campo_cod_rev.text()
-            mensagem = mensagem_firebase.replace("{{nome}}", nome).replace("{{cod_rev}}", rev).replace("\\n", "\n")
+            mensagem = mensagem.replace("{{cod_rev}}", rev)
 
-        elif chave == "clique_btn12":
+        if "{{pedido}}" in mensagem:
             pedido = ui.campo_pedido.text()
-            mensagem = mensagem_firebase.replace("{{pedido}}", pedido)
+            mensagem = mensagem.replace("{{pedido}}", pedido)
 
-        elif chave == "clique_btn18":
-            certificado = ui.campo_lista_versao_certificado.currentText()
+        if "{{cliente}}" in mensagem:
             cliente = ui.campo_nome.text()
-            pedido = ui.campo_pedido.text()
-            midia = "TOKEN" if "token" in certificado else "CARTÃO" if "cartão" in certificado else ""
-            mensagem = mensagem_firebase.replace("{{cliente}}", cliente).replace("{{pedido}}", pedido).replace("{{midia}}", midia)
+            mensagem = mensagem.replace("{{cliente}}", cliente)
 
-        else:
-            # Mensagens que não necessitam de tratamento específico
-            mensagem = mensagem_firebase
+        mensagem = mensagem.replace("\\n", "\n")
 
         clipboard = QApplication.clipboard()
         clipboard.setText(mensagem)
 
         if hasattr(self, 'nova_janela') and self.nova_janela is not None:
-            if self.nova_janela.isVisible():  
+            if self.nova_janela.isVisible():
                 self.nova_janela.close()
 
             self.nova_janela.deleteLater()
-            self.nova_janela = None  
+            self.nova_janela = None
 
 
     def determinar_hora(self,hora):
@@ -1614,11 +1746,11 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             ui.tableWidget.setRowCount(0)  
             ui.tableWidget.setColumnCount(5) 
             ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"]) 
-            ui.tableWidget.setColumnWidth(0, 72)
-            ui.tableWidget.setColumnWidth(1, 103)
-            ui.tableWidget.setColumnWidth(2, 51)
-            ui.tableWidget.setColumnWidth(3, 103)
-            ui.tableWidget.setColumnWidth(4, 171)  
+            ui.tableWidget.setColumnWidth(0, 82)
+            ui.tableWidget.setColumnWidth(1, 113)
+            ui.tableWidget.setColumnWidth(2, 62)
+            ui.tableWidget.setColumnWidth(3, 113)
+            ui.tableWidget.setColumnWidth(4, 181)  
 
             pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
@@ -1900,91 +2032,70 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
     def ajuste_largura_col(self):
         ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
         for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 83)
+                ui.tableWidget.setColumnWidth(col, 91)
 
 
 
-class Acoes_banco_de_dados:
-    def __init__(self,ui):
+class AcoesBancoDeDados:
+    def __init__(self, ui):
         self.ui = ui
         self.ref = db.reference("/Pedidos")
-    
+
     def salvar_pedido(self):
-        # Analisa se os campos do pedido estão preenchidos
         try:
-            pasta_cliente = ui.caminho_pasta.text()
             if not self.analise_de_campos():
                 return
 
-            ref = db.reference("/Pedidos")
-            self.num_pedido = ui.campo_pedido.text()
+            num_pedido = self.ui.campo_pedido.text()
+            novo_pedido_ref = self.ref.child(num_pedido)
 
-            num_pedido = ui.campo_pedido.text()
-            novo_pedido_ref = ref.child(num_pedido)
-            
-            # Verifica se o nó já existe
-            #PEDIDO EXISTE
-            if novo_pedido_ref.get() is not None:
-                #verificar se o pedido é DEFINITIVO ou TEMPORARIO
-                condic = self.verificar_status()
-                match condic:
-                    #Pedido existente + gravado Definitivo
-                    case 'DEFINITIVO':
-                        if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
-                            return
-                        # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
-                        # Caso queira retornar, é só mudar para update
-                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                        self.ui.campo_status_bd.setText("")
-                        self.ui.campo_status_bd.setToolTip("")
-                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(pasta_cliente)
-                        self.apagar_campos_pedido(0)
-                        ui.label_confirmacao_salvar.setText("✅")
-                        self.contar_verificacao()
-                        funcoes_app.ajuste_largura_col()
+            # Verifica se o pedido já existe
+            pedido_existente = novo_pedido_ref.get() is not None
+            condic = self.verificar_status()
 
-                    #Pedido existente + gravado temporariamente
-                    # Fiz essa alteração pra manter apenas as chaves que tenham algum valor 
-                    # Caso queira retornar, é só mudar 
-                    case 'TEMPORARIO':
-                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                        self.ui.campo_status_bd.setText("✅")
-                        ui.label_confirmacao_salvar.setText("✅")
-                        self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        self.contar_verificacao()
-                        funcoes_app.ajuste_largura_col()
-                        
-            #NOVO PEDIDO
+            if condic == 'DEFINITIVO' and not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
+                return
+
+            if condic == 'DEFINITIVO':
+                self.salvar_definitivo(novo_pedido_ref)
             else:
-                condic = self.verificar_status()
-                match condic:
-                    #Pedido existente + gravado Definitivo
-                    case 'DEFINITIVO':
-                        if not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
-                            return
-                        
-                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                        self.ui.campo_status_bd.setText("")
-                        self.ui.campo_status_bd.setToolTip("")
-                        self.forcar_fechamento_de_arquivo_e_deletar_pasta(ui.caminho_pasta.text())
-                        self.apagar_campos_pedido(0)
-                        ui.label_confirmacao_salvar.setText("✅")
-                        self.contar_verificacao()
-                        funcoes_app.ajuste_largura_col()
+                self.salvar_temporario(novo_pedido_ref)
 
-                    #Pedido existente + gravado temporariamente
-                    case 'TEMPORARIO':
+            self.atualizar_ui(condic, pedido_existente)
 
-                        novo_pedido_ref.set(self.dicionario_banco_de_dados())
-                        self.ui.campo_status_bd.setText("✅")
-                        ui.label_confirmacao_salvar.setText("✅")
-                        self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
-                        self.contar_verificacao()
-                        funcoes_app.ajuste_largura_col()
-                        
         except Exception as e:
             print(e)
-                
+
+
+    def salvar_temporario(self, novo_pedido_ref):
+        novo_pedido_ref.set(self.dicionario_banco_de_dados())
+        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
+
+
+    def salvar_definitivo(self, novo_pedido_ref):
+        self.forcar_fechamento_de_arquivo_e_deletar_pasta(self.ui.caminho_pasta.text())
+        novo_pedido_ref.set(self.dicionario_banco_de_dados())
+        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
+        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
+
+
+    def atualizar_ui(self, condic, pedido_existente):
+        if condic == 'DEFINITIVO':
+            self.ui.campo_status_bd.setText("")
+            self.ui.campo_status_bd.setToolTip("")
+            self.apagar_campos_pedido(0)
+            self.ui.label_confirmacao_excluir.setText("⬇️")
+            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
+        else:
+            self.ui.campo_status_bd.setText("✅")
+            self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
+
+        self.ui.label_confirmacao_salvar.setText("✅")
+        FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
+        self.contar_verificacao()
+        funcoes_app.ajuste_largura_col()
+        
+
     def mensagem_confirmacao(self,titulo,mensagem):
         resposta = QMessageBox.question(ui.centralwidget, titulo, mensagem, QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         if resposta == QMessageBox.Yes:
@@ -1992,8 +2103,10 @@ class Acoes_banco_de_dados:
         else:
             return False
 
+
     def mensagem_alerta(self,titulo,mensagem):
         QMessageBox.information(ui.centralwidget, titulo, mensagem, QMessageBox.Ok)
+
 
     def verificar_status(self):       
         for radiobutton in ui.groupBox_status.findChildren(QRadioButton):
@@ -2002,7 +2115,8 @@ class Acoes_banco_de_dados:
                     return "DEFINITIVO"
                 else:
                     return "TEMPORARIO"
-               
+
+
     def analise_de_campos(self):
 
         pedido = ui.campo_pedido.text()
@@ -2028,8 +2142,10 @@ class Acoes_banco_de_dados:
             mensagem_alerta = f"Preencha os seguintes campos para salvar o pedido!\n⭐{campos_faltando}"
             self.mensagem_alerta("Erro no envio", mensagem_alerta)
             ui.label_confirmacao_salvar.setText("❌")
+            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_salvar)
             return False
         return True
+
 
     def apagar_campos_pedido(self,origem):
         if origem == 1:
@@ -2037,7 +2153,7 @@ class Acoes_banco_de_dados:
                 return
         try:
             #Dados pedido  
-            ui.tableWidget.horizontalHeader().setDefaultSectionSize(70)
+            ui.tableWidget.horizontalHeader().setDefaultSectionSize(91)
             ui.caminho_pasta.setText("")
             ui.campo_cnpj_municipio.setText("")
             ui.campo_comentario.setPlainText("")
@@ -2073,14 +2189,18 @@ class Acoes_banco_de_dados:
             ui.campo_email_enviado.setText("")
             self.limpar_labels()
             self.contar_verificacao()
-
+            self.ui.label_confirmacao_excluir.setText("⬇️")
+            FuncoesPadrao.animar_label(self,self.ui.label_confirmacao_excluir)
 
         except Exception as e:
             print(e)
 
+
     def limpar_labels(self):
-        self.zerar_cor()
+        
+       
         ui.rb_digitacao.setChecked(True)
+        self.alteracao_status()
         ui.campo_status_bd.setText("")
         ui.label_confirmacao_converter_pdf.setText("")
         ui.label_confirmacao_criar_pasta.setText("")
@@ -2088,6 +2208,8 @@ class Acoes_banco_de_dados:
         ui.label_confirmacao_tirar_print.setText("")
         ui.label_confirmacao_salvar.setText("")
         ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);color:orange")
+        ui.label_confirmacao_excluir.setText("")
+    
          
     def dicionario_banco_de_dados(self):
         duracoes_certificado = {
@@ -2144,11 +2266,12 @@ class Acoes_banco_de_dados:
 
         return dados_filtrados
 
+
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
         for _ in range(3):  # Tenta fehar por 3 vezes
             try:
                 shutil.rmtree(folder_path)
-                return "Pasta excluída com sucesso"
+                return 
                 
             except PermissionError as e:
                 # Se a exclusão falhar devido a permissões, tenta fechar os arquivos em uso antes da próxima tentativa
@@ -2158,7 +2281,8 @@ class Acoes_banco_de_dados:
                 if not os.path.exists(folder_path):  # Verifica se a pasta não existe
                     return ""
                 return "Erro ao excluir pasta do cliente"
-                     
+
+
     def fechar_arquivo_em_uso(self,folder_path):
         processes = psutil.process_iter(['pid', 'name', 'open_files'])
         for process in processes:
@@ -2175,8 +2299,8 @@ class Acoes_banco_de_dados:
             except (psutil.AccessDenied, psutil.NoSuchProcess, psutil.ZombieProcess):
                 continue
 
+
     def carregar_dados(self):
-        #CORRIGIDO ------------------------------------------------
         try:
             num_pedido = ui.campo_pedido.text()
 
@@ -2198,6 +2322,7 @@ class Acoes_banco_de_dados:
         except Exception as e:
             pass
 
+
     def pegar_valor_tabela(self):
    #evento disparado ao dar double click na tabela
 
@@ -2217,6 +2342,7 @@ class Acoes_banco_de_dados:
         except :
             pass
 
+
     def preencher_status(self,status):
         match status:
             case "APROVADO":
@@ -2234,6 +2360,7 @@ class Acoes_banco_de_dados:
             case "VIDEO REALIZADA":
                 ui.rb_videook.setChecked(True)
                 self.alteracao_status()
+
 
     def preencher_dados(self, pedido_data):
         self.apagar_campos_pedido(0)  # Limpa os campos antes de começar a preencher
@@ -2318,7 +2445,7 @@ class Acoes_banco_de_dados:
             
             ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
             for i in range(ui.tableWidget.columnCount()): 
-                ui.tableWidget.horizontalHeader().resizeSection(i, 83)
+                ui.tableWidget.horizontalHeader().resizeSection(i, 91)
 
             
         except Exception as e:
@@ -2330,6 +2457,7 @@ class Acoes_banco_de_dados:
                 ui.label_confirmacao_criar_pasta.setText("✅")
         except Exception as e:
             print(f"Erro ao atualizar confirmação de pasta: {e}")
+
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
@@ -2371,6 +2499,7 @@ class Acoes_banco_de_dados:
         ui.campo_status_verificacao.setText(str(quantidade_verificacao))
         ui.campo_status_videook.setText(str(quantidade_videook))
 
+
     def preencher_tabela(self):
     #Evento disparado quando clico no botão procurar na aba 'Consulta'
         
@@ -2390,8 +2519,8 @@ class Acoes_banco_de_dados:
             ui.tableWidget.setRowCount(0)
             ui.tableWidget.setColumnCount(6)
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-            for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
+            
+            funcoes_app.ajuste_largura_col()
 
             valor_estimado = 0
             try:
@@ -2408,8 +2537,8 @@ class Acoes_banco_de_dados:
                 f = 0
                 venda = 0
                 total_pedidos = len(pedidos)
-                for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
+                funcoes_app.ajuste_largura_col()
+
                 ui.barra_progresso_consulta.setVisible(False)
                 
                 # Configura a barra de progresso corretamente
@@ -2514,14 +2643,17 @@ Vendas..........{venda}
                 print(e)
                 ui.campo_relatorio.setPlainText("")
                 ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-                for col in range(ui.tableWidget.columnCount()):
-                    ui.tableWidget.setColumnWidth(col, 83)
+                
+                funcoes_app.ajuste_largura_col()
+
                 ui.label_quantidade_bd.setText(f"{x} registro(s)")
+
                 ui.barra_progresso_consulta.setVisible(False)
                 self.contar_verificacao()
         except:
             pass
  
+
     def atualizar_documentos_tabela(self):
         # Limpar qualquer conteúdo existente na tabela
         self.ui.tabela_documentos.clearContents()
@@ -2558,11 +2690,12 @@ Vendas..........{venda}
 
             self.ui.tabela_documentos.setItem(num_documentos + i, 0, item_nome_documento)
 
+
     def alteracao_status(self):
         #AQUI VAI VERIFICAR SE
         if ui.rb_digitacao.isChecked():
             self.zerar_cor()
-            ui.rb_digitacao.setStyleSheet("border:none;color:rgb(113,66,230);")  
+            ui.rb_digitacao.setStyleSheet("border:none;color: rgb(113,66,230);")  
             return 'DIGITAÇÃO'
         elif ui.rb_videook.isChecked():
             self.zerar_cor()
@@ -2580,7 +2713,8 @@ Vendas..........{venda}
             self.zerar_cor()
             ui.rb_cancelado.setStyleSheet("border:none;color: red;")  
             return 'CANCELADO'
-        
+
+
     def zerar_cor(self):
         
         ui.rb_digitacao.setStyleSheet("border:none; color:rgb(170,170,170);")  
@@ -2589,10 +2723,12 @@ Vendas..........{venda}
         ui.rb_aprovado.setStyleSheet("border:none; color:rgb(170,170,170);")
         ui.rb_cancelado.setStyleSheet("border:none; color:rgb(170,170,170);")
 
+
     def iso_para_data(self,data):
         dt = datetime.datetime.strptime(data, "%Y-%m-%dT%H:%M:%SZ")
         qdt = QDateTime(dt)
         return qdt
+
 
     def data_para_iso(self,data):
         dt = data.toPyDateTime()
@@ -2611,10 +2747,12 @@ class JanelaOculta:
         self.animation_duration = 2  # Duração da animação em milissegundos
         self.animation_target_width = 0
         self.animation_target_height = 0
-        self.janela = Funcoes_padrao(ui)
+        self.janela = FuncoesPadrao(ui)
+        self.x = 578
+        self.y = 712
 
     def enterEvent(self, event):
-        self.animate_window_resize(530, 730)
+        self.animate_window_resize(self.x, self.y)
         self.janela.atualizar_documentos_tabela()
         self.parent.setWindowOpacity(1.0)  
 
@@ -2653,7 +2791,7 @@ class JanelaOculta:
 
         
     def mousePressEvent(self, event):
-        self.animate_window_resize(530,730)#469
+        self.animate_window_resize(self.x, self.y)#469
 
     def animate_window_resize(self, target_width, target_height):
         self.animation_target_width = target_width
@@ -2689,8 +2827,8 @@ ui = Ui_janela()
 ui.setupUi(janela)
 
 helper = JanelaOculta(janela)
-banco_dados = Acoes_banco_de_dados(ui)
-funcoes_app = Funcoes_padrao(ui)
+banco_dados = AcoesBancoDeDados(ui)
+funcoes_app = FuncoesPadrao(ui)
 
 #Manipulações
 janela.enterEvent = helper.enterEvent
@@ -2771,6 +2909,7 @@ ui.botao_link_venda.clicked.connect(lambda:funcoes_app.pegar_link_venda())
 ui.botao_envio_massa.clicked.connect(lambda:funcoes_app.envio_em_massa())
 
 #Campos de formatação
+ui.campo_comentario.setAcceptRichText(False)    
 ui.caminho_pasta_principal.setReadOnly(True)
 ui.campo_relatorio.setReadOnly(True)
 ui.caminho_pasta.setReadOnly(True)
