@@ -36,7 +36,9 @@ QLineEdit,
 QScrollArea,
 QWidget,
 QGridLayout,
-QComboBox
+QComboBox,
+QLabel,
+QHBoxLayout
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
@@ -61,12 +63,13 @@ ref = db.reference("/")
 
 
 
+
 class FuncoesPadrao:
     def __init__(self,ui,parent=None):
         self.ui = ui
         self.acoes = AcoesBancoDeDados(ui)
         self.parent = parent
-        self.dicionario = db.reference("/Mensagens").get()
+        
 
     def atualizar_barras_metas(self):
         try:
@@ -121,7 +124,7 @@ class FuncoesPadrao:
     def trazer_configuracoes(self):
         #CORRIGIDO ------------------------------------------------------------------
         try:
-            ref = db.reference("/Configuracoes")
+            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Configuracoes")
             # Faz uma solicitação GET para obter as configurações do banco de dados
             configs = ref.get()
 
@@ -146,6 +149,7 @@ class FuncoesPadrao:
                 ui.campo_dias_renovacao.setValue(configs['RNG RENOVACAO'])
                 ui.checkBox_transparecer.setChecked(configs['CHECKBOX TRANSP'])
                 ui.campo_porcentagem_transparencia.setValue(configs['VALOR TRANS'])
+               
 
 
             except Exception as e:
@@ -156,7 +160,6 @@ class FuncoesPadrao:
 
 
     def atualizar_configuracoes(self):
-        # CORRIGIDO --------------------------------------------------
         # Confirmação de atualização das configurações
         resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Atualizar configurações?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
         
@@ -164,9 +167,12 @@ class FuncoesPadrao:
             pass
         else:
             return
-        
-        ref = db.reference("/Configuracoes")
-        # Recupera o diretório da interface
+
+        usuario = ui.campo_usuario.text()  # Obtém o nome do usuário
+        ref_configuracoes = db.reference(f"Usuario/{usuario}/Dados/Configuracoes")  # Caminho para as configurações
+        ref_senha = db.reference(f"Usuario/{usuario}/Senha")  # Caminho para a senha
+
+        # Recupera os dados da interface
         diretorio = ui.caminho_pasta_principal.text()
         email = ui.campo_email_empresa.text()
         rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
@@ -181,44 +187,56 @@ class FuncoesPadrao:
         renovacao = ui.campo_dias_renovacao.value()
         transparencia = ui.checkBox_transparecer.isChecked()
         valor_transparencia = ui.campo_porcentagem_transparencia.value()
+        nova_senha = ui.campo_senha_usuario.text()  # Obtém a nova senha (do campo de senha)
+
         # Cria um dicionário com as novas configurações
         nova_config = {
             "DIRETORIO-RAIZ": diretorio,
-            "E-MAIL":email,
-            "RGB":rgb,
-            "PORCENTAGEM":porcentagem,
-            "IMPOSTO VALIDACAO":imposto,
-            "DESCONTO VALIDACAO":desconto,
-            "MODO PASTA":criar_pasta,
-            "DESCONTO TOTAL":campo_desconto,
-            "COD REV":campo_cod_rev,
-            "SENHA EMAIL":senha_email,
-            "AGENTE":atendente,
+            "E-MAIL": email,
+            "RGB": rgb,
+            "PORCENTAGEM": porcentagem,
+            "IMPOSTO VALIDACAO": imposto,
+            "DESCONTO VALIDACAO": desconto,
+            "MODO PASTA": criar_pasta,
+            "DESCONTO TOTAL": campo_desconto,
+            "COD REV": campo_cod_rev,
+            "SENHA EMAIL": senha_email,
+            "AGENTE": atendente,
             "RNG RENOVACAO": renovacao,
             "CHECKBOX TRANSP": transparencia,
-            "VALOR TRANS":valor_transparencia
-            }
+            "VALOR TRANS": valor_transparencia
+        }
 
         try:
-            # Tenta atualizar as configurações no banco de dados
-            ref.update(nova_config)
+            # Atualiza as configurações no banco de dados
+            ref_configuracoes.update(nova_config)
+
+            # Verifica se a senha foi alterada
+            if nova_senha:
+                # Atualiza a senha no caminho correspondente
+                ref_senha.set(nova_senha)
+                self.mensagem_alerta("Sucesso","Dados atualizados com sucesso!")
+            else:
+                self.mensagem_alerta("Erro","Erro ao atualizar dados!")
+
         except Exception as e:
             try:
                 # Se não conseguir atualizar, tenta adicionar as configurações
-                ref.set(nova_config)
-                print("Novas metas adicionadas com sucesso.")
+                ref_configuracoes.set(nova_config)
+                
             except Exception as e:
-                # Caso dê erro...
-                print(f"Erro ao atualizar ou adicionar metas: {e}")
+                self.mensagem_alerta("Erro",f"Erro ao adicionar configurações: {str(e)}")
+
 
 
     def trazer_metas(self):
         #CORRIGIDO ----------------------------------------------------------
-        ref = db.reference("/Metas")
+        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Metas")
         Metas = ref.get()
     
-        valor_semanal = Metas['SEMANAL']
-        valor_mensal = Metas['MENSAL']
+        
+        valor_semanal = Metas["SEMANAL"]
+        valor_mensal = Metas["MENSAL"]
         ui.campo_meta_semanal.setValue(int(valor_semanal))
         ui.campo_meta_mes.setValue(int(valor_mensal))
 
@@ -235,7 +253,8 @@ class FuncoesPadrao:
                 QtWidgets.QWidget().setLayout(layout)  # Limpar o layout atual
 
             if ui.tabWidget.currentIndex() == 2:
-                ref = db.reference("/Pedidos")
+                ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
+
                 Pedidos = ref.get()
 
                 # Inicializando contadores para cada semana
@@ -396,7 +415,7 @@ class FuncoesPadrao:
 
     def Atualizar_meta(self):
         #CORRIGIDO
-        ref = db.reference("/Metas")
+        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Metas")
 
         # Obtém as metas da interface do usuário
         meta_semana = ui.campo_meta_semanal.text()
@@ -1231,7 +1250,8 @@ class FuncoesPadrao:
 
     def carregar_lista_certificados(self):
        if ui.campo_lista_versao_certificado.currentText() == "":
-            ref = db.reference("/Certificados")
+            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+            
             certificados = ref.get()
 
             ui.campo_lista_versao_certificado.clear()  
@@ -1244,7 +1264,7 @@ class FuncoesPadrao:
 
     def pegar_link_venda(self):
         try:
-            ref = db.reference(f"/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
+            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
             certificado = ref.get()
             link_venda = certificado["LINK VENDA"]
             rev = str(ui.campo_cod_rev.text())
@@ -1257,7 +1277,7 @@ class FuncoesPadrao:
 
 
     def buscar_preco_certificado(self):
-        ref = db.reference("/Certificados")        
+        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")      
         lista_certificados = ref.get()        
         certificado = ui.campo_lista_versao_certificado.currentText()        
         if certificado in lista_certificados:            
@@ -1385,6 +1405,7 @@ class FuncoesPadrao:
 
 
     def abrir_nova_janela(self, janela_pai):
+        self.dicionario = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Mensagens").get()
         # Verifica se a janela de mensagens está aberta
         if hasattr(self, 'nova_janela') and self.nova_janela is not None:
             if self.nova_janela.isVisible():
@@ -1713,6 +1734,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             ui.campo_senha_email.setEchoMode(QLineEdit.Password)
 
 
+    def mostrar_senha_usuario(self):
+        if ui.campo_senha_usuario.echoMode() == QLineEdit.Password:
+            ui.campo_senha_usuario.setEchoMode(QLineEdit.Normal)
+        else:
+            ui.campo_senha_usuario.setEchoMode(QLineEdit.Password)
+
+
     def envio_em_massa(self):
         try:
             if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
@@ -1731,7 +1759,8 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
 
-            ref_link_venda = db.reference(f"/Certificados/")
+            ref_link_venda = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados/")
+
             lista_certificados = ref_link_venda.get()
             range_validacao = ui.campo_dias_renovacao.value()
 
@@ -2010,7 +2039,8 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 class AcoesBancoDeDados:
     def __init__(self, ui):
         self.ui = ui
-        self.ref = db.reference("/Pedidos")
+        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
+        
 
     def salvar_pedido(self):
         try:
@@ -2275,7 +2305,7 @@ class AcoesBancoDeDados:
             if num_pedido == "":
                 return
 
-            self.ref = db.reference("/Pedidos")
+            self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
 
             pedido_ref = self.ref.child(num_pedido)
             pedido_data = pedido_ref.get()
@@ -2478,7 +2508,7 @@ class AcoesBancoDeDados:
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
 
-            pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
+            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA") \
                             .start_at(data_inicial) \
                             .end_at(data_final)
             pedidos = pedidos_ref.get()
@@ -2619,7 +2649,8 @@ Vendas..........{venda}
 
                 ui.barra_progresso_consulta.setVisible(False)
                 self.contar_verificacao()
-        except:
+        except Exception as e:
+            print(e)
             pass
  
 
@@ -2703,6 +2734,117 @@ Vendas..........{venda}
         dt = data.toPyDateTime()
         iso_str = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         return iso_str
+
+
+
+
+
+from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QLabel, QLineEdit, QMainWindow, QWidget, QHBoxLayout
+from PyQt5.QtCore import Qt
+
+class LoginWindow(QMainWindow):
+    def __init__(self):
+        super().__init__()
+
+        self.setWindowTitle("Login")
+        self.setFixedSize(300, 150)
+
+        self.central_widget = QWidget()
+        self.setCentralWidget(self.central_widget)
+
+
+        layout = QVBoxLayout()
+
+        self.label_usuario = QLabel("Usuário:")
+        self.label_usuario.setStyleSheet("font-size: 16px;") 
+        layout.addWidget(self.label_usuario)
+
+        self.campo_usuario = QLineEdit()
+        self.campo_usuario.setPlaceholderText("Digite seu usuário")
+        self.campo_usuario.setStyleSheet("font-size: 16px; height: 30px;") 
+        layout.addWidget(self.campo_usuario)
+
+
+        self.label_senha = QLabel("Senha:")
+        self.label_senha.setStyleSheet("font-size: 16px;") 
+        layout.addWidget(self.label_senha)
+
+       
+        senha_layout = QHBoxLayout()
+
+        self.campo_senha = QLineEdit()
+        self.campo_senha.setPlaceholderText("Digite sua senha")
+        self.campo_senha.setEchoMode(QLineEdit.Password)  
+        self.campo_senha.setStyleSheet("font-size: 16px; height: 30px;") 
+        senha_layout.addWidget(self.campo_senha)
+
+      
+        self.botao_olho = QPushButton("👁️")
+        self.botao_olho.setFlat(True)  
+        self.botao_olho.clicked.connect(self.toggle_senha_visivel)
+        self.botao_olho.setFixedWidth(30) 
+        senha_layout.addWidget(self.botao_olho)
+        self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;") 
+
+        layout.addLayout(senha_layout)
+
+        self.botao_login = QPushButton("Entrar")
+        self.botao_login.setStyleSheet("font-size: 16px; height: 30px;") 
+        self.botao_login.clicked.connect(self.fazer_login)
+        layout.addWidget(self.botao_login)
+
+
+        self.central_widget.setLayout(layout)
+
+    def toggle_senha_visivel(self):
+
+        if self.campo_senha.echoMode() == QLineEdit.Password:
+            self.campo_senha.setEchoMode(QLineEdit.Normal) 
+            self.botao_olho.setText("❌") 
+            self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;")  
+        else:
+            self.campo_senha.setEchoMode(QLineEdit.Password)  
+            self.botao_olho.setText("👁️") 
+            self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;") 
+
+    def fazer_login(self):
+
+        usuario_campo = self.campo_usuario.text().strip()
+        senha_campo = self.campo_senha.text().strip()
+
+        try:
+  
+            user_ref = ref.child(f"Usuario/{usuario_campo}")
+            user_data = user_ref.get()
+
+
+            if user_data:
+                senha_servidor = user_data.get("Senha")  
+                if senha_servidor == senha_campo:
+                    QApplication.processEvents()
+                    self.label_usuario.setText("Usuário logado")
+                    self.label_usuario.setStyleSheet("color: green; font-size: 16px")
+                    time.sleep(0.5)
+                    QApplication.processEvents()
+                    self.close()  
+                    
+                    ui.campo_usuario.setText(f"{usuario_campo}")
+                    ui.campo_senha_usuario.setText(f"{senha_servidor}")
+                    
+                    janela.show()
+
+                else:
+                    self.label_usuario.setText("Senha inválida")
+                    self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+            else:
+                self.label_usuario.setText("Usuário não encontrado")
+                self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+        except Exception as e:
+            self.label_usuario.setText("Erro de conexão com o servidor")
+            self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+            print("Erro ao conectar ao Firebase:", e)
+
+
 
 
 
@@ -2874,10 +3016,13 @@ ui.rb_videook.clicked.connect(lambda:banco_dados.alteracao_status())
 ui.rb_verificacao.clicked.connect(lambda:banco_dados.alteracao_status())
 ui.rb_digitacao.clicked.connect(lambda:banco_dados.alteracao_status())
 ui.botao_ocultar_senha.clicked.connect(lambda:funcoes_app.mostrar_senha())
+ui.botao_ocultar_senha_usuario.clicked.connect(lambda:funcoes_app.mostrar_senha_usuario())
 ui.botao_link_venda.clicked.connect(lambda:funcoes_app.pegar_link_venda())
 ui.botao_envio_massa.clicked.connect(lambda:funcoes_app.envio_em_massa())
 
 #Campos de formatação
+ui.campo_senha_usuario.setReadOnly(False) 
+ui.campo_usuario.setReadOnly(True) 
 ui.campo_comentario.setAcceptRichText(False)    
 ui.caminho_pasta_principal.setReadOnly(True)
 ui.campo_relatorio.setReadOnly(True)
@@ -2947,6 +3092,7 @@ ui.barra_progresso_consulta.setVisible(False)
 
 screen_rect = desktop.screenGeometry(desktop.primaryScreen())
 ui.campo_senha_email.setEchoMode(QLineEdit.Password)
+ui.campo_senha_usuario.setEchoMode(QLineEdit.Password)
 
 
 x = screen_rect.width() - janela.width() - 20
@@ -2955,8 +3101,9 @@ y = (screen_rect.height() - janela.height()) // 5
 
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(151, 53)           
-janela.show()
+janela.setFixedSize(151, 53)   
+janelaLogin = LoginWindow()        
+janelaLogin.show()
 
 
 sys.exit(app.exec_())
