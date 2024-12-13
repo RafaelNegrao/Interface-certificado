@@ -257,31 +257,33 @@ class FuncoesPadrao:
 
                 Pedidos = ref.get()
 
-                # Inicializando contadores para cada semana
                 semanas = [0, 0, 0, 0, 0]
 
-                # Obter a data do campo ui.campo_data_meta
+
                 mes_meta = ui.campo_data_meta.date().month()
                 ano_meta = ui.campo_data_meta.date().year()
 
-                # Identificar o último dia do mês dinamicamente
+
                 ultimo_dia = calendar.monthrange(ano_meta, mes_meta)[1]
 
                 for pedido_info in Pedidos:
-                    if Pedidos[pedido_info]['STATUS'] == "APROVADO":
-                        data_pedido = Pedidos[pedido_info]['DATA']
-                        data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
+                    try:
+                        if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                            data_pedido = Pedidos[pedido_info]['DATA']
+                            data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
 
-                        if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
-                            semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
+                            if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
+                                semana_do_mes = data_formatada.isocalendar()[1] - (datetime.datetime(data_formatada.year, data_formatada.month, 1).isocalendar()[1] - 1)
 
-                            if semana_do_mes in range(1, 6):
-                                try:
-                                    preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
-                                    desconto = 1 - (ui.campo_desconto.value() / 100)
-                                    semanas[semana_do_mes - 1] += preco * desconto
-                                except:
-                                    pass
+                                if semana_do_mes in range(1, 6):
+                                    try:
+                                        preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
+                                        desconto = 1 - (ui.campo_desconto.value() / 100)
+                                        semanas[semana_do_mes - 1] += preco * desconto
+                                    except:
+                                        pass
+                    except:
+                        pass
 
                 # Atualiza os campos da interface gráfica com os valores calculados
                 ui.campo_certificados_semana_1.setText(str(semanas[0]))
@@ -925,7 +927,7 @@ class FuncoesPadrao:
             data_final = banco_dados.data_para_iso(QDateTime(ui.campo_data_ate.date()))
 
             # Consulte o banco de dados usando as datas no formato ISO
-            pedidos_ref = ref.child("Pedidos").order_by_child("DATA") \
+            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("DATA") \
                             .start_at(data_inicial) \
                             .end_at(data_final)
             req = pedidos_ref.get()
@@ -1756,10 +1758,10 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             ui.tableWidget.setColumnWidth(3, 113)
             ui.tableWidget.setColumnWidth(4, 181)  
 
-            pedidos_ref = ref.child("Pedidos").order_by_child("STATUS").equal_to("APROVADO")
+            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
 
-            ref_link_venda = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados/")
+            ref_link_venda = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
 
             lista_certificados = ref_link_venda.get()
             range_validacao = ui.campo_dias_renovacao.value()
@@ -1834,7 +1836,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                     enviar_email = True
                     env += 1
 
-                    ref.child("Pedidos").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
+                    ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
 
 
                 row_position = ui.tableWidget.rowCount()
@@ -2043,6 +2045,7 @@ class AcoesBancoDeDados:
         
 
     def salvar_pedido(self):
+        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
         try:
             if not self.analise_de_campos():
                 return
@@ -2210,19 +2213,33 @@ class AcoesBancoDeDados:
     
          
     def dicionario_banco_de_dados(self):
-        duracoes_certificado = {
-            "12": datetime.timedelta(days=365),
-            "18": datetime.timedelta(days=540),
-            "24": datetime.timedelta(days=720),
-            "36": datetime.timedelta(days=1080)
-        }
-        
-        data_validacao = datetime.datetime.strptime(ui.campo_data_agendamento.date().toString("yyyy-MM-dd"), "%Y-%m-%d")
-        certificado_duracao = duracoes_certificado.get(ui.campo_lista_versao_certificado.currentText(), datetime.timedelta(days=0))
-        duracao_certificado = data_validacao + certificado_duracao
 
+        # Data de agendamento (data de validação)
+        data_qdate = ui.campo_data_agendamento.date()  # Retorna um QDate
+        data_validacao = datetime.datetime(data_qdate.year(), data_qdate.month(), data_qdate.day())
+
+        # Captura a versão do certificado e normaliza o texto
+        versao_certificado = str(ui.campo_lista_versao_certificado.currentText()).strip()
+
+        # Verifica se o valor capturado contém "12", "18", "24", ou "36"
+        if "12" in versao_certificado:
+            dias_duracao = 365
+        elif "18" in versao_certificado:
+            dias_duracao = 540
+        elif "24" in versao_certificado:
+            dias_duracao = 720
+        elif "36" in versao_certificado:
+            dias_duracao = 1080
+        else:
+            dias_duracao = 0  # Valor padrão para casos inválidos
+
+        # Calcula a data de validade somando a duração ao agendamento
+        duracao_certificado = data_validacao + datetime.timedelta(days=dias_duracao)
+
+        # Renova status se o email foi enviado
         renova = "SIM" if ui.campo_email_enviado.text() == "SIM" else "NAO"
 
+        # Dados do pedido
         novos_dados = {
             "PASTA": ui.caminho_pasta.text(),
             "MUNICIPIO": ui.campo_cnpj_municipio.text(),
@@ -2238,7 +2255,7 @@ class AcoesBancoDeDados:
             "NASCIMENTO": ui.campo_data_nascimento.text(),
             "STATUS": self.alteracao_status(),
             "PEDIDO": ui.campo_pedido.text(),
-            "DATA": self.data_para_iso(QDateTime(ui.campo_data_agendamento.date())),
+            "DATA": self.data_para_iso(QDateTime(ui.campo_data_agendamento.date())),  # Passando o QDateTime
             "HORA": ui.campo_hora_agendamento.text(),
             "VENDA": ui.campo_lista_venda.currentText(),
             "MODALIDADE": ui.campo_lista_modalidade.currentText(),
@@ -2249,20 +2266,30 @@ class AcoesBancoDeDados:
             "PIS": ui.campo_pis.text(),
             "TELEFONE": ui.campo_telefone.text(),
             "OAB": ui.campo_funcional.text(),
-            "VALIDO ATE": "",
-            "EMAIL RENOVACAO": renova
+            "EMAIL RENOVACAO": renova,
+            "VALIDO ATE": self.data_para_iso(QDateTime.fromString(duracao_certificado.strftime('%Y-%m-%d %H:%M:%S'), 'yyyy-MM-dd HH:mm:ss'))  # Data ajustada com validade
         }
 
-        # Limpa dos dados se o status for "DEFINITIVO"
+        # Se o status for DEFINITIVO, adiciona a data de validade e limpa campos
         if self.verificar_status() == "DEFINITIVO":
-            campos_para_limpar = ["PASTA", "MUNICIPIO", "CODIGO DE SEG CNH", "RG", "CPF", "CNH", "MAE", "CNPJ", "NASCIMENTO", "RAZAO SOCIAL", "ORGAO RG", "PIS", "OAB"]
+            campos_para_limpar = [
+                "PASTA", "MUNICIPIO", "CODIGO DE SEG CNH", "RG", "CPF", "CNH", "MAE", 
+                "CNPJ", "NASCIMENTO", "RAZAO SOCIAL", "ORGAO RG", "PIS", "OAB"
+            ]
             novos_dados.update({campo: None for campo in campos_para_limpar})
-            novos_dados["VALIDO ATE"] = duracao_certificado.strftime("%Y-%m-%dT%H:%M:%SZ")
 
-        # Filtrar chaves não vazias
+            # Adiciona a data de validade no formato ISO
+            novos_dados["VALIDO ATE"] = self.data_para_iso(QDateTime.fromString(duracao_certificado.strftime('%Y-%m-%d %H:%M:%S'), 'yyyy-MM-dd HH:mm:ss'))
+
+        # Filtra as chaves que não são vazias
         dados_filtrados = {chave: valor for chave, valor in novos_dados.items() if valor not in [None, ""]}
 
         return dados_filtrados
+
+
+
+
+
 
 
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
@@ -2299,13 +2326,12 @@ class AcoesBancoDeDados:
 
 
     def carregar_dados(self):
+        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
         try:
             num_pedido = ui.campo_pedido.text()
 
             if num_pedido == "":
                 return
-
-            self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
 
             pedido_ref = self.ref.child(num_pedido)
             pedido_data = pedido_ref.get()
@@ -2322,6 +2348,7 @@ class AcoesBancoDeDados:
 
 
     def pegar_valor_tabela(self):
+        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
    #evento disparado ao dar double click na tabela
 
         item = ui.tableWidget.currentItem() 
@@ -2461,10 +2488,10 @@ class AcoesBancoDeDados:
 
     def contar_verificacao(self):
         # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
-        pedidos_verificacao = ref.child("Pedidos").order_by_child("STATUS").equal_to("VERIFICAÇÃO").get()
+        pedidos_verificacao = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("STATUS").equal_to("VERIFICAÇÃO").get()
         
         # Consulta no Firebase para pedidos com status "VIDEO REALIZADA"
-        pedidos_videook = ref.child("Pedidos").order_by_child("STATUS").equal_to("VIDEO REALIZADA").get()
+        pedidos_videook = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("STATUS").equal_to("VIDEO REALIZADA").get()
 
         quantidade_verificacao = 0  
         quantidade_videook = 0 
@@ -2824,8 +2851,9 @@ class LoginWindow(QMainWindow):
                     QApplication.processEvents()
                     self.label_usuario.setText("Usuário logado")
                     self.label_usuario.setStyleSheet("color: green; font-size: 16px")
-                    time.sleep(0.5)
+                    
                     QApplication.processEvents()
+                    time.sleep(0.5)
                     self.close()  
                     
                     ui.campo_usuario.setText(f"{usuario_campo}")
