@@ -38,7 +38,8 @@ QWidget,
 QGridLayout,
 QComboBox,
 QLabel,
-QHBoxLayout
+QHBoxLayout,
+QProgressDialog
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
@@ -55,9 +56,10 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from collections import Counter,defaultdict
 import numpy as np
 import mplcursors
-import calendar  # Para identificar o último dia do mês
+import calendar  
 from interfaceUpdates import AlteracoesInterface
-import webbrowser
+
+
 
 
 ref = db.reference("/")
@@ -71,77 +73,174 @@ class FuncoesPadrao:
         self.parent = parent
         self.versao = "1.0.1"
 
+
+
     def verificar_atualizacao(self):
-        """
-        Verifica se há uma nova versão no GitHub e abre a página do release se necessário.
-        """
         GITHUB_API_URL = "https://api.github.com/repos/RafaelNegrao/Interface-certificado/releases/latest"
         try:
             response = requests.get(GITHUB_API_URL)
             response.raise_for_status()
             dados_release = response.json()
 
-            ultima_versao = dados_release["tag_name"]  # Obtém a versão mais recente
-            url_release = dados_release["html_url"]   # URL do release
+            ultima_versao = dados_release["tag_name"]
+            assets = dados_release.get("assets", [])
 
             if self.comparar_versoes(self.versao, ultima_versao):
-                # Criação da janela de mensagem
-                self.mostrar_janela_confirmacao(ultima_versao, url_release)
+                if assets:
+                    download_url = assets[0]["browser_download_url"]
+                    self.mostrar_janela_confirmacao(ultima_versao, download_url)
+                    
+                else:
+                    QMessageBox.information(self.parent, "Atualização", "Nova versão disponível, mas sem arquivos para baixar.")
+                    sys.exit(0)
             else:
-                # Mensagem indicando que o programa já está atualizado
                 pass
-
         except requests.exceptions.RequestException as e:
-            # Exibe a mensagem de erro de rede
-            pass
+            QMessageBox.critical(self.parent, "Erro de Rede", f"Falha ao verificar atualizações:\n{str(e)}")
 
-
-
-    def mostrar_janela_confirmacao(self, ultima_versao, url_release):
-        """
-        Exibe uma janela de confirmação perguntando se o usuário quer abrir a página de atualização.
-        """
-        # Criar a caixa de diálogo
-        msg_box = QMessageBox()
+    def mostrar_janela_confirmacao(self, ultima_versao, download_url):
+        msg_box = QMessageBox(self.parent)
         msg_box.setIcon(QMessageBox.Information)
         msg_box.setWindowTitle("Atualização disponível")
+        msg_box.setText(f"Nova versão disponível: {ultima_versao}.\nVersão atual: {self.versao}.\n")
         
-        # Mensagem que será exibida
-        msg_box.setText(f"Nova versão disponível: {ultima_versao}.\nVersão atual: {self.versao}.\n\n"
-                        "Gostaria de abrir o site de atualização?")
+        # Define apenas um botão "Atualizar"
+        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
         
-        # Adiciona os botões Yes e No
-        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        # Renomeia o botão "Ok" para "Atualizar"
+        msg_box.button(QMessageBox.Ok).setText("Atualizar")
         
-        # Exibe a caixa de diálogo e verifica a resposta
+        # Exibe a mensagem e aguarda a resposta
         resposta = msg_box.exec_()
-        
-        if resposta == QMessageBox.Yes:
-            # Abre o navegador com a URL do release
-            webbrowser.open(url_release)
-            QApplication.quit()  # Encerra o programa imediatamente após abrir o navegador
+
+        # Se o usuário clicar em "Atualizar", retorna True para continuar com o download
+        if resposta == QMessageBox.Ok:
+            self.baixar_arquivo(download_url, ultima_versao)
         else:
-            # Caso o usuário escolha "No", o programa não é encerrado e segue normalmente
-            pass  # O programa continuará normalmente
+            sys.exit(0)
+            # Se o usuário clicar no "X" ou "Cancelar", encerra a aplicação sem continuar
+
+    def atualizar(novo_arquivo):
+        try:
+            # Caminho do executável atual
+            executavel_atual = os.path.join(os.getcwd(), "Auxiliar.exe")  # Nome do executável atual
+            # Exclui o executável atual, se existir
+            if os.path.exists(executavel_atual):
+                os.remove(executavel_atual)
+
+            # Renomeia o novo arquivo para o nome do executável
+            shutil.move(novo_arquivo, executavel_atual)
+            print("Atualização concluída com sucesso!")
+        except Exception as e:
+            print(f"Ocorreu um erro ao atualizar: {str(e)}")
 
 
-    def comparar_versoes(self, versao_local, versao_remota):
-        """
-        Compara duas versões no formato 'x.y.z' e retorna True se a versão remota for mais recente.
-        """
-        partes_local = list(map(int, versao_local.split('.')))
-        partes_remota = list(map(int, versao_remota.split('.')))
 
-        # Comparação numérica
-        for v_local, v_remota in zip(partes_local, partes_remota):
-            if v_remota > v_local:
-                return True
-            elif v_remota < v_local:
-                return False
+    def baixar_arquivo(self, download_url, nova_versao):
+        try:
+            nome_arquivo = f"Auxiliar-{nova_versao}.exe"  # Nome do novo arquivo
+            caminho_arquivo = os.path.join(os.getcwd(), nome_arquivo)
 
-        # Se forem iguais até agora, a versão remota pode ter mais subversões
-        return len(partes_remota) > len(partes_local)
+            response = requests.get(download_url, stream=True)
+            response.raise_for_status()
 
+            total_tamanho = int(response.headers.get('content-length', 0))
+            download_size = 0
+
+            # Cria um QProgressDialog para mostrar o progresso
+            progress_dialog = QProgressDialog("Baixando atualização...", "Cancelar", 0, 100, self.parent)
+            progress_dialog.setWindowTitle("Progresso do Download")
+            progress_dialog.setModal(True)
+            progress_dialog.setValue(0)
+
+            with open(caminho_arquivo, "wb") as f:
+                for chunk in response.iter_content(chunk_size=1024):
+                    if chunk:
+                        f.write(chunk)
+                        download_size += len(chunk)
+                        progress = (download_size / total_tamanho) * 100
+                        progress_dialog.setValue(int(progress))
+
+                        # Verifica se o usuário cancelou o download
+                        if progress_dialog.wasCanceled():
+                            QMessageBox.information(self.parent, "Download Cancelado", "O download foi cancelado.")
+                            sys.exit(0)
+
+            self.iniciar_atualizador(caminho_arquivo)
+
+        except requests.exceptions.RequestException as e:
+            QMessageBox.critical(self.parent, "Erro de Download", f"Ocorreu um erro durante o download:\n{str(e)}")
+        except Exception as e:
+            QMessageBox.critical(self.parent, "Erro Inesperado", f"Ocorreu um erro inesperado:\n{str(e)}")
+
+    def iniciar_atualizador(self, novo_arquivo):
+        try:
+            import os
+            import sys
+
+            caminho_antigo = os.path.join(os.getcwd(), "Auxiliar.exe")
+            caminho_novo = os.path.abspath(novo_arquivo)  # Garante caminho absoluto
+            script_bat = os.path.abspath("atualizar.bat")  # Caminho completo para o batch
+            
+            # Verifica se o novo arquivo existe
+            if not os.path.exists(caminho_novo):
+                raise FileNotFoundError(f"O arquivo {caminho_novo} não foi encontrado.")
+            
+            # Conteúdo do script batch
+            conteudo_bat = f"""
+            @echo off
+            title Atualizando o Programa
+            echo Aguardando o encerramento do programa antigo...
+
+            :loop
+            tasklist /fi "imagename eq Auxiliar.exe" | find /i "Auxiliar.exe" >nul
+            if not errorlevel 1 (
+                timeout /t 1 >nul
+                goto loop
+            )
+
+            echo Encerrando o programa antigo...
+            taskkill /im "Auxiliar.exe" /f >nul 2>&1  # Força o encerramento do programa antigo
+
+            echo Excluindo o arquivo antigo...
+            del "{caminho_antigo}" >nul 2>&1  # Exclui o arquivo antigo
+
+            echo Renomeando o novo arquivo...
+            timeout /t 2 >nul 2>&1
+            ren "{caminho_novo}" "Auxiliar.exe"
+            
+            echo Iniciando o novo programa...
+            timeout /t 2 >nul 2>&1
+            start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}"
+            
+            echo Limpando arquivos temporários...
+            del "%~f0" >nul 2>&1
+            """
+            
+            # Salva o script batch no disco
+            with open(script_bat, "w") as f:
+                f.write(conteudo_bat)
+            
+            # Executa o script batch de forma independente
+            os.system(f'start /b cmd /c "{script_bat}"')
+            
+            # Encerra o programa principal
+            sys.exit(0)
+        
+        except Exception as e:
+            from PyQt5.QtWidgets import QMessageBox
+            QMessageBox.critical(self, "Erro ao Iniciar Atualizador", f"Falha ao iniciar o atualizador:\n{str(e)}")
+    
+
+
+
+
+
+    def comparar_versoes(self, versao_atual, nova_versao):
+        return tuple(map(int, versao_atual.split("."))) < tuple(map(int, nova_versao.split(".")))
+
+
+    
 
     def evento_ao_abrir(self,event):
 
@@ -2913,7 +3012,7 @@ class LoginWindow(QMainWindow):
                 senha_servidor = user_data.get("Senha")  
                 if senha_servidor == senha_campo:
                     QApplication.processEvents()
-                    self.label_usuario.setText("Usuário logado")
+                    self.label_usuario.setText("Usuário logado com sucesso")
                     self.label_usuario.setStyleSheet("color: green; font-size: 16px")
                     
                     QApplication.processEvents()
@@ -3019,6 +3118,10 @@ class JanelaOculta:
            (passo_largura < 0 and nova_largura <= self.largura_destino_animacao):
             self.temporizador_animacao.stop()
             self.pai.setFixedSize(self.largura_destino_animacao, self.altura_destino_animacao)
+
+
+
+
 
 
 app = QtWidgets.QApplication(sys.argv)
