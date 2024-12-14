@@ -38,11 +38,10 @@ QWidget,
 QGridLayout,
 QComboBox,
 QLabel,
-QHBoxLayout,
-QProgressDialog
+QHBoxLayout
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator, QPalette, QBrush, QLinearGradient
 from Interface import Ui_janela
 from firebase_admin import db
 from requests.exceptions import RequestException
@@ -58,6 +57,7 @@ import numpy as np
 import mplcursors
 import calendar  
 from interfaceUpdates import AlteracoesInterface
+from update import Atualizar
 
 
 
@@ -71,181 +71,14 @@ class FuncoesPadrao:
         self.ui = ui
         self.acoes = AcoesBancoDeDados(ui)
         self.parent = parent
-        self.versao = "1.0.1"
 
-
-
-    def verificar_atualizacao(self):
-        GITHUB_API_URL = "https://api.github.com/repos/RafaelNegrao/Interface-certificado/releases/latest"
-        try:
-            response = requests.get(GITHUB_API_URL)
-            response.raise_for_status()
-            dados_release = response.json()
-
-            ultima_versao = dados_release["tag_name"]
-            assets = dados_release.get("assets", [])
-
-            if self.comparar_versoes(self.versao, ultima_versao):
-                if assets:
-                    download_url = assets[0]["browser_download_url"]
-                    self.mostrar_janela_confirmacao(ultima_versao, download_url)
-                    
-                else:
-                    QMessageBox.information(self.parent, "Atualização", "Nova versão disponível, mas sem arquivos para baixar.")
-                    sys.exit(0)
-            else:
-                pass
-        except requests.exceptions.RequestException as e:
-            QMessageBox.critical(self.parent, "Erro de Rede", f"Falha ao verificar atualizações:\n{str(e)}")
-
-    def mostrar_janela_confirmacao(self, ultima_versao, download_url):
-        msg_box = QMessageBox(self.parent)
-        msg_box.setIcon(QMessageBox.Information)
-        msg_box.setWindowTitle("Atualização disponível")
-        msg_box.setText(f"Nova versão disponível: {ultima_versao}.\nVersão atual: {self.versao}.\n")
-        
-        # Define apenas um botão "Atualizar"
-        msg_box.setStandardButtons(QMessageBox.Ok | QMessageBox.Cancel)
-        
-        # Renomeia o botão "Ok" para "Atualizar"
-        msg_box.button(QMessageBox.Ok).setText("Atualizar")
-        
-        # Exibe a mensagem e aguarda a resposta
-        resposta = msg_box.exec_()
-
-        # Se o usuário clicar em "Atualizar", retorna True para continuar com o download
-        if resposta == QMessageBox.Ok:
-            self.baixar_arquivo(download_url, ultima_versao)
-        else:
-            sys.exit(0)
-            # Se o usuário clicar no "X" ou "Cancelar", encerra a aplicação sem continuar
-
-    def atualizar(novo_arquivo):
-        try:
-            # Caminho do executável atual
-            executavel_atual = os.path.join(os.getcwd(), "Auxiliar.exe")  # Nome do executável atual
-            # Exclui o executável atual, se existir
-            if os.path.exists(executavel_atual):
-                os.remove(executavel_atual)
-
-            # Renomeia o novo arquivo para o nome do executável
-            shutil.move(novo_arquivo, executavel_atual)
-            print("Atualização concluída com sucesso!")
-        except Exception as e:
-            print(f"Ocorreu um erro ao atualizar: {str(e)}")
-
-
-
-    def baixar_arquivo(self, download_url, nova_versao):
-        try:
-            nome_arquivo = f"Auxiliar-{nova_versao}.exe"  # Nome do novo arquivo
-            caminho_arquivo = os.path.join(os.getcwd(), nome_arquivo)
-
-            response = requests.get(download_url, stream=True)
-            response.raise_for_status()
-
-            total_tamanho = int(response.headers.get('content-length', 0))
-            download_size = 0
-
-            # Cria um QProgressDialog para mostrar o progresso
-            progress_dialog = QProgressDialog("Baixando atualização...", "Cancelar", 0, 100, self.parent)
-            progress_dialog.setWindowTitle("Progresso do Download")
-            progress_dialog.setModal(True)
-            progress_dialog.setValue(0)
-
-            with open(caminho_arquivo, "wb") as f:
-                for chunk in response.iter_content(chunk_size=1024):
-                    if chunk:
-                        f.write(chunk)
-                        download_size += len(chunk)
-                        progress = (download_size / total_tamanho) * 100
-                        progress_dialog.setValue(int(progress))
-
-                        # Verifica se o usuário cancelou o download
-                        if progress_dialog.wasCanceled():
-                            QMessageBox.information(self.parent, "Download Cancelado", "O download foi cancelado.")
-                            sys.exit(0)
-
-            self.iniciar_atualizador(caminho_arquivo)
-
-        except requests.exceptions.RequestException as e:
-            QMessageBox.critical(self.parent, "Erro de Download", f"Ocorreu um erro durante o download:\n{str(e)}")
-        except Exception as e:
-            QMessageBox.critical(self.parent, "Erro Inesperado", f"Ocorreu um erro inesperado:\n{str(e)}")
-
-    def iniciar_atualizador(self, novo_arquivo):
-        try:
-            import os
-            import sys
-
-            caminho_antigo = os.path.join(os.getcwd(), "Auxiliar.exe")
-            caminho_novo = os.path.abspath(novo_arquivo)  # Garante caminho absoluto
-            script_bat = os.path.abspath("atualizar.bat")  # Caminho completo para o batch
-            
-            # Verifica se o novo arquivo existe
-            if not os.path.exists(caminho_novo):
-                raise FileNotFoundError(f"O arquivo {caminho_novo} não foi encontrado.")
-            
-            # Conteúdo do script batch
-            conteudo_bat = f"""
-            @echo off
-            title Atualizando o Programa
-            echo Aguardando o encerramento do programa antigo...
-
-            :loop
-            tasklist /fi "imagename eq Auxiliar.exe" | find /i "Auxiliar.exe" >nul
-            if not errorlevel 1 (
-                timeout /t 1 >nul
-                goto loop
-            )
-
-            echo Encerrando o programa antigo...
-            taskkill /im "Auxiliar.exe" /f >nul 2>&1  # Força o encerramento do programa antigo
-
-            echo Excluindo o arquivo antigo...
-            del "{caminho_antigo}" >nul 2>&1  # Exclui o arquivo antigo
-
-            echo Renomeando o novo arquivo...
-            timeout /t 2 >nul 2>&1
-            ren "{caminho_novo}" "Auxiliar.exe"
-            
-            echo Iniciando o novo programa...
-            timeout /t 2 >nul 2>&1
-            start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}"
-            
-            echo Limpando arquivos temporários...
-            del "%~f0" >nul 2>&1
-            """
-            
-            # Salva o script batch no disco
-            with open(script_bat, "w") as f:
-                f.write(conteudo_bat)
-            
-            # Executa o script batch de forma independente
-            os.system(f'start /b cmd /c "{script_bat}"')
-            
-            # Encerra o programa principal
-            sys.exit(0)
-        
-        except Exception as e:
-            from PyQt5.QtWidgets import QMessageBox
-            QMessageBox.critical(self, "Erro ao Iniciar Atualizador", f"Falha ao iniciar o atualizador:\n{str(e)}")
-    
-
-
-
-
-
-    def comparar_versoes(self, versao_atual, nova_versao):
-        return tuple(map(int, versao_atual.split("."))) < tuple(map(int, nova_versao.split(".")))
-
-
-    
 
     def evento_ao_abrir(self,event):
 
-        self.ui.label_versao.setText(f"{self.versao}")
-        self.verificar_atualizacao()
+        
+        atualizar = Atualizar(parent=self.parent)
+        atualizar.verificar_atualizacao()
+        self.ui.label_versao.setText(atualizar.versao)
         hora_atual = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M")
         self.login = db.reference(f"Usuario/{ui.campo_usuario.text()}/Hora Login")
         self.login.set(hora_atual)
@@ -257,6 +90,7 @@ class FuncoesPadrao:
         AlteracoesInterface.apagar_label_status_bd(self)
         self.ui.campo_status_bd.setToolTip("")
         banco_dados.contar_verificacao()
+
 
 
     def evento_ao_fechar(self,event):
@@ -2931,111 +2765,133 @@ Vendas..........{venda}
 
 
 
-
 class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Login")
-        self.setFixedSize(300, 150)
+      
+        self.fundo_cor = "rgb(40, 42, 54)" 
+        self.campo_texto_cor = "rgb(210, 210, 210)"  
+        self.campo_fundo_cor = "rgb(30, 30, 30)" 
+        self.botao_cor = "rgb(0, 122, 255)"  
+        self.cor_login = "rgb(210, 210, 210)"
 
+        self.setWindowTitle("Login")
+        self.setFixedSize(300, 300)
+
+      
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
 
-
+       
         layout = QVBoxLayout()
-
-        self.label_usuario = QLabel("Usuário:")
-        self.label_usuario.setStyleSheet("font-size: 16px;") 
-        layout.addWidget(self.label_usuario)
-
-        self.campo_usuario = QLineEdit()
-        self.campo_usuario.setPlaceholderText("Digite seu usuário")
-        self.campo_usuario.setStyleSheet("font-size: 16px; height: 30px;") 
-        layout.addWidget(self.campo_usuario)
-
-
-        self.label_senha = QLabel("Senha:")
-        self.label_senha.setStyleSheet("font-size: 16px;") 
-        layout.addWidget(self.label_senha)
+        layout.setAlignment(Qt.AlignCenter)
+        layout.setSpacing(20)  
 
        
-        senha_layout = QHBoxLayout()
+        self.label_titulo = QLabel("Login")
+        self.label_titulo.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {self.cor_login}; font-family: Consolas;")
+        self.label_titulo.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.label_titulo)
 
+        
+        self.campo_usuario = QLineEdit()
+        self.campo_usuario.setPlaceholderText("Nome")
+        self.campo_usuario.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Consolas;")
+        self.campo_usuario.setFocusPolicy(Qt.StrongFocus)  
+        layout.addWidget(self.campo_usuario)
+
+    
+        senha_layout = QHBoxLayout()
+        senha_layout.setContentsMargins(0, 0, 0, 0) 
         self.campo_senha = QLineEdit()
-        self.campo_senha.setPlaceholderText("Digite sua senha")
-        self.campo_senha.setEchoMode(QLineEdit.Password)  
-        self.campo_senha.setStyleSheet("font-size: 16px; height: 30px;") 
+        self.campo_senha.setPlaceholderText("Senha")
+        self.campo_senha.setEchoMode(QLineEdit.Password)
+        self.campo_senha.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Consolas;")
+        self.campo_senha.setFocusPolicy(Qt.StrongFocus)  
         senha_layout.addWidget(self.campo_senha)
 
-      
+
         self.botao_olho = QPushButton("👁️")
-        self.botao_olho.setFlat(True)  
+        self.botao_olho.setStyleSheet(f"font-size: 25px; height: 40px; background-color: transparent; color: {self.campo_texto_cor}; border: none; padding: 0; font-family: Consolas;")
+        self.botao_olho.setFixedSize(35, 35)  
         self.botao_olho.clicked.connect(self.toggle_senha_visivel)
-        self.botao_olho.setFixedWidth(30) 
         senha_layout.addWidget(self.botao_olho)
-        self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;") 
 
         layout.addLayout(senha_layout)
 
+        
         self.botao_login = QPushButton("Entrar")
-        self.botao_login.setStyleSheet("font-size: 16px; height: 30px;") 
+        self.botao_login.setStyleSheet(f"font-size: 16px; height: 40px; background-color: {self.botao_cor}; color: {self.campo_texto_cor}; border-radius: 5px; font-family: Consolas;")
         self.botao_login.clicked.connect(self.fazer_login)
         layout.addWidget(self.botao_login)
 
+        
+        self.label_mensagem = QLabel("")
+        self.label_mensagem.setStyleSheet(f"font-size: 16px; color: {self.campo_texto_cor}; font-family: Consolas;")
+        self.label_mensagem.setAlignment(Qt.AlignCenter)
+        self.label_mensagem.setFocusPolicy(Qt.NoFocus) 
+        self.label_mensagem.hide()  
+        layout.addWidget(self.label_mensagem)
 
+        
         self.central_widget.setLayout(layout)
 
-    def toggle_senha_visivel(self):
+        # Estilizar o fundo da janela
+        self.setStyleSheet(f"background-color: {self.fundo_cor}; font-family: Consolas;")
 
+    def toggle_senha_visivel(self):
         if self.campo_senha.echoMode() == QLineEdit.Password:
-            self.campo_senha.setEchoMode(QLineEdit.Normal) 
-            self.botao_olho.setText("❌") 
-            self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;")  
+            self.campo_senha.setEchoMode(QLineEdit.Normal)
+            self.botao_olho.setText("❌")
         else:
-            self.campo_senha.setEchoMode(QLineEdit.Password)  
-            self.botao_olho.setText("👁️") 
-            self.botao_olho.setStyleSheet("font-size: 16px; height: 40px;") 
+            self.campo_senha.setEchoMode(QLineEdit.Password)
+            self.botao_olho.setText("👁️")
 
     def fazer_login(self):
-
         usuario_campo = self.campo_usuario.text().strip()
         senha_campo = self.campo_senha.text().strip()
 
         try:
-  
             user_ref = ref.child(f"Usuario/{usuario_campo}")
             user_data = user_ref.get()
 
+            # Exibe a mensagem e altera a cor
+            self.label_mensagem.show()
 
             if user_data:
-                senha_servidor = user_data.get("Senha")  
+                senha_servidor = user_data.get("Senha")
                 if senha_servidor == senha_campo:
-                    QApplication.processEvents()
-                    self.label_usuario.setText("Usuário logado com sucesso")
-                    self.label_usuario.setStyleSheet("color: green; font-size: 16px")
-                    
-                    QApplication.processEvents()
-                    time.sleep(0.5)
-                    self.close()  
-                    
+                    QApplication.processEvents() 
+                    self.label_mensagem.setText("")
+                    self.label_mensagem.setText("Usuário logado")
+                    self.label_mensagem.setStyleSheet("color: green; font-size: 16px; font-family: Consolas;")
+
+                    QApplication.processEvents() 
+                    QTimer.singleShot(500, self.close)
+
+                   
                     ui.campo_usuario.setText(f"{usuario_campo}")
                     ui.campo_senha_usuario.setText(f"{senha_servidor}")
-                    
+
                     janela.show()
 
                 else:
-                    self.label_usuario.setText("Senha inválida")
-                    self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+                    self.label_mensagem.setText("")
+                    self.label_mensagem.setText("Senha inválida")
+                    self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
+                    QApplication.processEvents() 
             else:
-                self.label_usuario.setText("Usuário não encontrado")
-                self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+                self.label_mensagem.setText("")
+                self.label_mensagem.setText("Usuário não encontrado")
+                self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
+                QApplication.processEvents() 
+
         except Exception as e:
-            self.label_usuario.setText("Erro de conexão com o servidor")
-            self.label_usuario.setStyleSheet("color: red; font-size: 16px")
+            self.label_mensagem.setText("")
+            self.label_mensagem.setText("Erro de conexão com o servidor")
+            self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
             print("Erro ao conectar ao Firebase:", e)
-
-
 
 
 
