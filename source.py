@@ -57,10 +57,10 @@ import numpy as np
 import mplcursors
 import calendar  # Para identificar o último dia do mês
 from interfaceUpdates import AlteracoesInterface
+import webbrowser
 
 
 ref = db.reference("/")
-
 
 
 
@@ -69,7 +69,113 @@ class FuncoesPadrao:
         self.ui = ui
         self.acoes = AcoesBancoDeDados(ui)
         self.parent = parent
+        self.versao = "1.0.1"
+
+    def verificar_atualizacao(self):
+        """
+        Verifica se há uma nova versão no GitHub e abre a página do release se necessário.
+        """
+        GITHUB_API_URL = "https://api.github.com/repos/RafaelNegrao/Interface-certificado/releases/latest"
+        try:
+            response = requests.get(GITHUB_API_URL)
+            response.raise_for_status()
+            dados_release = response.json()
+
+            ultima_versao = dados_release["tag_name"]  # Obtém a versão mais recente
+            url_release = dados_release["html_url"]   # URL do release
+
+            if self.comparar_versoes(self.versao, ultima_versao):
+                # Criação da janela de mensagem
+                self.mostrar_janela_confirmacao(ultima_versao, url_release)
+            else:
+                # Mensagem indicando que o programa já está atualizado
+                pass
+
+        except requests.exceptions.RequestException as e:
+            # Exibe a mensagem de erro de rede
+            pass
+
+
+
+    def mostrar_janela_confirmacao(self, ultima_versao, url_release):
+        """
+        Exibe uma janela de confirmação perguntando se o usuário quer abrir a página de atualização.
+        """
+        # Criar a caixa de diálogo
+        msg_box = QMessageBox()
+        msg_box.setIcon(QMessageBox.Information)
+        msg_box.setWindowTitle("Atualização disponível")
         
+        # Mensagem que será exibida
+        msg_box.setText(f"Nova versão disponível: {ultima_versao}.\nVersão atual: {self.versao}.\n\n"
+                        "Gostaria de abrir o site de atualização?")
+        
+        # Adiciona os botões Yes e No
+        msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        
+        # Exibe a caixa de diálogo e verifica a resposta
+        resposta = msg_box.exec_()
+        
+        if resposta == QMessageBox.Yes:
+            # Abre o navegador com a URL do release
+            webbrowser.open(url_release)
+            QApplication.quit()  # Encerra o programa imediatamente após abrir o navegador
+        else:
+            # Caso o usuário escolha "No", o programa não é encerrado e segue normalmente
+            pass  # O programa continuará normalmente
+
+
+    def comparar_versoes(self, versao_local, versao_remota):
+        """
+        Compara duas versões no formato 'x.y.z' e retorna True se a versão remota for mais recente.
+        """
+        partes_local = list(map(int, versao_local.split('.')))
+        partes_remota = list(map(int, versao_remota.split('.')))
+
+        # Comparação numérica
+        for v_local, v_remota in zip(partes_local, partes_remota):
+            if v_remota > v_local:
+                return True
+            elif v_remota < v_local:
+                return False
+
+        # Se forem iguais até agora, a versão remota pode ter mais subversões
+        return len(partes_remota) > len(partes_local)
+
+
+    def evento_ao_abrir(self,event):
+
+        self.ui.label_versao.setText(f"{self.versao}")
+        self.verificar_atualizacao()
+        hora_atual = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M")
+        self.login = db.reference(f"Usuario/{ui.campo_usuario.text()}/Hora Login")
+        self.login.set(hora_atual)
+        self.trazer_configuracoes()
+        self.trazer_metas()
+        self.definir_cor()
+        self.carregar_lista_certificados()
+        ui.campo_data_meta.setDate(QDate.currentDate())
+        AlteracoesInterface.apagar_label_status_bd(self)
+        self.ui.campo_status_bd.setToolTip("")
+        banco_dados.contar_verificacao()
+
+
+    def evento_ao_fechar(self,event):
+
+        
+        result = QMessageBox.question(janela, "Confirmação", "Você realmente deseja sair?", QMessageBox.Yes | QMessageBox.No)
+        
+        if result == QMessageBox.Yes:
+            try:
+                event.accept()
+                self.nova_janela.close()  
+            
+            except:
+                event.accept()
+                
+        else:
+            event.ignore()
+
 
     def atualizar_barras_metas(self):
         try:
@@ -226,7 +332,6 @@ class FuncoesPadrao:
                 
             except Exception as e:
                 self.mensagem_alerta("Erro",f"Erro ao adicionar configurações: {str(e)}")
-
 
 
     def trazer_metas(self):
@@ -457,9 +562,9 @@ class FuncoesPadrao:
 
 
     def converter_todas_imagens_para_pdf(self):
-        caminho_pasta = ui.caminho_pasta.text()
+        try:
+            caminho_pasta = ui.caminho_pasta.text()
 
-        if caminho_pasta != "":
             for arquivo in os.listdir(caminho_pasta):
                 if arquivo.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
                     imagem_path = os.path.join(caminho_pasta, arquivo)
@@ -478,13 +583,9 @@ class FuncoesPadrao:
 
                     # Fecha o arquivo PDF
                     pdf.save()
-            AlteracoesInterface.confirmar_label_converter_pdf(self)
+            AlteracoesInterface.animar_label_pular(self,self.ui.botao_converter_todas_imagens_em_pdf)
             self.atualizar_documentos_tabela()
-        else:
-            # Chama a Função de escolher o tipo de conversão de imagem
-            self.escolher_conversao()
-
-            # Atualiza a lista de documentos na tabela da janela 'Dados Pedido'
+        except:
             self.atualizar_documentos_tabela()
 
 
@@ -1097,6 +1198,7 @@ class FuncoesPadrao:
                 self.converter_pdf_para_jpg()
             dialog.accept()
         botao_confirmar.clicked.connect(confirmar)
+
         dialog.exec_()
 
 
@@ -1132,35 +1234,6 @@ class FuncoesPadrao:
         except:
             self.atualizar_documentos_tabela()
             AlteracoesInterface.negar_label_converter_pdf(self)
-
-
-    def evento_ao_abrir(self,event):
-        
-        self.trazer_configuracoes()
-        self.trazer_metas()
-        self.definir_cor()
-        self.carregar_lista_certificados()
-        ui.campo_data_meta.setDate(QDate.currentDate())
-        AlteracoesInterface.apagar_label_status_bd(self)
-        self.ui.campo_status_bd.setToolTip("")
-        banco_dados.contar_verificacao()
-
-
-    def evento_ao_fechar(self,event):
-
-        
-        result = QMessageBox.question(janela, "Confirmação", "Você realmente deseja sair?", QMessageBox.Yes | QMessageBox.No)
-        
-        if result == QMessageBox.Yes:
-            try:
-                event.accept()
-                self.nova_janela.close()  
-            
-            except:
-                event.accept()
-                
-        else:
-            event.ignore()
 
 
     def copiar_campo(self, nome_campo):
@@ -2287,11 +2360,6 @@ class AcoesBancoDeDados:
         return dados_filtrados
 
 
-
-
-
-
-
     def forcar_fechamento_de_arquivo_e_deletar_pasta(self,folder_path):
         for _ in range(3):  # Tenta fehar por 3 vezes
             try:
@@ -2765,10 +2833,6 @@ Vendas..........{venda}
 
 
 
-
-from PyQt5.QtWidgets import QPushButton, QVBoxLayout, QLabel, QLineEdit, QMainWindow, QWidget, QHBoxLayout
-from PyQt5.QtCore import Qt
-
 class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -3026,7 +3090,7 @@ ui.botao_pasta_cliente.clicked.connect(lambda:funcoes_app.criar_pasta_cliente())
 ui.botao_tela_cheia.clicked.connect(lambda: funcoes_app.manter_tela_aberta())
 ui.botao_tela_cheia.setFlat(True)
 ui.botao_converter_todas_imagens_em_pdf.clicked.connect(lambda:funcoes_app.converter_todas_imagens_para_pdf())
-ui.botao_converter_todas_imagens_em_pdf.setFlat(True)
+ui.botao_converter.clicked.connect(lambda:funcoes_app.escolher_conversao())
 ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())

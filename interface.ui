@@ -2822,6 +2822,73 @@ QLineEdit:disabled, QLineEdit:!focus {
        <string/>
       </property>
      </widget>
+     <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
+      <property name="geometry">
+       <rect>
+        <x>524</x>
+        <y>470</y>
+        <width>49</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>22</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string extracomment="Cria a link do vídeo">🔄️</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_versao">
+      <property name="geometry">
+       <rect>
+        <x>484</x>
+        <y>619</y>
+        <width>84</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>8</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;color:rgb(0,190,247)</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
+      </property>
+     </widget>
      <zorder>campo_cnh</zorder>
      <zorder>campo_seguranca_cnh</zorder>
      <zorder>campo_rg</zorder>
@@ -2894,6 +2961,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <zorder>botao_junta</zorder>
      <zorder>campo_email_enviado</zorder>
      <zorder>label_confirmacao_excluir</zorder>
+     <zorder>botao_converter_todas_imagens_em_pdf</zorder>
+     <zorder>label_versao</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -5849,7 +5918,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <bool>true</bool>
     </property>
    </widget>
-   <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
+   <widget class="QPushButton" name="botao_converter">
     <property name="geometry">
      <rect>
       <x>464</x>
@@ -6587,7 +6656,7 @@ QLineEdit:disabled, QLineEdit:!focus {
    <zorder>label_confirmacao_criar_link_video</zorder>
    <zorder>label_5</zorder>
    <zorder>campo_status_bd_2</zorder>
-   <zorder>botao_converter_todas_imagens_em_pdf</zorder>
+   <zorder>botao_converter</zorder>
    <zorder>botao_menagem</zorder>
    <zorder>botao_tela_cheia</zorder>
    <zorder>botao_print_direto_na_pasta</zorder>
@@ -6690,7 +6759,7 @@ QLineEdit:disabled, QLineEdit:!focus {
   <tabstop>campo_m12</tabstop>
   <tabstop>campo_m13</tabstop>
   <tabstop>botao_duplicar_pedido</tabstop>
-  <tabstop>botao_converter_todas_imagens_em_pdf</tabstop>
+  <tabstop>botao_converter</tabstop>
   <tabstop>botao_dados_cnpj</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>botao_hoje</tabstop>
