@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 class Atualizar:
     def __init__(self, parent=None):
         self.parent = parent
-        self.versao = "1.0.4" 
+        self.versao = "1.0.2" 
 
 
     def verificar_atualizacao(self):
@@ -112,7 +112,7 @@ class Atualizar:
             conteudo_bat = f"""
             @echo off
             title Atualizando o Programa
-            echo Aguardando o encerramento do programa antigo...
+            echo Aguardande...
 
             :loop
             tasklist /fi "imagename eq Auxiliar.exe" | find /i "Auxiliar.exe" >nul
@@ -121,16 +121,15 @@ class Atualizar:
                 goto loop
             )
 
-            echo Encerrando o programa antigo...
+            echo Encerrando o processo...
             taskkill /im "Auxiliar.exe" /f >nul 2>&1
 
-            echo Excluindo o arquivo antigo...
             del "{caminho_antigo}" >nul 2>&1
 
-            echo Renomeando o novo arquivo...
+            echo Aplicando atualizacao...
             ren "{caminho_novo}" "Auxiliar.exe"
 
-            echo Testando conexão com o Firebase...
+            echo Testando conexao com o Firebase...
             timeout /t 2 >nul 2>&1
 
             echo Conexao bem sucedida...
