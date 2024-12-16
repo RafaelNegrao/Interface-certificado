@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 class Atualizar:
     def __init__(self, parent=None):
         self.parent = parent
-        self.versao = "1.0.2" 
+        self.versao = "1.0.6" 
 
 
     def verificar_atualizacao(self):
@@ -110,34 +110,70 @@ class Atualizar:
                 raise FileNotFoundError(f"O arquivo {caminho_novo} não foi encontrado.")
 
             conteudo_bat = f"""
-            @echo off
-            title Atualizando o Programa
-            echo Aguardande...
+                @echo off
+                title Atualizando o Programa
+                echo Aguarde...
 
-            :loop
-            tasklist /fi "imagename eq Auxiliar.exe" | find /i "Auxiliar.exe" >nul
-            if not errorlevel 1 (
-                timeout /t 1 >nul
-                goto loop
-            )
+                :check_auxiliar_running
+                tasklist /fi "imagename eq Auxiliar.exe" | find /i "Auxiliar.exe" >nul
+                if not errorlevel 1 (
+                    echo Aguardando o encerramento...
+                    timeout /t 1 >nul
+                    goto check_auxiliar_running
+                )
 
-            echo Encerrando o processo...
-            taskkill /im "Auxiliar.exe" /f >nul 2>&1
+                echo Encerrando o processo...
+                taskkill /im "Auxiliar.exe" /f >nul 2>&1
 
-            del "{caminho_antigo}" >nul 2>&1
+                :check_delete_old
+                echo Deletando arquivos temporarios...
+                del "{caminho_antigo}" >nul 2>&1
+                if exist "{caminho_antigo}" (
+                    echo Nao foi possivel deletar o arquivo antigo. Tentando novamente...
+                    timeout /t 1 >nul
+                    goto check_delete_old
+                )
 
-            echo Aplicando atualizacao...
-            ren "{caminho_novo}" "Auxiliar.exe"
+                echo Arquivo antigo deletado com sucesso.
 
-            echo Testando conexao com o Firebase...
-            timeout /t 2 >nul 2>&1
+                :apply_update
+                echo Aplicando atualizacao...
+                ren "{caminho_novo}" "Auxiliar.exe"
+                if not exist "{os.path.join(os.getcwd(), 'Auxiliar.exe')}" (
+                    echo A atualizacao falhou. Tentando novamente...
+                    timeout /t 1 >nul
+                    goto apply_update
+                )
 
-            echo Conexao bem sucedida...
-            start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}"
+                echo Atualizacao aplicada com sucesso.
 
-            echo Limpando arquivos temporários...
-            del "%~f0" >nul 2>&1
-            """
+                :check_firebase_connection
+                echo Testando conexao com o Firebase...
+                ping -n 1 firebase.google.com >nul
+                if errorlevel 1 (
+                    echo Falha na conexao com o Firebase. Tentando novamente...
+                    timeout /t 2 >nul
+                    goto check_firebase_connection
+                )
+
+                echo Conexao bem sucedida.
+
+                :start_program
+                echo Iniciando o programa...
+                start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}"
+
+                :cleanup
+                echo Limpando arquivos temporarios...
+                del "%~f0" >nul 2>&1
+                if exist "%~f0" (
+                    echo Nao foi possivel limpar o script temporario. Tentando novamente...
+                    timeout /t 1 >nul
+                    goto cleanup
+                )
+
+                echo Atualizacao concluida com sucesso!
+                """
+
             with open(script_bat, "w") as f:
                 f.write(conteudo_bat)
 

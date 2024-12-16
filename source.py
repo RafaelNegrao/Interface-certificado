@@ -92,7 +92,6 @@ class FuncoesPadrao:
         banco_dados.contar_verificacao()
 
 
-
     def evento_ao_fechar(self,event):
 
         
@@ -499,7 +498,7 @@ class FuncoesPadrao:
             caminho_pasta = ui.caminho_pasta.text()
 
             for arquivo in os.listdir(caminho_pasta):
-                if arquivo.lower().endswith(('.png', '.jpg', '.jpeg', '.gif')):
+                if arquivo.lower().endswith(('.png', '.jpg', '.jpeg', '.gif', '.heic')):
                     imagem_path = os.path.join(caminho_pasta, arquivo)
 
                     # Cria um arquivo PDF com o mesmo nome da imagem
@@ -743,58 +742,93 @@ class FuncoesPadrao:
 
     def dados_cnpj(self):
         ui.campo_cnpj_municipio.setText("") 
+        ui.campo_cnpj_razao_social.setText("")
+        ui.campo_nome.setText("") 
 
         cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
 
         if not cnpj:
             return
-        
+
         url = f"https://www.receitaws.com.br/v1/cnpj/{cnpj}"
 
         try:
-            resposta = requests.get(url)
+            resposta = requests.get(url, timeout=10)
 
             if resposta.status_code == 200:
                 data = resposta.json()
-                ui.campo_cnpj_municipio.setText(f'{data['municipio']}/{data['uf']}')
-                ui.campo_cnpj_razao_social.setText(data['nome'])
+                ui.campo_cnpj_municipio.setText(f'{data["municipio"]}/{data["uf"]}')
+                ui.campo_cnpj_razao_social.setText(data["nome"])
 
-                qsa = data.get('qsa', [])
-    
+                situacao_empresa = data.get("situacao", "").upper()
+                if situacao_empresa in ["INATIVA", "INAPTA"]:
+                    self.mensagem_alerta("ALERTA", f"A empresa está {situacao_empresa}!")
+                    ui.campo_comentario.setPlainText(f"{ui.campo_comentario.toPlainText()}\n•A empresa está {situacao_empresa} ")
+                    return
+
+                qsa = data.get("qsa", [])
+                uf = data["uf"]
+
+                # Atualizar o campo da lista de Junta Comercial
+                ui.campo_lista_junta_comercial.setCurrentText(uf)
+                self.atualizar_documentos_tabela()
+
+                # Verificar os nomes do QSA
                 if len(qsa) == 1:
-                    if ui.campo_nome.text() == "":
-                        ui.campo_nome.setText(qsa[0]['nome'])
-                    else:
-                        pass
+                    nome = qsa[0]["nome"]
+                    if not ui.campo_nome.text():
+                        ui.campo_nome.setText(nome)
+                elif len(qsa) > 1:
+                    self.selecionar_nome_qsa(qsa)
                 else:
                     pass
 
-                uf = data['uf']
-                
-                if uf != "SP":
-                    ui.campo_lista_junta_comercial.setCurrentText(uf)
-                    self.atualizar_documentos_tabela()
-                    return
-                else:
-                    ui.campo_lista_junta_comercial.setCurrentText(uf)
-                    self.atualizar_documentos_tabela()
-                    return
-                
+            elif resposta.status_code == 429:
+                self.mensagem_alerta("Limite de Requisições", "Você atingiu o limite de requisições da API.\nTente novamente em alguns segundos.")
             else:
-                ui.campo_cnpj_municipio.setText("")
+                self.mensagem_alerta("Erro", "CNPJ inválido ou não encontrado.")
                 self.atualizar_documentos_tabela()
-                return
-            
-        except RequestException:
-            ui.campo_cnpj_municipio.setText("")
-            ui.campo_cnpj_uf.setText("")
+
+        except requests.exceptions.Timeout:
+            self.mensagem_alerta("Erro de Conexão", "A conexão demorou muito para responder. Verifique sua internet.")
             self.atualizar_documentos_tabela()
-            self.mensagem_alerta("ERRO DE CONEXÃO","Sem conexão com a internet.")
-            return
+
+        except requests.RequestException:
+            self.mensagem_alerta("Erro de Conexão", "Não foi possível conectar à API. Verifique sua internet.")
+            self.atualizar_documentos_tabela()
+
         except Exception as e:
+            self.mensagem_alerta("Erro Desconhecido", 
+                                "Um erro inesperado ocorreu. Tente novamente mais tarde!")
             self.atualizar_documentos_tabela()
-            self.mensagem_alerta("ACESSO BLOQUEADO","Limite de requisições atingido!\nEspere alguns segundos para fazer nova busca!")
-            return
+
+
+    def selecionar_nome_qsa(self, qsa):
+        dialog = QDialog(ui.centralwidget)
+        dialog.setWindowTitle("Selecione o Nome do QSA")
+        dialog.setMinimumWidth(400)
+
+        layout = QVBoxLayout(dialog)
+
+        label_instrucoes = QLabel("Nomes no QSA:")
+        layout.addWidget(label_instrucoes)
+
+        for pessoa in qsa:
+            nome = pessoa["nome"]
+            botao = QPushButton(nome)
+            layout.addWidget(botao)
+
+            # Usando uma função lambda para preservar o valor de 'nome' em cada iteração
+            botao.clicked.connect(lambda _, nome=nome: self.selecionar_nome(nome, dialog))
+
+        # Exibir o diálogo
+        dialog.exec_()
+
+    def selecionar_nome(self, nome, dialog):
+        ui.campo_nome.setText(nome)
+        dialog.accept()
+
+
 
 
     def procurar_junta(self):
@@ -1104,68 +1138,69 @@ class FuncoesPadrao:
 
 
     def escolher_conversao(self):
-
         dialog = QDialog(ui.centralwidget)
         dialog.setWindowTitle("Selecione o tipo de conversão")
         
         layout_dialog = QVBoxLayout(dialog)
 
-        radio_jpg_to_pdf = QRadioButton("JPG para PDF")
-        radio_pdf_to_jpg = QRadioButton("PDF para JPG")
+        radio_imagem_para_pdf = QRadioButton("Imagem > PDF")
+        radio_pdf_para_imagem = QRadioButton("PDF > Imagem")
         
-
-        layout_dialog.addWidget(radio_jpg_to_pdf)
-        layout_dialog.addWidget(radio_pdf_to_jpg)
+        layout_dialog.addWidget(radio_imagem_para_pdf)
+        layout_dialog.addWidget(radio_pdf_para_imagem)
 
         botao_confirmar = QPushButton("Confirmar")
         layout_dialog.addWidget(botao_confirmar)
 
-
         def confirmar():
-
-            if radio_jpg_to_pdf.isChecked():
-
-                self.converter_jpg_para_pdf()
-            elif radio_pdf_to_jpg.isChecked():
-
-                self.converter_pdf_para_jpg()
+            if radio_imagem_para_pdf.isChecked():
+                self.converter_imagem_para_pdf()
+            elif radio_pdf_para_imagem.isChecked():
+                self.converter_pdf_para_imagem()
             dialog.accept()
-        botao_confirmar.clicked.connect(confirmar)
 
+        botao_confirmar.clicked.connect(confirmar)
         dialog.exec_()
 
 
-    def converter_jpg_para_pdf(self):
+    def converter_imagem_para_pdf(self):
         try:
-            image_paths = filedialog.askopenfilenames(filetypes=[("Image Files", "*.jpg *.jpeg *.png")], title="Converter JPG/PNG > PDF")
+            image_paths = filedialog.askopenfilenames(
+                filetypes=[("Image Files", "*.jpg *.jpeg *.png *.heic")], 
+                title="Converter Imagem > PDF"
+            )
             if not image_paths:
                 return
             for image_path in image_paths:
                 nome_do_arquivo, _ = os.path.splitext(os.path.basename(image_path))
-                imagem = Image.open(image_path)
+                imagem = Image.open(image_path).convert('RGB')  # Converte para RGB, necessário para PDFs
                 imagem.save(f'{os.path.dirname(image_path)}\\{nome_do_arquivo}.pdf', 'PDF', resolution=100.0)
             AlteracoesInterface.confirmar_label_converter_pdf(self)
-        except:
+        except Exception as e:
+            print(f"Erro ao converter imagem para PDF: {e}")
             AlteracoesInterface.negar_label_converter_pdf(self)
 
 
-    def converter_pdf_para_jpg(self):
+    def converter_pdf_para_imagem(self):
         try:
-            pdf_paths = filedialog.askopenfilenames(filetypes=[("PDF Files", "*.pdf")], title="Converter PDF > img")
+            pdf_paths = filedialog.askopenfilenames(
+                filetypes=[("PDF Files", "*.pdf")], 
+                title="Converter PDF > Imagem"
+            )
             if not pdf_paths:
                 return
             for pdf_path in pdf_paths:
                 nome_do_arquivo, _ = os.path.splitext(os.path.basename(pdf_path))
-                pdf_document = fitz.open(pdf_path)
-                primeira_pagina = pdf_document.load_page(0)
-                imagem = primeira_pagina.get_pixmap()
-                imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
-                imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}.jpg', 'JPEG', quality=95)
+                pdf_document = fitz.open(pdf_path)  # PyMuPDF para manipulação de PDFs
+                for page_number in range(len(pdf_document)):  # Extrai todas as páginas
+                    pagina = pdf_document.load_page(page_number)
+                    imagem = pagina.get_pixmap()
+                    imagem_pillow = Image.frombytes("RGB", [imagem.width, imagem.height], imagem.samples)
+                    imagem_pillow.save(f'{os.path.dirname(pdf_path)}\\{nome_do_arquivo}_page{page_number + 1}.jpg', 'JPEG', quality=95)
             AlteracoesInterface.confirmar_label_converter_pdf(self)
             self.atualizar_documentos_tabela()
-
-        except:
-            self.atualizar_documentos_tabela()
+        except Exception as e:
+            print(f"Erro ao converter PDF para imagem: {e}")
             AlteracoesInterface.negar_label_converter_pdf(self)
 
 
@@ -1320,25 +1355,6 @@ class FuncoesPadrao:
             ui.campo_preco_certificado.setToolTip(tooltip_text)
             ui.campo_preco_certificado.setText(valor_final_formatado)
 
-
-    def duplicar_pedido(self):
-        resposta = QMessageBox.question(ui.centralwidget,'Duplicar pedido', 'Duplicar pedido atual?', QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if resposta == QMessageBox.Yes:
-            pedido = ui.campo_pedido.text()
-            ui.campo_pedido.setText('')
-            ui.campo_pedido.setReadOnly(False)
-            ui.campo_cnpj.setText('')
-            ui.campo_cnpj_razao_social.setText('')
-            ui.campo_cnpj_municipio.setText('')
-            self.acoes.limpar_labels()
-            ui.campo_lista_versao_certificado.setCurrentText("")
-            ui.campo_preco_certificado.setText('')
-            AlteracoesInterface.label_status_bd_desatualizado(self)
-
-            return True
-        else:
-            return False
-        
 
     def atualizar_documentos_tabela(self):
 
@@ -2868,7 +2884,7 @@ class LoginWindow(QMainWindow):
                     self.label_mensagem.setStyleSheet("color: green; font-size: 16px; font-family: Consolas;")
 
                     QApplication.processEvents() 
-                    QTimer.singleShot(500, self.close)
+                    QTimer.singleShot(300, self.close)
 
                    
                     ui.campo_usuario.setText(f"{usuario_campo}")
@@ -3030,8 +3046,8 @@ ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verifi
 ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
+
 ui.botao_excluir_dados_tabela.clicked.connect(lambda:funcoes_app.limpar_tabela())
-ui.botao_duplicar_pedido.clicked.connect(lambda:funcoes_app.duplicar_pedido())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())
 ui.botao_consultar.clicked.connect(lambda:banco_dados.preencher_tabela())
@@ -3110,9 +3126,8 @@ ui.campo_preco_certificado_cheio.setReadOnly(True)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
 #ToolTip
-ui.botao_duplicar_pedido.setToolTip('Duplicar pedido')
 ui.campo_status_bd_2.setToolTip("Status dos dados no servidor\n✅ - Pedido atualizado no servidor\n❌ - Pedido desatualizado no servidor")
-ui.botao_converter_todas_imagens_em_pdf.setToolTip("Conversor de JPG/PDF")
+ui.botao_converter_todas_imagens_em_pdf.setToolTip("Converte as imagens da pasta do cliente para PDF")
 ui.botao_agrupar_PDF.setToolTip("Mesclar PDF")
 ui.botao_print_direto_na_pasta.setToolTip("Tira um print da tela")
 ui.botao_tela_cheia.setToolTip("Liga/Desliga a tela cheia")
@@ -3120,6 +3135,7 @@ ui.botao_menagem.setToolTip("Mensagens")
 ui.botao_enviar_email.setToolTip("Enviar e-mail para cliente")
 ui.campo_status_bd_3.setToolTip("Quantidade de pedidos AGUARDANDO intervenção")
 ui.campo_dias_renovacao.setToolTip("Define o intervalo de dias para o envio de emails de renovação. Por exemplo, se definir 15 , serão considerados os próximos 15 dias a partir de hoje.")
+ui.botao_converter.setToolTip("Converte de imagens")
 
 
 #Validador
@@ -3150,6 +3166,8 @@ x = screen_rect.width() - janela.width() - 20
 y = (screen_rect.height() - janela.height()) // 5
 
 
+janela.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTopHint)
+janela.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
 janela.setFixedSize(151, 53)   
