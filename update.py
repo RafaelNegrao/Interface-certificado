@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 class Atualizar:
     def __init__(self, parent=None):
         self.parent = parent
-        self.versao = "1.0.6" 
+        self.versao = "1.0.7" 
 
 
     def verificar_atualizacao(self):
@@ -111,6 +111,7 @@ class Atualizar:
 
             conteudo_bat = f"""
                 @echo off
+                chcp 65001 >nul
                 title Atualizando o Programa
                 echo Aguarde...
 
@@ -160,7 +161,7 @@ class Atualizar:
 
                 :start_program
                 echo Iniciando o programa...
-                start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}"
+                start "" "{os.path.join(os.getcwd(), 'Auxiliar.exe')}""
 
                 :cleanup
                 echo Limpando arquivos temporarios...
@@ -173,6 +174,7 @@ class Atualizar:
 
                 echo Atualizacao concluida com sucesso!
                 """
+
 
             with open(script_bat, "w") as f:
                 f.write(conteudo_bat)

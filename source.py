@@ -69,13 +69,12 @@ ref = db.reference("/")
 class FuncoesPadrao:
     def __init__(self,ui,parent=None):
         self.ui = ui
-        self.acoes = AcoesBancoDeDados(ui)
         self.parent = parent
+        self.dicionario = None
 
 
     def evento_ao_abrir(self,event):
-
-        
+  
         atualizar = Atualizar(parent=self.parent)
         atualizar.verificar_atualizacao()
         self.ui.label_versao.setText(atualizar.versao)
@@ -291,8 +290,10 @@ class FuncoesPadrao:
 
             if ui.tabWidget.currentIndex() == 2:
                 ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
+                mes_meta = ui.campo_data_meta.date().month()  # Pega o mês da data selecionada
+                ano_meta = ui.campo_data_meta.date().year()
 
-                Pedidos = ref.get()
+                Pedidos = ref.order_by_child("DATA").start_at(f"{ano_meta}-{mes_meta:02d}-01T00:00:00Z").end_at(f"{ano_meta}-{mes_meta:02d}-{calendar.monthrange(ano_meta, mes_meta)[1]}T23:59:59Z").get()
 
                 semanas = [0, 0, 0, 0, 0]
 
@@ -824,11 +825,10 @@ class FuncoesPadrao:
         # Exibir o diálogo
         dialog.exec_()
 
+
     def selecionar_nome(self, nome, dialog):
         ui.campo_nome.setText(nome)
         dialog.accept()
-
-
 
 
     def procurar_junta(self):
@@ -1320,8 +1320,8 @@ class FuncoesPadrao:
 
 
     def buscar_preco_certificado(self):
-        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")      
-        lista_certificados = ref.get()        
+        certificados = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")      
+        lista_certificados = certificados.get()        
         certificado = ui.campo_lista_versao_certificado.currentText()        
         if certificado in lista_certificados:            
             # Armazenar o valor da chave correspondente em uma variável            
@@ -1429,7 +1429,9 @@ class FuncoesPadrao:
 
 
     def abrir_nova_janela(self, janela_pai):
-        self.dicionario = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Mensagens").get()
+        if self.dicionario is None:
+            self.dicionario = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Mensagens").get()
+
         # Verifica se a janela de mensagens está aberta
         if hasattr(self, 'nova_janela') and self.nova_janela is not None:
             if self.nova_janela.isVisible():
@@ -2063,7 +2065,6 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 class AcoesBancoDeDados:
     def __init__(self, ui):
         self.ui = ui
-        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
         
 
     def salvar_pedido(self):
@@ -2236,14 +2237,14 @@ class AcoesBancoDeDados:
          
     def dicionario_banco_de_dados(self):
 
-        # Data de agendamento (data de validação)
+
         data_qdate = ui.campo_data_agendamento.date()  # Retorna um QDate
         data_validacao = datetime.datetime(data_qdate.year(), data_qdate.month(), data_qdate.day())
 
-        # Captura a versão do certificado e normaliza o texto
+
         versao_certificado = str(ui.campo_lista_versao_certificado.currentText()).strip()
 
-        # Verifica se o valor capturado contém "12", "18", "24", ou "36"
+
         if "12" in versao_certificado:
             dias_duracao = 365
         elif "18" in versao_certificado:
@@ -2253,9 +2254,9 @@ class AcoesBancoDeDados:
         elif "36" in versao_certificado:
             dias_duracao = 1080
         else:
-            dias_duracao = 0  # Valor padrão para casos inválidos
+            dias_duracao = 0  
 
-        # Calcula a data de validade somando a duração ao agendamento
+
         duracao_certificado = data_validacao + datetime.timedelta(days=dias_duracao)
 
         # Renova status se o email foi enviado
@@ -2344,6 +2345,7 @@ class AcoesBancoDeDados:
 
     def carregar_dados(self):
         self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
+
         try:
             num_pedido = ui.campo_pedido.text()
 
@@ -3170,7 +3172,8 @@ janela.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTop
 janela.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(151, 53)   
+janela.setFixedSize(151, 53)
+
 janelaLogin = LoginWindow()        
 janelaLogin.show()
 
