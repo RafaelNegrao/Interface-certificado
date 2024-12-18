@@ -70,7 +70,8 @@ class FuncoesPadrao:
         self.ui = ui
         self.parent = parent
         self.dicionario = None
-        self.acoes = AcoesBancoDeDados
+        self.acoes = AcoesBancoDeDados(ui)
+        
 
 
     def evento_ao_abrir(self,event):
@@ -614,6 +615,7 @@ class FuncoesPadrao:
 
 
     def criar_pasta_cliente(self):
+        
         try:
             pedido = ui.campo_pedido.text()
             versao = ui.campo_lista_versao_certificado.currentText()
@@ -667,7 +669,7 @@ class FuncoesPadrao:
                 else:
                     AlteracoesInterface.confirmar_label_criar_pasta(self)
 
-                AcoesBancoDeDados.salvar_pedido(self)
+                self.acoes.salvar_pedido()
             #Caso exista, abra
             else:
                 self.abrir_pasta_cliente()
