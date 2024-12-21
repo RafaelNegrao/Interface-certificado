@@ -84,7 +84,6 @@ class FuncoesPadrao:
         self.login.set(hora_atual)
         self.trazer_configuracoes()
         self.trazer_metas()
-        self.definir_cor()
         self.carregar_lista_certificados()
         ui.campo_data_meta.setDate(QDate.currentDate())
         AlteracoesInterface.apagar_label_status_bd(self)
@@ -168,14 +167,9 @@ class FuncoesPadrao:
 
             try:
                 # Carrega as configurações da interface com base nos dados obtidos
-                cor = configs["RGB"]
-                r, g, b = map(int, cor.split(','))
 
                 ui.caminho_pasta_principal.setText(configs['DIRETORIO-RAIZ'])
                 ui.campo_email_empresa.setText(configs['E-MAIL'])
-                ui.campo_cor_R.setValue(int(r))
-                ui.campo_cor_G.setValue(int(g))
-                ui.campo_cor_B.setValue(int(b))
                 ui.campo_porcentagem_validacao.setValue(int(configs['PORCENTAGEM']))
                 ui.campo_imposto_validacao.setValue(configs['IMPOSTO VALIDACAO'])
                 ui.campo_desconto_validacao.setValue(configs['DESCONTO VALIDACAO'])
@@ -213,7 +207,6 @@ class FuncoesPadrao:
         # Recupera os dados da interface
         diretorio = ui.caminho_pasta_principal.text()
         email = ui.campo_email_empresa.text()
-        rgb = (f"{ui.campo_cor_R.value()},{ui.campo_cor_G.value()},{ui.campo_cor_B.value()}")
         porcentagem = ui.campo_porcentagem_validacao.value()
         desconto = ui.campo_desconto_validacao.value()
         imposto = ui.campo_imposto_validacao.value()
@@ -231,7 +224,6 @@ class FuncoesPadrao:
         nova_config = {
             "DIRETORIO-RAIZ": diretorio,
             "E-MAIL": email,
-            "RGB": rgb,
             "PORCENTAGEM": porcentagem,
             "IMPOSTO VALIDACAO": imposto,
             "DESCONTO VALIDACAO": desconto,
@@ -389,12 +381,9 @@ class FuncoesPadrao:
                 fig, ax = plt.subplots(figsize=(14, 8))
                 fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
 
-                campo_cor_r = 40
-                campo_cor_g = 42
-                campo_cor_b = 54
 
-                fig.patch.set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
-                ax.set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+                fig.patch.set_facecolor((60/255, 62/255, 84/255))
+                ax.set_facecolor((60/255, 62/255, 84/255))
 
                 bar_width = 0.6
 
@@ -417,8 +406,8 @@ class FuncoesPadrao:
                     ax.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
 
                 leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
-                leg.get_frame().set_facecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
-                leg.get_frame().set_edgecolor((campo_cor_r/255, campo_cor_g/255, campo_cor_b/255))
+                leg.get_frame().set_facecolor((60/255, 62/255, 84/255))
+                leg.get_frame().set_edgecolor((60/255, 62/255, 84/255))
 
                 ax.tick_params(axis='x', labelsize=6, colors=fonte_cor)
                 ax.tick_params(axis='y', labelsize=6, colors=fonte_cor)
@@ -441,17 +430,6 @@ class FuncoesPadrao:
 
         except Exception as e:
             print (f'Erro: {e}')
-
-
-    def definir_cor(self):
-        # Define a cor da borda interna superior da interface
-        cor_R = ui.campo_cor_R.value()
-        cor_G = ui.campo_cor_G.value()
-        cor_B = ui.campo_cor_B.value()
-        # Criando a string de folha de estilo com a cor selecionada
-    
-        # Aplicando a folha de estilo à label
-        ui.label_5.setStyleSheet(f"background-color:rgb({cor_R},{cor_G}, {cor_B})")
 
 
     def Atualizar_meta(self):
@@ -1263,11 +1241,10 @@ class FuncoesPadrao:
             self.ui.label_confirmacao_salvar.setText("")
             self.ui.label_confirmacao_excluir.setText("")
             
-
             nome_campo_atual = campo_atual.objectName()
             if nome_campo_atual == "campo_lista_versao_certificado":
                 self.buscar_preco_certificado()
-
+              
 
     def obter_valor_campo(self, campo):
         if isinstance(campo, QtWidgets.QLineEdit):
@@ -1379,7 +1356,7 @@ class FuncoesPadrao:
 
             item_nome_documento = QTableWidgetItem(documento)
 
-            item_nome_documento.setForeground(QColor(90, 54, 247))
+            item_nome_documento.setForeground(QColor(220, 0, 0))
 
             self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
 
@@ -2233,7 +2210,7 @@ class AcoesBancoDeDados:
         ui.label_confirmacao_mesclar_pdf.setText("")
         ui.label_confirmacao_tirar_print.setText("")
         ui.label_confirmacao_salvar.setText("")
-        ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(68,71,90);background-color:rgb(40,42, 54);color:orange")
+        ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(120,120,120);background-color:rgb(60,62, 84);color:orange")
         ui.label_confirmacao_excluir.setText("")
     
          
@@ -2723,7 +2700,7 @@ Vendas..........{venda}
 
             item_nome_documento = QTableWidgetItem(documento)
 
-            item_nome_documento.setForeground(QColor(90, 54, 247))
+            item_nome_documento.setForeground(QColor(255, 0, 0))
 
             self.ui.tabela_documentos.setItem(i, 0, item_nome_documento)
 
@@ -2795,7 +2772,7 @@ class JanelaOculta:
         self.largura_destino_animacao = 0
         self.altura_destino_animacao = 0
         self.janela = FuncoesPadrao(ui)
-        self.largura = 578
+        self.largura = 580
         self.altura = 712
 
     def evento_entrada(self, evento):
@@ -2944,7 +2921,6 @@ ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
 ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
-ui.botao_definir_cor.clicked.connect(lambda:funcoes_app.definir_cor())
 ui.botao_menagem.clicked.connect(lambda:funcoes_app.abrir_janela_mensagem())
 ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))

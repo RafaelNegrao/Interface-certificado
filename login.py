@@ -115,7 +115,7 @@ class LoginWindow(QMainWindow):
                 if senha_servidor == senha_campo:
                     QApplication.processEvents() 
                     self.label_mensagem.setText("")
-                    self.label_mensagem.setText("Usuário logado")
+                    self.label_mensagem.setText("✅")
                     self.label_mensagem.setStyleSheet("color: green; font-size: 16px; font-family: Consolas;")
 
                     QApplication.processEvents() 
@@ -129,18 +129,18 @@ class LoginWindow(QMainWindow):
 
                 else:
                     self.label_mensagem.setText("")
-                    self.label_mensagem.setText("Senha inválida")
+                    self.label_mensagem.setText("❌ Senha inválida")
                     self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
                     QApplication.processEvents() 
             else:
                 self.label_mensagem.setText("")
-                self.label_mensagem.setText("Usuário não encontrado")
+                self.label_mensagem.setText("❌ Usuário não encontrado")
                 self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
                 QApplication.processEvents() 
 
         except Exception as e:
             self.label_mensagem.setText("")
-            self.label_mensagem.setText("Erro de conexão com o servidor")
+            self.label_mensagem.setText("❌ Erro de conexão com o servidor")
             self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
             print("Erro ao conectar ao Firebase:", e)
 
