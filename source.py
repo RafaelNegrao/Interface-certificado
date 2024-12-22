@@ -1115,7 +1115,7 @@ class FuncoesPadrao:
             self.atualizar_documentos_tabela()
 
             return
-
+        
 
     def escolher_conversao(self):
         dialog = QDialog(ui.centralwidget)
@@ -2040,6 +2040,71 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 ui.tableWidget.setColumnWidth(col, 91)
 
 
+    def mesclar_pdf_pasta_cliente(self):
+        try:
+            # Obter o caminho da pasta
+            folder_to_open_directory = ui.caminho_pasta.text().strip()
+            if not os.path.isdir(folder_to_open_directory):
+                QMessageBox.warning(ui.centralwidget, "Erro", "O caminho especificado na pasta é inválido!")
+                return
+
+            # Obter os itens selecionados na tabela **antes de abrir qualquer diálogo**
+            itens_selecionados = ui.tabela_documentos.selectedItems()
+            if not itens_selecionados:
+                QMessageBox.warning(ui.centralwidget, "Erro", "Nenhum documento foi selecionado na tabela!")
+                return
+
+            # Armazenar os nomes dos arquivos selecionados antes de abrir o diálogo
+            nomes_arquivos = set(item.text().strip() for item in itens_selecionados)
+
+            # Solicitar o nome do novo documento mesclado
+            nome_documento, ok = QInputDialog.getItem(ui.centralwidget, "Nome do Documento", "Escolha o tipo de documento:", ["CNH COMPLETA", "RG COMPLETO","OAB COMPLETO","DOC ADICIONAL","DOC COMPLETO","OUTRO"], 0, False)
+            
+            if not ok or not nome_documento.strip():
+                return  # Caso o usuário cancele ou não insira um nome válido
+
+            if nome_documento == "OUTRO":
+                nome_documento, ok = QInputDialog.getText(ui.centralwidget, "Nome do Documento", "Digite o nome do documento:")
+
+            if not ok or not nome_documento.strip():
+                return  # Caso o usuário cancele ou não insira um nome válido
+
+            # Verificar os caminhos dos arquivos
+            file_paths = [os.path.join(folder_to_open_directory, nome_arquivo) for nome_arquivo in nomes_arquivos]
+            arquivos_existentes = [arquivo for arquivo in file_paths if os.path.isfile(arquivo)]
+
+            if not arquivos_existentes:
+                QMessageBox.warning(ui.centralwidget, "Erro", "Nenhum dos arquivos selecionados foi encontrado!")
+                return
+
+            # Verificar se alguns arquivos selecionados estão ausentes
+            if len(arquivos_existentes) < len(file_paths):
+                QMessageBox.warning(ui.centralwidget, "Aviso", "Alguns arquivos selecionados não foram encontrados!")
+
+            # Mesclar os PDFs
+            pdf_merger = PyPDF2.PdfMerger()
+            for path in arquivos_existentes:
+                pdf_merger.append(path)
+
+            # Salvar o arquivo mesclado
+            save_path = os.path.join(folder_to_open_directory, f"{nome_documento.strip()}.pdf")
+            with open(save_path, 'wb') as merged_pdf:
+                pdf_merger.write(merged_pdf)
+
+            pdf_merger.close()
+
+            # Exibir mensagem de sucesso e atualizar a tabela
+            AlteracoesInterface.animar_label_pular(self,self.ui.botao_agrupar_PDF_pasta_cliente)
+            self.atualizar_documentos_tabela()
+
+        except Exception as e:
+            QMessageBox.critical(ui.centralwidget, "Erro", f"Erro ao mesclar os documentos: {str(e)}")
+            if 'pdf_merger' in locals():
+                pdf_merger.close()
+            self.atualizar_documentos_tabela()
+
+
+
 
 class AcoesBancoDeDados:
     def __init__(self, ui):
@@ -2897,7 +2962,7 @@ ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verifi
 ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
-
+ui.botao_agrupar_PDF_pasta_cliente.clicked.connect(lambda:funcoes_app.mesclar_pdf_pasta_cliente())
 ui.botao_excluir_dados_tabela.clicked.connect(lambda:funcoes_app.limpar_tabela())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())
@@ -2938,6 +3003,7 @@ ui.botao_link_venda.clicked.connect(lambda:funcoes_app.pegar_link_venda())
 ui.botao_envio_massa.clicked.connect(lambda:funcoes_app.envio_em_massa())
 
 #Campos de formatação
+ui.tabela_documentos.setSelectionMode(QTableWidget.MultiSelection) 
 ui.campo_senha_usuario.setReadOnly(False) 
 ui.campo_usuario.setReadOnly(True) 
 ui.campo_comentario.setAcceptRichText(False)    
@@ -2986,6 +3052,7 @@ ui.botao_enviar_email.setToolTip("Enviar e-mail para cliente")
 ui.campo_status_bd_3.setToolTip("Quantidade de pedidos AGUARDANDO intervenção")
 ui.campo_dias_renovacao.setToolTip("Define o intervalo de dias para o envio de emails de renovação. Por exemplo, se definir 15 , serão considerados os próximos 15 dias a partir de hoje.")
 ui.botao_converter.setToolTip("Converte de imagens")
+ui.botao_agrupar_PDF_pasta_cliente.setToolTip("Mescla as imagens selecionadas na pasta do cliente")
 
 
 #Validador

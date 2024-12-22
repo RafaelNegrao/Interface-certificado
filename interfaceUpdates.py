@@ -60,6 +60,8 @@ class AlteracoesInterface:
         self.ui.label_confirmacao_mesclar_pdf.setText("❌")
         AlteracoesInterface.animar_label_pular(self,self.ui.label_confirmacao_mesclar_pdf)
 
+        
+
 
     # Funções relacionadas à criação de pasta
     def confirmar_label_criar_pasta(self):
