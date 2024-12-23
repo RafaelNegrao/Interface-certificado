@@ -1232,6 +1232,39 @@ class FuncoesPadrao:
         else:
             pass
 
+    
+    def atualizar_aba_cliente(self):
+        # Verifica se a aba ativa é a de índice 2
+        if ui.aba_dados_cliente.currentIndex() == 2:
+            # Limpa o campo consolidado
+            ui.campo_consolidado.setPlainText("")
+            
+            # Verifica se o campo de certificado está relacionado a CPF
+            if "CPF" in ui.campo_lista_versao_certificado.currentText():
+                # Monta a mensagem sem os dados de CNPJ
+                mensagem = (
+                    f"CERTIFICADO: {ui.campo_lista_versao_certificado.currentText()}\n\n"
+                    f"NOME: {ui.campo_nome.text()}\n\n"
+                    f"E-MAIL: {ui.campo_email.text()}\n\n"
+                    f"CPF: {ui.campo_cpf.text()}\n"
+                )
+            elif "CNPJ" in ui.campo_lista_versao_certificado.currentText():
+                # Monta a mensagem incluindo os dados de CNPJ
+                mensagem = (
+                    f"CERTIFICADO: {ui.campo_lista_versao_certificado.currentText()}\n\n"
+                    f"NOME: {ui.campo_nome.text()}\n\n"
+                    f"E-MAIL: {ui.campo_email.text()}\n\n"
+                    f"CPF: {ui.campo_cpf.text()}\n\n"
+                    f"CNPJ: {ui.campo_cnpj.text()}\n\n"
+                    f"RAZÃO SOCIAL: {ui.campo_cnpj_razao_social.text()}\n\n"
+                    f"MUNICÍPIO: {ui.campo_cnpj_municipio.text()}\n"
+                )
+            else:
+                 mensagem = ""
+            
+            # Define o texto no campo consolidado
+            ui.campo_consolidado.setPlainText(mensagem)
+
 
     def valor_alterado(self, campo_atual):
         self.atualizar_documentos_tabela()
@@ -1329,7 +1362,14 @@ class FuncoesPadrao:
                 f"Valor final: R${valor_final_formatado}"
             )
 
-
+            midias = ["cartão","token"]
+            
+            if any(midia in certificado.lower() for midia in midias):
+                ui.alerta_midia.setText("⚠️")
+                ui.alerta_midia.setToolTip("Certificado com Mídia\nLembre-se de pegar o endereço para envio")
+            else:
+                ui.alerta_midia.setText("")
+                ui.alerta_midia.setToolTip("")
             
             ui.campo_preco_certificado.setToolTip(tooltip_text)
             ui.campo_preco_certificado.setText(valor_final_formatado)
@@ -2139,12 +2179,24 @@ class AcoesBancoDeDados:
 
 
     def salvar_temporario(self, novo_pedido_ref):
-        novo_pedido_ref.set(self.dicionario_banco_de_dados())
+        novo_pedido_ref.update(self.dicionario_banco_de_dados())
 
 
     def salvar_definitivo(self, novo_pedido_ref):
         self.forcar_fechamento_de_arquivo_e_deletar_pasta(self.ui.caminho_pasta.text())
+        self.verificar_midia()
         novo_pedido_ref.set(self.dicionario_banco_de_dados())
+
+    def verificar_midia(self):
+        certificado = ui.campo_lista_versao_certificado.currentText()
+        midias = ["cartão","token"]
+        
+        if any(midia in certificado.lower() for midia in midias) and ui.rb_aprovado.isChecked():
+            QMessageBox.warning(ui.centralwidget, "ALERTA", "ESSE PEDIDO CONTÉM MÍDIA\nNÃO SE ESQUEÇA DE ENVIAR O EMAIL PARA ENVIO DO DISPOSITIVO")
+
+
+        
+
 
 
     def atualizar_ui(self, condic, pedido_existente):
@@ -2255,9 +2307,13 @@ class AcoesBancoDeDados:
             ui.campo_funcional.setText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
+            ui.campo_consolidado.setPlainText("")
+            ui.alerta_midia.setText("")
+            ui.alerta_midia.setToolTip("")
             self.limpar_labels()
             self.contar_verificacao()
             AlteracoesInterface.confirmar_label_excluir(self)
+            self.ui.aba_dados_cliente.setCurrentIndex(0) 
 
 
         except Exception as e:
@@ -2402,6 +2458,7 @@ class AcoesBancoDeDados:
             if pedido_data:
 
                 self.preencher_dados(pedido_data)
+                self.ui.aba_dados_cliente.setCurrentIndex(0) 
                
             else:  
                return 'Pedido nao existe'
@@ -3066,6 +3123,7 @@ ui.campo_preco_certificado.setValidator(validator)
 
 #Eventos tabela
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
+ui.aba_dados_cliente.currentChanged.connect(lambda: funcoes_app.atualizar_aba_cliente())
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
 ui.tableWidget.itemDoubleClicked.connect(lambda:banco_dados.pegar_valor_tabela())
 ui.tableWidget.itemClicked.connect(lambda:funcoes_app.copiar_pedido_tabela(None))
