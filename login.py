@@ -15,7 +15,7 @@ ref = db.reference("/")
 
 
 class LoginWindow(QMainWindow):
-    def __init__(self,janela,ui):
+    def __init__(self, janela, ui):
         super().__init__()
         self.ui = ui
         self.janela = janela
@@ -41,14 +41,14 @@ class LoginWindow(QMainWindow):
 
        
         self.label_titulo = QLabel("Login")
-        self.label_titulo.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {self.cor_login}; font-family: Consolas;")
+        self.label_titulo.setStyleSheet(f"font-size: 24px; font-weight: bold; color: {self.cor_login}; font-family: Calibri;")
         self.label_titulo.setAlignment(Qt.AlignCenter)
         layout.addWidget(self.label_titulo)
 
         
         self.campo_usuario = QLineEdit()
-        self.campo_usuario.setPlaceholderText("Nome")
-        self.campo_usuario.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Consolas;")
+        self.campo_usuario.setPlaceholderText("Usuário")
+        self.campo_usuario.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Calibri;")
         self.campo_usuario.setFocusPolicy(Qt.StrongFocus)  
         layout.addWidget(self.campo_usuario)
 
@@ -58,13 +58,13 @@ class LoginWindow(QMainWindow):
         self.campo_senha = QLineEdit()
         self.campo_senha.setPlaceholderText("Senha")
         self.campo_senha.setEchoMode(QLineEdit.Password)
-        self.campo_senha.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Consolas;")
+        self.campo_senha.setStyleSheet(f"font-size: 18px; height: 35px; border-radius: 5px; padding: 5px; background-color: {self.campo_fundo_cor}; color: {self.campo_texto_cor}; border: 1px solid {self.campo_texto_cor}; font-family: Calibri;")
         self.campo_senha.setFocusPolicy(Qt.StrongFocus)  
         senha_layout.addWidget(self.campo_senha)
 
 
         self.botao_olho = QPushButton("👁️")
-        self.botao_olho.setStyleSheet(f"font-size: 25px; height: 40px; background-color: transparent; color: {self.campo_texto_cor}; border: none; padding: 0; font-family: Consolas;")
+        self.botao_olho.setStyleSheet(f"font-size: 25px; height: 40px; background-color: transparent; color: {self.campo_texto_cor}; border: none; padding: 0; font-family: Calibri;")
         self.botao_olho.setFixedSize(35, 35)  
         self.botao_olho.clicked.connect(self.toggle_senha_visivel)
         senha_layout.addWidget(self.botao_olho)
@@ -73,13 +73,13 @@ class LoginWindow(QMainWindow):
 
         
         self.botao_login = QPushButton("Entrar")
-        self.botao_login.setStyleSheet(f"font-size: 16px; height: 40px; background-color: {self.botao_cor}; color: {self.campo_texto_cor}; border-radius: 5px; font-family: Consolas;")
+        self.botao_login.setStyleSheet(f"font-size: 16px; height: 40px; background-color: {self.botao_cor}; color: {self.campo_texto_cor}; border-radius: 5px; font-family: Calibri;")
         self.botao_login.clicked.connect(self.fazer_login)
         layout.addWidget(self.botao_login)
 
         
         self.label_mensagem = QLabel("")
-        self.label_mensagem.setStyleSheet(f"font-size: 16px; color: {self.campo_texto_cor}; font-family: Consolas;")
+        self.label_mensagem.setStyleSheet(f"font-size: 16px; color: {self.campo_texto_cor}; font-family: Calibri;")
         self.label_mensagem.setAlignment(Qt.AlignCenter)
         self.label_mensagem.setFocusPolicy(Qt.NoFocus) 
         self.label_mensagem.hide()  
@@ -89,7 +89,8 @@ class LoginWindow(QMainWindow):
         self.central_widget.setLayout(layout)
 
         # Estilizar o fundo da janela
-        self.setStyleSheet(f"background-color: {self.fundo_cor}; font-family: Consolas;")
+        self.setStyleSheet(f"background-color: {self.fundo_cor}; font-family: Calibri;")
+
 
     def toggle_senha_visivel(self):
         if self.campo_senha.echoMode() == QLineEdit.Password:
@@ -98,6 +99,7 @@ class LoginWindow(QMainWindow):
         else:
             self.campo_senha.setEchoMode(QLineEdit.Password)
             self.botao_olho.setText("👁️")
+
 
     def fazer_login(self):
         usuario_campo = self.campo_usuario.text().strip()
@@ -113,13 +115,13 @@ class LoginWindow(QMainWindow):
             if user_data:
                 senha_servidor = user_data.get("Senha")
                 if senha_servidor == senha_campo:
-                    QApplication.processEvents() 
+                    #QApplication.processEvents() 
                     self.label_mensagem.setText("")
                     self.label_mensagem.setText("✅")
-                    self.label_mensagem.setStyleSheet("color: green; font-size: 16px; font-family: Consolas;")
+                    self.label_mensagem.setStyleSheet("color: green; font-size: 16px; font-family: Calibri;")
 
                     QApplication.processEvents() 
-                    QTimer.singleShot(300, self.close)
+                    QTimer.singleShot(0, self.close)
 
                    
                     self.ui.campo_usuario.setText(f"{usuario_campo}")
@@ -130,17 +132,17 @@ class LoginWindow(QMainWindow):
                 else:
                     self.label_mensagem.setText("")
                     self.label_mensagem.setText("❌ Senha inválida")
-                    self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
+                    self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Calibri;")
                     QApplication.processEvents() 
             else:
                 self.label_mensagem.setText("")
                 self.label_mensagem.setText("❌ Usuário não encontrado")
-                self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
+                self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Calibri;")
                 QApplication.processEvents() 
 
         except Exception as e:
             self.label_mensagem.setText("")
             self.label_mensagem.setText("❌ Erro de conexão com o servidor")
-            self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Consolas;")
+            self.label_mensagem.setStyleSheet("color: red; font-size: 16px; font-family: Calibri;")
             print("Erro ao conectar ao Firebase:", e)
 

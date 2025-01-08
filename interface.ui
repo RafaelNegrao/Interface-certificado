@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>575</width>
-    <height>714</height>
+    <width>603</width>
+    <height>705</height>
    </rect>
   </property>
   <property name="palette">
@@ -63,10 +63,10 @@
    <widget class="QTabWidget" name="tabWidget">
     <property name="geometry">
      <rect>
-      <x>-5</x>
-      <y>54</y>
-      <width>641</width>
-      <height>678</height>
+      <x>-4</x>
+      <y>50</y>
+      <width>648</width>
+      <height>789</height>
      </rect>
     </property>
     <property name="minimumSize">
@@ -83,11 +83,11 @@
     </property>
     <property name="font">
      <font>
-      <family>Consolas</family>
+      <family>Leelawadee UI</family>
       <pointsize>9</pointsize>
-      <weight>75</weight>
+      <weight>50</weight>
       <italic>false</italic>
-      <bold>true</bold>
+      <bold>false</bold>
      </font>
     </property>
     <property name="styleSheet">
@@ -151,14 +151,14 @@ QTabBar::tab:Hover {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>13</y>
+        <y>4</y>
         <width>49</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -176,16 +176,16 @@ color:rgb(170,170,170)</string>
      <widget class="QDateEdit" name="campo_data_agendamento">
       <property name="geometry">
        <rect>
-        <x>162</x>
+        <x>168</x>
         <y>20</y>
-        <width>99</width>
-        <height>36</height>
+        <width>93</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -242,18 +242,18 @@ QDateEdit::down-button {
      <widget class="QLineEdit" name="campo_pedido">
       <property name="geometry">
        <rect>
-        <x>15</x>
+        <x>16</x>
         <y>20</y>
-        <width>134</width>
-        <height>36</height>
+        <width>133</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
+        <family>Calibri</family>
+        <pointsize>14</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="cursor">
@@ -279,16 +279,16 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QTimeEdit" name="campo_hora_agendamento">
       <property name="geometry">
        <rect>
-        <x>270</x>
+        <x>280</x>
         <y>20</y>
-        <width>73</width>
-        <height>36</height>
+        <width>68</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -315,15 +315,15 @@ QTimeEdit:disabled, QTimeEdit:!focus {
      <widget class="QLabel" name="label_4">
       <property name="geometry">
        <rect>
-        <x>270</x>
-        <y>13</y>
+        <x>280</x>
+        <y>4</y>
         <width>49</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -341,15 +341,15 @@ color:rgb(170,170,170)</string>
      <widget class="QLabel" name="label_3">
       <property name="geometry">
        <rect>
-        <x>162</x>
-        <y>13</y>
+        <x>168</x>
+        <y>4</y>
         <width>41</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -367,16 +367,16 @@ color:rgb(170,170,170)</string>
      <widget class="QComboBox" name="campo_lista_venda">
       <property name="geometry">
        <rect>
-        <x>174</x>
-        <y>137</y>
+        <x>180</x>
+        <y>116</y>
         <width>64</width>
-        <height>36</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -452,15 +452,15 @@ QComboBox::drop-down {
      <widget class="QLabel" name="label_22">
       <property name="geometry">
        <rect>
-        <x>174</x>
-        <y>132</y>
+        <x>182</x>
+        <y>102</y>
         <width>57</width>
         <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -479,14 +479,14 @@ color:rgb(170,170,170)</string>
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>130</y>
+        <y>100</y>
         <width>77</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -504,16 +504,16 @@ color:rgb(170,170,170)</string>
      <widget class="QComboBox" name="campo_lista_modalidade">
       <property name="geometry">
        <rect>
-        <x>16</x>
-        <y>138</y>
-        <width>148</width>
-        <height>36</height>
+        <x>15</x>
+        <y>116</y>
+        <width>149</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -565,7 +565,7 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>122</x>
-        <y>22</y>
+        <y>14</y>
         <width>30</width>
         <height>30</height>
        </rect>
@@ -600,7 +600,7 @@ background-color:transparent</string>
       <property name="geometry">
        <rect>
         <x>138</x>
-        <y>22</y>
+        <y>14</y>
         <width>17</width>
         <height>17</height>
        </rect>
@@ -622,15 +622,15 @@ background-color:transparent</string>
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>76</y>
-        <width>406</width>
-        <height>36</height>
+        <y>68</y>
+        <width>421</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>10</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -667,14 +667,14 @@ QComboBox::drop-down {
       <property name="geometry">
        <rect>
         <x>16</x>
-        <y>69</y>
+        <y>52</y>
         <width>53</width>
         <height>10</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -695,16 +695,16 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>344</x>
-        <y>137</y>
+        <x>360</x>
+        <y>117</y>
         <width>77</width>
-        <height>36</height>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -738,15 +738,15 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_13">
       <property name="geometry">
        <rect>
-        <x>344</x>
-        <y>132</y>
+        <x>360</x>
+        <y>104</y>
         <width>53</width>
         <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -764,10 +764,10 @@ color:rgb(170,170,170)</string>
      <widget class="QGroupBox" name="groupBox_status">
       <property name="geometry">
        <rect>
-        <x>430</x>
+        <x>446</x>
         <y>17</y>
-        <width>141</width>
-        <height>156</height>
+        <width>149</width>
+        <height>127</height>
        </rect>
       </property>
       <property name="font">
@@ -786,16 +786,16 @@ background-color:rgb(60, 62, 84);</string>
       <widget class="QRadioButton" name="rb_digitacao">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>16</y>
-         <width>82</width>
+         <x>12</x>
+         <y>10</y>
+         <width>93</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>9</pointsize>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -818,16 +818,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_videook">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>44</y>
+         <x>12</x>
+         <y>33</y>
          <width>124</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>9</pointsize>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -843,16 +843,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_verificacao">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>72</y>
-         <width>96</width>
+         <x>12</x>
+         <y>56</y>
+         <width>106</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>9</pointsize>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -868,16 +868,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_aprovado">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>75</width>
+         <x>12</x>
+         <y>79</y>
+         <width>92</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>9</pointsize>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -893,16 +893,16 @@ color:rgb(113,66,230)</string>
       <widget class="QRadioButton" name="rb_cancelado">
        <property name="geometry">
         <rect>
-         <x>10</x>
-         <y>128</y>
-         <width>82</width>
+         <x>12</x>
+         <y>102</y>
+         <width>96</width>
          <height>16</height>
         </rect>
        </property>
        <property name="font">
         <font>
-         <family>Consolas</family>
-         <pointsize>9</pointsize>
+         <family>Calibri</family>
+         <pointsize>10</pointsize>
         </font>
        </property>
        <property name="focusPolicy">
@@ -922,16 +922,16 @@ color:rgb(113,66,230)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>248</x>
-        <y>137</y>
-        <width>86</width>
-        <height>36</height>
+        <x>262</x>
+        <y>117</y>
+        <width>79</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
-        <pointsize>11</pointsize>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
        </font>
@@ -962,15 +962,15 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_17">
       <property name="geometry">
        <rect>
-        <x>248</x>
-        <y>132</y>
+        <x>264</x>
+        <y>104</y>
         <width>53</width>
         <height>7</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -988,8 +988,8 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_link_venda">
       <property name="geometry">
        <rect>
-        <x>394</x>
-        <y>80</y>
+        <x>408</x>
+        <y>66</y>
         <width>23</width>
         <height>23</height>
        </rect>
@@ -1023,7 +1023,7 @@ color:rgb(170,170,170)</string>
      <widget class="QLabel" name="label_31">
       <property name="geometry">
        <rect>
-        <x>442</x>
+        <x>450</x>
         <y>13</y>
         <width>35</width>
         <height>8</height>
@@ -1031,7 +1031,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Segoe UI</family>
+        <family>Leelawadee UI</family>
         <pointsize>6</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -1048,8 +1048,8 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_salvar">
       <property name="geometry">
        <rect>
-        <x>352</x>
-        <y>22</y>
+        <x>365</x>
+        <y>16</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -1089,8 +1089,8 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_excluir_dados">
       <property name="geometry">
        <rect>
-        <x>390</x>
-        <y>22</y>
+        <x>403</x>
+        <y>16</y>
         <width>32</width>
         <height>32</height>
        </rect>
@@ -1124,8 +1124,8 @@ color:rgb(170,170,170)</string>
      <widget class="QLabel" name="label_confirmacao_salvar">
       <property name="geometry">
        <rect>
-        <x>366</x>
-        <y>16</y>
+        <x>379</x>
+        <y>10</y>
         <width>17</width>
         <height>17</height>
        </rect>
@@ -1183,8 +1183,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_confirmacao_excluir">
       <property name="geometry">
        <rect>
-        <x>403</x>
-        <y>16</y>
+        <x>416</x>
+        <y>10</y>
         <width>17</width>
         <height>17</height>
        </rect>
@@ -1202,195 +1202,736 @@ QLineEdit:disabled, QLineEdit:!focus {
        <string/>
       </property>
      </widget>
-     <widget class="QTabWidget" name="aba_dados_cliente">
+     <widget class="QPushButton" name="alerta_midia">
       <property name="geometry">
        <rect>
-        <x>15</x>
-        <y>193</y>
-        <width>557</width>
-        <height>437</height>
+        <x>380</x>
+        <y>66</y>
+        <width>26</width>
+        <height>26</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Consolas</family>
-        <pointsize>9</pointsize>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="layoutDirection">
+       <enum>Qt::LeftToRight</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:7px;
+;background-color: transparent</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_agrupar_PDF_pasta_cliente">
+      <property name="geometry">
+       <rect>
+        <x>567</x>
+        <y>216</y>
+        <width>29</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;
+background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string extracomment="Cria a link do vídeo">🗃️</string>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
+      <property name="geometry">
+       <rect>
+        <x>565</x>
+        <y>186</y>
+        <width>30</width>
+        <height>32</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>14</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="toolTip">
+       <string>Converte as imagens da pasta do cliente para PDF</string>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string extracomment="Cria a link do vídeo">🔄️</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_12">
+      <property name="geometry">
+       <rect>
+        <x>346</x>
+        <y>174</y>
+        <width>61</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">
-QTabWidget::pane {
-    background-color: rgb(50, 55, 60); /* Cor do painel */
-    font-size: 30px; /* Tamanho da fonte */
-}
-
-QTabBar::tab {
-     background-color: rgb(50, 55, 60); /* Cor das abas selecionadas */
-     color: rgb(220, 220, 220);
-}
-
-QTabBar::tab:selected {
-    background-color: rgb(30,35, 40); /* Cor das abas selecionadas */
-    color: rgb(220, 220, 220);
-}
-
-QHeader{
- 	background-color: rgb(50, 55, 60);
-
-}
-
-/* Estiliza o conteúdo das abas */
-
-
-
-
-QWidget {
-    background-color: rgb(60, 62,84); /* Cor do conteúdo */
-    color: rgb(220, 220, 220);
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>NASCIMENTO</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_49">
+      <property name="geometry">
+       <rect>
+        <x>300</x>
+        <y>404</y>
+        <width>45</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>PIS/CEI</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_44">
+      <property name="geometry">
+       <rect>
+        <x>447</x>
+        <y>174</y>
+        <width>101</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(60, 62, 84);
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>DOCUMENTOS NA PASTA</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_cnh">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>363</y>
+        <width>117</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
-border-radius:7px;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
 }
 
-QTabBar::tab:Hover {
-    background-color: rgb(30, 35, 40); /* Cor das abas selecionadas */
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
 }
-
-
-
-
-
-
-
-
 </string>
       </property>
-      <property name="tabPosition">
-       <enum>QTabWidget::North</enum>
+      <property name="text">
+       <string/>
       </property>
-      <property name="currentIndex">
-       <number>0</number>
+     </widget>
+     <widget class="QLabel" name="label_15">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>351</y>
+        <width>25</width>
+        <height>7</height>
+       </rect>
       </property>
-      <property name="iconSize">
-       <size>
-        <width>16</width>
-        <height>16</height>
-       </size>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
       </property>
-      <property name="documentMode">
-       <bool>true</bool>
-      </property>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Documentos Pessoais</string>
-       </attribute>
-       <widget class="QPushButton" name="botao_consulta_pis">
-        <property name="geometry">
-         <rect>
-          <x>182</x>
-          <y>370</y>
-          <width>21</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_enviar_email">
-        <property name="geometry">
-         <rect>
-          <x>378</x>
-          <y>80</y>
-          <width>25</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string extracomment="Enviar e-mail para cliente">📧</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_50">
-        <property name="geometry">
-         <rect>
-          <x>214</x>
-          <y>362</y>
-          <width>55</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>FUNCIONAL</string>
-        </property>
-       </widget>
-       <widget class="QDateEdit" name="campo_data_nascimento">
-        <property name="geometry">
-         <rect>
-          <x>163</x>
-          <y>135</y>
-          <width>96</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QDateEdit {
+      </property>
+      <property name="text">
+       <string>CNH</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_16">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>402</y>
+        <width>80</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>CÓD SEG - CNH</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_11">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>230</y>
+        <width>37</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>E-MAIL</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_telefone">
+      <property name="geometry">
+       <rect>
+        <x>418</x>
+        <y>244</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>📞</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_pis">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>416</y>
+        <width>21</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_10">
+      <property name="geometry">
+       <rect>
+        <x>186</x>
+        <y>288</y>
+        <width>21</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>RG</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_18">
+      <property name="geometry">
+       <rect>
+        <x>146</x>
+        <y>350</y>
+        <width>65</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>NOME DA MÃE</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_nome_mae">
+      <property name="geometry">
+       <rect>
+        <x>144</x>
+        <y>364</y>
+        <width>294</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_cpf">
+      <property name="geometry">
+       <rect>
+        <x>154</x>
+        <y>300</y>
+        <width>21</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍︎</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_27">
+      <property name="geometry">
+       <rect>
+        <x>446</x>
+        <y>404</y>
+        <width>61</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(60, 62, 84);
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>  OBSERVAÇÕES</string>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_24">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>174</y>
+        <width>77</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>NOME</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_rg">
+      <property name="geometry">
+       <rect>
+        <x>288</x>
+        <y>300</y>
+        <width>17</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QTextEdit" name="campo_comentario">
+      <property name="geometry">
+       <rect>
+        <x>444</x>
+        <y>416</y>
+        <width>152</width>
+        <height>204</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>9</pointsize>
+       </font>
+      </property>
+      <property name="cursor" stdset="0">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:7px;
+border: 1px solid rgb(120,120,120);
+background-color:rgb(60,62, 84);
+color:orange</string>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="html">
+       <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Calibri'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Consolas';&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_6">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>289</y>
+        <width>25</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>CPF</string>
+      </property>
+     </widget>
+     <widget class="QTableWidget" name="tabela_documentos">
+      <property name="geometry">
+       <rect>
+        <x>446</x>
+        <y>186</y>
+        <width>151</width>
+        <height>206</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>8</pointsize>
+       </font>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::StrongFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:7px;
+border: 1px solid rgb(120,120,120);
+background-color:rgb(60,62, 84);</string>
+      </property>
+      <property name="verticalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="horizontalScrollBarPolicy">
+       <enum>Qt::ScrollBarAlwaysOff</enum>
+      </property>
+      <property name="columnCount">
+       <number>1</number>
+      </property>
+      <attribute name="horizontalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderCascadingSectionResizes">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderDefaultSectionSize">
+       <number>240</number>
+      </attribute>
+      <attribute name="horizontalHeaderHighlightSections">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="horizontalHeaderStretchLastSection">
+       <bool>true</bool>
+      </attribute>
+      <attribute name="verticalHeaderVisible">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderDefaultSectionSize">
+       <number>12</number>
+      </attribute>
+      <attribute name="verticalHeaderHighlightSections">
+       <bool>false</bool>
+      </attribute>
+      <attribute name="verticalHeaderMinimumSectionSize">
+       <number>20</number>
+      </attribute>
+      <column>
+       <property name="text">
+        <string>docs</string>
+       </property>
+      </column>
+     </widget>
+     <widget class="QDateEdit" name="campo_data_nascimento">
+      <property name="geometry">
+       <rect>
+        <x>346</x>
+        <y>188</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QDateEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -1417,208 +1958,102 @@ QDateEdit::down-button {
 
 
 </string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-        <property name="buttonSymbols">
-         <enum>QAbstractSpinBox::NoButtons</enum>
-        </property>
-        <property name="correctionMode">
-         <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
-        </property>
-        <property name="showGroupSeparator" stdset="0">
-         <bool>false</bool>
-        </property>
-        <property name="calendarPopup">
-         <bool>false</bool>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_15">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>186</y>
-          <width>25</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignCenter</set>
+      </property>
+      <property name="buttonSymbols">
+       <enum>QAbstractSpinBox::NoButtons</enum>
+      </property>
+      <property name="correctionMode">
+       <enum>QAbstractSpinBox::CorrectToPreviousValue</enum>
+      </property>
+      <property name="showGroupSeparator" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="calendarPopup">
+       <bool>false</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_48">
+      <property name="geometry">
+       <rect>
+        <x>318</x>
+        <y>288</y>
+        <width>57</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>CNH</string>
-        </property>
-       </widget>
-       <widget class="QTableWidget" name="tabela_documentos">
-        <property name="geometry">
-         <rect>
-          <x>412</x>
-          <y>20</y>
-          <width>141</width>
-          <height>200</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>8</pointsize>
-         </font>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:7px;
-border: 1px solid rgb(120,120,120);
-background-color:rgb(60,62, 84);</string>
-        </property>
-        <property name="verticalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="columnCount">
-         <number>1</number>
-        </property>
-        <attribute name="horizontalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderCascadingSectionResizes">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderDefaultSectionSize">
-         <number>240</number>
-        </attribute>
-        <attribute name="horizontalHeaderHighlightSections">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="horizontalHeaderShowSortIndicator" stdset="0">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="horizontalHeaderStretchLastSection">
-         <bool>true</bool>
-        </attribute>
-        <attribute name="verticalHeaderVisible">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderDefaultSectionSize">
-         <number>12</number>
-        </attribute>
-        <attribute name="verticalHeaderHighlightSections">
-         <bool>false</bool>
-        </attribute>
-        <attribute name="verticalHeaderMinimumSectionSize">
-         <number>20</number>
-        </attribute>
-        <column>
-         <property name="text">
-          <string>docs</string>
-         </property>
-        </column>
-       </widget>
-       <widget class="QPushButton" name="botao_telefone">
-        <property name="geometry">
-         <rect>
-          <x>380</x>
-          <y>138</y>
-          <width>25</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>📞</string>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="campo_comentario">
-        <property name="geometry">
-         <rect>
-          <x>410</x>
-          <y>239</y>
-          <width>142</width>
-          <height>164</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="cursor" stdset="0">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:7px;
-border: 1px solid rgb(120,120,120);
-background-color:rgb(60,62, 84);
-color:orange</string>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="html">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Consolas'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_cnh">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>194</y>
-          <width>191</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string>ORGÃO RG</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_enviar_email">
+      <property name="geometry">
+       <rect>
+        <x>282</x>
+        <y>244</y>
+        <width>25</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string extracomment="Enviar e-mail para cliente">📧</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_rg">
+      <property name="geometry">
+       <rect>
+        <x>185</x>
+        <y>302</y>
+        <width>119</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -1629,33 +2064,36 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_pis">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>368</y>
-          <width>197</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_telefone">
+      <property name="geometry">
+       <rect>
+        <x>317</x>
+        <y>246</y>
+        <width>121</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -1666,33 +2104,64 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_nome">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>22</y>
-          <width>398</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_funcional">
+      <property name="geometry">
+       <rect>
+        <x>272</x>
+        <y>416</y>
+        <width>17</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_nome">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>188</y>
+        <width>316</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -1703,231 +2172,36 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_6">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>128</y>
-          <width>25</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>CPF</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_44">
-        <property name="geometry">
-         <rect>
-          <x>412</x>
-          <y>10</y>
-          <width>101</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:rgb(60, 62, 84);
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>DOCUMENTOS NA PASTA</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignCenter</set>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_11">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>70</y>
-          <width>37</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>E-MAIL</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_46">
-        <property name="geometry">
-         <rect>
-          <x>267</x>
-          <y>130</y>
-          <width>49</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>TELEFONE</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_consulta_cnh">
-        <property name="geometry">
-         <rect>
-          <x>176</x>
-          <y>196</y>
-          <width>21</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_consulta_funcional">
-        <property name="geometry">
-         <rect>
-          <x>382</x>
-          <y>370</y>
-          <width>17</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_18">
-        <property name="geometry">
-         <rect>
-          <x>5</x>
-          <y>246</y>
-          <width>65</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>NOME DA MÃE</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_rg">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>309</y>
-          <width>198</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_funcional">
+      <property name="geometry">
+       <rect>
+        <x>146</x>
+        <y>417</y>
+        <width>142</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -1938,171 +2212,62 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_10">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>304</y>
-          <width>21</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_50">
+      <property name="geometry">
+       <rect>
+        <x>146</x>
+        <y>405</y>
+        <width>55</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>RG</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_12">
-        <property name="geometry">
-         <rect>
-          <x>162</x>
-          <y>130</y>
-          <width>61</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>NASCIMENTO</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_16">
-        <property name="geometry">
-         <rect>
-          <x>206</x>
-          <y>188</y>
-          <width>80</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>CÓD SEG - CNH</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_consulta_rg">
-        <property name="geometry">
-         <rect>
-          <x>184</x>
-          <y>312</y>
-          <width>17</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_48">
-        <property name="geometry">
-         <rect>
-          <x>214</x>
-          <y>304</y>
-          <width>57</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>ORGÃO RG</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_funcional">
-        <property name="geometry">
-         <rect>
-          <x>214</x>
-          <y>368</y>
-          <width>189</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string>FUNCIONAL</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_seguranca_cnh">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>416</y>
+        <width>119</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -2113,65 +2278,169 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_24">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>14</y>
-          <width>77</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_email">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>246</y>
+        <width>289</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_cnh">
+      <property name="geometry">
+       <rect>
+        <x>116</x>
+        <y>362</y>
+        <width>21</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_cpf">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>302</y>
+        <width>156</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_46">
+      <property name="geometry">
+       <rect>
+        <x>318</x>
+        <y>232</y>
+        <width>49</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>NOME COMPLETO</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_rg_orgao">
-        <property name="geometry">
-         <rect>
-          <x>214</x>
-          <y>309</y>
-          <width>190</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string>TELEFONE</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_pis">
+      <property name="geometry">
+       <rect>
+        <x>299</x>
+        <y>418</y>
+        <width>138</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -2182,36 +2451,33 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_telefone">
-        <property name="geometry">
-         <rect>
-          <x>267</x>
-          <y>135</y>
-          <width>137</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_rg_orgao">
+      <property name="geometry">
+       <rect>
+        <x>318</x>
+        <y>302</y>
+        <width>119</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -2222,62 +2488,176 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_27">
-        <property name="geometry">
-         <rect>
-          <x>412</x>
-          <y>230</y>
-          <width>61</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:rgb(60, 62, 84);
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_cnpj_municipio">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>594</y>
+        <width>421</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>ArrowCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_cnpj">
+      <property name="geometry">
+       <rect>
+        <x>15</x>
+        <y>490</y>
+        <width>314</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_25">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>582</y>
+        <width>77</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>  OBSERVAÇÕES</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_nome_mae">
-        <property name="geometry">
-         <rect>
-          <x>5</x>
-          <y>252</y>
-          <width>398</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
+      </property>
+      <property name="text">
+       <string>MUNICÍPIO CNPJ</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_consulta_cnpj">
+      <property name="geometry">
+       <rect>
+        <x>290</x>
+        <y>488</y>
+        <width>17</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="campo_cnpj_razao_social">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>543</y>
+        <width>421</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -2288,610 +2668,87 @@ QLineEdit:disabled, QLineEdit:!focus {
     border-bottom: 1px solid rgb(120, 120, 120);
 }
 </string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_email">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>78</y>
-          <width>398</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_cpf">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>135</y>
-          <width>148</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_consulta_cpf">
-        <property name="geometry">
-         <rect>
-          <x>132</x>
-          <y>138</y>
-          <width>21</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍︎</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_seguranca_cnh">
-        <property name="geometry">
-         <rect>
-          <x>207</x>
-          <y>194</y>
-          <width>196</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_49">
-        <property name="geometry">
-         <rect>
-          <x>6</x>
-          <y>362</y>
-          <width>45</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="placeholderText">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="botao_junta">
+      <property name="geometry">
+       <rect>
+        <x>420</x>
+        <y>488</y>
+        <width>17</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_47">
+      <property name="geometry">
+       <rect>
+        <x>16</x>
+        <y>532</y>
+        <width>105</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
 color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>PIS/CEI</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_agrupar_PDF_pasta_cliente">
-        <property name="geometry">
-         <rect>
-          <x>524</x>
-          <y>50</y>
-          <width>29</width>
-          <height>28</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>14</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;
-background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string extracomment="Cria a link do vídeo">🗃️</string>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_converter_todas_imagens_em_pdf">
-        <property name="geometry">
-         <rect>
-          <x>522</x>
-          <y>20</y>
-          <width>30</width>
-          <height>32</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>14</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="toolTip">
-         <string>Converte as imagens da pasta do cliente para PDF</string>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string extracomment="Cria a link do vídeo">🔄️</string>
-        </property>
-        <property name="autoDefault">
-         <bool>false</bool>
-        </property>
-        <property name="default">
-         <bool>false</bool>
-        </property>
-        <property name="flat">
-         <bool>true</bool>
-        </property>
-       </widget>
-       <zorder>campo_data_nascimento</zorder>
-       <zorder>tabela_documentos</zorder>
-       <zorder>campo_comentario</zorder>
-       <zorder>campo_cnh</zorder>
-       <zorder>campo_pis</zorder>
-       <zorder>campo_nome</zorder>
-       <zorder>label_44</zorder>
-       <zorder>botao_consulta_cnh</zorder>
-       <zorder>campo_rg</zorder>
-       <zorder>label_10</zorder>
-       <zorder>label_12</zorder>
-       <zorder>botao_consulta_rg</zorder>
-       <zorder>campo_funcional</zorder>
-       <zorder>label_24</zorder>
-       <zorder>campo_rg_orgao</zorder>
-       <zorder>campo_telefone</zorder>
-       <zorder>label_27</zorder>
-       <zorder>campo_nome_mae</zorder>
-       <zorder>campo_email</zorder>
-       <zorder>campo_cpf</zorder>
-       <zorder>botao_consulta_cpf</zorder>
-       <zorder>campo_seguranca_cnh</zorder>
-       <zorder>label_49</zorder>
-       <zorder>botao_consulta_pis</zorder>
-       <zorder>label_16</zorder>
-       <zorder>label_48</zorder>
-       <zorder>label_50</zorder>
-       <zorder>label_46</zorder>
-       <zorder>label_11</zorder>
-       <zorder>label_6</zorder>
-       <zorder>label_15</zorder>
-       <zorder>label_18</zorder>
-       <zorder>botao_telefone</zorder>
-       <zorder>botao_enviar_email</zorder>
-       <zorder>botao_agrupar_PDF_pasta_cliente</zorder>
-       <zorder>botao_consulta_funcional</zorder>
-       <zorder>botao_converter_todas_imagens_em_pdf</zorder>
-      </widget>
-      <widget class="QWidget" name="tab_3">
-       <attribute name="title">
-        <string>Documentos Empresa</string>
-       </attribute>
-       <widget class="QPushButton" name="botao_dados_cnpj">
-        <property name="geometry">
-         <rect>
-          <x>245</x>
-          <y>33</y>
-          <width>21</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>12</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>📋</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_28">
-        <property name="geometry">
-         <rect>
-          <x>282</x>
-          <y>27</y>
-          <width>41</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>JUNTA</string>
-        </property>
-       </widget>
-       <widget class="QPushButton" name="botao_consulta_cnpj">
-        <property name="geometry">
-         <rect>
-          <x>227</x>
-          <y>33</y>
-          <width>17</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_25">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>152</y>
-          <width>77</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>MUNICÍPIO CNPJ</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_cnpj_municipio">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>156</y>
-          <width>537</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>ArrowCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_cnpj">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>31</y>
-          <width>261</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_47">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>90</y>
-          <width>105</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>RAZÃO SOCIAL - CNPJ</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="campo_cnpj_razao_social">
-        <property name="geometry">
-         <rect>
-          <x>9</x>
-          <y>93</y>
-          <width>537</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>10</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-        <property name="placeholderText">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_14">
-        <property name="geometry">
-         <rect>
-          <x>8</x>
-          <y>27</y>
-          <width>29</width>
-          <height>7</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>CNPJ</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="campo_lista_junta_comercial">
-        <property name="geometry">
-         <rect>
-          <x>282</x>
-          <y>31</y>
-          <width>112</width>
-          <height>34</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox {
+      </property>
+      <property name="text">
+       <string>RAZÃO SOCIAL - CNPJ</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_lista_junta_comercial">
+      <property name="geometry">
+       <rect>
+        <x>346</x>
+        <y>490</y>
+        <width>91</width>
+        <height>26</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
     border: none;
     border-bottom: 1px solid rgb(90, 54, 247);
     border-radius: 0;
@@ -2909,474 +2766,291 @@ QComboBox::down-arrow {
 QComboBox::drop-down {
     width: 0;
 }</string>
-        </property>
-        <property name="editable">
-         <bool>false</bool>
-        </property>
-        <item>
-         <property name="text">
-          <string>SP</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>AC</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>AL</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>AM</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>AP</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>BA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>CE</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>DF</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>ES</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>GO</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MG</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MS</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>MT</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PA</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PB</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PE</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PI</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PR</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RJ</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RN</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RO</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RR</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>RS</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>SC</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>SE</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>TO</string>
-         </property>
-        </item>
-       </widget>
-       <widget class="QPushButton" name="botao_junta">
-        <property name="geometry">
-         <rect>
-          <x>373</x>
-          <y>34</y>
-          <width>17</width>
-          <height>25</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>PointingHandCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::NoFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:10px;background-color:transparent</string>
-        </property>
-        <property name="text">
-         <string>🔍</string>
-        </property>
-       </widget>
-       <zorder>campo_cnpj_municipio</zorder>
-       <zorder>campo_cnpj</zorder>
-       <zorder>campo_cnpj_razao_social</zorder>
-       <zorder>label_14</zorder>
-       <zorder>campo_lista_junta_comercial</zorder>
-       <zorder>botao_junta</zorder>
-       <zorder>label_25</zorder>
-       <zorder>label_47</zorder>
-       <zorder>label_28</zorder>
-       <zorder>botao_dados_cnpj</zorder>
-       <zorder>botao_consulta_cnpj</zorder>
-      </widget>
-      <widget class="QWidget" name="tab_8">
-       <attribute name="title">
-        <string>Consolidado</string>
-       </attribute>
-       <widget class="QLabel" name="label_38">
-        <property name="geometry">
-         <rect>
-          <x>19</x>
-          <y>4</y>
-          <width>65</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Segoe UI</family>
-          <pointsize>6</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:rgb(60, 62, 84);
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>SCRIPT</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
-        </property>
-       </widget>
-       <widget class="QTextEdit" name="campo_consolidado">
-        <property name="geometry">
-         <rect>
-          <x>17</x>
-          <y>20</y>
-          <width>523</width>
-          <height>381</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>9</pointsize>
-         </font>
-        </property>
-        <property name="cursor" stdset="0">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="focusPolicy">
-         <enum>Qt::StrongFocus</enum>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">border-radius:7px;
-border: 1px solid rgb(120,120,120);
-background-color:rgb(60,62, 84);
-</string>
-        </property>
-        <property name="horizontalScrollBarPolicy">
-         <enum>Qt::ScrollBarAlwaysOff</enum>
-        </property>
-        <property name="html">
-         <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
-&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
-p, li { white-space: pre-wrap; }
-&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Consolas'; font-size:9pt; font-weight:400; font-style:normal;&quot;&gt;
-&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QWidget" name="tab_7">
-       <attribute name="title">
-        <string>Configs Cliente</string>
-       </attribute>
-       <widget class="QLabel" name="label_8">
-        <property name="geometry">
-         <rect>
-          <x>15</x>
-          <y>30</y>
-          <width>157</width>
-          <height>10</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>7</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>DIRETÓRIO PASTA CLIENTE ATUAL</string>
-        </property>
-       </widget>
-       <widget class="QLineEdit" name="caminho_pasta">
-        <property name="enabled">
-         <bool>true</bool>
-        </property>
-        <property name="geometry">
-         <rect>
-          <x>15</x>
-          <y>41</y>
-          <width>526</width>
-          <height>35</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>12</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="cursor">
-         <cursorShape>IBeamCursor</cursorShape>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QLineEdit {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QLineEdit:disabled, QLineEdit:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-       <widget class="QLabel" name="label_42">
-        <property name="geometry">
-         <rect>
-          <x>17</x>
-          <y>91</y>
-          <width>69</width>
-          <height>10</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>7</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-        </property>
-        <property name="text">
-         <string>MODO  PASTA</string>
-        </property>
-       </widget>
-       <widget class="QComboBox" name="campo_lista_tipo_criar_pasta">
-        <property name="geometry">
-         <rect>
-          <x>16</x>
-          <y>100</y>
-          <width>157</width>
-          <height>35</height>
-         </rect>
-        </property>
-        <property name="font">
-         <font>
-          <family>Consolas</family>
-          <pointsize>11</pointsize>
-          <weight>50</weight>
-          <italic>false</italic>
-          <bold>false</bold>
-         </font>
-        </property>
-        <property name="styleSheet">
-         <string notr="true">QComboBox {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QComboBox:disabled, QComboBox:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-
-QComboBox::down-arrow {
-    image: none;
-}
-
-QComboBox::drop-down {
-    width: 0;
-}
-</string>
-        </property>
-        <property name="editable">
-         <bool>false</bool>
-        </property>
-        <item>
-         <property name="text">
-          <string>PEDIDO</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>NOME</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>PEDIDO-NOME</string>
-         </property>
-        </item>
-       </widget>
-      </widget>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>SP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AL</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AM</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>AP</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>BA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>DF</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>ES</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>GO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MG</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>MT</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PA</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PB</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PI</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RJ</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RN</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RR</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>RS</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SC</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>SE</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>TO</string>
+       </property>
+      </item>
      </widget>
-     <widget class="QLabel" name="label_37">
+     <widget class="QPushButton" name="botao_dados_cnpj">
       <property name="geometry">
        <rect>
-        <x>548</x>
-        <y>193</y>
-        <width>25</width>
-        <height>21</height>
+        <x>308</x>
+        <y>488</y>
+        <width>21</width>
+        <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <family>Consolas</family>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:rgb(50, 55, 60);
-</string>
-      </property>
-      <property name="text">
-       <string/>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="alerta_midia">
-      <property name="geometry">
-       <rect>
-        <x>362</x>
-        <y>74</y>
-        <width>30</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>18</pointsize>
+        <pointsize>10</pointsize>
         <weight>50</weight>
         <italic>false</italic>
         <bold>false</bold>
        </font>
       </property>
       <property name="cursor">
-       <cursorShape>ArrowCursor</cursorShape>
+       <cursorShape>PointingHandCursor</cursorShape>
       </property>
       <property name="focusPolicy">
        <enum>Qt::NoFocus</enum>
       </property>
-      <property name="layoutDirection">
-       <enum>Qt::LeftToRight</enum>
-      </property>
       <property name="styleSheet">
-       <string notr="true">border-radius:7px;
-;background-color: transparent</string>
+       <string notr="true">border-radius:10px;background-color:transparent</string>
       </property>
       <property name="text">
-       <string/>
+       <string>📋</string>
       </property>
      </widget>
+     <widget class="QLabel" name="label_14">
+      <property name="geometry">
+       <rect>
+        <x>17</x>
+        <y>478</y>
+        <width>29</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>CNPJ</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_28">
+      <property name="geometry">
+       <rect>
+        <x>346</x>
+        <y>478</y>
+        <width>41</width>
+        <height>7</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Leelawadee UI</family>
+        <pointsize>6</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>JUNTA</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_38">
+      <property name="geometry">
+       <rect>
+        <x>13</x>
+        <y>154</y>
+        <width>583</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(40, 45, 50);
+</string>
+      </property>
+      <property name="text">
+       <string> Dados Pessoais</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_39">
+      <property name="geometry">
+       <rect>
+        <x>13</x>
+        <y>456</y>
+        <width>426</width>
+        <height>13</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>9</pointsize>
+        <weight>50</weight>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:rgb(40, 45, 50);
+</string>
+      </property>
+      <property name="text">
+       <string> Dados Empresa</string>
+      </property>
+     </widget>
+     <zorder>campo_funcional</zorder>
+     <zorder>campo_cnh</zorder>
+     <zorder>campo_cnpj_razao_social</zorder>
+     <zorder>label_47</zorder>
+     <zorder>campo_lista_junta_comercial</zorder>
+     <zorder>campo_pis</zorder>
+     <zorder>campo_rg</zorder>
+     <zorder>label_16</zorder>
+     <zorder>campo_telefone</zorder>
+     <zorder>campo_cpf</zorder>
+     <zorder>tabela_documentos</zorder>
      <zorder>campo_data_agendamento</zorder>
      <zorder>campo_pedido</zorder>
      <zorder>campo_hora_agendamento</zorder>
@@ -3403,9 +3077,46 @@ QComboBox::drop-down {
      <zorder>label_31</zorder>
      <zorder>campo_email_enviado</zorder>
      <zorder>label_confirmacao_excluir</zorder>
-     <zorder>aba_dados_cliente</zorder>
-     <zorder>label_37</zorder>
      <zorder>alerta_midia</zorder>
+     <zorder>botao_agrupar_PDF_pasta_cliente</zorder>
+     <zorder>botao_converter_todas_imagens_em_pdf</zorder>
+     <zorder>label_12</zorder>
+     <zorder>label_49</zorder>
+     <zorder>label_44</zorder>
+     <zorder>label_15</zorder>
+     <zorder>label_11</zorder>
+     <zorder>botao_telefone</zorder>
+     <zorder>botao_consulta_pis</zorder>
+     <zorder>label_10</zorder>
+     <zorder>label_18</zorder>
+     <zorder>campo_nome_mae</zorder>
+     <zorder>botao_consulta_cpf</zorder>
+     <zorder>label_27</zorder>
+     <zorder>label_24</zorder>
+     <zorder>botao_consulta_rg</zorder>
+     <zorder>campo_comentario</zorder>
+     <zorder>label_6</zorder>
+     <zorder>campo_data_nascimento</zorder>
+     <zorder>label_48</zorder>
+     <zorder>botao_consulta_funcional</zorder>
+     <zorder>campo_nome</zorder>
+     <zorder>label_50</zorder>
+     <zorder>campo_seguranca_cnh</zorder>
+     <zorder>campo_email</zorder>
+     <zorder>botao_consulta_cnh</zorder>
+     <zorder>label_46</zorder>
+     <zorder>campo_rg_orgao</zorder>
+     <zorder>campo_cnpj_municipio</zorder>
+     <zorder>campo_cnpj</zorder>
+     <zorder>label_25</zorder>
+     <zorder>botao_consulta_cnpj</zorder>
+     <zorder>botao_junta</zorder>
+     <zorder>botao_dados_cnpj</zorder>
+     <zorder>label_14</zorder>
+     <zorder>label_28</zorder>
+     <zorder>botao_enviar_email</zorder>
+     <zorder>label_38</zorder>
+     <zorder>label_39</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
@@ -3414,8 +3125,8 @@ QComboBox::drop-down {
      <widget class="QPushButton" name="botao_procurar">
       <property name="geometry">
        <rect>
-        <x>502</x>
-        <y>590</y>
+        <x>528</x>
+        <y>594</y>
         <width>62</width>
         <height>29</height>
        </rect>
@@ -3448,15 +3159,15 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_quantidade_bd">
       <property name="geometry">
        <rect>
-        <x>146</x>
-        <y>592</y>
+        <x>172</x>
+        <y>596</y>
         <width>226</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>10</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -3469,7 +3180,7 @@ color:rgb(90,54,247);
        <enum>Qt::LeftToRight</enum>
       </property>
       <property name="styleSheet">
-       <string notr="true">color:rgb(90,54,247);</string>
+       <string notr="true">color:rgb(220,220,220);</string>
       </property>
       <property name="text">
        <string/>
@@ -3524,7 +3235,7 @@ background-color:transparent</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3571,7 +3282,7 @@ QDateEdit::down-button {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3666,7 +3377,7 @@ color:rgb(170,170,170)</string>
        <rect>
         <x>18</x>
         <y>144</y>
-        <width>551</width>
+        <width>574</width>
         <height>6</height>
        </rect>
       </property>
@@ -3728,7 +3439,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -3794,14 +3505,14 @@ color:rgb(170,170,170)</string>
       <property name="geometry">
        <rect>
         <x>18</x>
-        <y>590</y>
+        <y>594</y>
         <width>29</width>
         <height>25</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>10</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -3861,7 +3572,7 @@ background-color:transparent</string>
      <widget class="QTextEdit" name="campo_relatorio">
       <property name="geometry">
        <rect>
-        <x>278</x>
+        <x>302</x>
         <y>16</y>
         <width>289</width>
         <height>121</height>
@@ -3894,7 +3605,7 @@ background-color:rgb(60,62, 84);</string>
      <widget class="QLabel" name="label_26">
       <property name="geometry">
        <rect>
-        <x>284</x>
+        <x>308</x>
         <y>10</y>
         <width>57</width>
         <height>9</height>
@@ -3920,8 +3631,8 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_envio_massa">
       <property name="geometry">
        <rect>
-        <x>378</x>
-        <y>590</y>
+        <x>404</x>
+        <y>594</y>
         <width>117</width>
         <height>29</height>
        </rect>
@@ -3991,22 +3702,31 @@ background-color:transparent</string>
        <rect>
         <x>18</x>
         <y>159</y>
-        <width>550</width>
-        <height>419</height>
+        <width>574</width>
+        <height>427</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>8</pointsize>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">QHeaderView::section {
-    background-color: transparent;
-  
+       <string notr="true">/* Adicionar borda ao redor de todo o QTableWidget */
+QTableWidget {
+    border: 1px solid rgb(120, 120, 120); /* Borda ao redor da tabela */
 }
 
+/* Adicionar borda ao redor do header */
+
+
+/* Estilo para cada seção do header */
+QHeaderView::section {
+    border: 1px solid rgb(120, 120, 120); /* Borda ao redor de cada célula do cabeçalho */
+    background-color: transparent; /* Fundo transparente */
+    padding: 1px; /* Ajuste de espaçamento */
+}
 </string>
       </property>
       <property name="verticalScrollBarPolicy">
@@ -4016,7 +3736,7 @@ background-color:transparent</string>
        <enum>Qt::ScrollBarAlwaysOff</enum>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
-       <number>91</number>
+       <number>96</number>
       </attribute>
       <attribute name="verticalHeaderVisible">
        <bool>false</bool>
@@ -4077,7 +3797,7 @@ background-color:transparent</string>
      <widget class="QLabel" name="label_36">
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>72</x>
         <y>16</y>
         <width>61</width>
         <height>8</height>
@@ -4106,7 +3826,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>64</x>
+        <x>72</x>
         <y>22</y>
         <width>103</width>
         <height>31</height>
@@ -4114,7 +3834,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>14</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -4155,7 +3875,7 @@ QDateEdit::down-button {
      <widget class="QLabel" name="label_70">
       <property name="geometry">
        <rect>
-        <x>182</x>
+        <x>190</x>
         <y>16</y>
         <width>85</width>
         <height>9</height>
@@ -4181,7 +3901,7 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_atualizar_meta">
       <property name="geometry">
        <rect>
-        <x>412</x>
+        <x>420</x>
         <y>22</y>
         <width>111</width>
         <height>31</height>
@@ -4212,7 +3932,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_71">
       <property name="geometry">
        <rect>
-        <x>284</x>
+        <x>292</x>
         <y>16</y>
         <width>75</width>
         <height>9</height>
@@ -4238,7 +3958,7 @@ color:rgb(170,170,170)</string>
      <widget class="QSpinBox" name="campo_meta_semanal">
       <property name="geometry">
        <rect>
-        <x>182</x>
+        <x>190</x>
         <y>22</y>
         <width>90</width>
         <height>31</height>
@@ -4246,7 +3966,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -4278,7 +3998,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_meta_mes">
       <property name="geometry">
        <rect>
-        <x>284</x>
+        <x>292</x>
         <y>22</y>
         <width>90</width>
         <height>31</height>
@@ -4286,7 +4006,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <bold>false</bold>
@@ -4318,7 +4038,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta1">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>70</y>
         <width>500</width>
         <height>25</height>
@@ -4326,7 +4046,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4346,7 +4066,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta3">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>142</y>
         <width>500</width>
         <height>25</height>
@@ -4354,7 +4074,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4374,7 +4094,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta4">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>178</y>
         <width>500</width>
         <height>25</height>
@@ -4382,7 +4102,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4402,7 +4122,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta2">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>106</y>
         <width>500</width>
         <height>25</height>
@@ -4410,7 +4130,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4430,7 +4150,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta5">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>214</y>
         <width>500</width>
         <height>25</height>
@@ -4438,7 +4158,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4458,7 +4178,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_meta_mes">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>250</y>
         <width>500</width>
         <height>25</height>
@@ -4466,7 +4186,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>11</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4486,7 +4206,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_mensal">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>250</y>
         <width>500</width>
         <height>25</height>
@@ -4520,7 +4240,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_4">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>178</y>
         <width>500</width>
         <height>25</height>
@@ -4551,7 +4271,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_5">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>214</y>
         <width>500</width>
         <height>25</height>
@@ -4582,7 +4302,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_2">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>106</y>
         <width>500</width>
         <height>25</height>
@@ -4613,7 +4333,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_1">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>70</y>
         <width>500</width>
         <height>25</height>
@@ -4644,7 +4364,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QProgressBar" name="barra_meta_semana_3">
       <property name="geometry">
        <rect>
-        <x>40</x>
+        <x>54</x>
         <y>142</y>
         <width>500</width>
         <height>25</height>
@@ -4677,8 +4397,8 @@ QSpinBox:disabled, QSpinBox:!focus {
        <rect>
         <x>10</x>
         <y>247</y>
-        <width>582</width>
-        <height>388</height>
+        <width>595</width>
+        <height>402</height>
        </rect>
       </property>
      </widget>
@@ -4713,15 +4433,15 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>66</x>
-        <y>475</y>
-        <width>100</width>
+        <x>430</x>
+        <y>417</y>
+        <width>94</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4754,15 +4474,15 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>163</y>
-        <width>448</width>
+        <width>446</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4792,7 +4512,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_7">
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>154</y>
         <width>137</width>
         <height>10</height>
@@ -4818,8 +4538,8 @@ color:rgb(170,170,170)</string>
      <widget class="QLabel" name="label_9">
       <property name="geometry">
        <rect>
-        <x>66</x>
-        <y>466</y>
+        <x>430</x>
+        <y>408</y>
         <width>61</width>
         <height>10</height>
        </rect>
@@ -4844,7 +4564,7 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_altera_pasta_principal">
       <property name="geometry">
        <rect>
-        <x>486</x>
+        <x>482</x>
         <y>160</y>
         <width>33</width>
         <height>30</height>
@@ -4879,7 +4599,7 @@ background-color:transparent</string>
      <widget class="QLabel" name="label_33">
       <property name="geometry">
        <rect>
-        <x>68</x>
+        <x>78</x>
         <y>217</y>
         <width>41</width>
         <height>10</height>
@@ -4908,15 +4628,15 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>68</x>
+        <x>78</x>
         <y>226</y>
-        <width>447</width>
+        <width>445</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -4946,8 +4666,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="botao_atualizar_configuracoes">
       <property name="geometry">
        <rect>
-        <x>313</x>
-        <y>562</y>
+        <x>323</x>
+        <y>580</y>
         <width>201</width>
         <height>31</height>
        </rect>
@@ -4980,7 +4700,7 @@ color:rgb(90,54,247);
      <widget class="QLabel" name="label_45">
       <property name="geometry">
        <rect>
-        <x>65</x>
+        <x>75</x>
         <y>342</y>
         <width>100</width>
         <height>10</height>
@@ -5006,7 +4726,7 @@ color:rgb(170,170,170)</string>
      <widget class="QSpinBox" name="campo_porcentagem_validacao">
       <property name="geometry">
        <rect>
-        <x>65</x>
+        <x>75</x>
         <y>351</y>
         <width>100</width>
         <height>30</height>
@@ -5014,7 +4734,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5050,7 +4770,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QSpinBox" name="campo_imposto_validacao">
       <property name="geometry">
        <rect>
-        <x>285</x>
+        <x>312</x>
         <y>351</y>
         <width>100</width>
         <height>30</height>
@@ -5058,7 +4778,7 @@ QSpinBox:disabled, QSpinBox:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5094,7 +4814,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_51">
       <property name="geometry">
        <rect>
-        <x>285</x>
+        <x>312</x>
         <y>342</y>
         <width>100</width>
         <height>10</height>
@@ -5120,7 +4840,7 @@ color:rgb(170,170,170)</string>
      <widget class="QLabel" name="label_52">
       <property name="geometry">
        <rect>
-        <x>66</x>
+        <x>76</x>
         <y>406</y>
         <width>100</width>
         <height>10</height>
@@ -5146,7 +4866,7 @@ color:rgb(170,170,170)</string>
      <widget class="QDoubleSpinBox" name="campo_desconto_validacao">
       <property name="geometry">
        <rect>
-        <x>66</x>
+        <x>76</x>
         <y>415</y>
         <width>100</width>
         <height>30</height>
@@ -5154,7 +4874,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5193,7 +4913,7 @@ QDoubleSpinBox:disabled, QDoubleSpinBox:!focus {
      <widget class="QLabel" name="label_53">
       <property name="geometry">
        <rect>
-        <x>175</x>
+        <x>194</x>
         <y>342</y>
         <width>100</width>
         <height>10</height>
@@ -5219,7 +4939,7 @@ color:rgb(170,170,170)</string>
      <widget class="QSpinBox" name="campo_desconto">
       <property name="geometry">
        <rect>
-        <x>175</x>
+        <x>194</x>
         <y>351</y>
         <width>100</width>
         <height>30</height>
@@ -5227,7 +4947,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5263,7 +4983,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_29">
       <property name="geometry">
        <rect>
-        <x>286</x>
+        <x>312</x>
         <y>406</y>
         <width>49</width>
         <height>10</height>
@@ -5292,7 +5012,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>286</x>
+        <x>312</x>
         <y>416</y>
         <width>100</width>
         <height>30</height>
@@ -5300,7 +5020,7 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5333,7 +5053,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>285</y>
         <width>446</width>
         <height>30</height>
@@ -5341,7 +5061,7 @@ QLineEdit:disabled, QLineEdit:!focus {
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5371,7 +5091,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_34">
       <property name="geometry">
        <rect>
-        <x>68</x>
+        <x>78</x>
         <y>275</y>
         <width>69</width>
         <height>10</height>
@@ -5400,15 +5120,15 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>102</y>
-        <width>448</width>
+        <width>447</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5438,7 +5158,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_30">
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>94</y>
         <width>49</width>
         <height>10</height>
@@ -5496,7 +5216,7 @@ background-color:transparent</string>
      <widget class="QSpinBox" name="campo_dias_renovacao">
       <property name="geometry">
        <rect>
-        <x>175</x>
+        <x>194</x>
         <y>415</y>
         <width>100</width>
         <height>30</height>
@@ -5504,7 +5224,7 @@ background-color:transparent</string>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5537,7 +5257,7 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_41">
       <property name="geometry">
        <rect>
-        <x>175</x>
+        <x>194</x>
         <y>406</y>
         <width>100</width>
         <height>10</height>
@@ -5563,8 +5283,8 @@ color:rgb(170,170,170)</string>
      <widget class="QCheckBox" name="checkBox_transparecer">
       <property name="geometry">
        <rect>
-        <x>248</x>
-        <y>480</y>
+        <x>504</x>
+        <y>358</y>
         <width>18</width>
         <height>17</height>
        </rect>
@@ -5582,15 +5302,15 @@ color:rgb(170,170,170)</string>
      <widget class="QSpinBox" name="campo_porcentagem_transparencia">
       <property name="geometry">
        <rect>
-        <x>176</x>
-        <y>475</y>
+        <x>432</x>
+        <y>351</y>
         <width>92</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5626,8 +5346,8 @@ QSpinBox:disabled, QSpinBox:!focus {
      <widget class="QLabel" name="label_32">
       <property name="geometry">
        <rect>
-        <x>176</x>
-        <y>464</y>
+        <x>432</x>
+        <y>340</y>
         <width>92</width>
         <height>10</height>
        </rect>
@@ -5655,15 +5375,15 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>40</y>
-        <width>221</width>
+        <width>213</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5693,7 +5413,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_35">
       <property name="geometry">
        <rect>
-        <x>67</x>
+        <x>77</x>
         <y>32</y>
         <width>49</width>
         <height>10</height>
@@ -5722,15 +5442,15 @@ color:rgb(170,170,170)</string>
       </property>
       <property name="geometry">
        <rect>
-        <x>294</x>
+        <x>304</x>
         <y>40</y>
-        <width>221</width>
+        <width>219</width>
         <height>30</height>
        </rect>
       </property>
       <property name="font">
        <font>
-        <family>Consolas</family>
+        <family>Calibri</family>
         <pointsize>12</pointsize>
         <weight>50</weight>
         <italic>false</italic>
@@ -5760,7 +5480,7 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QLabel" name="label_43">
       <property name="geometry">
        <rect>
-        <x>294</x>
+        <x>304</x>
         <y>32</y>
         <width>49</width>
         <height>10</height>
@@ -5786,7 +5506,7 @@ color:rgb(170,170,170)</string>
      <widget class="QPushButton" name="botao_ocultar_senha_usuario">
       <property name="geometry">
        <rect>
-        <x>490</x>
+        <x>486</x>
         <y>44</y>
         <width>25</width>
         <height>21</height>
@@ -5813,6 +5533,157 @@ background-color:transparent</string>
       </property>
       <property name="text">
        <string>👁️</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_42">
+      <property name="geometry">
+       <rect>
+        <x>77</x>
+        <y>522</y>
+        <width>69</width>
+        <height>10</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>7</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>MODO  PASTA</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="campo_lista_tipo_criar_pasta">
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>531</y>
+        <width>157</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>11</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QComboBox {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QComboBox:disabled, QComboBox:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+
+QComboBox::down-arrow {
+    image: none;
+}
+
+QComboBox::drop-down {
+    width: 0;
+}
+</string>
+      </property>
+      <property name="editable">
+       <bool>false</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>PEDIDO</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>NOME</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PEDIDO-NOME</string>
+       </property>
+      </item>
+     </widget>
+     <widget class="QLineEdit" name="caminho_pasta">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>473</y>
+        <width>447</width>
+        <height>30</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Calibri</family>
+        <pointsize>12</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>IBeamCursor</cursorShape>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">QLineEdit {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QLineEdit:disabled, QLineEdit:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_8">
+      <property name="geometry">
+       <rect>
+        <x>76</x>
+        <y>462</y>
+        <width>157</width>
+        <height>10</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>7</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+      </property>
+      <property name="text">
+       <string>DIRETÓRIO PASTA CLIENTE ATUAL</string>
       </property>
      </widget>
      <zorder>campo_verifica_tela_cheia</zorder>
@@ -5848,13 +5719,17 @@ background-color:transparent</string>
      <zorder>campo_senha_usuario</zorder>
      <zorder>label_43</zorder>
      <zorder>botao_ocultar_senha_usuario</zorder>
+     <zorder>label_42</zorder>
+     <zorder>campo_lista_tipo_criar_pasta</zorder>
+     <zorder>caminho_pasta</zorder>
+     <zorder>label_8</zorder>
     </widget>
    </widget>
    <widget class="QPushButton" name="botao_print_direto_na_pasta">
     <property name="geometry">
      <rect>
-      <x>410</x>
-      <y>-2</y>
+      <x>436</x>
+      <y>-5</y>
       <width>46</width>
       <height>56</height>
      </rect>
@@ -5889,8 +5764,8 @@ background-color:transparent</string>
      <rect>
       <x>-92</x>
       <y>-8</y>
-      <width>680</width>
-      <height>63</height>
+      <width>700</width>
+      <height>59</height>
      </rect>
     </property>
     <property name="font">
@@ -5912,7 +5787,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>8</x>
-      <y>4</y>
+      <y>1</y>
       <width>46</width>
       <height>46</height>
      </rect>
@@ -5945,8 +5820,8 @@ background-color:transparent</string>
    <widget class="QPushButton" name="botao_agrupar_PDF">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>6</y>
+      <x>546</x>
+      <y>3</y>
       <width>46</width>
       <height>43</height>
      </rect>
@@ -5978,8 +5853,8 @@ background-color:transparent</string>
    <widget class="QPushButton" name="botao_converter">
     <property name="geometry">
      <rect>
-      <x>464</x>
-      <y>10</y>
+      <x>490</x>
+      <y>7</y>
       <width>49</width>
       <height>41</height>
      </rect>
@@ -6018,7 +5893,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>80</x>
-      <y>4</y>
+      <y>1</y>
       <width>26</width>
       <height>26</height>
      </rect>
@@ -6044,8 +5919,8 @@ background-color:transparent</string>
    <widget class="QLabel" name="label_confirmacao_tirar_print">
     <property name="geometry">
      <rect>
-      <x>438</x>
-      <y>12</y>
+      <x>464</x>
+      <y>9</y>
       <width>16</width>
       <height>16</height>
      </rect>
@@ -6081,8 +5956,8 @@ background-color:transparent</string>
    <widget class="QLabel" name="label_confirmacao_converter_pdf">
     <property name="geometry">
      <rect>
-      <x>488</x>
-      <y>10</y>
+      <x>514</x>
+      <y>7</y>
       <width>16</width>
       <height>16</height>
      </rect>
@@ -6100,8 +5975,8 @@ background-color:transparent</string>
    <widget class="QLabel" name="label_confirmacao_mesclar_pdf">
     <property name="geometry">
      <rect>
-      <x>546</x>
-      <y>10</y>
+      <x>572</x>
+      <y>7</y>
       <width>16</width>
       <height>16</height>
      </rect>
@@ -6120,7 +5995,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>58</x>
-      <y>5</y>
+      <y>2</y>
       <width>41</width>
       <height>45</height>
      </rect>
@@ -6149,8 +6024,8 @@ background-color:transparent</string>
    <widget class="QPushButton" name="botao_menagem">
     <property name="geometry">
      <rect>
-      <x>356</x>
-      <y>7</y>
+      <x>382</x>
+      <y>4</y>
       <width>46</width>
       <height>43</height>
      </rect>
@@ -6184,7 +6059,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>96</x>
-      <y>8</y>
+      <y>5</y>
       <width>45</width>
       <height>37</height>
      </rect>
@@ -6214,7 +6089,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>128</x>
-      <y>12</y>
+      <y>9</y>
       <width>33</width>
       <height>17</height>
      </rect>
@@ -6241,7 +6116,7 @@ background-color:transparent</string>
     <property name="geometry">
      <rect>
       <x>128</x>
-      <y>27</y>
+      <y>24</y>
       <width>33</width>
       <height>21</height>
      </rect>
@@ -6393,10 +6268,10 @@ background-color:transparent</string>
    <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>992</x>
-      <y>19</y>
+      <x>986</x>
+      <y>28</y>
       <width>100</width>
-      <height>466</height>
+      <height>373</height>
      </rect>
     </property>
     <layout class="QGridLayout" name="gridLayout">
@@ -6675,35 +6550,11 @@ background-color:transparent</string>
      </item>
     </layout>
    </widget>
-   <widget class="QLabel" name="label_54">
-    <property name="geometry">
-     <rect>
-      <x>315</x>
-      <y>55</y>
-      <width>261</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="font">
-     <font>
-      <family>Consolas</family>
-      <weight>50</weight>
-      <bold>false</bold>
-     </font>
-    </property>
-    <property name="styleSheet">
-     <string notr="true">background-color:rgb(40, 45, 50);
-</string>
-    </property>
-    <property name="text">
-     <string/>
-    </property>
-   </widget>
    <widget class="QLabel" name="label_versao">
     <property name="geometry">
      <rect>
-      <x>486</x>
-      <y>59</y>
+      <x>504</x>
+      <y>56</y>
       <width>84</width>
       <height>16</height>
      </rect>
@@ -6727,9 +6578,33 @@ background-color:transparent</string>
      <set>Qt::AlignRight|Qt::AlignTop|Qt::AlignTrailing</set>
     </property>
    </widget>
+   <widget class="QLabel" name="label_37">
+    <property name="geometry">
+     <rect>
+      <x>283</x>
+      <y>48</y>
+      <width>345</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <family>Consolas</family>
+      <weight>50</weight>
+      <bold>false</bold>
+     </font>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">background-color:rgb(40, 45, 50);
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <zorder>label_5</zorder>
    <zorder>tabWidget</zorder>
    <zorder>label_confirmacao_criar_link_video</zorder>
-   <zorder>label_5</zorder>
    <zorder>campo_status_bd_2</zorder>
    <zorder>botao_converter</zorder>
    <zorder>botao_menagem</zorder>
@@ -6745,7 +6620,7 @@ background-color:transparent</string>
    <zorder>campo_status_videook</zorder>
    <zorder>layoutWidget</zorder>
    <zorder>layoutWidget</zorder>
-   <zorder>label_54</zorder>
+   <zorder>label_37</zorder>
    <zorder>label_versao</zorder>
   </widget>
  </widget>
@@ -6756,33 +6631,36 @@ background-color:transparent</string>
   <tabstop>campo_lista_versao_certificado</tabstop>
   <tabstop>campo_lista_modalidade</tabstop>
   <tabstop>campo_lista_venda</tabstop>
+  <tabstop>campo_preco_certificado_cheio</tabstop>
   <tabstop>campo_preco_certificado</tabstop>
   <tabstop>campo_nome</tabstop>
-  <tabstop>campo_email</tabstop>
-  <tabstop>campo_cpf</tabstop>
   <tabstop>campo_data_nascimento</tabstop>
+  <tabstop>campo_email</tabstop>
   <tabstop>campo_telefone</tabstop>
-  <tabstop>campo_cnh</tabstop>
-  <tabstop>campo_seguranca_cnh</tabstop>
-  <tabstop>campo_nome_mae</tabstop>
+  <tabstop>campo_cpf</tabstop>
   <tabstop>campo_rg</tabstop>
   <tabstop>campo_rg_orgao</tabstop>
-  <tabstop>campo_pis</tabstop>
+  <tabstop>campo_cnh</tabstop>
+  <tabstop>campo_nome_mae</tabstop>
+  <tabstop>campo_seguranca_cnh</tabstop>
   <tabstop>campo_funcional</tabstop>
+  <tabstop>campo_pis</tabstop>
   <tabstop>campo_cnpj</tabstop>
   <tabstop>campo_lista_junta_comercial</tabstop>
   <tabstop>campo_cnpj_razao_social</tabstop>
   <tabstop>campo_cnpj_municipio</tabstop>
+  <tabstop>campo_comentario</tabstop>
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
   <tabstop>campo_lista_status_2</tabstop>
   <tabstop>campo_data_meta</tabstop>
   <tabstop>campo_meta_semanal</tabstop>
   <tabstop>campo_meta_mes</tabstop>
+  <tabstop>campo_usuario</tabstop>
   <tabstop>campo_senha_usuario</tabstop>
   <tabstop>campo_nome_agente</tabstop>
+  <tabstop>caminho_pasta_principal</tabstop>
   <tabstop>campo_email_empresa</tabstop>
-  <tabstop>campo_m7</tabstop>
   <tabstop>campo_senha_email</tabstop>
   <tabstop>campo_porcentagem_validacao</tabstop>
   <tabstop>campo_desconto</tabstop>
@@ -6791,29 +6669,22 @@ background-color:transparent</string>
   <tabstop>campo_desconto_validacao</tabstop>
   <tabstop>campo_dias_renovacao</tabstop>
   <tabstop>campo_cod_rev</tabstop>
-  <tabstop>campo_comentario</tabstop>
-  <tabstop>campo_m8</tabstop>
-  <tabstop>campo_m9</tabstop>
-  <tabstop>campo_m10</tabstop>
-  <tabstop>campo_m11</tabstop>
-  <tabstop>campo_m12</tabstop>
-  <tabstop>campo_m13</tabstop>
-  <tabstop>tabWidget</tabstop>
-  <tabstop>campo_relatorio</tabstop>
-  <tabstop>campo_preco_certificado_cheio</tabstop>
+  <tabstop>campo_verifica_tela_cheia</tabstop>
+  <tabstop>caminho_pasta</tabstop>
+  <tabstop>campo_lista_tipo_criar_pasta</tabstop>
   <tabstop>botao_ocultar_senha</tabstop>
   <tabstop>campo_certificados_semana_1</tabstop>
   <tabstop>campo_email_enviado</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>campo_m5</tabstop>
   <tabstop>campo_m3</tabstop>
-  <tabstop>campo_usuario</tabstop>
+  <tabstop>campo_m7</tabstop>
   <tabstop>campo_certificados_mes</tabstop>
   <tabstop>botao_ocultar_senha_usuario</tabstop>
   <tabstop>campo_certificados_semana_4</tabstop>
   <tabstop>campo_m2</tabstop>
   <tabstop>botao_atualizar_meta</tabstop>
-  <tabstop>caminho_pasta_principal</tabstop>
+  <tabstop>campo_m9</tabstop>
   <tabstop>campo_m4</tabstop>
   <tabstop>campo_certificados_semana_2</tabstop>
   <tabstop>campo_certificados_semana_5</tabstop>
@@ -6821,9 +6692,13 @@ background-color:transparent</string>
   <tabstop>campo_certificados_semana_3</tabstop>
   <tabstop>campo_m6</tabstop>
   <tabstop>tabela_documentos</tabstop>
-  <tabstop>campo_verifica_tela_cheia</tabstop>
-  <tabstop>aba_dados_cliente</tabstop>
-  <tabstop>caminho_pasta</tabstop>
+  <tabstop>campo_m11</tabstop>
+  <tabstop>campo_m13</tabstop>
+  <tabstop>campo_m12</tabstop>
+  <tabstop>campo_relatorio</tabstop>
+  <tabstop>campo_m10</tabstop>
+  <tabstop>tabWidget</tabstop>
+  <tabstop>campo_m8</tabstop>
  </tabstops>
  <resources/>
  <connections/>

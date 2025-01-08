@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 class Atualizar:
     def __init__(self, parent=None):
         self.parent = parent
-        self.versao = "1.0.10" 
+        self.versao = "1.0.13" 
 
 
     def verificar_atualizacao(self):

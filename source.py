@@ -43,7 +43,6 @@ QWidget,
 QGridLayout,
 QComboBox,
 QLabel,
-QHBoxLayout
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
@@ -57,7 +56,7 @@ from collections import defaultdict
 from interfaceUpdates import AlteracoesInterface
 from update import Atualizar
 from login import LoginWindow
-
+#from playwright.sync_api import sync_playwright
 
 
 
@@ -72,7 +71,6 @@ class FuncoesPadrao:
         self.dicionario = None
         self.acoes = AcoesBancoDeDados(ui)
         
-
 
     def evento_ao_abrir(self,event):
   
@@ -121,10 +119,10 @@ class FuncoesPadrao:
                 barra.setValue(certificados_semana)
 
                 if certificados_semana >= meta_semanal:
-                    label.setStyleSheet('color: rgb(113,66,230); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')  # Azul
+                    label.setStyleSheet('color: rgb(220,220,220); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')  # Azul
                     label.setText(f"Semana {semana_num} | Meta atingida! - R${certificados_semana} / R${meta_semanal}")
                 else:
-                    label.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
+                    label.setStyleSheet('color: rgb(220,220,220); background-color: transparent; border: 1px solid rgb(68,71,90)')
                     label.setText(f"Semana {semana_num} | R${certificados_semana} / R${meta_semanal}")
                 
                 return certificados_semana
@@ -148,10 +146,10 @@ class FuncoesPadrao:
 
             # Define o texto e o estilo do label da meta mensal
             if soma >= meta_mensal:
-                ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')
+                ui.label_meta_mes.setStyleSheet('color: rgb(220,220,220); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')
                 ui.label_meta_mes.setText(f"Meta mensal atingida! - R${soma} / R${meta_mensal}")
             else:
-                ui.label_meta_mes.setStyleSheet('color: rgb(113,66,230); background-color: transparent; border: 1px solid rgb(68,71,90)')
+                ui.label_meta_mes.setStyleSheet('color: rgb(220,220,220); background-color: transparent; border: 1px solid rgb(68,71,90)')
                 ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
 
         except Exception as e:
@@ -1232,39 +1230,6 @@ class FuncoesPadrao:
         else:
             pass
 
-    
-    def atualizar_aba_cliente(self):
-        # Verifica se a aba ativa é a de índice 2
-        if ui.aba_dados_cliente.currentIndex() == 2:
-            # Limpa o campo consolidado
-            ui.campo_consolidado.setPlainText("")
-            
-            # Verifica se o campo de certificado está relacionado a CPF
-            if "CPF" in ui.campo_lista_versao_certificado.currentText():
-                # Monta a mensagem sem os dados de CNPJ
-                mensagem = (
-                    f"CERTIFICADO: {ui.campo_lista_versao_certificado.currentText()}\n\n"
-                    f"NOME: {ui.campo_nome.text()}\n\n"
-                    f"E-MAIL: {ui.campo_email.text()}\n\n"
-                    f"CPF: {ui.campo_cpf.text()}\n"
-                )
-            elif "CNPJ" in ui.campo_lista_versao_certificado.currentText():
-                # Monta a mensagem incluindo os dados de CNPJ
-                mensagem = (
-                    f"CERTIFICADO: {ui.campo_lista_versao_certificado.currentText()}\n\n"
-                    f"NOME: {ui.campo_nome.text()}\n\n"
-                    f"E-MAIL: {ui.campo_email.text()}\n\n"
-                    f"CPF: {ui.campo_cpf.text()}\n\n"
-                    f"CNPJ: {ui.campo_cnpj.text()}\n\n"
-                    f"RAZÃO SOCIAL: {ui.campo_cnpj_razao_social.text()}\n\n"
-                    f"MUNICÍPIO: {ui.campo_cnpj_municipio.text()}\n"
-                )
-            else:
-                 mensagem = ""
-            
-            # Define o texto no campo consolidado
-            ui.campo_consolidado.setPlainText(mensagem)
-
 
     def valor_alterado(self, campo_atual):
         self.atualizar_documentos_tabela()
@@ -1505,6 +1470,10 @@ class FuncoesPadrao:
             nome = ui.campo_nome_agente.text()
             mensagem = mensagem.replace("{{nome}}", nome)
 
+        if "{{campo_nome}}" in mensagem:
+            nome = ui.campo_nome.text().capitalize().split()[0]
+            mensagem = mensagem.replace("{{campo_nome}}", nome)
+
         if "{{midia}}" in mensagem:
             certificado = ui.campo_lista_versao_certificado.currentText().lower()
             midia = "CARTÃO" if "cartão" in certificado else "TOKEN" if "token" in certificado else ""
@@ -1644,7 +1613,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                         f"    <div class='header'><h1>Validação Certisign</h1></div>"
                         f"    <div class='content'>"
                         f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
-                        f"      <p>Esperado que esteja bem.</p>"
+                        f"      <p>Espero que esteja bem.</p>"
                         f"      <P>Sou {nome} e sou agente de registro da ACB Digital.</p>"
                         f"      <p>Estou entrando em contato para informar que temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
                         f"      <p>Atenciosamente,<br>{nome}</p>"
@@ -1682,7 +1651,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                         f"    <div class='header'><h1>Validação Certisign</h1></div>"
                         f"    <div class='content'>"
                         f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
-                        f"      <p>Esperado que esteja bem.</p>"
+                        f"      <p>Espero que esteja bem.</p>"
                         f"      <P>Sou {nome} e sou agente de registro da ACB Digital.</p>"
                         f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
                         f"      <p>No entanto, o pagamento ainda não foi reconhecido em nosso sistema. Para prosseguirmos com a validação, é necessário que o pagamento seja confirmado.</p>"
@@ -1729,7 +1698,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                         f"    </div>"
                         f"    <div class='content'>"
                         f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}</p>"
-                        f"      <p>Esperado que esteja bem.</p>"
+                        f"      <p>Espero que esteja bem.</p>"
                         f"      <p>Meu nome é {nome} e sou Agente de Registro da ACB Digital.</p>"
                         f"      <p>Verificamos que a validade do seu certificado digital está próxima do <b>vencimento</b>.</p>"
                         f"      <p>Compreendemos a importância de manter a continuidade dos serviços digitais em sua organização. Portanto, gostaríamos de oferecer a renovação do seu certificado.</p>"
@@ -1795,11 +1764,11 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             ui.tableWidget.setRowCount(0)  
             ui.tableWidget.setColumnCount(5) 
             ui.tableWidget.setHorizontalHeaderLabels(["PEDIDO OR","EMAIL", "ENVIADO?", "RETORNO", "PRAZO RESTANTE"]) 
-            ui.tableWidget.setColumnWidth(0, 82)
-            ui.tableWidget.setColumnWidth(1, 113)
-            ui.tableWidget.setColumnWidth(2, 62)
-            ui.tableWidget.setColumnWidth(3, 113)
-            ui.tableWidget.setColumnWidth(4, 181)  
+            ui.tableWidget.setColumnWidth(0, 89)
+            ui.tableWidget.setColumnWidth(1, 117)
+            ui.tableWidget.setColumnWidth(2, 67)
+            ui.tableWidget.setColumnWidth(3, 115)
+            ui.tableWidget.setColumnWidth(4, 187)  
 
             pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
@@ -1959,7 +1928,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                                 f"    </div>"
                                 f"    <div class='content'>"
                                 f"      <p>Olá {primeiro_nome.capitalize()}</p>"
-                                f"      <p>Esperado que esteja bem.</p>"
+                                f"      <p>Espero que esteja bem.</p>"
                                 f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                                 f"      <p>Fizemos a validação para seu certificado digital, modelo"
                                 f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
@@ -2009,7 +1978,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                                 f"    </div>"
                                 f"    <div class='content'>"
                                 f"      <p>Olá {primeiro_nome.capitalize()}!</p>"
-                                f"      <p>Esperado que esteja bem.</p>"
+                                f"      <p>Espero que esteja bem.</p>"
                                 f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                                 f"      <p>Fizemos a validação para seu certificado digital, modelo"
                                 f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
@@ -2077,7 +2046,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
     def ajuste_largura_col(self):
         ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
         for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnWidth(col, 91)
+                ui.tableWidget.setColumnWidth(col, 96)
 
 
     def mesclar_pdf_pasta_cliente(self):
@@ -2142,6 +2111,8 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             if 'pdf_merger' in locals():
                 pdf_merger.close()
             self.atualizar_documentos_tabela()
+
+
 
 
 
@@ -2307,13 +2278,12 @@ class AcoesBancoDeDados:
             ui.campo_funcional.setText("")
             ui.campo_preco_certificado_cheio.setText("")
             ui.campo_email_enviado.setText("")
-            ui.campo_consolidado.setPlainText("")
             ui.alerta_midia.setText("")
             ui.alerta_midia.setToolTip("")
             self.limpar_labels()
             self.contar_verificacao()
             AlteracoesInterface.confirmar_label_excluir(self)
-            self.ui.aba_dados_cliente.setCurrentIndex(0) 
+
 
 
         except Exception as e:
@@ -2458,7 +2428,7 @@ class AcoesBancoDeDados:
             if pedido_data:
 
                 self.preencher_dados(pedido_data)
-                self.ui.aba_dados_cliente.setCurrentIndex(0) 
+
                
             else:  
                return 'Pedido nao existe'
@@ -2894,13 +2864,15 @@ class JanelaOculta:
         self.largura_destino_animacao = 0
         self.altura_destino_animacao = 0
         self.janela = FuncoesPadrao(ui)
-        self.largura = 580
-        self.altura = 712
+        self.largura = 608
+        self.altura = 715
+
 
     def evento_entrada(self, evento):
         self.redimensionar_janela_animacao(self.largura, self.altura)
         self.janela.atualizar_documentos_tabela()
         self.pai.setWindowOpacity(1.0)  
+
 
     def evento_saida(self, evento):
         self.janela.atualizar_documentos_tabela()
@@ -2916,9 +2888,9 @@ class JanelaOculta:
             if not mouse_dentro_janela:
 
                 if int(ui.campo_status_videook.text()) == 0 and int(ui.campo_status_verificacao.text()) == 0:
-                    self.redimensionar_janela_animacao(108, 53)
+                    self.redimensionar_janela_animacao(108, 50)
                 else:
-                    self.redimensionar_janela_animacao(151, 53)
+                    self.redimensionar_janela_animacao(151, 50)
         else:
             posicao_cursor = QtGui.QCursor.pos()
             posicao_janela = self.pai.mapToGlobal(QtCore.QPoint(0, 0))
@@ -2938,11 +2910,13 @@ class JanelaOculta:
     def evento_clique_mouse(self, evento):
         self.redimensionar_janela_animacao(self.largura, self.altura)  # 469
 
+
     def redimensionar_janela_animacao(self, largura_destino, altura_destino):
         self.largura_destino_animacao = largura_destino
         self.altura_destino_animacao = altura_destino
         self.temporizador_animacao.stop()
         self.temporizador_animacao.start(int(self.duracao_animacao / self.passo_animacao))
+
 
     def atualizar_tamanho_janela(self):
         largura_atual = self.pai.width()
@@ -3123,7 +3097,6 @@ ui.campo_preco_certificado.setValidator(validator)
 
 #Eventos tabela
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
-ui.aba_dados_cliente.currentChanged.connect(lambda: funcoes_app.atualizar_aba_cliente())
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
 ui.tableWidget.itemDoubleClicked.connect(lambda:banco_dados.pegar_valor_tabela())
 ui.tableWidget.itemClicked.connect(lambda:funcoes_app.copiar_pedido_tabela(None))
@@ -3145,7 +3118,7 @@ janela.setWindowFlags(QtCore.Qt.FramelessWindowHint | QtCore.Qt.WindowStaysOnTop
 janela.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
-janela.setFixedSize(151, 53)
+janela.setFixedSize(151, 50)
 
 janelaLogin = LoginWindow(janela,ui)        
 janelaLogin.show()
