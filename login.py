@@ -73,7 +73,7 @@ class LoginWindow(QMainWindow):
 
         
         self.botao_login = QPushButton("Entrar")
-        self.botao_login.setStyleSheet(f"font-size: 16px; height: 40px; background-color: {self.botao_cor}; color: {self.campo_texto_cor}; border-radius: 5px; font-family: Calibri;")
+        self.botao_login.setStyleSheet(f"font-size: 20px; height: 40px; background-color: {self.botao_cor}; color: {self.campo_texto_cor}; border-radius: 5px; font-family: Calibri;")
         self.botao_login.clicked.connect(self.fazer_login)
         layout.addWidget(self.botao_login)
 

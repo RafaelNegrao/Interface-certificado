@@ -50,12 +50,12 @@ class Ui_janela(object):
 "\n"
 "QTabBar::tab {\n"
 "     background-color: rgb(40, 45, 50); /* Cor das abas selecionadas */\n"
-"     color: rgb(220, 220, 220);\n"
+"     color: rgb(255, 255, 255);\n"
 "}\n"
 "\n"
 "QTabBar::tab:selected {\n"
 "    background-color: rgb(60,62, 84); /* Cor das abas selecionadas */\n"
-"    color: rgb(220, 220, 220);\n"
+"    color: rgb(255, 255, 255);\n"
 "}\n"
 "\n"
 "QHeader{\n"
@@ -65,7 +65,7 @@ class Ui_janela(object):
 "/* Estiliza o conteúdo das abas */\n"
 "QWidget {\n"
 "    background-color: rgb(60, 62,84); /* Cor do conteúdo */\n"
-"    color: rgb(220, 220, 220);\n"
+"    color: rgb(255, 255, 255);\n"
 "    border: none;\n"
 "}\n"
 "QTabBar::tab:Hover {\n"
@@ -84,7 +84,7 @@ class Ui_janela(object):
         self.tab_5 = QtWidgets.QWidget()
         self.tab_5.setObjectName("tab_5")
         self.label = QtWidgets.QLabel(self.tab_5)
-        self.label.setGeometry(QtCore.QRect(16, 4, 49, 10))
+        self.label.setGeometry(QtCore.QRect(16, 6, 49, 10))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -99,7 +99,7 @@ class Ui_janela(object):
         self.campo_data_agendamento.setGeometry(QtCore.QRect(168, 20, 93, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_data_agendamento.setFont(font)
@@ -157,7 +157,7 @@ class Ui_janela(object):
         self.campo_hora_agendamento.setGeometry(QtCore.QRect(280, 20, 68, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_hora_agendamento.setFont(font)
@@ -175,7 +175,7 @@ class Ui_janela(object):
         self.campo_hora_agendamento.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
         self.campo_hora_agendamento.setObjectName("campo_hora_agendamento")
         self.label_4 = QtWidgets.QLabel(self.tab_5)
-        self.label_4.setGeometry(QtCore.QRect(280, 4, 49, 10))
+        self.label_4.setGeometry(QtCore.QRect(280, 6, 49, 10))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -187,7 +187,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_4.setObjectName("label_4")
         self.label_3 = QtWidgets.QLabel(self.tab_5)
-        self.label_3.setGeometry(QtCore.QRect(168, 4, 41, 10))
+        self.label_3.setGeometry(QtCore.QRect(168, 6, 41, 10))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -199,10 +199,10 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_3.setObjectName("label_3")
         self.campo_lista_venda = QtWidgets.QComboBox(self.tab_5)
-        self.campo_lista_venda.setGeometry(QtCore.QRect(180, 116, 64, 26))
+        self.campo_lista_venda.setGeometry(QtCore.QRect(179, 116, 64, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_lista_venda.setFont(font)
@@ -242,7 +242,7 @@ class Ui_janela(object):
         self.campo_lista_venda.addItem("")
         self.campo_lista_venda.addItem("")
         self.label_22 = QtWidgets.QLabel(self.tab_5)
-        self.label_22.setGeometry(QtCore.QRect(182, 102, 57, 7))
+        self.label_22.setGeometry(QtCore.QRect(182, 104, 57, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -254,7 +254,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_22.setObjectName("label_22")
         self.label_23 = QtWidgets.QLabel(self.tab_5)
-        self.label_23.setGeometry(QtCore.QRect(16, 100, 77, 10))
+        self.label_23.setGeometry(QtCore.QRect(16, 102, 77, 10))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -269,7 +269,7 @@ class Ui_janela(object):
         self.campo_lista_modalidade.setGeometry(QtCore.QRect(15, 116, 149, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_lista_modalidade.setFont(font)
@@ -329,7 +329,7 @@ class Ui_janela(object):
         self.campo_lista_versao_certificado.setGeometry(QtCore.QRect(16, 68, 421, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_lista_versao_certificado.setFont(font)
@@ -358,7 +358,7 @@ class Ui_janela(object):
         self.campo_lista_versao_certificado.setEditable(False)
         self.campo_lista_versao_certificado.setObjectName("campo_lista_versao_certificado")
         self.label_40 = QtWidgets.QLabel(self.tab_5)
-        self.label_40.setGeometry(QtCore.QRect(16, 52, 53, 10))
+        self.label_40.setGeometry(QtCore.QRect(16, 54, 53, 10))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -371,10 +371,10 @@ class Ui_janela(object):
         self.label_40.setObjectName("label_40")
         self.campo_preco_certificado = QtWidgets.QLineEdit(self.tab_5)
         self.campo_preco_certificado.setEnabled(True)
-        self.campo_preco_certificado.setGeometry(QtCore.QRect(360, 117, 77, 26))
+        self.campo_preco_certificado.setGeometry(QtCore.QRect(360, 116, 77, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_preco_certificado.setFont(font)
@@ -395,7 +395,7 @@ class Ui_janela(object):
         self.campo_preco_certificado.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_preco_certificado.setObjectName("campo_preco_certificado")
         self.label_13 = QtWidgets.QLabel(self.tab_5)
-        self.label_13.setGeometry(QtCore.QRect(360, 104, 53, 7))
+        self.label_13.setGeometry(QtCore.QRect(360, 106, 53, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -407,7 +407,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_13.setObjectName("label_13")
         self.groupBox_status = QtWidgets.QGroupBox(self.tab_5)
-        self.groupBox_status.setGeometry(QtCore.QRect(446, 17, 149, 127))
+        self.groupBox_status.setGeometry(QtCore.QRect(448, 17, 146, 127))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         self.groupBox_status.setFont(font)
@@ -425,7 +425,7 @@ class Ui_janela(object):
         self.rb_digitacao.setFocusPolicy(QtCore.Qt.NoFocus)
         self.rb_digitacao.setLayoutDirection(QtCore.Qt.LeftToRight)
         self.rb_digitacao.setStyleSheet("border: solid rgb(0, 0, 253);\n"
-"color:rgb(113,66,230)")
+"color:rgb(255,255,255)")
         self.rb_digitacao.setChecked(True)
         self.rb_digitacao.setObjectName("rb_digitacao")
         self.rb_videook = QtWidgets.QRadioButton(self.groupBox_status)
@@ -466,10 +466,10 @@ class Ui_janela(object):
         self.rb_cancelado.setObjectName("rb_cancelado")
         self.campo_preco_certificado_cheio = QtWidgets.QLineEdit(self.tab_5)
         self.campo_preco_certificado_cheio.setEnabled(True)
-        self.campo_preco_certificado_cheio.setGeometry(QtCore.QRect(262, 117, 79, 26))
+        self.campo_preco_certificado_cheio.setGeometry(QtCore.QRect(258, 116, 79, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_preco_certificado_cheio.setFont(font)
@@ -489,7 +489,7 @@ class Ui_janela(object):
         self.campo_preco_certificado_cheio.setAlignment(QtCore.Qt.AlignCenter)
         self.campo_preco_certificado_cheio.setObjectName("campo_preco_certificado_cheio")
         self.label_17 = QtWidgets.QLabel(self.tab_5)
-        self.label_17.setGeometry(QtCore.QRect(264, 104, 53, 7))
+        self.label_17.setGeometry(QtCore.QRect(264, 106, 53, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -501,10 +501,10 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_17.setObjectName("label_17")
         self.botao_link_venda = QtWidgets.QPushButton(self.tab_5)
-        self.botao_link_venda.setGeometry(QtCore.QRect(408, 66, 23, 23))
+        self.botao_link_venda.setGeometry(QtCore.QRect(410, 66, 23, 23))
         font = QtGui.QFont()
         font.setFamily("Consolas")
-        font.setPointSize(14)
+        font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -516,7 +516,7 @@ class Ui_janela(object):
 ";background-color: transparent")
         self.botao_link_venda.setObjectName("botao_link_venda")
         self.label_31 = QtWidgets.QLabel(self.tab_5)
-        self.label_31.setGeometry(QtCore.QRect(450, 13, 35, 8))
+        self.label_31.setGeometry(QtCore.QRect(456, 13, 35, 8))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -601,7 +601,7 @@ class Ui_janela(object):
         self.alerta_midia.setGeometry(QtCore.QRect(380, 66, 26, 26))
         font = QtGui.QFont()
         font.setFamily("Consolas")
-        font.setPointSize(14)
+        font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -643,7 +643,7 @@ class Ui_janela(object):
         self.botao_converter_todas_imagens_em_pdf.setFlat(True)
         self.botao_converter_todas_imagens_em_pdf.setObjectName("botao_converter_todas_imagens_em_pdf")
         self.label_12 = QtWidgets.QLabel(self.tab_5)
-        self.label_12.setGeometry(QtCore.QRect(346, 174, 61, 7))
+        self.label_12.setGeometry(QtCore.QRect(346, 178, 61, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -655,7 +655,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_12.setObjectName("label_12")
         self.label_49 = QtWidgets.QLabel(self.tab_5)
-        self.label_49.setGeometry(QtCore.QRect(300, 404, 45, 7))
+        self.label_49.setGeometry(QtCore.QRect(300, 408, 45, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -667,7 +667,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_49.setObjectName("label_49")
         self.label_44 = QtWidgets.QLabel(self.tab_5)
-        self.label_44.setGeometry(QtCore.QRect(447, 174, 101, 7))
+        self.label_44.setGeometry(QtCore.QRect(448, 176, 101, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -680,10 +680,10 @@ class Ui_janela(object):
         self.label_44.setAlignment(QtCore.Qt.AlignCenter)
         self.label_44.setObjectName("label_44")
         self.campo_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_cnh.setGeometry(QtCore.QRect(16, 363, 117, 26))
+        self.campo_cnh.setGeometry(QtCore.QRect(18, 358, 117, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnh.setFont(font)
@@ -702,7 +702,7 @@ class Ui_janela(object):
         self.campo_cnh.setText("")
         self.campo_cnh.setObjectName("campo_cnh")
         self.label_15 = QtWidgets.QLabel(self.tab_5)
-        self.label_15.setGeometry(QtCore.QRect(17, 351, 25, 7))
+        self.label_15.setGeometry(QtCore.QRect(17, 348, 25, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -714,7 +714,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_15.setObjectName("label_15")
         self.label_16 = QtWidgets.QLabel(self.tab_5)
-        self.label_16.setGeometry(QtCore.QRect(16, 402, 80, 7))
+        self.label_16.setGeometry(QtCore.QRect(16, 406, 80, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -726,7 +726,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_16.setObjectName("label_16")
         self.label_11 = QtWidgets.QLabel(self.tab_5)
-        self.label_11.setGeometry(QtCore.QRect(17, 230, 37, 7))
+        self.label_11.setGeometry(QtCore.QRect(17, 236, 37, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -751,7 +751,7 @@ class Ui_janela(object):
         self.botao_telefone.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_telefone.setObjectName("botao_telefone")
         self.botao_consulta_pis = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_pis.setGeometry(QtCore.QRect(420, 416, 21, 25))
+        self.botao_consulta_pis.setGeometry(QtCore.QRect(418, 418, 21, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -764,7 +764,7 @@ class Ui_janela(object):
         self.botao_consulta_pis.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_consulta_pis.setObjectName("botao_consulta_pis")
         self.label_10 = QtWidgets.QLabel(self.tab_5)
-        self.label_10.setGeometry(QtCore.QRect(186, 288, 21, 7))
+        self.label_10.setGeometry(QtCore.QRect(186, 292, 21, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -776,7 +776,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_10.setObjectName("label_10")
         self.label_18 = QtWidgets.QLabel(self.tab_5)
-        self.label_18.setGeometry(QtCore.QRect(146, 350, 65, 7))
+        self.label_18.setGeometry(QtCore.QRect(146, 348, 65, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -788,10 +788,10 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_18.setObjectName("label_18")
         self.campo_nome_mae = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_nome_mae.setGeometry(QtCore.QRect(144, 364, 294, 26))
+        self.campo_nome_mae.setGeometry(QtCore.QRect(144, 358, 294, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_nome_mae.setFont(font)
@@ -810,7 +810,7 @@ class Ui_janela(object):
         self.campo_nome_mae.setText("")
         self.campo_nome_mae.setObjectName("campo_nome_mae")
         self.botao_consulta_cpf = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cpf.setGeometry(QtCore.QRect(154, 300, 21, 25))
+        self.botao_consulta_cpf.setGeometry(QtCore.QRect(152, 302, 21, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -823,7 +823,7 @@ class Ui_janela(object):
         self.botao_consulta_cpf.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_consulta_cpf.setObjectName("botao_consulta_cpf")
         self.label_27 = QtWidgets.QLabel(self.tab_5)
-        self.label_27.setGeometry(QtCore.QRect(446, 404, 61, 7))
+        self.label_27.setGeometry(QtCore.QRect(450, 406, 61, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -836,7 +836,7 @@ class Ui_janela(object):
         self.label_27.setAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignLeft|QtCore.Qt.AlignVCenter)
         self.label_27.setObjectName("label_27")
         self.label_24 = QtWidgets.QLabel(self.tab_5)
-        self.label_24.setGeometry(QtCore.QRect(17, 174, 77, 7))
+        self.label_24.setGeometry(QtCore.QRect(17, 178, 77, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -849,7 +849,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_24.setObjectName("label_24")
         self.botao_consulta_rg = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_rg.setGeometry(QtCore.QRect(288, 300, 17, 25))
+        self.botao_consulta_rg.setGeometry(QtCore.QRect(286, 302, 17, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -862,7 +862,7 @@ class Ui_janela(object):
         self.botao_consulta_rg.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_consulta_rg.setObjectName("botao_consulta_rg")
         self.campo_comentario = QtWidgets.QTextEdit(self.tab_5)
-        self.campo_comentario.setGeometry(QtCore.QRect(444, 416, 152, 204))
+        self.campo_comentario.setGeometry(QtCore.QRect(448, 416, 148, 204))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(9)
@@ -876,7 +876,7 @@ class Ui_janela(object):
         self.campo_comentario.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
         self.campo_comentario.setObjectName("campo_comentario")
         self.label_6 = QtWidgets.QLabel(self.tab_5)
-        self.label_6.setGeometry(QtCore.QRect(17, 289, 25, 7))
+        self.label_6.setGeometry(QtCore.QRect(17, 292, 25, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -888,7 +888,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_6.setObjectName("label_6")
         self.tabela_documentos = QtWidgets.QTableWidget(self.tab_5)
-        self.tabela_documentos.setGeometry(QtCore.QRect(446, 186, 151, 206))
+        self.tabela_documentos.setGeometry(QtCore.QRect(449, 186, 148, 206))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(8)
@@ -918,7 +918,7 @@ class Ui_janela(object):
         self.campo_data_nascimento.setGeometry(QtCore.QRect(346, 188, 91, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -957,7 +957,7 @@ class Ui_janela(object):
         self.campo_data_nascimento.setCalendarPopup(False)
         self.campo_data_nascimento.setObjectName("campo_data_nascimento")
         self.label_48 = QtWidgets.QLabel(self.tab_5)
-        self.label_48.setGeometry(QtCore.QRect(318, 288, 57, 7))
+        self.label_48.setGeometry(QtCore.QRect(318, 292, 57, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -985,7 +985,7 @@ class Ui_janela(object):
         self.campo_rg.setGeometry(QtCore.QRect(185, 302, 119, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_rg.setFont(font)
@@ -1008,7 +1008,7 @@ class Ui_janela(object):
         self.campo_telefone.setGeometry(QtCore.QRect(317, 246, 121, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_telefone.setFont(font)
@@ -1027,7 +1027,7 @@ class Ui_janela(object):
         self.campo_telefone.setText("")
         self.campo_telefone.setObjectName("campo_telefone")
         self.botao_consulta_funcional = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_funcional.setGeometry(QtCore.QRect(272, 416, 17, 25))
+        self.botao_consulta_funcional.setGeometry(QtCore.QRect(270, 418, 17, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -1043,7 +1043,7 @@ class Ui_janela(object):
         self.campo_nome.setGeometry(QtCore.QRect(16, 188, 316, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_nome.setFont(font)
@@ -1063,10 +1063,10 @@ class Ui_janela(object):
         self.campo_nome.setPlaceholderText("")
         self.campo_nome.setObjectName("campo_nome")
         self.campo_funcional = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_funcional.setGeometry(QtCore.QRect(146, 417, 142, 26))
+        self.campo_funcional.setGeometry(QtCore.QRect(146, 418, 142, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_funcional.setFont(font)
@@ -1086,7 +1086,7 @@ class Ui_janela(object):
         self.campo_funcional.setPlaceholderText("")
         self.campo_funcional.setObjectName("campo_funcional")
         self.label_50 = QtWidgets.QLabel(self.tab_5)
-        self.label_50.setGeometry(QtCore.QRect(146, 405, 55, 7))
+        self.label_50.setGeometry(QtCore.QRect(146, 408, 55, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1098,10 +1098,10 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_50.setObjectName("label_50")
         self.campo_seguranca_cnh = QtWidgets.QLineEdit(self.tab_5)
-        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(16, 416, 119, 26))
+        self.campo_seguranca_cnh.setGeometry(QtCore.QRect(17, 418, 119, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_seguranca_cnh.setFont(font)
@@ -1122,7 +1122,7 @@ class Ui_janela(object):
         self.campo_email.setGeometry(QtCore.QRect(15, 246, 289, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -1143,7 +1143,7 @@ class Ui_janela(object):
         self.campo_email.setPlaceholderText("")
         self.campo_email.setObjectName("campo_email")
         self.botao_consulta_cnh = QtWidgets.QPushButton(self.tab_5)
-        self.botao_consulta_cnh.setGeometry(QtCore.QRect(116, 362, 21, 25))
+        self.botao_consulta_cnh.setGeometry(QtCore.QRect(116, 358, 21, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -1159,7 +1159,7 @@ class Ui_janela(object):
         self.campo_cpf.setGeometry(QtCore.QRect(15, 302, 156, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
@@ -1180,7 +1180,7 @@ class Ui_janela(object):
         self.campo_cpf.setPlaceholderText("")
         self.campo_cpf.setObjectName("campo_cpf")
         self.label_46 = QtWidgets.QLabel(self.tab_5)
-        self.label_46.setGeometry(QtCore.QRect(318, 232, 49, 7))
+        self.label_46.setGeometry(QtCore.QRect(318, 236, 49, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1195,7 +1195,7 @@ class Ui_janela(object):
         self.campo_pis.setGeometry(QtCore.QRect(299, 418, 138, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_pis.setFont(font)
@@ -1217,7 +1217,7 @@ class Ui_janela(object):
         self.campo_rg_orgao.setGeometry(QtCore.QRect(318, 302, 119, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_rg_orgao.setFont(font)
@@ -1241,7 +1241,7 @@ class Ui_janela(object):
         self.campo_cnpj_municipio.setGeometry(QtCore.QRect(16, 594, 421, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnpj_municipio.setFont(font)
@@ -1264,7 +1264,7 @@ class Ui_janela(object):
         self.campo_cnpj.setGeometry(QtCore.QRect(15, 490, 314, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnpj.setFont(font)
@@ -1284,7 +1284,7 @@ class Ui_janela(object):
         self.campo_cnpj.setPlaceholderText("")
         self.campo_cnpj.setObjectName("campo_cnpj")
         self.label_25 = QtWidgets.QLabel(self.tab_5)
-        self.label_25.setGeometry(QtCore.QRect(16, 582, 77, 7))
+        self.label_25.setGeometry(QtCore.QRect(16, 584, 77, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1312,7 +1312,7 @@ class Ui_janela(object):
         self.campo_cnpj_razao_social.setGeometry(QtCore.QRect(16, 543, 421, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_cnpj_razao_social.setFont(font)
@@ -1332,7 +1332,7 @@ class Ui_janela(object):
         self.campo_cnpj_razao_social.setPlaceholderText("")
         self.campo_cnpj_razao_social.setObjectName("campo_cnpj_razao_social")
         self.botao_junta = QtWidgets.QPushButton(self.tab_5)
-        self.botao_junta.setGeometry(QtCore.QRect(420, 488, 17, 25))
+        self.botao_junta.setGeometry(QtCore.QRect(418, 490, 17, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(10)
@@ -1342,7 +1342,7 @@ class Ui_janela(object):
         self.botao_junta.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_junta.setObjectName("botao_junta")
         self.label_47 = QtWidgets.QLabel(self.tab_5)
-        self.label_47.setGeometry(QtCore.QRect(16, 532, 105, 7))
+        self.label_47.setGeometry(QtCore.QRect(16, 534, 105, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1357,7 +1357,7 @@ class Ui_janela(object):
         self.campo_lista_junta_comercial.setGeometry(QtCore.QRect(346, 490, 91, 26))
         font = QtGui.QFont()
         font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setPointSize(11)
         font.setBold(False)
         font.setWeight(50)
         self.campo_lista_junta_comercial.setFont(font)
@@ -1422,7 +1422,7 @@ class Ui_janela(object):
         self.botao_dados_cnpj.setStyleSheet("border-radius:10px;background-color:transparent")
         self.botao_dados_cnpj.setObjectName("botao_dados_cnpj")
         self.label_14 = QtWidgets.QLabel(self.tab_5)
-        self.label_14.setGeometry(QtCore.QRect(17, 478, 29, 7))
+        self.label_14.setGeometry(QtCore.QRect(17, 480, 29, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1434,7 +1434,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_14.setObjectName("label_14")
         self.label_28 = QtWidgets.QLabel(self.tab_5)
-        self.label_28.setGeometry(QtCore.QRect(346, 478, 41, 7))
+        self.label_28.setGeometry(QtCore.QRect(346, 480, 41, 7))
         font = QtGui.QFont()
         font.setFamily("Leelawadee UI")
         font.setPointSize(6)
@@ -1446,7 +1446,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_28.setObjectName("label_28")
         self.label_38 = QtWidgets.QLabel(self.tab_5)
-        self.label_38.setGeometry(QtCore.QRect(13, 154, 583, 13))
+        self.label_38.setGeometry(QtCore.QRect(13, 154, 585, 13))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(9)
@@ -1559,7 +1559,7 @@ class Ui_janela(object):
         self.botao_procurar.setFont(font)
         self.botao_procurar.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_procurar.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.botao_procurar.setStyleSheet("border-radius:10px;\n"
+        self.botao_procurar.setStyleSheet("border-radius:4px;\n"
 "background-color:rgb(73, 218, 107);\n"
 "color:rgb(90,54,247);\n"
 "")
@@ -1816,7 +1816,7 @@ class Ui_janela(object):
         self.botao_envio_massa.setFont(font)
         self.botao_envio_massa.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
         self.botao_envio_massa.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.botao_envio_massa.setStyleSheet("border-radius:10px;\n"
+        self.botao_envio_massa.setStyleSheet("border-radius:4px;\n"
 "background-color:rgb(120, 0, 190);\n"
 "color:rgb(205,205,205);\n"
 "")
@@ -1844,7 +1844,7 @@ class Ui_janela(object):
         self.tableWidget.setFont(font)
         self.tableWidget.setStyleSheet("/* Adicionar borda ao redor de todo o QTableWidget */\n"
 "QTableWidget {\n"
-"    border: 1px solid rgb(120, 120, 120); /* Borda ao redor da tabela */\n"
+"    border: 1px solid rgb(100, 100, 100); /* Borda ao redor da tabela */\n"
 "}\n"
 "\n"
 "/* Adicionar borda ao redor do header */\n"
@@ -1852,7 +1852,7 @@ class Ui_janela(object):
 "\n"
 "/* Estilo para cada seção do header */\n"
 "QHeaderView::section {\n"
-"    border: 1px solid rgb(120, 120, 120); /* Borda ao redor de cada célula do cabeçalho */\n"
+"    border: 1px solid rgb(100, 100, 100); /* Borda ao redor de cada célula do cabeçalho */\n"
 "    background-color: transparent; /* Fundo transparente */\n"
 "    padding: 1px; /* Ajuste de espaçamento */\n"
 "}\n"
@@ -2204,95 +2204,167 @@ class Ui_janela(object):
         self.tabWidget.addTab(self.tab_4, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
-        self.campo_verifica_tela_cheia = QtWidgets.QLineEdit(self.tab)
-        self.campo_verifica_tela_cheia.setEnabled(True)
-        self.campo_verifica_tela_cheia.setGeometry(QtCore.QRect(430, 417, 94, 30))
+        self.botao_atualizar_configuracoes = QtWidgets.QPushButton(self.tab)
+        self.botao_atualizar_configuracoes.setGeometry(QtCore.QRect(365, 590, 191, 31))
         font = QtGui.QFont()
-        font.setFamily("Calibri")
+        font.setFamily("Segoe UI")
+        font.setPointSize(10)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.botao_atualizar_configuracoes.setFont(font)
+        self.botao_atualizar_configuracoes.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_atualizar_configuracoes.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.botao_atualizar_configuracoes.setStyleSheet("border-radius:4px;\n"
+"background-color:rgb(73, 218, 107);\n"
+"color:rgb(90,54,247);\n"
+"")
+        self.botao_atualizar_configuracoes.setObjectName("botao_atualizar_configuracoes")
+        self.groupBox = QtWidgets.QGroupBox(self.tab)
+        self.groupBox.setGeometry(QtCore.QRect(50, 22, 509, 62))
+        self.groupBox.setStyleSheet("QGroupBox{\n"
+"border-radius:7px;\n"
+"border: 1px solid rgb(120,120,120);\n"
+"background-color:rgb(60, 62, 84);}")
+        self.groupBox.setTitle("")
+        self.groupBox.setObjectName("groupBox")
+        self.botao_ocultar_senha_usuario = QtWidgets.QPushButton(self.groupBox)
+        self.botao_ocultar_senha_usuario.setGeometry(QtCore.QRect(464, 22, 25, 21))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
         font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.campo_verifica_tela_cheia.setFont(font)
-        self.campo_verifica_tela_cheia.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_verifica_tela_cheia.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_verifica_tela_cheia.setText("")
-        self.campo_verifica_tela_cheia.setObjectName("campo_verifica_tela_cheia")
-        self.caminho_pasta_principal = QtWidgets.QLineEdit(self.tab)
-        self.caminho_pasta_principal.setEnabled(True)
-        self.caminho_pasta_principal.setGeometry(QtCore.QRect(77, 163, 446, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.caminho_pasta_principal.setFont(font)
-        self.caminho_pasta_principal.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.caminho_pasta_principal.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.caminho_pasta_principal.setText("")
-        self.caminho_pasta_principal.setObjectName("caminho_pasta_principal")
-        self.label_7 = QtWidgets.QLabel(self.tab)
-        self.label_7.setGeometry(QtCore.QRect(77, 154, 137, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_7.setFont(font)
-        self.label_7.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_7.setObjectName("label_7")
-        self.label_9 = QtWidgets.QLabel(self.tab)
-        self.label_9.setGeometry(QtCore.QRect(430, 408, 61, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_9.setFont(font)
-        self.label_9.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_9.setObjectName("label_9")
-        self.botao_altera_pasta_principal = QtWidgets.QPushButton(self.tab)
-        self.botao_altera_pasta_principal.setGeometry(QtCore.QRect(482, 160, 33, 30))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(16)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.botao_altera_pasta_principal.setFont(font)
-        self.botao_altera_pasta_principal.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_altera_pasta_principal.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.botao_altera_pasta_principal.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.botao_altera_pasta_principal.setStyleSheet("border-radius:7px;\n"
+        self.botao_ocultar_senha_usuario.setFont(font)
+        self.botao_ocultar_senha_usuario.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_ocultar_senha_usuario.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.botao_ocultar_senha_usuario.setStyleSheet("border-radius:7px;\n"
 "background-color:transparent")
-        self.botao_altera_pasta_principal.setObjectName("botao_altera_pasta_principal")
-        self.label_33 = QtWidgets.QLabel(self.tab)
-        self.label_33.setGeometry(QtCore.QRect(78, 217, 41, 10))
+        self.botao_ocultar_senha_usuario.setObjectName("botao_ocultar_senha_usuario")
+        self.campo_senha_usuario = QtWidgets.QLineEdit(self.groupBox)
+        self.campo_senha_usuario.setEnabled(True)
+        self.campo_senha_usuario.setGeometry(QtCore.QRect(262, 22, 228, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_senha_usuario.setFont(font)
+        self.campo_senha_usuario.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_senha_usuario.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_senha_usuario.setText("")
+        self.campo_senha_usuario.setObjectName("campo_senha_usuario")
+        self.label_35 = QtWidgets.QLabel(self.groupBox)
+        self.label_35.setGeometry(QtCore.QRect(20, 14, 49, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_35.setFont(font)
+        self.label_35.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_35.setObjectName("label_35")
+        self.label_43 = QtWidgets.QLabel(self.groupBox)
+        self.label_43.setGeometry(QtCore.QRect(262, 14, 49, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_43.setFont(font)
+        self.label_43.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_43.setObjectName("label_43")
+        self.campo_usuario = QtWidgets.QLineEdit(self.groupBox)
+        self.campo_usuario.setEnabled(True)
+        self.campo_usuario.setGeometry(QtCore.QRect(20, 22, 213, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_usuario.setFont(font)
+        self.campo_usuario.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_usuario.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_usuario.setText("")
+        self.campo_usuario.setObjectName("campo_usuario")
+        self.campo_usuario.raise_()
+        self.campo_senha_usuario.raise_()
+        self.botao_ocultar_senha_usuario.raise_()
+        self.label_35.raise_()
+        self.label_43.raise_()
+        self.groupBox_2 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_2.setGeometry(QtCore.QRect(50, 102, 509, 110))
+        self.groupBox_2.setStyleSheet("QGroupBox{\n"
+"border-radius:7px;\n"
+"border: 1px solid rgb(120,120,120);\n"
+"background-color:rgb(60, 62, 84);}")
+        self.groupBox_2.setTitle("")
+        self.groupBox_2.setObjectName("groupBox_2")
+        self.label_30 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_30.setGeometry(QtCore.QRect(16, 16, 49, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_30.setFont(font)
+        self.label_30.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_30.setObjectName("label_30")
+        self.campo_nome_agente = QtWidgets.QLineEdit(self.groupBox_2)
+        self.campo_nome_agente.setEnabled(True)
+        self.campo_nome_agente.setGeometry(QtCore.QRect(16, 24, 236, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_nome_agente.setFont(font)
+        self.campo_nome_agente.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_nome_agente.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_nome_agente.setText("")
+        self.campo_nome_agente.setObjectName("campo_nome_agente")
+        self.label_33 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_33.setGeometry(QtCore.QRect(13, 59, 41, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
@@ -2303,9 +2375,9 @@ class Ui_janela(object):
         self.label_33.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
         self.label_33.setObjectName("label_33")
-        self.campo_email_empresa = QtWidgets.QLineEdit(self.tab)
+        self.campo_email_empresa = QtWidgets.QLineEdit(self.groupBox_2)
         self.campo_email_empresa.setEnabled(True)
-        self.campo_email_empresa.setGeometry(QtCore.QRect(78, 226, 445, 30))
+        self.campo_email_empresa.setGeometry(QtCore.QRect(13, 68, 239, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2327,24 +2399,185 @@ class Ui_janela(object):
 "")
         self.campo_email_empresa.setText("")
         self.campo_email_empresa.setObjectName("campo_email_empresa")
-        self.botao_atualizar_configuracoes = QtWidgets.QPushButton(self.tab)
-        self.botao_atualizar_configuracoes.setGeometry(QtCore.QRect(323, 580, 201, 31))
+        self.botao_ocultar_senha = QtWidgets.QPushButton(self.groupBox_2)
+        self.botao_ocultar_senha.setGeometry(QtCore.QRect(462, 66, 25, 21))
         font = QtGui.QFont()
-        font.setFamily("Segoe UI")
-        font.setPointSize(10)
+        font.setFamily("Consolas")
+        font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.botao_atualizar_configuracoes.setFont(font)
-        self.botao_atualizar_configuracoes.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_atualizar_configuracoes.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.botao_atualizar_configuracoes.setStyleSheet("border-radius:10px;\n"
-"background-color:rgb(73, 218, 107);\n"
-"color:rgb(90,54,247);\n"
+        self.botao_ocultar_senha.setFont(font)
+        self.botao_ocultar_senha.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_ocultar_senha.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.botao_ocultar_senha.setStyleSheet("border-radius:7px;\n"
+"background-color:transparent")
+        self.botao_ocultar_senha.setObjectName("botao_ocultar_senha")
+        self.label_34 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_34.setGeometry(QtCore.QRect(282, 58, 69, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_34.setFont(font)
+        self.label_34.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_34.setObjectName("label_34")
+        self.campo_senha_email = QtWidgets.QLineEdit(self.groupBox_2)
+        self.campo_senha_email.setEnabled(True)
+        self.campo_senha_email.setGeometry(QtCore.QRect(282, 67, 206, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_senha_email.setFont(font)
+        self.campo_senha_email.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_senha_email.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
 "")
-        self.botao_atualizar_configuracoes.setObjectName("botao_atualizar_configuracoes")
-        self.label_45 = QtWidgets.QLabel(self.tab)
-        self.label_45.setGeometry(QtCore.QRect(75, 342, 100, 10))
+        self.campo_senha_email.setText("")
+        self.campo_senha_email.setObjectName("campo_senha_email")
+        self.label_29 = QtWidgets.QLabel(self.groupBox_2)
+        self.label_29.setGeometry(QtCore.QRect(284, 14, 49, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_29.setFont(font)
+        self.label_29.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_29.setObjectName("label_29")
+        self.campo_cod_rev = QtWidgets.QLineEdit(self.groupBox_2)
+        self.campo_cod_rev.setEnabled(True)
+        self.campo_cod_rev.setGeometry(QtCore.QRect(284, 24, 100, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_cod_rev.setFont(font)
+        self.campo_cod_rev.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_cod_rev.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_cod_rev.setText("")
+        self.campo_cod_rev.setObjectName("campo_cod_rev")
+        self.campo_senha_email.raise_()
+        self.label_30.raise_()
+        self.campo_nome_agente.raise_()
+        self.label_33.raise_()
+        self.campo_email_empresa.raise_()
+        self.botao_ocultar_senha.raise_()
+        self.label_34.raise_()
+        self.label_29.raise_()
+        self.campo_cod_rev.raise_()
+        self.groupBox_3 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_3.setGeometry(QtCore.QRect(50, 234, 509, 64))
+        self.groupBox_3.setStyleSheet("QGroupBox{\n"
+"border-radius:7px;\n"
+"border: 1px solid rgb(120,120,120);\n"
+"background-color:rgb(60, 62, 84);}")
+        self.groupBox_3.setTitle("")
+        self.groupBox_3.setObjectName("groupBox_3")
+        self.botao_altera_pasta_principal = QtWidgets.QPushButton(self.groupBox_3)
+        self.botao_altera_pasta_principal.setGeometry(QtCore.QRect(452, 14, 33, 30))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(16)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.botao_altera_pasta_principal.setFont(font)
+        self.botao_altera_pasta_principal.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
+        self.botao_altera_pasta_principal.setFocusPolicy(QtCore.Qt.NoFocus)
+        self.botao_altera_pasta_principal.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.botao_altera_pasta_principal.setStyleSheet("border-radius:7px;\n"
+"background-color:transparent")
+        self.botao_altera_pasta_principal.setObjectName("botao_altera_pasta_principal")
+        self.label_7 = QtWidgets.QLabel(self.groupBox_3)
+        self.label_7.setGeometry(QtCore.QRect(19, 16, 137, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_7.setFont(font)
+        self.label_7.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_7.setObjectName("label_7")
+        self.caminho_pasta_principal = QtWidgets.QLineEdit(self.groupBox_3)
+        self.caminho_pasta_principal.setEnabled(True)
+        self.caminho_pasta_principal.setGeometry(QtCore.QRect(19, 25, 463, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.caminho_pasta_principal.setFont(font)
+        self.caminho_pasta_principal.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.caminho_pasta_principal.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.caminho_pasta_principal.setText("")
+        self.caminho_pasta_principal.setObjectName("caminho_pasta_principal")
+        self.caminho_pasta_principal.raise_()
+        self.botao_altera_pasta_principal.raise_()
+        self.label_7.raise_()
+        self.groupBox_4 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_4.setGeometry(QtCore.QRect(51, 317, 509, 67))
+        self.groupBox_4.setStyleSheet("QGroupBox{\n"
+"border-radius:7px;\n"
+"border: 1px solid rgb(120,120,120);\n"
+"background-color:rgb(60, 62, 84);}")
+        self.groupBox_4.setTitle("")
+        self.groupBox_4.setObjectName("groupBox_4")
+        self.label_53 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_53.setGeometry(QtCore.QRect(148, 15, 100, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_53.setFont(font)
+        self.label_53.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_53.setObjectName("label_53")
+        self.label_45 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_45.setGeometry(QtCore.QRect(18, 15, 100, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
@@ -2355,33 +2588,20 @@ class Ui_janela(object):
         self.label_45.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
         self.label_45.setObjectName("label_45")
-        self.campo_porcentagem_validacao = QtWidgets.QSpinBox(self.tab)
-        self.campo_porcentagem_validacao.setGeometry(QtCore.QRect(75, 351, 100, 30))
+        self.label_51 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_51.setGeometry(QtCore.QRect(266, 15, 100, 10))
         font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
+        font.setFamily("Consolas")
+        font.setPointSize(7)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.campo_porcentagem_validacao.setFont(font)
-        self.campo_porcentagem_validacao.setStyleSheet("QSpinBox {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QSpinBox:disabled, QSpinBox:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_porcentagem_validacao.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.campo_porcentagem_validacao.setMinimum(1)
-        self.campo_porcentagem_validacao.setMaximum(100)
-        self.campo_porcentagem_validacao.setProperty("value", 1)
-        self.campo_porcentagem_validacao.setObjectName("campo_porcentagem_validacao")
-        self.campo_imposto_validacao = QtWidgets.QSpinBox(self.tab)
-        self.campo_imposto_validacao.setGeometry(QtCore.QRect(312, 351, 100, 30))
+        self.label_51.setFont(font)
+        self.label_51.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_51.setObjectName("label_51")
+        self.campo_imposto_validacao = QtWidgets.QSpinBox(self.groupBox_4)
+        self.campo_imposto_validacao.setGeometry(QtCore.QRect(266, 24, 100, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2405,20 +2625,58 @@ class Ui_janela(object):
         self.campo_imposto_validacao.setMaximum(100)
         self.campo_imposto_validacao.setProperty("value", 1)
         self.campo_imposto_validacao.setObjectName("campo_imposto_validacao")
-        self.label_51 = QtWidgets.QLabel(self.tab)
-        self.label_51.setGeometry(QtCore.QRect(312, 342, 100, 10))
+        self.campo_desconto = QtWidgets.QSpinBox(self.groupBox_4)
+        self.campo_desconto.setGeometry(QtCore.QRect(148, 24, 100, 24))
         font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
+        font.setFamily("Calibri")
+        font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.label_51.setFont(font)
-        self.label_51.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_51.setObjectName("label_51")
-        self.label_52 = QtWidgets.QLabel(self.tab)
-        self.label_52.setGeometry(QtCore.QRect(76, 406, 100, 10))
+        self.campo_desconto.setFont(font)
+        self.campo_desconto.setStyleSheet("QSpinBox {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QSpinBox:disabled, QSpinBox:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_desconto.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.campo_desconto.setMinimum(1)
+        self.campo_desconto.setMaximum(100)
+        self.campo_desconto.setProperty("value", 1)
+        self.campo_desconto.setObjectName("campo_desconto")
+        self.campo_porcentagem_validacao = QtWidgets.QSpinBox(self.groupBox_4)
+        self.campo_porcentagem_validacao.setGeometry(QtCore.QRect(18, 24, 100, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_porcentagem_validacao.setFont(font)
+        self.campo_porcentagem_validacao.setStyleSheet("QSpinBox {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QSpinBox:disabled, QSpinBox:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_porcentagem_validacao.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.campo_porcentagem_validacao.setMinimum(1)
+        self.campo_porcentagem_validacao.setMaximum(100)
+        self.campo_porcentagem_validacao.setProperty("value", 1)
+        self.campo_porcentagem_validacao.setObjectName("campo_porcentagem_validacao")
+        self.label_52 = QtWidgets.QLabel(self.groupBox_4)
+        self.label_52.setGeometry(QtCore.QRect(384, 15, 100, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
@@ -2429,8 +2687,8 @@ class Ui_janela(object):
         self.label_52.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
         self.label_52.setObjectName("label_52")
-        self.campo_desconto_validacao = QtWidgets.QDoubleSpinBox(self.tab)
-        self.campo_desconto_validacao.setGeometry(QtCore.QRect(76, 415, 100, 30))
+        self.campo_desconto_validacao = QtWidgets.QDoubleSpinBox(self.groupBox_4)
+        self.campo_desconto_validacao.setGeometry(QtCore.QRect(384, 24, 100, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2455,67 +2713,38 @@ class Ui_janela(object):
         self.campo_desconto_validacao.setSingleStep(0.1)
         self.campo_desconto_validacao.setProperty("value", 1.0)
         self.campo_desconto_validacao.setObjectName("campo_desconto_validacao")
-        self.label_53 = QtWidgets.QLabel(self.tab)
-        self.label_53.setGeometry(QtCore.QRect(194, 342, 100, 10))
+        self.groupBox_6 = QtWidgets.QGroupBox(self.tab)
+        self.groupBox_6.setGeometry(QtCore.QRect(48, 408, 509, 173))
+        self.groupBox_6.setStyleSheet("QGroupBox{\n"
+"border-radius:7px;\n"
+"border: 1px solid rgb(120,120,120);\n"
+"background-color:rgb(60, 62, 84);}")
+        self.groupBox_6.setTitle("")
+        self.groupBox_6.setObjectName("groupBox_6")
+        self.label_8 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_8.setGeometry(QtCore.QRect(20, 17, 157, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.label_53.setFont(font)
-        self.label_53.setStyleSheet("background-color:transparent;\n"
+        self.label_8.setFont(font)
+        self.label_8.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
-        self.label_53.setObjectName("label_53")
-        self.campo_desconto = QtWidgets.QSpinBox(self.tab)
-        self.campo_desconto.setGeometry(QtCore.QRect(194, 351, 100, 30))
+        self.label_8.setObjectName("label_8")
+        self.caminho_pasta = QtWidgets.QLineEdit(self.groupBox_6)
+        self.caminho_pasta.setEnabled(True)
+        self.caminho_pasta.setGeometry(QtCore.QRect(20, 28, 467, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.campo_desconto.setFont(font)
-        self.campo_desconto.setStyleSheet("QSpinBox {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QSpinBox:disabled, QSpinBox:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_desconto.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.campo_desconto.setMinimum(1)
-        self.campo_desconto.setMaximum(100)
-        self.campo_desconto.setProperty("value", 1)
-        self.campo_desconto.setObjectName("campo_desconto")
-        self.label_29 = QtWidgets.QLabel(self.tab)
-        self.label_29.setGeometry(QtCore.QRect(312, 406, 49, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_29.setFont(font)
-        self.label_29.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_29.setObjectName("label_29")
-        self.campo_cod_rev = QtWidgets.QLineEdit(self.tab)
-        self.campo_cod_rev.setEnabled(True)
-        self.campo_cod_rev.setGeometry(QtCore.QRect(312, 416, 100, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_cod_rev.setFont(font)
-        self.campo_cod_rev.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_cod_rev.setStyleSheet("QLineEdit {\n"
+        self.caminho_pasta.setFont(font)
+        self.caminho_pasta.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.caminho_pasta.setStyleSheet("QLineEdit {\n"
 "    border: none;\n"
 "    border-bottom: 1px solid rgb(90, 54, 247);\n"
 "    border-radius: 0;\n"
@@ -2526,273 +2755,10 @@ class Ui_janela(object):
 "    border-bottom: 1px solid rgb(120, 120, 120);\n"
 "}\n"
 "")
-        self.campo_cod_rev.setText("")
-        self.campo_cod_rev.setObjectName("campo_cod_rev")
-        self.campo_senha_email = QtWidgets.QLineEdit(self.tab)
-        self.campo_senha_email.setEnabled(True)
-        self.campo_senha_email.setGeometry(QtCore.QRect(77, 285, 446, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_senha_email.setFont(font)
-        self.campo_senha_email.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_senha_email.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_senha_email.setText("")
-        self.campo_senha_email.setObjectName("campo_senha_email")
-        self.label_34 = QtWidgets.QLabel(self.tab)
-        self.label_34.setGeometry(QtCore.QRect(78, 275, 69, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_34.setFont(font)
-        self.label_34.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_34.setObjectName("label_34")
-        self.campo_nome_agente = QtWidgets.QLineEdit(self.tab)
-        self.campo_nome_agente.setEnabled(True)
-        self.campo_nome_agente.setGeometry(QtCore.QRect(77, 102, 447, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_nome_agente.setFont(font)
-        self.campo_nome_agente.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_nome_agente.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_nome_agente.setText("")
-        self.campo_nome_agente.setObjectName("campo_nome_agente")
-        self.label_30 = QtWidgets.QLabel(self.tab)
-        self.label_30.setGeometry(QtCore.QRect(77, 94, 49, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_30.setFont(font)
-        self.label_30.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_30.setObjectName("label_30")
-        self.botao_ocultar_senha = QtWidgets.QPushButton(self.tab)
-        self.botao_ocultar_senha.setGeometry(QtCore.QRect(486, 290, 25, 21))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.botao_ocultar_senha.setFont(font)
-        self.botao_ocultar_senha.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_ocultar_senha.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.botao_ocultar_senha.setStyleSheet("border-radius:7px;\n"
-"background-color:transparent")
-        self.botao_ocultar_senha.setObjectName("botao_ocultar_senha")
-        self.campo_dias_renovacao = QtWidgets.QSpinBox(self.tab)
-        self.campo_dias_renovacao.setGeometry(QtCore.QRect(194, 415, 100, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_dias_renovacao.setFont(font)
-        self.campo_dias_renovacao.setStyleSheet("QSpinBox {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QSpinBox:disabled, QSpinBox:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_dias_renovacao.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.campo_dias_renovacao.setMinimum(0)
-        self.campo_dias_renovacao.setMaximum(255)
-        self.campo_dias_renovacao.setObjectName("campo_dias_renovacao")
-        self.label_41 = QtWidgets.QLabel(self.tab)
-        self.label_41.setGeometry(QtCore.QRect(194, 406, 100, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_41.setFont(font)
-        self.label_41.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_41.setObjectName("label_41")
-        self.checkBox_transparecer = QtWidgets.QCheckBox(self.tab)
-        self.checkBox_transparecer.setGeometry(QtCore.QRect(504, 358, 18, 17))
-        self.checkBox_transparecer.setFocusPolicy(QtCore.Qt.NoFocus)
-        self.checkBox_transparecer.setStyleSheet("background-color:transparent;color:rgb(150,150,150)")
-        self.checkBox_transparecer.setText("")
-        self.checkBox_transparecer.setObjectName("checkBox_transparecer")
-        self.campo_porcentagem_transparencia = QtWidgets.QSpinBox(self.tab)
-        self.campo_porcentagem_transparencia.setGeometry(QtCore.QRect(432, 351, 92, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_porcentagem_transparencia.setFont(font)
-        self.campo_porcentagem_transparencia.setStyleSheet("QSpinBox {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QSpinBox:disabled, QSpinBox:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_porcentagem_transparencia.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
-        self.campo_porcentagem_transparencia.setMinimum(20)
-        self.campo_porcentagem_transparencia.setMaximum(100)
-        self.campo_porcentagem_transparencia.setProperty("value", 20)
-        self.campo_porcentagem_transparencia.setObjectName("campo_porcentagem_transparencia")
-        self.label_32 = QtWidgets.QLabel(self.tab)
-        self.label_32.setGeometry(QtCore.QRect(432, 340, 92, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_32.setFont(font)
-        self.label_32.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_32.setObjectName("label_32")
-        self.campo_usuario = QtWidgets.QLineEdit(self.tab)
-        self.campo_usuario.setEnabled(True)
-        self.campo_usuario.setGeometry(QtCore.QRect(77, 40, 213, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_usuario.setFont(font)
-        self.campo_usuario.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_usuario.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_usuario.setText("")
-        self.campo_usuario.setObjectName("campo_usuario")
-        self.label_35 = QtWidgets.QLabel(self.tab)
-        self.label_35.setGeometry(QtCore.QRect(77, 32, 49, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_35.setFont(font)
-        self.label_35.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_35.setObjectName("label_35")
-        self.campo_senha_usuario = QtWidgets.QLineEdit(self.tab)
-        self.campo_senha_usuario.setEnabled(True)
-        self.campo_senha_usuario.setGeometry(QtCore.QRect(304, 40, 219, 30))
-        font = QtGui.QFont()
-        font.setFamily("Calibri")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.campo_senha_usuario.setFont(font)
-        self.campo_senha_usuario.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.campo_senha_usuario.setStyleSheet("QLineEdit {\n"
-"    border: none;\n"
-"    border-bottom: 1px solid rgb(90, 54, 247);\n"
-"    border-radius: 0;\n"
-"    background-color: rgb(60, 62, 84);\n"
-"}\n"
-"\n"
-"QLineEdit:disabled, QLineEdit:!focus {\n"
-"    border-bottom: 1px solid rgb(120, 120, 120);\n"
-"}\n"
-"")
-        self.campo_senha_usuario.setText("")
-        self.campo_senha_usuario.setObjectName("campo_senha_usuario")
-        self.label_43 = QtWidgets.QLabel(self.tab)
-        self.label_43.setGeometry(QtCore.QRect(304, 32, 49, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_43.setFont(font)
-        self.label_43.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_43.setObjectName("label_43")
-        self.botao_ocultar_senha_usuario = QtWidgets.QPushButton(self.tab)
-        self.botao_ocultar_senha_usuario.setGeometry(QtCore.QRect(486, 44, 25, 21))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(12)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.botao_ocultar_senha_usuario.setFont(font)
-        self.botao_ocultar_senha_usuario.setCursor(QtGui.QCursor(QtCore.Qt.PointingHandCursor))
-        self.botao_ocultar_senha_usuario.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.botao_ocultar_senha_usuario.setStyleSheet("border-radius:7px;\n"
-"background-color:transparent")
-        self.botao_ocultar_senha_usuario.setObjectName("botao_ocultar_senha_usuario")
-        self.label_42 = QtWidgets.QLabel(self.tab)
-        self.label_42.setGeometry(QtCore.QRect(77, 522, 69, 10))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setPointSize(7)
-        font.setBold(False)
-        font.setItalic(False)
-        font.setWeight(50)
-        self.label_42.setFont(font)
-        self.label_42.setStyleSheet("background-color:transparent;\n"
-"color:rgb(170,170,170)")
-        self.label_42.setObjectName("label_42")
-        self.campo_lista_tipo_criar_pasta = QtWidgets.QComboBox(self.tab)
-        self.campo_lista_tipo_criar_pasta.setGeometry(QtCore.QRect(76, 531, 157, 30))
+        self.caminho_pasta.setText("")
+        self.caminho_pasta.setObjectName("caminho_pasta")
+        self.campo_lista_tipo_criar_pasta = QtWidgets.QComboBox(self.groupBox_6)
+        self.campo_lista_tipo_criar_pasta.setGeometry(QtCore.QRect(18, 76, 157, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(11)
@@ -2824,18 +2790,30 @@ class Ui_janela(object):
         self.campo_lista_tipo_criar_pasta.addItem("")
         self.campo_lista_tipo_criar_pasta.addItem("")
         self.campo_lista_tipo_criar_pasta.addItem("")
-        self.caminho_pasta = QtWidgets.QLineEdit(self.tab)
-        self.caminho_pasta.setEnabled(True)
-        self.caminho_pasta.setGeometry(QtCore.QRect(76, 473, 447, 30))
+        self.label_42 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_42.setGeometry(QtCore.QRect(19, 67, 69, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_42.setFont(font)
+        self.label_42.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_42.setObjectName("label_42")
+        self.campo_telefone_sac_cliente = QtWidgets.QLineEdit(self.groupBox_6)
+        self.campo_telefone_sac_cliente.setEnabled(True)
+        self.campo_telefone_sac_cliente.setGeometry(QtCore.QRect(207, 77, 279, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.caminho_pasta.setFont(font)
-        self.caminho_pasta.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
-        self.caminho_pasta.setStyleSheet("QLineEdit {\n"
+        self.campo_telefone_sac_cliente.setFont(font)
+        self.campo_telefone_sac_cliente.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_telefone_sac_cliente.setStyleSheet("QLineEdit {\n"
 "    border: none;\n"
 "    border-bottom: 1px solid rgb(90, 54, 247);\n"
 "    border-radius: 0;\n"
@@ -2846,57 +2824,188 @@ class Ui_janela(object):
 "    border-bottom: 1px solid rgb(120, 120, 120);\n"
 "}\n"
 "")
-        self.caminho_pasta.setText("")
-        self.caminho_pasta.setObjectName("caminho_pasta")
-        self.label_8 = QtWidgets.QLabel(self.tab)
-        self.label_8.setGeometry(QtCore.QRect(76, 462, 157, 10))
+        self.campo_telefone_sac_cliente.setText("")
+        self.campo_telefone_sac_cliente.setObjectName("campo_telefone_sac_cliente")
+        self.label_54 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_54.setGeometry(QtCore.QRect(208, 68, 69, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
         font.setBold(False)
         font.setItalic(False)
         font.setWeight(50)
-        self.label_8.setFont(font)
-        self.label_8.setStyleSheet("background-color:transparent;\n"
+        self.label_54.setFont(font)
+        self.label_54.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
-        self.label_8.setObjectName("label_8")
-        self.campo_verifica_tela_cheia.raise_()
-        self.caminho_pasta_principal.raise_()
-        self.label_7.raise_()
-        self.label_9.raise_()
-        self.botao_altera_pasta_principal.raise_()
-        self.campo_email_empresa.raise_()
+        self.label_54.setObjectName("label_54")
+        self.campo_dias_renovacao = QtWidgets.QSpinBox(self.groupBox_6)
+        self.campo_dias_renovacao.setGeometry(QtCore.QRect(19, 131, 100, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_dias_renovacao.setFont(font)
+        self.campo_dias_renovacao.setStyleSheet("QSpinBox {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QSpinBox:disabled, QSpinBox:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_dias_renovacao.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.campo_dias_renovacao.setMinimum(0)
+        self.campo_dias_renovacao.setMaximum(255)
+        self.campo_dias_renovacao.setObjectName("campo_dias_renovacao")
+        self.campo_verifica_tela_cheia = QtWidgets.QLineEdit(self.groupBox_6)
+        self.campo_verifica_tela_cheia.setEnabled(True)
+        self.campo_verifica_tela_cheia.setGeometry(QtCore.QRect(206, 131, 94, 24))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.campo_verifica_tela_cheia.setFont(font)
+        self.campo_verifica_tela_cheia.setCursor(QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_verifica_tela_cheia.setStyleSheet("QLineEdit {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QLineEdit:disabled, QLineEdit:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_verifica_tela_cheia.setText("")
+        self.campo_verifica_tela_cheia.setObjectName("campo_verifica_tela_cheia")
+        self.label_41 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_41.setGeometry(QtCore.QRect(19, 122, 100, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_41.setFont(font)
+        self.label_41.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_41.setObjectName("label_41")
+        self.label_9 = QtWidgets.QLabel(self.groupBox_6)
+        self.label_9.setGeometry(QtCore.QRect(206, 122, 61, 10))
+        font = QtGui.QFont()
+        font.setFamily("Consolas")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_9.setFont(font)
+        self.label_9.setStyleSheet("background-color:transparent;\n"
+"color:rgb(170,170,170)")
+        self.label_9.setObjectName("label_9")
+        self.campo_porcentagem_transparencia = QtWidgets.QSpinBox(self.groupBox_6)
+        self.campo_porcentagem_transparencia.setGeometry(QtCore.QRect(398, 128, 86, 28))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(12)
+        self.campo_porcentagem_transparencia.setFont(font)
+        self.campo_porcentagem_transparencia.setStyleSheet("QSpinBox {\n"
+"    border: none;\n"
+"    border-bottom: 1px solid rgb(90, 54, 247);\n"
+"    border-radius: 0;\n"
+"    background-color: rgb(60, 62, 84);\n"
+"}\n"
+"\n"
+"QSpinBox:disabled, QSpinBox:!focus {\n"
+"    border-bottom: 1px solid rgb(120, 120, 120);\n"
+"}\n"
+"")
+        self.campo_porcentagem_transparencia.setButtonSymbols(QtWidgets.QAbstractSpinBox.NoButtons)
+        self.campo_porcentagem_transparencia.setMinimum(10)
+        self.campo_porcentagem_transparencia.setMaximum(100)
+        self.campo_porcentagem_transparencia.setObjectName("campo_porcentagem_transparencia")
+        self.checkBox_transparecer = QtWidgets.QCheckBox(self.groupBox_6)
+        self.checkBox_transparecer.setGeometry(QtCore.QRect(470, 134, 19, 17))
+        self.checkBox_transparecer.setText("")
+        self.checkBox_transparecer.setObjectName("checkBox_transparecer")
+        self.label_2 = QtWidgets.QLabel(self.tab)
+        self.label_2.setGeometry(QtCore.QRect(60, 18, 39, 10))
+        font = QtGui.QFont()
+        font.setFamily("Leelawadee UI")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_2.setFont(font)
+        self.label_2.setStyleSheet("\n"
+"color:rgb(220,220,220)")
+        self.label_2.setObjectName("label_2")
+        self.label_32 = QtWidgets.QLabel(self.tab)
+        self.label_32.setGeometry(QtCore.QRect(58, 404, 99, 10))
+        font = QtGui.QFont()
+        font.setFamily("Leelawadee UI")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_32.setFont(font)
+        self.label_32.setStyleSheet("\n"
+"color:rgb(220,220,220)")
+        self.label_32.setObjectName("label_32")
+        self.label_55 = QtWidgets.QLabel(self.tab)
+        self.label_55.setGeometry(QtCore.QRect(60, 314, 54, 10))
+        font = QtGui.QFont()
+        font.setFamily("Leelawadee UI")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_55.setFont(font)
+        self.label_55.setStyleSheet("\n"
+"color:rgb(220,220,220)")
+        self.label_55.setObjectName("label_55")
+        self.label_56 = QtWidgets.QLabel(self.tab)
+        self.label_56.setGeometry(QtCore.QRect(60, 230, 79, 10))
+        font = QtGui.QFont()
+        font.setFamily("Leelawadee UI")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_56.setFont(font)
+        self.label_56.setStyleSheet("\n"
+"color:rgb(220,220,220)")
+        self.label_56.setObjectName("label_56")
+        self.label_57 = QtWidgets.QLabel(self.tab)
+        self.label_57.setGeometry(QtCore.QRect(60, 98, 75, 10))
+        font = QtGui.QFont()
+        font.setFamily("Leelawadee UI")
+        font.setPointSize(7)
+        font.setBold(False)
+        font.setItalic(False)
+        font.setWeight(50)
+        self.label_57.setFont(font)
+        self.label_57.setStyleSheet("\n"
+"color:rgb(220,220,220)")
+        self.label_57.setObjectName("label_57")
         self.botao_atualizar_configuracoes.raise_()
-        self.campo_porcentagem_validacao.raise_()
-        self.campo_imposto_validacao.raise_()
-        self.campo_desconto_validacao.raise_()
-        self.campo_desconto.raise_()
-        self.campo_cod_rev.raise_()
-        self.label_33.raise_()
-        self.label_45.raise_()
-        self.label_51.raise_()
-        self.label_52.raise_()
-        self.label_53.raise_()
-        self.label_29.raise_()
-        self.campo_senha_email.raise_()
-        self.label_34.raise_()
-        self.campo_nome_agente.raise_()
-        self.label_30.raise_()
-        self.botao_ocultar_senha.raise_()
-        self.campo_dias_renovacao.raise_()
-        self.label_41.raise_()
-        self.campo_porcentagem_transparencia.raise_()
-        self.checkBox_transparecer.raise_()
+        self.groupBox.raise_()
+        self.groupBox_2.raise_()
+        self.groupBox_3.raise_()
+        self.groupBox_4.raise_()
+        self.groupBox_6.raise_()
+        self.label_2.raise_()
+        self.label_55.raise_()
+        self.label_56.raise_()
+        self.label_57.raise_()
         self.label_32.raise_()
-        self.campo_usuario.raise_()
-        self.label_35.raise_()
-        self.campo_senha_usuario.raise_()
-        self.label_43.raise_()
-        self.botao_ocultar_senha_usuario.raise_()
-        self.label_42.raise_()
-        self.campo_lista_tipo_criar_pasta.raise_()
-        self.caminho_pasta.raise_()
-        self.label_8.raise_()
         self.tabWidget.addTab(self.tab, "")
         self.botao_print_direto_na_pasta = QtWidgets.QPushButton(self.centralwidget)
         self.botao_print_direto_na_pasta.setGeometry(QtCore.QRect(436, -5, 46, 56))
@@ -3320,7 +3429,7 @@ class Ui_janela(object):
         self.label_versao.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.label_versao.setObjectName("label_versao")
         self.label_37 = QtWidgets.QLabel(self.centralwidget)
-        self.label_37.setGeometry(QtCore.QRect(283, 48, 345, 26))
+        self.label_37.setGeometry(QtCore.QRect(283, 48, 345, 25))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setBold(False)
@@ -3394,8 +3503,7 @@ class Ui_janela(object):
         janela.setTabOrder(self.campo_senha_email, self.campo_porcentagem_validacao)
         janela.setTabOrder(self.campo_porcentagem_validacao, self.campo_desconto)
         janela.setTabOrder(self.campo_desconto, self.campo_imposto_validacao)
-        janela.setTabOrder(self.campo_imposto_validacao, self.campo_porcentagem_transparencia)
-        janela.setTabOrder(self.campo_porcentagem_transparencia, self.campo_desconto_validacao)
+        janela.setTabOrder(self.campo_imposto_validacao, self.campo_desconto_validacao)
         janela.setTabOrder(self.campo_desconto_validacao, self.campo_dias_renovacao)
         janela.setTabOrder(self.campo_dias_renovacao, self.campo_cod_rev)
         janela.setTabOrder(self.campo_cod_rev, self.campo_verifica_tela_cheia)
@@ -3556,29 +3664,34 @@ class Ui_janela(object):
         self.botao_atualizar_meta.setText(_translate("janela", "SALVAR META"))
         self.label_71.setText(_translate("janela", " META MÊS"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_4), _translate("janela", "Metas"))
-        self.label_7.setText(_translate("janela", "DIRETÓRIO PASTA PRINCIPAL"))
-        self.label_9.setText(_translate("janela", "TELA CHEIA"))
-        self.botao_altera_pasta_principal.setText(_translate("janela", "📂"))
-        self.label_33.setText(_translate("janela", "E-MAIL"))
         self.botao_atualizar_configuracoes.setText(_translate("janela", "ATUALIZAR CONFIGURAÇÕES"))
-        self.label_45.setText(_translate("janela", "PARTE  VALIDAÇÃO (%)"))
-        self.label_51.setText(_translate("janela", "IMP RENDA (%)"))
-        self.label_52.setText(_translate("janela", "DESC. POR VALIDAÇÃO"))
-        self.label_53.setText(_translate("janela", "DESC DO TOTAL (%)"))
-        self.label_29.setText(_translate("janela", "COD REV"))
-        self.label_34.setText(_translate("janela", "SENHA EMAIL"))
-        self.label_30.setText(_translate("janela", "AGENTE"))
-        self.botao_ocultar_senha.setText(_translate("janela", "👁️"))
-        self.label_41.setText(_translate("janela", "DIAS RENOVAÇÃO"))
-        self.label_32.setText(_translate("janela", "TRANSPARECER TELA"))
+        self.botao_ocultar_senha_usuario.setText(_translate("janela", "👁️"))
         self.label_35.setText(_translate("janela", "USUÁRIO"))
         self.label_43.setText(_translate("janela", "SENHA"))
-        self.botao_ocultar_senha_usuario.setText(_translate("janela", "👁️"))
-        self.label_42.setText(_translate("janela", "MODO  PASTA"))
+        self.label_30.setText(_translate("janela", "AGENTE"))
+        self.label_33.setText(_translate("janela", "E-MAIL"))
+        self.botao_ocultar_senha.setText(_translate("janela", "👁️"))
+        self.label_34.setText(_translate("janela", "SENHA EMAIL"))
+        self.label_29.setText(_translate("janela", "COD REV"))
+        self.botao_altera_pasta_principal.setText(_translate("janela", "📂"))
+        self.label_7.setText(_translate("janela", "DIRETÓRIO PASTA PRINCIPAL"))
+        self.label_53.setText(_translate("janela", "DESC DO TOTAL (%)"))
+        self.label_45.setText(_translate("janela", "PARTE VALIDAÇÃO (%)"))
+        self.label_51.setText(_translate("janela", "IMP DE RENDA (%)"))
+        self.label_52.setText(_translate("janela", "DESC. POR VALIDAÇÃO"))
+        self.label_8.setText(_translate("janela", "DIRETÓRIO PASTA CLIENTE ATUAL"))
         self.campo_lista_tipo_criar_pasta.setItemText(0, _translate("janela", "PEDIDO"))
         self.campo_lista_tipo_criar_pasta.setItemText(1, _translate("janela", "NOME"))
         self.campo_lista_tipo_criar_pasta.setItemText(2, _translate("janela", "PEDIDO-NOME"))
-        self.label_8.setText(_translate("janela", "DIRETÓRIO PASTA CLIENTE ATUAL"))
+        self.label_42.setText(_translate("janela", "MODO  PASTA"))
+        self.label_54.setText(_translate("janela", "SAC CLIENTE"))
+        self.label_41.setText(_translate("janela", "DIAS RENOVAÇÃO"))
+        self.label_9.setText(_translate("janela", "TELA CHEIA"))
+        self.label_2.setText(_translate("janela", "  LOGIN"))
+        self.label_32.setText(_translate("janela", "  CONFIGURAÇÕES APP"))
+        self.label_55.setText(_translate("janela", "  CONTÁBIL"))
+        self.label_56.setText(_translate("janela", "  PASTA PRINCIPAL"))
+        self.label_57.setText(_translate("janela", "  DADOS AGENTE"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("janela", "Configs"))
         self.botao_print_direto_na_pasta.setText(_translate("janela", "📸"))
         self.botao_tela_cheia.setText(_translate("janela", "🔓"))
@@ -3587,5 +3700,6 @@ class Ui_janela(object):
         self.campo_status_bd_2.setText(_translate("janela", "🖥️"))
         self.botao_menagem.setText(_translate("janela", "💬"))
         self.campo_status_bd_3.setText(_translate("janela", "🚦"))
+
 
 

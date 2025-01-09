@@ -179,6 +179,7 @@ class FuncoesPadrao:
                 ui.campo_dias_renovacao.setValue(configs['RNG RENOVACAO'])
                 ui.checkBox_transparecer.setChecked(configs['CHECKBOX TRANSP'])
                 ui.campo_porcentagem_transparencia.setValue(configs['VALOR TRANS'])
+                ui.campo_telefone_sac_cliente.setText(configs['SAC'])
                
 
 
@@ -217,6 +218,7 @@ class FuncoesPadrao:
         transparencia = ui.checkBox_transparecer.isChecked()
         valor_transparencia = ui.campo_porcentagem_transparencia.value()
         nova_senha = ui.campo_senha_usuario.text()  # Obtém a nova senha (do campo de senha)
+        sac_cliente = ui.campo_telefone_sac_cliente.text()
 
         # Cria um dicionário com as novas configurações
         nova_config = {
@@ -232,7 +234,8 @@ class FuncoesPadrao:
             "AGENTE": atendente,
             "RNG RENOVACAO": renovacao,
             "CHECKBOX TRANSP": transparencia,
-            "VALOR TRANS": valor_transparencia
+            "VALOR TRANS": valor_transparencia,
+            "SAC": sac_cliente
         }
 
         try:
@@ -1242,7 +1245,13 @@ class FuncoesPadrao:
             nome_campo_atual = campo_atual.objectName()
             if nome_campo_atual == "campo_lista_versao_certificado":
                 self.buscar_preco_certificado()
-              
+            
+            elif nome_campo_atual == "campo_preco_certificado_cheio":
+                valor_formatado = f"{float(ui.campo_preco_certificado_cheio.text()):.2f}"
+                ui.campo_preco_certificado_cheio.setText(valor_formatado)
+                ui.campo_preco_certificado.setText(self.calcular_comissao()["valor_final_formatado"])
+                self.atualizar_campos_comissao()
+
 
     def obter_valor_campo(self, campo):
         if isinstance(campo, QtWidgets.QLineEdit):
@@ -1294,50 +1303,6 @@ class FuncoesPadrao:
                 pyperclip.copy(str(link))
         except:
             pass
-
-
-    def buscar_preco_certificado(self):
-        certificados = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")      
-        lista_certificados = certificados.get()        
-        certificado = ui.campo_lista_versao_certificado.currentText()        
-        if certificado in lista_certificados:            
-            # Armazenar o valor da chave correspondente em uma variável            
-            valor_do_certificado = float(lista_certificados[certificado]["VALOR"].replace(',','.'))            
-            ui.campo_preco_certificado_cheio.setText(str(valor_do_certificado))            
-            porcentagem_validacao = int(ui.campo_porcentagem_validacao.value()) / 100            
-            imposto_de_renda = 1 - (ui.campo_imposto_validacao.value() / 100)            
-            desconto_validacao = float(ui.campo_desconto_validacao.text().replace(',','.'))                                    
-            valor_final = ((valor_do_certificado * porcentagem_validacao) * imposto_de_renda) - desconto_validacao            
-            if valor_final < 0:                
-                valor_final = 0            
-            valor_final_formatado = "{:.2f}".format(valor_final) 
-            
-            # Atualizar apenas o ToolTip
-            tooltip_text = (
-                f"COMO CHEGUEI NESSE VALOR?\n"
-                "\n"
-                f"Valor do certificado: R${valor_do_certificado}\n"
-                f"Porcentagem na validação ({porcentagem_validacao * 100:.1f}%): R${valor_do_certificado * porcentagem_validacao:.2f}\n"
-                "\n"
-                f"(=)Valor Bruto: R${valor_do_certificado * porcentagem_validacao:.2f}\n"
-                f"(-) Imposto de renda ({(1 - imposto_de_renda) * 100:.1f}%): -R${valor_do_certificado * porcentagem_validacao * (1 - imposto_de_renda):.2f}\n"
-                f"(=)Valor líquido: R${valor_do_certificado * porcentagem_validacao * imposto_de_renda:.2f}\n"
-                f"(-) Desconto adicional: -R${desconto_validacao}\n"
-                f"---------------------------------\n"
-                f"Valor final: R${valor_final_formatado}"
-            )
-
-            midias = ["cartão","token"]
-            
-            if any(midia in certificado.lower() for midia in midias):
-                ui.alerta_midia.setText("⚠️")
-                ui.alerta_midia.setToolTip("Certificado com Mídia\nLembre-se de pegar o endereço para envio")
-            else:
-                ui.alerta_midia.setText("")
-                ui.alerta_midia.setToolTip("")
-            
-            ui.campo_preco_certificado.setToolTip(tooltip_text)
-            ui.campo_preco_certificado.setText(valor_final_formatado)
 
 
     def atualizar_documentos_tabela(self):
@@ -1543,7 +1508,7 @@ f'Sou o {nome} que fez a validação do seu certificado digital.\n'\
             mensagem = f'{mensagem_inicial}, tudo bem?\n'\
 f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para seu certificado digital às *{ui.campo_hora_agendamento.text()}*. \n' \
 'Porém, verifiquei que o pagamento para seu pedido ainda *não foi reconhecido no sistema*.\n'\
-'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato com o suporte pelo contato *4020-9735* para que possam fazer a liberação do pedido.'
+f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato com o suporte pelo contato *{ui.campo_telefone_sac_cliente.text()}* para que possam fazer a liberação do pedido.'
 
         numero = ui.campo_telefone.text()  
         mensagem = mensagem.replace(' ', '%20')  
@@ -1552,6 +1517,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 
 
     def envio_de_email(self):
+        email = ui.campo_email_empresa.text()
+        senha = ui.campo_senha_email.text()
+
+        if not email or not senha:
+            self.mensagem_alerta("ERRO","Necessário cadastrar o e-mail do agente na aba 'Configs' para envio")
+            return
+
         try:
             nome = ui.campo_nome_agente.text()
             hora = ui.campo_hora_agendamento.time().toString("HH:mm")
@@ -1575,7 +1547,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                 return
         
 
-            tipo_mensagem, ok = QInputDialog.getItem(ui.centralwidget, "Envio", "Escolha o conteúdo do E-mail:", ["INICIO DE ATENDIMENTO", "PROBLEMA DE PAGAMENTO","RENOVAÇÃO"], 0, False)
+            tipo_mensagem, ok = QInputDialog.getItem(ui.centralwidget, "Envio", "Escolha o conteúdo do E-mail:", ["INICIO DE ATENDIMENTO", "SOLICITAR DOCUMENTOS","PROBLEMA DE PAGAMENTO","RENOVAÇÃO"], 0, False)
             if not ok:
                 return
             
@@ -1586,6 +1558,125 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             primeiro_nome = ui.campo_nome.text().split()[0]
 
             match tipo_mensagem:
+
+                case "SOLICITAR DOCUMENTOS":
+                    
+                    certificado = ui.campo_lista_versao_certificado.currentText()
+                    if "CNPJ" in certificado:
+                        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
+                        assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
+                        corpo_html = (
+                            f"<!DOCTYPE html>"
+                            f"<html lang='pt-BR'>"
+                            f"<head>"
+                            f"<meta charset='UTF-8'>"
+                            f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                            f"<style>"
+                            f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; font-size: 16px; }} "
+                            f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }} "
+                            f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; }} "
+                            f"  .header h1 {{ margin: 0; font-size: 24px; }} "
+                            f"  .content {{ padding: 20px; }} "
+                            f"  .content p, .content ul, .content li {{ font-size: 16px; line-height: 1.6; color: #333333; }} "
+                            f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: #4E4BFF; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; text-align: center; }} "
+                            f"  .btn:hover {{ background-color: #3b3ae3; transition: background-color 0.3s ease; }} "
+                            f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 14px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }} "
+                            f"</style>"
+                            f"</head>"
+                            f"<body>"
+                            f"  <div class='container'>"
+                            f"    <div class='header'><h1>Validação Certificado Digital</h1></div>"
+                            f"    <div class='content'>"
+                            f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
+                            f"      <p>Espero que esteja bem.</p>"
+                            f"      <p>Sou {nome} e sou agente de registro da ACB Digital.</p>"
+                            f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
+                            f"      <p>Para agilizar a validação, preciso que o senhor(a) encaminhe respondendo a este e-mail, a relação de documentos abaixo:</p>"
+                            f"      <ul>"
+                            f"        <li><b>1 - Uma foto completa de seu documento de identificação, podendo ser um dos listados abaixo:</b></li>"
+                            f"        <ul>"
+                            f"          <li>CNH</li>"
+                            f"          <li>CNH digital</li>"
+                            f"          <li>RG (Apenas a versão física)</li>"
+                            f"          <li>CREA</li>"
+                            f"          <li>OAB</li>"
+                            f"          <li>PASSAPORTE</li>"
+                            f"        </ul>"
+                            f"      </ul>"
+                            f"      <p><b>Observações:</b><br>"
+                            f"      (a) Retire o documento de identificação do plástico e abra-o.<br>"
+                            f"      (b) O verso do documento é onde está o QRcode.</p><br>"
+                            f"      <ul>"
+                            f"        <li><b>2 - O documento de constituição da empresa, podendo ser:</b></li>"
+                            f"        <ul>"
+                            f"          <li>Contrato Social</li>"
+                            f"          <li>Certidão de inteiro teor</li>"
+                            f"          <li>Estatuto social</li>"
+                            f"          <li>Requerimento de empresário</li>"
+                            f"        </ul>"
+                            f"      </ul>"
+                            f"      <a href='mailto:{ui.campo_email_empresa.text()}?subject=Documentos - Pedido {ui.campo_pedido.text()}' target='_blank' class='btn'>Enviar Documentos</a>"
+                            f"    </div>"
+                            f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                            f"  </div>"
+                            f"</body>"
+                            f"</html>"
+                        )
+                    
+                    elif "CPF" in certificado:
+                        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
+                        assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
+                        corpo_html = (
+                            f"<!DOCTYPE html>"
+                            f"<html lang='pt-BR'>"
+                            f"<head>"
+                            f"<meta charset='UTF-8'>"
+                            f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                            f"<style>"
+                            f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; font-size: 16px; }} "
+                            f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }} "
+                            f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; }} "
+                            f"  .header h1 {{ margin: 0; font-size: 24px; }} "
+                            f"  .content {{ padding: 20px; }} "
+                            f"  .content p, .content ul, .content li {{ font-size: 16px; line-height: 1.6; color: #333333; }} "
+                            f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: #4E4BFF; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; text-align: center; }} "
+                            f"  .btn:hover {{ background-color: #3b3ae3; transition: background-color 0.3s ease; }} "
+                            f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 14px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }} "
+                            f"</style>"
+                            f"</head>"
+                            f"<body>"
+                            f"  <div class='container'>"
+                            f"    <div class='header'><h1>Validação Certificado Digital</h1></div>"
+                            f"    <div class='content'>"
+                            f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
+                            f"      <p>Espero que esteja bem.</p>"
+                            f"      <p>Sou {nome} e sou agente de registro da ACB Digital.</p>"
+                            f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
+                            f"      <p>Para agilizar a validação, preciso que o senhor(a) encaminhe respondendo a este e-mail, a relação de documentos abaixo:</p>"
+                            f"      <ul>"
+                            f"        <li><b>1 - Uma foto completa de seu documento de identificação, podendo ser um dos listados abaixo:</b></li>"
+                            f"        <ul>"
+                            f"          <li>CNH</li>"
+                            f"          <li>CNH digital</li>"
+                            f"          <li>RG (Apenas a versão física)</li>"
+                            f"          <li>CREA</li>"
+                            f"          <li>OAB</li>"
+                            f"          <li>PASSAPORTE</li>"
+                            f"        </ul>"
+                            f"      </ul>"
+                            f"      <p><b>Observações:</b><br>"
+                            f"      (a) Retire o documento de identificação do plástico e abra-o.<br>"
+                            f"      (b) O verso do documento é onde está o QRcode.</p><br>"
+                            f"      <a href='mailto:{ui.campo_email_empresa.text()}?subject=Documentos - Pedido {ui.campo_pedido.text()}' target='_blank' class='btn'>Enviar Documentos</a>"
+                            f"    </div>"
+                            f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                            f"  </div>"
+                            f"</body>"
+                            f"</html>"
+                        )
+
+
+
                 case 'INICIO DE ATENDIMENTO':
                     mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                     assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
@@ -1655,7 +1746,7 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                         f"      <P>Sou {nome} e sou agente de registro da ACB Digital.</p>"
                         f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
                         f"      <p>No entanto, o pagamento ainda não foi reconhecido em nosso sistema. Para prosseguirmos com a validação, é necessário que o pagamento seja confirmado.</p>"
-                        f"      <p>Peço que entre em contato com o suporte pelo telefone 4020-9735 para regularizar a situação.</p>"
+                        f"      <p>Peço que entre em contato com o suporte pelo telefone {ui.campo_telefone_sac_cliente.text()} para regularizar a situação.</p>"
                         f"      <p>Agradeço a compreensão.</p>"
                         f"      <p><br>Atenciosamente,<br>{nome}</p>"
                         f"    </div>"
@@ -1666,9 +1757,10 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
                     )
                     
                 case 'RENOVAÇÃO':
-                    ref_link_venda = db.reference(f"/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
+                    # Ajustando o caminho correto com base na estrutura apresentada
+                    ref_link_venda = db.reference(f"/Usuario/{ui.campo_usuario.text()}/Dados/Certificados/{ui.campo_lista_versao_certificado.currentText()}/LINK VENDA")
                     certificado = ref_link_venda.get()
-                    link_venda = f'{certificado["LINK VENDA"]}{ui.campo_cod_rev.text()}'
+                    link_venda = f'{certificado}{ui.campo_cod_rev.text()}'
                     mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
                     assunto = f"Renovação Certificado Digital Certisign"
                     
@@ -1756,6 +1848,13 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
 
 
     def envio_em_massa(self):
+        email = ui.campo_email_empresa.text()
+        senha = ui.campo_senha_email.text()
+
+        if not email or not senha:
+            self.mensagem_alerta("ERRO","Necessário cadastrar o e-mail do agente na aba 'Configs' para envio")
+            return
+
         try:
             if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
 
@@ -2113,7 +2212,75 @@ f'Sou o {nome}, agente de registro da ACB Digital e temos um agendamento para se
             self.atualizar_documentos_tabela()
 
 
+    def calcular_comissao(self):
+        porcentagem_validacao = int(ui.campo_porcentagem_validacao.value()) / 100
+        imposto_de_renda = 1 - (ui.campo_imposto_validacao.value() / 100)
+        desconto_validacao = float(ui.campo_desconto_validacao.text().replace(',', '.'))
+        valor_certificado = float(ui.campo_preco_certificado_cheio.text().replace(',', '.'))
 
+        valor_final = ((valor_certificado * porcentagem_validacao) * imposto_de_renda) - desconto_validacao
+        if valor_final < 0:
+            valor_final = 0
+
+        valor_final_formatado = "{:,.2f}".format(valor_final).replace('.', ',').replace(',', '.', 1)
+
+        return {
+            "porcentagem_validacao": porcentagem_validacao,
+            "imposto_de_renda": imposto_de_renda,
+            "desconto_validacao": desconto_validacao,
+            "valor_final": valor_final,
+            "valor_final_formatado": valor_final_formatado
+        }
+
+
+    def buscar_preco_certificado(self):
+        certificados = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+        lista_certificados = certificados.get()
+        certificado = ui.campo_lista_versao_certificado.currentText()
+
+        if certificado in lista_certificados:
+            valor_do_certificado = float(lista_certificados[certificado]["VALOR"].replace(',', '.'))
+            ui.campo_preco_certificado_cheio.setText(f"{valor_do_certificado:,.2f}".replace('.', ',').replace(',', '.', 1))
+
+            self.atualizar_campos_comissao()
+
+            midias = ["cartão", "token"]
+            if any(midia in certificado.lower() for midia in midias):
+                ui.alerta_midia.setText("⚠️")
+                ui.alerta_midia.setToolTip("Certificado com Mídia\nLembre-se de pegar o endereço para envio")
+            else:
+                ui.alerta_midia.setText("")
+                ui.alerta_midia.setToolTip("")
+
+
+    def atualizar_campos_comissao(self):
+        comissao = self.calcular_comissao()
+
+        ui.campo_preco_certificado.setText(comissao["valor_final_formatado"])
+
+        self.explica_valor(comissao)
+
+
+    def explica_valor(self, comissao):
+        valor_certificado = float(ui.campo_preco_certificado_cheio.text().replace(',', '.'))
+
+        tooltip_text = (
+            f"COMO CHEGUEI NESSE VALOR?\n"
+            f"\n"
+            f"Valor do certificado: R${valor_certificado:,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"Porcentagem na validação ({comissao['porcentagem_validacao'] * 100:.1f}%): R${valor_certificado * comissao['porcentagem_validacao']:,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"\n"
+            f"(=)Valor Bruto: R${valor_certificado * comissao['porcentagem_validacao']:,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"(-)Imposto de renda ({(1 - comissao['imposto_de_renda']) * 100:.1f}%): -R${valor_certificado * comissao['porcentagem_validacao'] * (1 - comissao['imposto_de_renda']):,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"(=)Valor líquido: R${valor_certificado * comissao['porcentagem_validacao'] * comissao['imposto_de_renda']:,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"(-) Desconto adicional: -R${comissao['desconto_validacao']:,.2f}".replace('.', ',').replace(',', '.', 1) + "\n"
+            f"---------------------------------\n"
+            f"Valor final: R${comissao['valor_final_formatado']}\n\n"
+            f"*Esse valor é apenas uma aproximação"
+        )
+
+        ui.campo_preco_certificado.setToolTip(tooltip_text)
+        
 
 
 
@@ -2158,16 +2325,13 @@ class AcoesBancoDeDados:
         self.verificar_midia()
         novo_pedido_ref.set(self.dicionario_banco_de_dados())
 
+
     def verificar_midia(self):
         certificado = ui.campo_lista_versao_certificado.currentText()
         midias = ["cartão","token"]
         
         if any(midia in certificado.lower() for midia in midias) and ui.rb_aprovado.isChecked():
             QMessageBox.warning(ui.centralwidget, "ALERTA", "ESSE PEDIDO CONTÉM MÍDIA\nNÃO SE ESQUEÇA DE ENVIAR O EMAIL PARA ENVIO DO DISPOSITIVO")
-
-
-        
-
 
 
     def atualizar_ui(self, condic, pedido_existente):
@@ -2303,8 +2467,8 @@ class AcoesBancoDeDados:
         ui.label_confirmacao_salvar.setText("")
         ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(120,120,120);background-color:rgb(60,62, 84);color:orange")
         ui.label_confirmacao_excluir.setText("")
-    
-         
+
+       
     def dicionario_banco_de_dados(self):
 
 
@@ -2724,7 +2888,7 @@ class AcoesBancoDeDados:
                                 if item is not None:
                                     match status:
                                         case 'DIGITAÇÃO':
-                                            item.setForeground(QColor(113, 66, 230))
+                                            item.setForeground(QColor(170, 170, 170))
                                         case 'VIDEO REALIZADA':
                                             item.setForeground(QColor(25, 200, 255))
                                         case 'VERIFICAÇÃO':
@@ -2812,7 +2976,7 @@ Vendas..........{venda}
         #AQUI VAI VERIFICAR SE
         if ui.rb_digitacao.isChecked():
             self.zerar_cor()
-            ui.rb_digitacao.setStyleSheet("border:none;color: rgb(113,66,230);")  
+            ui.rb_digitacao.setStyleSheet("border:none;color: rgb(255,255,255);")  
             return 'DIGITAÇÃO'
         elif ui.rb_videook.isChecked():
             self.zerar_cor()
@@ -2834,11 +2998,11 @@ Vendas..........{venda}
 
     def zerar_cor(self):
         
-        ui.rb_digitacao.setStyleSheet("border:none; color:rgb(170,170,170);")  
-        ui.rb_videook.setStyleSheet("border:none; color:rgb(170,170,170);")
-        ui.rb_verificacao.setStyleSheet("border:none; color:rgb(170,170,170);")
-        ui.rb_aprovado.setStyleSheet("border:none; color:rgb(170,170,170);")
-        ui.rb_cancelado.setStyleSheet("border:none; color:rgb(170,170,170);")
+        ui.rb_digitacao.setStyleSheet("border:none; color:rgb(255,255,255);")  
+        ui.rb_videook.setStyleSheet("border:none; color:rgb(255,255,255);")
+        ui.rb_verificacao.setStyleSheet("border:none; color:rgb(255,255,255);")
+        ui.rb_aprovado.setStyleSheet("border:none; color:rgb(255,255,255);")
+        ui.rb_cancelado.setStyleSheet("border:none; color:rgb(255,255,255);")
 
 
     def iso_para_data(self,data):
@@ -2865,7 +3029,7 @@ class JanelaOculta:
         self.altura_destino_animacao = 0
         self.janela = FuncoesPadrao(ui)
         self.largura = 608
-        self.altura = 715
+        self.altura = 711
 
 
     def evento_entrada(self, evento):
@@ -2963,6 +3127,7 @@ janela.closeEvent = funcoes_app.evento_ao_fechar
 janela.showEvent = funcoes_app.evento_ao_abrir
 
 #Alterações nos campos
+ui.campo_preco_certificado_cheio.editingFinished.connect(lambda:funcoes_app.valor_alterado(ui.campo_preco_certificado_cheio))
 ui.campo_rg_orgao.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_rg_orgao))
 ui.campo_nome.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome))
 ui.campo_cnpj_municipio.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_cnpj_municipio))
@@ -3068,8 +3233,7 @@ ui.campo_pis.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pis
 ui.campo_telefone.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_telefone")
 ui.campo_funcional.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_funcional")
 ui.campo_preco_certificado.setReadOnly(False)
-#ui.campo_cnpj_razao_social.setReadOnly(True)
-ui.campo_preco_certificado_cheio.setReadOnly(True)
+ui.campo_preco_certificado_cheio.setReadOnly(False)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)
 
 #ToolTip
@@ -3084,7 +3248,28 @@ ui.campo_status_bd_3.setToolTip("Quantidade de pedidos AGUARDANDO intervenção"
 ui.campo_dias_renovacao.setToolTip("Define o intervalo de dias para o envio de emails de renovação. Por exemplo, se definir 15 , serão considerados os próximos 15 dias a partir de hoje.")
 ui.botao_converter.setToolTip("Converte de imagens")
 ui.botao_agrupar_PDF_pasta_cliente.setToolTip("Mescla as imagens selecionadas na pasta do cliente")
+ui.campo_porcentagem_validacao.setToolTip(
+    "A porcentagem que o agente de registro irá ganhar na validação do certificado.\n"
+    "Exemplo: Se a porcentagem de validação for 30%, isso significa que 15% do valor do certificado fica com você e os outros 15% são destinados à ACB."
+)
 
+ui.campo_desconto.setToolTip(
+    "A porcentagem que será descontada do valor total dos pedidos aprovados.\n"
+    "Exemplo: Se você tem R$ 2.000,00 em pedidos aprovados e vai tirar 10%, o valor do desconto será R$ 200,00.\n"
+    "Lembre-se que, como os valores dos certificados podem não ser exatos (devido a pedidos não pagos ou sem valor), "
+    "você pode ajustar essa porcentagem para garantir que o total seja o mais próximo possível da sua expectativa."
+)
+
+ui.campo_imposto_validacao.setToolTip(
+    "A porcentagem do valor que será destinada ao imposto de renda em cada validação.\n"
+    "Exemplo: Se o imposto de renda for 20%, e o valor bruto da validação for R$ 1.000,00, o desconto será R$ 200,00."
+)
+ui.campo_desconto_validacao.setToolTip(
+    "O valor em reais que a Certisign cobra por cada certificado validado. Esse valor é dividido igualmente entre o agente de registro e a ACB.\n"
+    "Exemplo: Se o valor for R$ 10,00, o agente paga R$ 5,00 e a ACB paga R$ 5,00."
+)
+
+ui.caminho_pasta_principal.setToolTip("Caminho da pasta principal onde as pastas dos clientes serão armazenadas")
 
 #Validador
 regex = QRegExp("[0-9.]*")
