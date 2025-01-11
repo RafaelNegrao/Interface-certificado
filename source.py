@@ -17,6 +17,7 @@ import numpy as np
 import mplcursors
 import calendar  
 import smtplib
+import locale
 import matplotlib.pyplot as plt
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
@@ -56,7 +57,6 @@ from collections import defaultdict
 from interfaceUpdates import AlteracoesInterface
 from update import Atualizar
 from login import LoginWindow
-#from playwright.sync_api import sync_playwright
 
 
 
@@ -80,13 +80,24 @@ class FuncoesPadrao:
         hora_atual = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M")
         self.login = db.reference(f"Usuario/{ui.campo_usuario.text()}/Hora Login")
         self.login.set(hora_atual)
+        
         self.trazer_configuracoes()
         self.trazer_metas()
         self.carregar_lista_certificados()
+        
         ui.campo_data_meta.setDate(QDate.currentDate())
         AlteracoesInterface.apagar_label_status_bd(self)
         self.ui.campo_status_bd.setToolTip("")
         banco_dados.contar_verificacao()
+
+        dia_atual = datetime.datetime.now().day
+        if 1 <= dia_atual <= 5:
+            ui.tabWidget.setCurrentIndex(1)
+            self.envio_em_massa()
+            QApplication.processEvents() 
+        
+
+
 
 
     def evento_ao_fechar(self,event):
@@ -119,10 +130,10 @@ class FuncoesPadrao:
                 barra.setValue(certificados_semana)
 
                 if certificados_semana >= meta_semanal:
-                    label.setStyleSheet('color: rgb(220,220,220); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')  # Azul
+                    label.setStyleSheet('color: rgb(255,255,255); background-color: rgb(46, 150, 255); border: 1px solid rgb(120,120,120)')  # Azul
                     label.setText(f"Semana {semana_num} | Meta atingida! - R${certificados_semana} / R${meta_semanal}")
                 else:
-                    label.setStyleSheet('color: rgb(220,220,220); background-color: transparent; border: 1px solid rgb(68,71,90)')
+                    label.setStyleSheet('color: rgb(255,255,255); background-color: transparent; border: 1px solid rgb(120,120,120)')
                     label.setText(f"Semana {semana_num} | R${certificados_semana} / R${meta_semanal}")
                 
                 return certificados_semana
@@ -146,11 +157,11 @@ class FuncoesPadrao:
 
             # Define o texto e o estilo do label da meta mensal
             if soma >= meta_mensal:
-                ui.label_meta_mes.setStyleSheet('color: rgb(220,220,220); background-color: rgb(46, 214, 255); border: 1px solid rgb(68,71,90)')
+                ui.label_meta_mes.setStyleSheet('color: rgb(255,255,255); background-color: rgb(46, 214, 255); border: 1px solid rgb(120,120,120)')
                 ui.label_meta_mes.setText(f"Meta mensal atingida! - R${soma} / R${meta_mensal}")
             else:
-                ui.label_meta_mes.setStyleSheet('color: rgb(220,220,220); background-color: transparent; border: 1px solid rgb(68,71,90)')
-                ui.label_meta_mes.setText(f"R${soma} / R${meta_mensal}")
+                ui.label_meta_mes.setStyleSheet('color: rgb(255,255,255); background-color: transparent; border: 1px solid rgb(120,120,120)')
+                ui.label_meta_mes.setText(f"Mensal | R${soma} / R${meta_mensal}")
 
         except Exception as e:
             print(f"Erro: {e}")
@@ -180,6 +191,7 @@ class FuncoesPadrao:
                 ui.checkBox_transparecer.setChecked(configs['CHECKBOX TRANSP'])
                 ui.campo_porcentagem_transparencia.setValue(configs['VALOR TRANS'])
                 ui.campo_telefone_sac_cliente.setText(configs['SAC'])
+                ui.campo_porcentagem_venda.setValue(configs['PORCENTAGEM VENDA'])
                
 
 
@@ -219,6 +231,7 @@ class FuncoesPadrao:
         valor_transparencia = ui.campo_porcentagem_transparencia.value()
         nova_senha = ui.campo_senha_usuario.text()  # Obtém a nova senha (do campo de senha)
         sac_cliente = ui.campo_telefone_sac_cliente.text()
+        porc_venda = ui.campo_porcentagem_venda.value()
 
         # Cria um dicionário com as novas configurações
         nova_config = {
@@ -235,7 +248,8 @@ class FuncoesPadrao:
             "RNG RENOVACAO": renovacao,
             "CHECKBOX TRANSP": transparencia,
             "VALOR TRANS": valor_transparencia,
-            "SAC": sac_cliente
+            "SAC": sac_cliente,
+            "PORCENTAGEM VENDA": porc_venda
         }
 
         try:
@@ -274,6 +288,8 @@ class FuncoesPadrao:
     def atualizar_meta_clientes(self):
         try:
             # Zerar o QWidget `campo_grafico`
+            
+
             layout = ui.campo_grafico.layout()
             if layout:
                 for i in reversed(range(layout.count())):
@@ -284,6 +300,10 @@ class FuncoesPadrao:
 
             if ui.tabWidget.currentIndex() == 2:
                 ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
+                
+                certificados_ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+                certificados = certificados_ref.get()
+
                 mes_meta = ui.campo_data_meta.date().month()  # Pega o mês da data selecionada
                 ano_meta = ui.campo_data_meta.date().year()
 
@@ -291,10 +311,8 @@ class FuncoesPadrao:
 
                 semanas = [0, 0, 0, 0, 0]
 
-
                 mes_meta = ui.campo_data_meta.date().month()
                 ano_meta = ui.campo_data_meta.date().year()
-
 
                 ultimo_dia = calendar.monthrange(ano_meta, mes_meta)[1]
 
@@ -312,6 +330,23 @@ class FuncoesPadrao:
                                         preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
                                         desconto = 1 - (ui.campo_desconto.value() / 100)
                                         semanas[semana_do_mes - 1] += preco * desconto
+
+                                        # Verificar se a venda é 'SIM' e acumular o valor do certificado
+                                        if Pedidos[pedido_info].get('VENDA', '') == "SIM":
+                                            # Verifica se a chave 'PRECO CERTIFICADO' existe
+                                            preco_certificado = Pedidos[pedido_info].get('PRECO CERTIFICADO', None)
+                                            
+                                            if preco_certificado:
+                                                # Se a chave existir, pega o preço e multiplica pela porcentagem de venda
+                                                preco_certificado = float(preco_certificado.replace(',', '.'))
+                                                porcentagem_venda = ui.campo_porcentagem_venda.value() / 100
+                                                semanas[semana_do_mes - 1] += preco_certificado * porcentagem_venda
+                                            else:
+                                                # Caso a chave 'PRECO CERTIFICADO' não exista, tenta pegar o preço da versão
+                                                versao = Pedidos[pedido_info].get('VERSAO', '')
+                                                valor = certificados[versao]['VALOR']
+                                                valor = float(valor.replace(',', '.'))  # Garantir que o valor está formatado corretamente
+                                                semanas[semana_do_mes - 1] += valor * (ui.campo_porcentagem_venda.value() / 100)
                                     except:
                                         pass
                     except:
@@ -338,8 +373,8 @@ class FuncoesPadrao:
                 self.atualizar_barras_metas()
 
                 dias_do_mes = range(1, ultimo_dia + 1)
-                categorias_por_dia = {"CPF": defaultdict(int), "CNPJ": defaultdict(int)}
-                valores_por_dia = {"CPF": defaultdict(float), "CNPJ": defaultdict(float)}
+                categorias_por_dia = {"CPF": defaultdict(int), "CNPJ": defaultdict(int), "VENDAS": defaultdict(int)}
+                valores_por_dia = {"CPF": defaultdict(float), "CNPJ": defaultdict(float), "VENDAS": defaultdict(float)}
 
                 for pedido_info in Pedidos:
                     if Pedidos[pedido_info]['STATUS'] == "APROVADO":
@@ -349,6 +384,8 @@ class FuncoesPadrao:
                         if data_formatada.month == mes_meta and data_formatada.year == ano_meta:
                             dia = data_formatada.day
                             versao = Pedidos[pedido_info].get('VERSAO', '') 
+                            venda = Pedidos[pedido_info].get('VENDA', '')
+
                             preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
                             desconto = 1 - (ui.campo_desconto.value() / 100)
                             valor_com_desconto = preco * desconto
@@ -360,18 +397,25 @@ class FuncoesPadrao:
                                 categorias_por_dia["CNPJ"][dia] += 1
                                 valores_por_dia["CNPJ"][dia] += valor_com_desconto
 
+                            # Verificar se a chave VENDA é 'SIM'
+                            if venda == "SIM":
+                                categorias_por_dia["VENDAS"][dia] += 1
+                                valores_por_dia["VENDAS"][dia] += valor_com_desconto
+
                 cpf_counts = [categorias_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
                 cnpj_counts = [categorias_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+                vendas_counts = [categorias_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
+
                 cpf_totals = [valores_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
                 cnpj_totals = [valores_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+                vendas_totals = [valores_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
 
-                total_counts = [cpf_counts[i] + cnpj_counts[i] for i in range(len(dias_do_mes))]
+                total_counts = [cpf_counts[i] + cnpj_counts[i] + vendas_counts[i] for i in range(len(dias_do_mes))]
 
                 # Obter apenas os dias úteis do mês
                 dias_uteis = pd.bdate_range(start=f"{ano_meta}-{mes_meta:02d}-01", 
                                             end=f"{ano_meta}-{mes_meta:02d}-{ultimo_dia:02d}").day.tolist()
-                                            
-                
+
                 media_cumulativa = np.cumsum([total_counts[i - 1] for i in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
                 media_cumulativa_cpf = np.cumsum([cpf_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
                 media_cumulativa_cnpj = np.cumsum([cnpj_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
@@ -382,7 +426,6 @@ class FuncoesPadrao:
                 fig, ax = plt.subplots(figsize=(14, 8))
                 fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
 
-
                 fig.patch.set_facecolor((60/255, 62/255, 84/255))
                 ax.set_facecolor((60/255, 62/255, 84/255))
 
@@ -390,10 +433,11 @@ class FuncoesPadrao:
 
                 ax.bar(dias_do_mes, cnpj_counts, width=bar_width, label="CNPJ", color="orange")
                 ax.bar(dias_do_mes, cpf_counts, width=bar_width, bottom=cnpj_counts, label="CPF", color="blue")
+                ax.bar(dias_do_mes, vendas_counts, width=bar_width, bottom=[cnpj_counts[i] + cpf_counts[i] for i in range(len(cnpj_counts))], label="Vendas", color="cyan")
 
                 ax.plot(dias_uteis, media_cumulativa, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
                 ax.plot(dias_uteis, media_cumulativa_cnpj, color="yellow", linestyle="-", linewidth=1, label="Média Acumulada CNPJ")
-                ax.plot(dias_uteis, media_cumulativa_cpf, color="cyan", linestyle="-", linewidth=1, label="Média Acumulada CPF")
+                ax.plot(dias_uteis, media_cumulativa_cpf, color="blue", linestyle="-", linewidth=1, label="Média Acumulada CPF")
 
                 fonte_cor = (150/255, 150/255, 150/255)
 
@@ -418,10 +462,9 @@ class FuncoesPadrao:
                     f'Dia: {int(sel.target[0])}\n'
                     f'CPF: {cpf_counts[int(sel.target[0]) - 1]}  Valor: R$ {cpf_totals[int(sel.target[0]) - 1]:,.2f}\n'
                     f'CNPJ: {cnpj_counts[int(sel.target[0]) - 1]}  Valor: R$ {cnpj_totals[int(sel.target[0]) - 1]:,.2f}\n'
-                    f'TOTAL: R$ {cpf_totals[int(sel.target[0]) - 1] + cnpj_totals[int(sel.target[0]) - 1]:,.2f}'
+                    f'Vendas: {vendas_counts[int(sel.target[0]) - 1]}\n'
+                    f'TOTAL: R$ {cpf_totals[int(sel.target[0]) - 1] + cnpj_totals[int(sel.target[0]) - 1] + vendas_totals[int(sel.target[0]) - 1]:,.2f}'
                 ))
-
-
 
                 cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
 
@@ -430,7 +473,7 @@ class FuncoesPadrao:
                 ui.campo_grafico.setLayout(new_layout)
 
         except Exception as e:
-            print (f'Erro: {e}')
+            print(f'Erro: {e}')
 
 
     def Atualizar_meta(self):
@@ -1197,7 +1240,8 @@ class FuncoesPadrao:
             'campo_rg',
             'campo_nome_mae',
             'campo_nome',
-            'campo_pis',
+            'campo_pis'
+
         ]
 
         if nome_campo in campos:
@@ -1593,21 +1637,22 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                             f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
                             f"      <p>Para agilizar a validação, preciso que o senhor(a) encaminhe respondendo a este e-mail, a relação de documentos abaixo:</p>"
                             f"      <ul>"
-                            f"        <li><b>1 - Uma foto completa de seu documento de identificação, podendo ser um dos listados abaixo:</b></li>"
+                            f"        <b>1 - Uma foto completa de seu documento de identificação(frente e verso), podendo ser um dos listados abaixo:</b>"
                             f"        <ul>"
-                            f"          <li>CNH</li>"
+                            f"          <li>CNH <a href='https://drive.google.com/file/d/1T-LCFCQ49C_L2GMal81GohFylKvoi88x/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"          <li>CNH digital</li>"
-                            f"          <li>RG (Apenas a versão física)</li>"
+                            f"          <li>RG (Apenas a versão física) <a href='https://drive.google.com/file/d/1vGPFx_6VcS7MJlAEXgyj0DNJY0Gp3i9-/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"          <li>CREA</li>"
                             f"          <li>OAB</li>"
-                            f"          <li>PASSAPORTE</li>"
+                            f"          <li>PASSAPORTE <a href='https://drive.google.com/file/d/1TQEUC5YLYY0yz72R4IY0xgbhKfXFq_Po/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"        </ul>"
                             f"      </ul>"
                             f"      <p><b>Observações:</b><br>"
                             f"      (a) Retire o documento de identificação do plástico e abra-o.<br>"
                             f"      (b) O verso do documento é onde está o QRcode.</p><br>"
+                            f"       - Ao lado está um link de exemplo "
                             f"      <ul>"
-                            f"        <li><b>2 - O documento de constituição da empresa, podendo ser:</b></li>"
+                            f"       <b>2 - O documento de constituição da empresa, podendo ser:</b>"
                             f"        <ul>"
                             f"          <li>Contrato Social</li>"
                             f"          <li>Certidão de inteiro teor</li>"
@@ -1617,7 +1662,45 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                             f"      </ul>"
                             f"      <a href='mailto:{ui.campo_email_empresa.text()}?subject=Documentos - Pedido {ui.campo_pedido.text()}' target='_blank' class='btn'>Enviar Documentos</a>"
                             f"    </div>"
-                            f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                            f"    <div class='footer'>ACB Digital &copy; 2025. Todos os direitos reservados.</div>"
+                            f"  </div>"
+                            f"</body>"
+                            f"</html>"
+                        )
+
+                    elif "CPF" in certificado and "OAB" in certificado:
+                        mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
+                        assunto = f"Validação Certificado Digital - Pedido {ui.campo_pedido.text()}"
+                        corpo_html = (
+                            f"<!DOCTYPE html>"
+                            f"<html lang='pt-BR'>"
+                            f"<head>"
+                            f"<meta charset='UTF-8'>"
+                            f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                            f"<style>"
+                            f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; font-size: 16px; }} "
+                            f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }} "
+                            f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; text-align: center; }} "
+                            f"  .header h1 {{ margin: 0; font-size: 24px; }} "
+                            f"  .content {{ padding: 20px; }} "
+                            f"  .content p, .content ul, .content li {{ font-size: 16px; line-height: 1.6; color: #333333; }} "
+                            f"  .btn {{ display: inline-block; padding: 10px 20px; background-color: #4E4BFF; color: #ffffff !important; text-decoration: none; border-radius: 5px; font-weight: bold; margin-top: 20px; text-align: center; }} "
+                            f"  .btn:hover {{ background-color: #3b3ae3; transition: background-color 0.3s ease; }} "
+                            f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 14px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }} "
+                            f"</style>"
+                            f"</head>"
+                            f"<body>"
+                            f"  <div class='container'>"
+                            f"    <div class='header'><h1>Validação Certificado Digital</h1></div>"
+                            f"    <div class='content'>"
+                            f"      <p>{mensagem_inicial} {primeiro_nome.capitalize()}!</p>"
+                            f"      <p>Espero que esteja bem.</p>"
+                            f"      <p>Sou {nome} e sou agente de registro da ACB Digital.</p>"
+                            f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
+                            f"      <p>Para agilizar a validação, preciso que o senhor(a) encaminhe respondendo a este e-mail, uma foto completa de seu documento de identificação <b>OAB<b>, frente e verso</p><br>"
+                            f"      <a href='mailto:{ui.campo_email_empresa.text()}?subject=Documentos - Pedido {ui.campo_pedido.text()}' target='_blank' class='btn'>Enviar Documentos</a>"
+                            f"    </div>"
+                            f"    <div class='footer'>ACB Digital &copy; 2025. Todos os direitos reservados.</div>"
                             f"  </div>"
                             f"</body>"
                             f"</html>"
@@ -1654,14 +1737,14 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                             f"      <p>Temos uma validação agendada para o seu certificado digital às <b>{hora}</b> do dia <b>{data}</b>.</p>"
                             f"      <p>Para agilizar a validação, preciso que o senhor(a) encaminhe respondendo a este e-mail, a relação de documentos abaixo:</p>"
                             f"      <ul>"
-                            f"        <li><b>1 - Uma foto completa de seu documento de identificação, podendo ser um dos listados abaixo:</b></li>"
+                            f"        <b>1 - Uma foto completa de seu documento de identificação(frente e verso), podendo ser um dos listados abaixo:</b>"
                             f"        <ul>"
-                            f"          <li>CNH</li>"
+                            f"          <li>CNH <a href='https://drive.google.com/file/d/1T-LCFCQ49C_L2GMal81GohFylKvoi88x/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"          <li>CNH digital</li>"
-                            f"          <li>RG (Apenas a versão física)</li>"
+                            f"          <li>RG (Apenas a versão física) <a href='https://drive.google.com/file/d/1vGPFx_6VcS7MJlAEXgyj0DNJY0Gp3i9-/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"          <li>CREA</li>"
                             f"          <li>OAB</li>"
-                            f"          <li>PASSAPORTE</li>"
+                            f"          <li>PASSAPORTE <a href='https://drive.google.com/file/d/1TQEUC5YLYY0yz72R4IY0xgbhKfXFq_Po/view?usp=drive_link'>[Exemplo]</a></li>"
                             f"        </ul>"
                             f"      </ul>"
                             f"      <p><b>Observações:</b><br>"
@@ -1669,7 +1752,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                             f"      (b) O verso do documento é onde está o QRcode.</p><br>"
                             f"      <a href='mailto:{ui.campo_email_empresa.text()}?subject=Documentos - Pedido {ui.campo_pedido.text()}' target='_blank' class='btn'>Enviar Documentos</a>"
                             f"    </div>"
-                            f"    <div class='footer'>ACB Digital &copy; 2024. Todos os direitos reservados.</div>"
+                            f"    <div class='footer'>ACB Digital &copy; 2025. Todos os direitos reservados.</div>"
                             f"  </div>"
                             f"</body>"
                             f"</html>"
@@ -2035,14 +2118,14 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
                                 f"      <p>{nome}</p>"
                                 f"    </div>"
                                 f"    <div class='footer'>"
-                                f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
+                                f"      <p>ACB Serviços e Negócios &copy; 2025. Todos os direitos reservados.</p>"
                                 f"    </div>"
                                 f"  </div>"
                                 f"</body>"
@@ -2085,14 +2168,14 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><b>{ui.campo_email_empresa.text()}</b></p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
                                 f"      <p>{nome}</p>"
                                 f"    </div>"
                                 f"    <div class='footer'>"
-                                f"      <p>ACB Serviços e Negócios &copy; 2024. Todos os direitos reservados.</p>"
+                                f"      <p>ACB Serviços e Negócios &copy; 2025. Todos os direitos reservados.</p>"
                                 f"    </div>"
                                 f"  </div>"
                                 f"</body>"
@@ -2524,6 +2607,7 @@ class AcoesBancoDeDados:
             "TELEFONE": ui.campo_telefone.text(),
             "OAB": ui.campo_funcional.text(),
             "EMAIL RENOVACAO": renova,
+            "PRECO CERTIFICADO":ui.campo_preco_certificado_cheio.text(),
             "VALIDO ATE": self.data_para_iso(QDateTime.fromString(duracao_certificado.strftime('%Y-%m-%d %H:%M:%S'), 'yyyy-MM-dd HH:mm:ss'))  # Data ajustada com validade
         }
 
@@ -2667,7 +2751,8 @@ class AcoesBancoDeDados:
             (ui.campo_preco_certificado, "PRECO"),
             (ui.campo_telefone, "TELEFONE"),
             (ui.campo_funcional, "OAB"),
-            (ui.campo_email_enviado, "EMAIL RENOVACAO")
+            (ui.campo_email_enviado, "EMAIL RENOVACAO"),
+            (ui.campo_preco_certificado_cheio,"PRECO CERTIFICADO")
         ]
 
         for campo, chave in campos:
@@ -2783,11 +2868,17 @@ class AcoesBancoDeDados:
 
     def preencher_tabela(self):
     #Evento disparado quando clico no botão procurar na aba 'Consulta'
+        if hasattr(self, 'carregando_dados') and self.carregando_dados:
+            return  # Se já estiver carregando, ignora o clique
+
         
         try:
-
+            self.carregando_dados = True
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
+            
+            certificados_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+            certificados = certificados_ref.get()
 
             pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA") \
                             .start_at(data_inicial) \
@@ -2818,6 +2909,7 @@ class AcoesBancoDeDados:
                 venda = 0
                 total_pedidos = len(pedidos)
                 funcoes_app.ajuste_largura_col()
+                valor_venda = 0
 
                 ui.barra_progresso_consulta.setVisible(False)
                 
@@ -2868,6 +2960,8 @@ class AcoesBancoDeDados:
                                     preco = float(pedido_info['PRECO'])
                                     valor_estimado += preco
 
+
+
                                     if 'e-CNPJ' in pedido_info['VERSAO']:
                                         valor_cnpj += preco
                                         j += 1
@@ -2878,9 +2972,18 @@ class AcoesBancoDeDados:
                                         
                                     if pedido_info['VENDA'] == "SIM":
                                         venda += 1
+                                        try:
+                                            valor_venda += (float(pedido_info['PRECO CERTIFICADO'])) * (ui.campo_porcentagem_venda.value()/100)
+                                        except:
+                                            versao = pedido_info['VERSAO']
+                                            valor = certificados[versao]['VALOR']
+                                            valor = float(valor.replace(',', '.')) 
+                                            valor_venda += valor * (ui.campo_porcentagem_venda.value()/100)
+
+
                                 QApplication.processEvents()
-                            except ValueError:
-                                pass
+                            except Exception as e:
+                                print (e)
 
                             for col in range(ui.tableWidget.columnCount()):
                                 item = ui.tableWidget.item(row_position, col)
@@ -2906,13 +3009,19 @@ class AcoesBancoDeDados:
                 self.contar_verificacao()
 
                 total_venda = valor_cnpj + valor_cpf
-                ui.campo_relatorio.setPlainText(f'''(+)e-CNPJ [{j}]........R$ {valor_cnpj:.2f}
-(+)e-CPF [{f}].........R$ {valor_cpf:.2f}
-(=)Total [{j+f}].........R$ {total_venda:.2f}
-(-){ui.campo_desconto.text()}%...............R$ {total_venda * (float(ui.campo_desconto.text()) / 100):.2f}
-----------------------------------
-(=)Total Esperado....R$ {total_venda * (1 - float(ui.campo_desconto.text()) / 100):.2f}
-Vendas..........{venda}
+                total_geral = (total_venda * (1 - float(ui.campo_desconto.text()) / 100)) + valor_venda
+                locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+
+                ui.campo_relatorio.setPlainText(f'''
+(+)e-CNPJ [{j}]..................R$ {locale.format_string('%.2f', valor_cnpj, grouping=True) if valor_cnpj != 0 else "0,00"}
+(+)e-CPF [{f}]...................R$ {locale.format_string('%.2f', valor_cpf, grouping=True) if valor_cpf != 0 else "0,00"}
+(=)Total [{j+f}]...................R$ {locale.format_string('%.2f', total_venda, grouping=True) if total_venda != 0 else "0,00"}
+(-){ui.campo_desconto.text()}%..........................R$ {locale.format_string('%.2f', total_venda * (float(ui.campo_desconto.text()) / 100), grouping=True) if total_venda != 0 else "0,00"}
+---------------------------------------------
+(=)Total Esperado...............R$ {locale.format_string('%.2f', total_venda * (1 - float(ui.campo_desconto.text()) / 100), grouping=True) if total_venda != 0 else "0,00"}
+(+)Vendas [{venda}]...................R$ {locale.format_string('%.2f', valor_venda, grouping=True) if valor_venda != 0 else "0,00"}
+---------------------------------------------
+(=)Total Esperado + Vendas .....R$ {locale.format_string('%.2f', total_geral, grouping=True) if total_geral != 0 else "0,00"}
 ''')
 
                 ui.barra_progresso_consulta.setVisible(False)
@@ -2933,6 +3042,10 @@ Vendas..........{venda}
         except Exception as e:
             print(e)
             pass
+
+        finally:
+            # Marca como não carregando
+            self.carregando_dados = False
  
 
     def atualizar_documentos_tabela(self):
@@ -3211,9 +3324,9 @@ ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
 ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados()) ##########################################################################
 ui.campo_cnpj.editingFinished.connect (lambda:funcoes_app.formatar_cnpj())
-ui.campo_meta_semanal.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
-ui.campo_meta_mes.valueChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
-ui.campo_data_meta.dateChanged.connect(lambda:funcoes_app.atualizar_meta_clientes())
+ui.campo_meta_semanal.editingFinished.connect(lambda:funcoes_app.atualizar_meta_clientes())
+ui.campo_meta_mes.editingFinished.connect(lambda:funcoes_app.atualizar_meta_clientes())
+ui.campo_data_meta.editingFinished.connect(lambda:funcoes_app.atualizar_meta_clientes())
 ui.campo_nome.editingFinished.connect(lambda:funcoes_app.formatar_nome())
 ui.campo_nome.setContextMenuPolicy(Qt.NoContextMenu)
 ui.campo_nome_mae.editingFinished.connect(lambda:funcoes_app.formatar_nome_mae())
