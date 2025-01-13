@@ -19,6 +19,7 @@ import calendar
 import smtplib
 import locale
 import matplotlib.pyplot as plt
+from email.utils import formataddr
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -44,6 +45,8 @@ QWidget,
 QGridLayout,
 QComboBox,
 QLabel,
+QTextEdit,
+QHBoxLayout
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
@@ -96,9 +99,6 @@ class FuncoesPadrao:
             self.envio_em_massa()
             QApplication.processEvents() 
         
-
-
-
 
     def evento_ao_fechar(self,event):
 
@@ -1480,12 +1480,24 @@ class FuncoesPadrao:
             mensagem = mensagem.replace("{{nome}}", nome)
 
         if "{{campo_nome}}" in mensagem:
-            nome = ui.campo_nome.text().capitalize().split()[0]
+            try:
+                nome = ui.campo_nome.text().capitalize().split()[0]
+            except:
+                nome = ""
             mensagem = mensagem.replace("{{campo_nome}}", nome)
 
         if "{{midia}}" in mensagem:
             certificado = ui.campo_lista_versao_certificado.currentText().lower()
-            midia = "CARTÃO" if "cartão" in certificado else "TOKEN" if "token" in certificado else ""
+    
+            if "cartão e leitora" in certificado:
+                midia = "CARTÃO E LEITORA"
+            elif "cartão" in certificado:
+                midia = "CARTÃO"
+            elif "token" in certificado:
+                midia = "TOKEN"
+            else:
+                midia = ""
+            
             mensagem = mensagem.replace("{{midia}}", midia)
 
         if "{{cod_rev}}" in mensagem:
@@ -1499,6 +1511,11 @@ class FuncoesPadrao:
         if "{{cliente}}" in mensagem:
             cliente = ui.campo_nome.text()
             mensagem = mensagem.replace("{{cliente}}", cliente)
+        
+        if"{{sac}}" in mensagem:
+            sac = ui.campo_telefone_sac_cliente.text()
+            mensagem = mensagem.replace("{{sac}}", sac)
+
 
         mensagem = mensagem.replace("\\n", "\n")
 
@@ -1511,6 +1528,9 @@ class FuncoesPadrao:
 
             self.nova_janela.deleteLater()
             self.nova_janela = None
+
+
+    
 
 
     def determinar_hora(self,hora):
@@ -2410,11 +2430,214 @@ class AcoesBancoDeDados:
 
 
     def verificar_midia(self):
-        certificado = ui.campo_lista_versao_certificado.currentText()
-        midias = ["cartão","token"]
-        
-        if any(midia in certificado.lower() for midia in midias) and ui.rb_aprovado.isChecked():
-            QMessageBox.warning(ui.centralwidget, "ALERTA", "ESSE PEDIDO CONTÉM MÍDIA\nNÃO SE ESQUEÇA DE ENVIAR O EMAIL PARA ENVIO DO DISPOSITIVO")
+        # Determina a mídia com base no certificado
+        certificado = self.ui.campo_lista_versao_certificado.currentText().lower()
+        if "cartão e leitora" in certificado:
+            midia = "CARTÃO E LEITORA"
+        elif "cartão" in certificado:
+            midia = "CARTÃO"
+        elif "token" in certificado:
+            midia = "TOKEN"
+        else:
+            midia = "Mídia não especificada"
+
+        # Verifica se o certificado possui mídia e se está aprovado
+        if any(chave in certificado for chave in ["cartão", "token", "leitora"]) and self.ui.rb_aprovado.isChecked() and self.ui.campo_lista_modalidade.currentText() == "VIDEO":
+            QMessageBox.warning(
+                self.ui.centralwidget,
+                "ALERTA",
+                "Esse pedido contém mídia.\nEnviar e-mail com os dados do cliente para envio de mídia."
+            )
+
+            janela = None
+
+            # Função para enviar o e-mail
+            def enviar_email():
+                nonlocal janela
+                destinatario = input_destinatario.text()
+                assunto = input_assunto.text()
+                endereco = text_endereco.toPlainText()
+
+                remetente = self.ui.campo_email_empresa.text()
+                senha = self.ui.campo_senha_email.text()
+
+                if not endereco.strip():
+                    QMessageBox.warning(janela, "Erro", "O campo 'Endereço' está vazio. Preencha o endereço antes de enviar!")
+                    return
+
+                if not remetente or not senha:
+                    QMessageBox.warning(janela, "Erro", "O e-mail ou a senha do remetente não foram preenchidos!")
+                    return
+
+                try:
+                    corpo_html = (
+                        f"<!DOCTYPE html>"
+                        f"<html lang='pt-BR'>"
+                        f"<head>"
+                        f"<meta charset='UTF-8'>"
+                        f"<meta name='viewport' content='width=device-width, initial-scale=1.0'>"
+                        f"<link href='https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Poppins:wght@400;700&display=swap' rel='stylesheet'>"
+                        f"<style>"
+                        f"  body {{ font-family: 'Montserrat', 'Poppins', Arial, sans-serif; color: #333333; margin: 0; padding: 0; background-color: #f7f7f7; }} "
+                        f"  .container {{ width: 100%; max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); }} "
+                        f"  .header {{ background-color: #4E4BFF; color: white; padding: 20px; border-top-left-radius: 8px; border-top-right-radius: 8px; }} "
+                        f"  .header h1 {{ margin: 0; font-size: 24px; }} "
+                        f"  .content {{ padding: 20px; }} "
+                        f"  .content p {{ font-size: 16px; line-height: 1.6; color: #333333; }} "
+                        f"  .footer {{ background-color: #f1f1f1; text-align: center; padding: 10px; font-size: 14px; color: #888888; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px; }} "
+                        f"</style>"
+                        f"</head>"
+                        f"<body>"
+                        f"  <div class='container'>"
+                        f"    <div class='header'>"
+                        f"      <h1>Envio de Mídia</h1>"
+                        f"    </div>"
+                        f"    <div class='content'>"
+                        f"      <p><b>Nome do Cliente:</b> {self.ui.campo_nome.text()}</p>"
+                        f"      <p><b>Mídia:</b> {midia}</p>"
+                        f"      <p><b>Pedido:</b> {self.ui.campo_pedido.text()}</p>"
+                        f"      <p><b>Endereço:</b> {endereco}</p>"
+                        f"    </div>"
+                        f"    <div class='footer'>"
+                        f"      <p>ACB Serviços e Negócios &copy; 2025. Todos os direitos reservados.</p>"
+                        f"    </div>"
+                        f"  </div>"
+                        f"</body>"
+                        f"</html>"
+                    )
+
+                    msg = MIMEMultipart("alternative")
+                    msg['Subject'] = assunto
+                    msg['From'] = remetente
+                    msg['To'] = destinatario
+                    msg.add_header('Disposition-Notification-To', remetente)  
+                    msg.add_header('Return-Receipt-To', remetente)  
+                    msg.attach(MIMEText(corpo_html, "html"))
+
+                    with smtplib.SMTP_SSL('email-ssl.com.br', 465) as smtp_server:
+                        smtp_server.login(remetente, senha)
+                        smtp_server.sendmail(remetente, destinatario, msg.as_string())
+
+                    QMessageBox.information(janela, "Sucesso", "E-mail enviado com sucesso!")
+                    if janela.isVisible():
+                        janela.close()
+
+                except smtplib.SMTPException as e:
+                    QMessageBox.critical(janela, "Erro", f"Falha ao enviar o e-mail: {e}")
+
+            # Função para cancelar e fechar a janela
+            def cancelar():
+                if janela.isVisible():
+                    janela.close()
+
+            janela = QDialog(self.ui.centralwidget)
+            janela.setWindowTitle("Enviar E-mail")
+            janela.setFixedSize(550, 300)
+
+
+            principal_geometry = self.ui.centralwidget.geometry()
+            principal_pos = self.ui.centralwidget.mapToGlobal(principal_geometry.topLeft())
+            principal_width = principal_geometry.width()
+
+            # Posicionar a janela ao lado da principal
+            janela_x = principal_pos.x() - principal_width - 10  # Adicionar margem de 10 pixels
+            janela_y = principal_pos.y()
+            janela.move(janela_x, janela_y)
+
+            # Definir estilos
+            fundo_cor = "rgb(60, 62, 84)"
+            campo_texto_cor = "rgb(210, 210, 210)"
+            campo_fundo_cor = "rgb(40, 45, 50)"
+            
+            botao_enviar_hover = "rgb(0, 122, 255)"
+            botao_enviar_cor = "rgb(0, 102, 215)"
+
+            botao_cancelar_hover = "rgb(255, 0, 0)"
+            botao_cancelar_cor = "rgb(215, 0, 0)"
+
+            janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor};")
+
+            janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor};")
+
+            
+
+            layout = QVBoxLayout()
+
+            label_destinatario = QLabel("E-mail do Destinatário:")
+            input_destinatario = QLineEdit()
+            input_destinatario.setText("agendamento@acbdigital.com.br")
+            input_destinatario.setStyleSheet(
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+            )
+            layout.addWidget(label_destinatario)
+            layout.addWidget(input_destinatario)
+
+            label_assunto = QLabel("Assunto:")
+            input_assunto = QLineEdit()
+            input_assunto.setText(f"ENVIO DE {midia} - PEDIDO {self.ui.campo_pedido.text()}")
+            input_assunto.setStyleSheet(
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+            )
+            layout.addWidget(label_assunto)
+            layout.addWidget(input_assunto)
+
+            label_endereco = QLabel("Endereço do cliente:")
+            text_endereco = QTextEdit()
+            text_endereco.setText(self.ui.campo_comentario.toPlainText())
+            text_endereco.setStyleSheet(
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+            )
+            layout.addWidget(label_endereco)
+            layout.addWidget(text_endereco)
+
+            layout_botoes = QHBoxLayout()
+            botao_enviar = QPushButton("Enviar E-mail")
+            botao_enviar.setStyleSheet(
+                f"background-color: {botao_enviar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+            )
+            botao_enviar.clicked.connect(enviar_email)
+            layout_botoes.addWidget(botao_enviar)
+
+            botao_cancelar = QPushButton("Cancelar")
+            botao_cancelar.setStyleSheet(
+                f"background-color: {botao_cancelar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+            )
+            botao_cancelar.clicked.connect(cancelar)
+            layout_botoes.addWidget(botao_cancelar)
+
+            layout.addLayout(layout_botoes)
+
+            # Adicionar estilos de hover aos botões
+            botao_enviar.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {botao_enviar_cor};
+                    color: {campo_texto_cor};
+                    padding: 5px;
+                    border-radius: 5px;
+                }}
+                QPushButton:hover {{
+                    background-color: {botao_enviar_hover};
+                }}
+                """
+            )
+
+            botao_cancelar.setStyleSheet(
+                f"""
+                QPushButton {{
+                    background-color: {botao_cancelar_cor};
+                    color: {campo_texto_cor};
+                    padding: 5px;
+                    border-radius: 5px;
+                }}
+                QPushButton:hover {{
+                    background-color: {botao_cancelar_hover};
+                }}
+                """
+            )
+
+            janela.setLayout(layout)
+            janela.exec_()
 
 
     def atualizar_ui(self, condic, pedido_existente):

@@ -1205,8 +1205,8 @@ QLineEdit:disabled, QLineEdit:!focus {
      <widget class="QPushButton" name="alerta_midia">
       <property name="geometry">
        <rect>
-        <x>380</x>
-        <y>66</y>
+        <x>384</x>
+        <y>64</y>
         <width>26</width>
         <height>26</height>
        </rect>
@@ -3040,6 +3040,37 @@ color:rgb(170,170,170)</string>
        <string> Dados Empresa</string>
       </property>
      </widget>
+     <widget class="QPushButton" name="botao_consulta_nome">
+      <property name="geometry">
+       <rect>
+        <x>314</x>
+        <y>187</y>
+        <width>17</width>
+        <height>25</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Consolas</family>
+        <pointsize>10</pointsize>
+        <weight>50</weight>
+        <italic>false</italic>
+        <bold>false</bold>
+       </font>
+      </property>
+      <property name="cursor">
+       <cursorShape>PointingHandCursor</cursorShape>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">border-radius:10px;background-color:transparent</string>
+      </property>
+      <property name="text">
+       <string>🔍</string>
+      </property>
+     </widget>
      <zorder>campo_funcional</zorder>
      <zorder>campo_cnh</zorder>
      <zorder>campo_cnpj_razao_social</zorder>
@@ -3117,6 +3148,7 @@ color:rgb(170,170,170)</string>
      <zorder>botao_enviar_email</zorder>
      <zorder>label_38</zorder>
      <zorder>label_39</zorder>
+     <zorder>botao_consulta_nome</zorder>
     </widget>
     <widget class="QWidget" name="tab_6">
      <attribute name="title">
