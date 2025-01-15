@@ -481,7 +481,7 @@ class FuncoesPadrao:
                 ui.campo_grafico.setLayout(new_layout)
 
 
-                
+            
             try:
                 # Remove o layout do campo de horário antes de adicionar o novo gráfico
                 layout_horario = ui.campo_grafico_horario.layout()
@@ -555,6 +555,7 @@ class FuncoesPadrao:
                 pass
 
 
+
             try:
                 layout_tipo = ui.campo_grafico_tipo_certificado.layout()
                 if layout_tipo:
@@ -564,12 +565,10 @@ class FuncoesPadrao:
                             widget.deleteLater()
                     QtWidgets.QWidget().setLayout(layout_tipo)
 
-
                 total_cpf_aprovado = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
                 total_cnpj_aprovado = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
                 total_cpf_outros = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
                 total_cnpj_outros = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
-
 
                 total_a1 = sum(
                     1 for pedido_info in Pedidos
@@ -580,75 +579,98 @@ class FuncoesPadrao:
                     if 'no computador' not in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
                 )
 
-                # Inicializa contadores para mídias
                 midia_cartao_leitora = sum(1 for pedido_info in Pedidos if 'cartão e leitora' in Pedidos[pedido_info]['VERSAO'].lower())
                 midia_cartao = sum(1 for pedido_info in Pedidos if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower())
                 midia_token = sum(1 for pedido_info in Pedidos if 'token' in Pedidos[pedido_info]['VERSAO'].lower())
 
-                # Gráficos de pizza em layout 2x2
-                fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  # Dois gráficos por linha
+                fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  
                 fig3.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
-                fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo geral
+                fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  
 
-                # Personalização da fonte
                 font_props = {'fontsize': 6, 'color': 'black'}
                 fonte_titulo = {'fontsize': 10, 'color': 'white'}
 
-                # Função para filtrar valores zerados
                 def filtrar_dados(labels, valores):
-                    labels_filtrados = [f"{label} [{valor}]" for label, valor in zip(labels, valores) if valor > 0]
+                    labels_filtrados = [label for label, valor in zip(labels, valores) if valor > 0]
                     valores_filtrados = [valor for valor in valores if valor > 0]
                     return labels_filtrados, valores_filtrados
 
-                # Gráfico de porcentagem por tipo de certificado
+                def adicionar_descricao(ax, labels, valores, colors, percentuais):
+                    # Adiciona os valores e as porcentagens dentro do gráfico
+                    total = sum(valores)
+                    for i, (label, valor, color) in enumerate(zip(labels, valores, colors)):
+                        percentual = (valor / total) * 100
+                        ax.text(0, 0.2 - (i * 0.2), f'{label} [{valor}] {percentual:.1f}%', ha='center', va='center', fontsize=8, color=color)
+
+                # Gráfico Tipo de Certificado
                 labels_certificado, valores_certificado = filtrar_dados(['CPF', 'CNPJ'], [total_cpf_aprovado, total_cnpj_aprovado])
+                total_certificado = sum(valores_certificado)
+
+                colors_certificado = ['PowderBlue', 'orange']
                 axs3[0, 0].pie(
-                    valores_certificado, 
-                    labels=labels_certificado, 
-                    autopct='%1.1f%%', 
-                    startangle=90, 
-                    colors=['blue', 'orange'], 
-                    textprops=font_props
+                    valores_certificado,
+                    startangle=90,
+                    colors=colors_certificado,
+                    textprops=font_props,
+                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
+                    pctdistance=0.80, 
+                    labels=None 
                 )
                 axs3[0, 0].set_title('Tipo de Certificado', fontdict=fonte_titulo)
+                adicionar_descricao(axs3[0, 0], labels_certificado, valores_certificado, colors_certificado, [])
 
-                # Gráfico de relação de status
+                # Gráfico Relação de Status
                 total_aprovados = total_cpf_aprovado + total_cnpj_aprovado
                 total_outros = total_cpf_outros + total_cnpj_outros
                 labels_status, valores_status = filtrar_dados(['Aprovados', 'Outros'], [total_aprovados, total_outros])
+                total_status = sum(valores_status)
+
+                colors_status = ['lightgreen', 'red']
                 axs3[0, 1].pie(
-                    valores_status, 
-                    labels=labels_status, 
-                    autopct='%1.1f%%', 
-                    startangle=90, 
-                    colors=['green', 'red'], 
-                    textprops=font_props
+                    valores_status,
+                    startangle=90,
+                    colors=colors_status,
+                    textprops=font_props,
+                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
+                    pctdistance=0.80,  
+                    labels=None
                 )
                 axs3[0, 1].set_title('Relação de Status', fontdict=fonte_titulo)
+                adicionar_descricao(axs3[0, 1], labels_status, valores_status, colors_status, [])
 
-                # Gráfico por tipo de versão
-                labels_versao, valores_versao = filtrar_dados(['A1 (Computador)', 'A3 (Outros)'], [total_a1, total_a3])
+                # Gráfico por Tipo de Versão
+                labels_versao, valores_versao = filtrar_dados(['A1', 'A3'], [total_a1, total_a3])
+                total_versao = sum(valores_versao)
+
+                colors_versao = ['violet', 'Gold']
                 axs3[1, 0].pie(
-                    valores_versao, 
-                    labels=labels_versao, 
-                    autopct='%1.1f%%', 
-                    startangle=90, 
-                    colors=['purple', 'brown'], 
-                    textprops=font_props
+                    valores_versao,
+                    startangle=90,
+                    colors=colors_versao,
+                    textprops=font_props,
+                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
+                    pctdistance=0.80,  
+                    labels=None
                 )
                 axs3[1, 0].set_title('Quantidade por Tipo de Versão', fontdict=fonte_titulo)
+                adicionar_descricao(axs3[1, 0], labels_versao, valores_versao, colors_versao, [])
 
-                # Gráfico por mídia
-                labels_midia, valores_midia = filtrar_dados(['Cartão e Leitora', 'Cartão', 'Token'], [midia_cartao_leitora, midia_cartao, midia_token])
+                # Gráfico por Mídia
+                labels_midia, valores_midia = filtrar_dados(['C + L', 'Cartão', 'Token'], [midia_cartao_leitora, midia_cartao, midia_token])
+                total_midia = sum(valores_midia)
+
+                colors_midia = ['cyan', 'yellow', 'orangeRed']
                 axs3[1, 1].pie(
-                    valores_midia, 
-                    labels=labels_midia, 
-                    autopct='%1.1f%%', 
-                    startangle=90, 
-                    colors=['darkblue', 'teal', 'gray'], 
-                    textprops=font_props
+                    valores_midia,
+                    startangle=90,
+                    colors=colors_midia,
+                    textprops=font_props,
+                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
+                    pctdistance=0.80,  
+                    labels=None
                 )
                 axs3[1, 1].set_title('Quantidade por Tipo de Mídia', fontdict=fonte_titulo)
+                adicionar_descricao(axs3[1, 1], labels_midia, valores_midia, colors_midia, [])
 
                 # Adiciona os gráficos ao layout
                 new_layout_tipo_certificado = QtWidgets.QVBoxLayout()
@@ -661,8 +683,20 @@ class FuncoesPadrao:
 
 
 
+
+
+
+
+
+
+
         except Exception as e:
             print(f'Erro: {e}')
+
+
+
+
+
 
 
     def Atualizar_meta(self):
@@ -2328,7 +2362,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
@@ -2378,7 +2412,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
