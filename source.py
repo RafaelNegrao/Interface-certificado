@@ -583,6 +583,20 @@ class FuncoesPadrao:
                 midia_cartao = sum(1 for pedido_info in Pedidos if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower())
                 midia_token = sum(1 for pedido_info in Pedidos if 'token' in Pedidos[pedido_info]['VERSAO'].lower())
 
+                midia_cartao_leitora = sum(
+                    1 for pedido_info in Pedidos
+                    if 'cartão e leitora' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
+                )
+                midia_cartao = sum(
+                    1 for pedido_info in Pedidos
+                    if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
+                )
+                midia_token = sum(
+                    1 for pedido_info in Pedidos
+                    if 'token' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
+                )
+
+
                 fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  
                 fig3.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
                 fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  
