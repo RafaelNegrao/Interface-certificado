@@ -148,12 +148,12 @@ class LoginWindow(QMainWindow):
     def mostrar_label_sucesso(self):
         self.botao_login.hide()
         self.label_mensagem.setText("✅")
-        self.label_mensagem.setStyleSheet("font-size: 26px; color: green; font-family: Calibri;")
+        self.label_mensagem.setStyleSheet("font-size: 30px; color: green; font-family: Calibri;")
         self.label_mensagem.setWindowOpacity(0)
         self.label_mensagem.show()
 
         self.animacao_label = QPropertyAnimation(self.label_mensagem, b"windowOpacity")
-        self.animacao_label.setDuration(500)
+        self.animacao_label.setDuration(300)
         self.animacao_label.setStartValue(0)
         self.animacao_label.setEndValue(1)
         self.animacao_label.finished.connect(self.abrir_proxima_janela)

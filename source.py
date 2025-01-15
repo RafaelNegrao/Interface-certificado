@@ -46,7 +46,9 @@ QGridLayout,
 QComboBox,
 QLabel,
 QTextEdit,
-QHBoxLayout
+QHBoxLayout,
+QSpacerItem,
+QSizePolicy
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
 from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
@@ -92,6 +94,14 @@ class FuncoesPadrao:
         AlteracoesInterface.apagar_label_status_bd(self)
         self.ui.campo_status_bd.setToolTip("")
         banco_dados.contar_verificacao()
+        
+        self.privilegio = db.reference(f"Usuario/{ui.campo_usuario.text()}/Privilegio").get()
+
+        if self.privilegio != "admin":
+            ui.botao_criar_usuario.deleteLater()
+            ui.label_novo_usuario.deleteLater()
+
+
 
         dia_atual = datetime.datetime.now().day
         if 1 <= dia_atual <= 5:
@@ -192,6 +202,7 @@ class FuncoesPadrao:
                 ui.campo_porcentagem_transparencia.setValue(configs['VALOR TRANS'])
                 ui.campo_telefone_sac_cliente.setText(configs['SAC'])
                 ui.campo_porcentagem_venda.setValue(configs['PORCENTAGEM VENDA'])
+                ui.campo_telefone_alo_parceiro.setText(configs['TELEFONE ALO PARCEIRO'])
                
 
 
@@ -232,6 +243,8 @@ class FuncoesPadrao:
         nova_senha = ui.campo_senha_usuario.text()  # Obtém a nova senha (do campo de senha)
         sac_cliente = ui.campo_telefone_sac_cliente.text()
         porc_venda = ui.campo_porcentagem_venda.value()
+        alo_parceiro = ui.campo_telefone_alo_parceiro.text()
+
 
         # Cria um dicionário com as novas configurações
         nova_config = {
@@ -249,7 +262,8 @@ class FuncoesPadrao:
             "CHECKBOX TRANSP": transparencia,
             "VALOR TRANS": valor_transparencia,
             "SAC": sac_cliente,
-            "PORCENTAGEM VENDA": porc_venda
+            "PORCENTAGEM VENDA": porc_venda,
+            "TELEFONE ALO PARCEIRO":alo_parceiro
         }
 
         try:
@@ -295,13 +309,13 @@ class FuncoesPadrao:
                 for i in reversed(range(layout.count())):
                     widget = layout.itemAt(i).widget()
                     if widget is not None:
-                        widget.deleteLater()  # Remover widgets antigos
-                QtWidgets.QWidget().setLayout(layout)  # Limpar o layout atual
+                        widget.deleteLater()  
+                QtWidgets.QWidget().setLayout(layout)  
 
             if ui.tabWidget.currentIndex() == 2:
                 ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
                 
-                certificados_ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+                certificados_ref = db.reference(f"Configuracoes/Certificados")
                 certificados = certificados_ref.get()
 
                 mes_meta = ui.campo_data_meta.date().month()  # Pega o mês da data selecionada
@@ -331,28 +345,23 @@ class FuncoesPadrao:
                                         desconto = 1 - (ui.campo_desconto.value() / 100)
                                         semanas[semana_do_mes - 1] += preco * desconto
 
-                                        # Verificar se a venda é 'SIM' e acumular o valor do certificado
                                         if Pedidos[pedido_info].get('VENDA', '') == "SIM":
-                                            # Verifica se a chave 'PRECO CERTIFICADO' existe
                                             preco_certificado = Pedidos[pedido_info].get('PRECO CERTIFICADO', None)
                                             
                                             if preco_certificado:
-                                                # Se a chave existir, pega o preço e multiplica pela porcentagem de venda
                                                 preco_certificado = float(preco_certificado.replace(',', '.'))
                                                 porcentagem_venda = ui.campo_porcentagem_venda.value() / 100
                                                 semanas[semana_do_mes - 1] += preco_certificado * porcentagem_venda
                                             else:
-                                                # Caso a chave 'PRECO CERTIFICADO' não exista, tenta pegar o preço da versão
                                                 versao = Pedidos[pedido_info].get('VERSAO', '')
                                                 valor = certificados[versao]['VALOR']
-                                                valor = float(valor.replace(',', '.'))  # Garantir que o valor está formatado corretamente
+                                                valor = float(valor.replace(',', '.')) 
                                                 semanas[semana_do_mes - 1] += valor * (ui.campo_porcentagem_venda.value() / 100)
                                     except:
                                         pass
                     except:
                         pass
 
-                # Atualiza os campos da interface gráfica com os valores calculados
                 ui.campo_certificados_semana_1.setText(str(semanas[0]))
                 ui.campo_certificados_semana_2.setText(str(semanas[1]))
                 ui.campo_certificados_semana_3.setText(str(semanas[2]))
@@ -412,7 +421,6 @@ class FuncoesPadrao:
 
                 total_counts = [cpf_counts[i] + cnpj_counts[i] + vendas_counts[i] for i in range(len(dias_do_mes))]
 
-                # Obter apenas os dias úteis do mês
                 dias_uteis = pd.bdate_range(start=f"{ano_meta}-{mes_meta:02d}-01", 
                                             end=f"{ano_meta}-{mes_meta:02d}-{ultimo_dia:02d}").day.tolist()
 
@@ -439,7 +447,7 @@ class FuncoesPadrao:
                 ax.plot(dias_uteis, media_cumulativa_cnpj, color="yellow", linestyle="-", linewidth=1, label="Média Acumulada CNPJ")
                 ax.plot(dias_uteis, media_cumulativa_cpf, color="blue", linestyle="-", linewidth=1, label="Média Acumulada CPF")
 
-                fonte_cor = (150/255, 150/255, 150/255)
+                fonte_cor = (255/255, 255/255, 255/255)
 
                 ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
                 ax.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
@@ -471,6 +479,187 @@ class FuncoesPadrao:
                 new_layout = QtWidgets.QVBoxLayout()
                 new_layout.addWidget(FigureCanvas(fig))
                 ui.campo_grafico.setLayout(new_layout)
+
+
+                
+            try:
+                # Remove o layout do campo de horário antes de adicionar o novo gráfico
+                layout_horario = ui.campo_grafico_horario.layout()
+                if layout_horario:
+                    for i in reversed(range(layout_horario.count())):
+                        widget = layout_horario.itemAt(i).widget()
+                        if widget is not None:
+                            widget.deleteLater()
+                    QtWidgets.QWidget().setLayout(layout_horario)
+
+                # Inicializa dicionários para pedidos por intervalo de hora
+                pedidos_por_intervalo_cpf = defaultdict(int)
+                pedidos_por_intervalo_cnpj = defaultdict(int)
+
+                # Define os intervalos de hora (08:00 às 19:00)
+                intervalos = [
+                    f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)
+                ]  # Intervalos de 08:00 às 19:00
+                intervalo_map = {f"{h:02d}": f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)}
+
+                for pedido_info in Pedidos:
+                    if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                        hora = Pedidos[pedido_info]['HORA'][:2]  # Pega somente a hora (hh:mm -> hh)
+                        intervalo = intervalo_map.get(hora, None)  # Mapeia para o intervalo correspondente
+
+                        if intervalo:
+                            tipo_certificado = Pedidos[pedido_info]['VERSAO']
+                            if 'CPF' in tipo_certificado:
+                                pedidos_por_intervalo_cpf[intervalo] += 1
+                            elif 'CNPJ' in tipo_certificado:
+                                pedidos_por_intervalo_cnpj[intervalo] += 1
+
+                # Ordena os intervalos e prepara os dados
+                horas = sorted(intervalos)
+                pedidos_cpf_counts = [pedidos_por_intervalo_cpf.get(hora, 0) for hora in horas]
+                pedidos_cnpj_counts = [pedidos_por_intervalo_cnpj.get(hora, 0) for hora in horas]
+
+                # Gráfico de barras
+                fig2, ax2 = plt.subplots(figsize=(14, 8))
+                fig2.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)  # Ajusta o espaço para os rótulos
+                fig2.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo geral
+                ax2.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo do gráfico
+
+                ax2.bar(horas, pedidos_cpf_counts, width=0.4, label="CPF", color="blue", align='center')
+                ax2.bar(horas, pedidos_cnpj_counts, width=0.4, label="CNPJ", color="orange", bottom=pedidos_cpf_counts, align='center')
+
+                fonte_cor = (255 / 255, 255 / 255, 255 / 255)  # Cor do texto (branco)
+
+                ax2.set_xlabel("Intervalos de Horário", fontsize=7, color=fonte_cor)
+                ax2.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
+                ax2.set_xticks(range(len(horas)))
+                ax2.set_xticklabels(horas, rotation=45, ha='right', fontsize=6, color=fonte_cor)
+
+                ax2.set_ylim(0, max(pedidos_cpf_counts[i] + pedidos_cnpj_counts[i] for i in range(len(horas))) + 1)
+
+                for y in range(0, max(pedidos_cpf_counts[i] + pedidos_cnpj_counts[i] for i in range(len(horas))) + 1):
+                    ax2.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
+
+                leg = ax2.legend(fontsize=6, labelcolor=fonte_cor)
+                leg.get_frame().set_facecolor((60 / 255, 62 / 255, 84 / 255))
+                leg.get_frame().set_edgecolor((60 / 255, 62 / 255, 84 / 255))
+
+                ax2.tick_params(axis='x', labelsize=6, colors=fonte_cor)
+                ax2.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+
+                new_layout_horario = QtWidgets.QVBoxLayout()
+                new_layout_horario.addWidget(FigureCanvas(fig2))
+                ui.campo_grafico_horario.setLayout(new_layout_horario)
+
+            except Exception as e:
+                pass
+
+
+            try:
+                layout_tipo = ui.campo_grafico_tipo_certificado.layout()
+                if layout_tipo:
+                    for i in reversed(range(layout_tipo.count())):
+                        widget = layout_tipo.itemAt(i).widget()
+                        if widget is not None:
+                            widget.deleteLater()
+                    QtWidgets.QWidget().setLayout(layout_tipo)
+
+
+                total_cpf_aprovado = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
+                total_cnpj_aprovado = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
+                total_cpf_outros = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
+                total_cnpj_outros = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
+
+
+                total_a1 = sum(
+                    1 for pedido_info in Pedidos
+                    if 'no computador' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
+                )
+                total_a3 = sum(
+                    1 for pedido_info in Pedidos
+                    if 'no computador' not in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
+                )
+
+                # Inicializa contadores para mídias
+                midia_cartao_leitora = sum(1 for pedido_info in Pedidos if 'cartão e leitora' in Pedidos[pedido_info]['VERSAO'].lower())
+                midia_cartao = sum(1 for pedido_info in Pedidos if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower())
+                midia_token = sum(1 for pedido_info in Pedidos if 'token' in Pedidos[pedido_info]['VERSAO'].lower())
+
+                # Gráficos de pizza em layout 2x2
+                fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  # Dois gráficos por linha
+                fig3.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
+                fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo geral
+
+                # Personalização da fonte
+                font_props = {'fontsize': 6, 'color': 'black'}
+                fonte_titulo = {'fontsize': 10, 'color': 'white'}
+
+                # Função para filtrar valores zerados
+                def filtrar_dados(labels, valores):
+                    labels_filtrados = [f"{label} [{valor}]" for label, valor in zip(labels, valores) if valor > 0]
+                    valores_filtrados = [valor for valor in valores if valor > 0]
+                    return labels_filtrados, valores_filtrados
+
+                # Gráfico de porcentagem por tipo de certificado
+                labels_certificado, valores_certificado = filtrar_dados(['CPF', 'CNPJ'], [total_cpf_aprovado, total_cnpj_aprovado])
+                axs3[0, 0].pie(
+                    valores_certificado, 
+                    labels=labels_certificado, 
+                    autopct='%1.1f%%', 
+                    startangle=90, 
+                    colors=['blue', 'orange'], 
+                    textprops=font_props
+                )
+                axs3[0, 0].set_title('Tipo de Certificado', fontdict=fonte_titulo)
+
+                # Gráfico de relação de status
+                total_aprovados = total_cpf_aprovado + total_cnpj_aprovado
+                total_outros = total_cpf_outros + total_cnpj_outros
+                labels_status, valores_status = filtrar_dados(['Aprovados', 'Outros'], [total_aprovados, total_outros])
+                axs3[0, 1].pie(
+                    valores_status, 
+                    labels=labels_status, 
+                    autopct='%1.1f%%', 
+                    startangle=90, 
+                    colors=['green', 'red'], 
+                    textprops=font_props
+                )
+                axs3[0, 1].set_title('Relação de Status', fontdict=fonte_titulo)
+
+                # Gráfico por tipo de versão
+                labels_versao, valores_versao = filtrar_dados(['A1 (Computador)', 'A3 (Outros)'], [total_a1, total_a3])
+                axs3[1, 0].pie(
+                    valores_versao, 
+                    labels=labels_versao, 
+                    autopct='%1.1f%%', 
+                    startangle=90, 
+                    colors=['purple', 'brown'], 
+                    textprops=font_props
+                )
+                axs3[1, 0].set_title('Quantidade por Tipo de Versão', fontdict=fonte_titulo)
+
+                # Gráfico por mídia
+                labels_midia, valores_midia = filtrar_dados(['Cartão e Leitora', 'Cartão', 'Token'], [midia_cartao_leitora, midia_cartao, midia_token])
+                axs3[1, 1].pie(
+                    valores_midia, 
+                    labels=labels_midia, 
+                    autopct='%1.1f%%', 
+                    startangle=90, 
+                    colors=['darkblue', 'teal', 'gray'], 
+                    textprops=font_props
+                )
+                axs3[1, 1].set_title('Quantidade por Tipo de Mídia', fontdict=fonte_titulo)
+
+                # Adiciona os gráficos ao layout
+                new_layout_tipo_certificado = QtWidgets.QVBoxLayout()
+                new_layout_tipo_certificado.addWidget(FigureCanvas(fig3))
+                ui.campo_grafico_tipo_certificado.setLayout(new_layout_tipo_certificado)
+
+            except Exception as e:
+                pass
+
+
+
 
         except Exception as e:
             print(f'Erro: {e}')
@@ -1323,7 +1512,7 @@ class FuncoesPadrao:
 
     def carregar_lista_certificados(self):
        if ui.campo_lista_versao_certificado.currentText() == "":
-            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+            ref = db.reference(f"Configuracoes/Certificados")
             
             certificados = ref.get()
 
@@ -1337,7 +1526,7 @@ class FuncoesPadrao:
 
     def pegar_link_venda(self):
         try:
-            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
+            ref = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
             certificado = ref.get()
             link_venda = certificado["LINK VENDA"]
             rev = str(ui.campo_cod_rev.text())
@@ -1423,7 +1612,7 @@ class FuncoesPadrao:
 
     def abrir_nova_janela(self, janela_pai):
         if self.dicionario is None:
-            self.dicionario = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Mensagens").get()
+            self.dicionario = db.reference(f"Configuracoes/Mensagens").get()
 
         # Verifica se a janela de mensagens está aberta
         if hasattr(self, 'nova_janela') and self.nova_janela is not None:
@@ -1530,9 +1719,6 @@ class FuncoesPadrao:
             self.nova_janela = None
 
 
-    
-
-
     def determinar_hora(self,hora):
         match hora:
             case tempo if tempo < datetime.datetime.strptime("12:00", "%H:%M").time():
@@ -1619,7 +1805,10 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             cor_botao_fundo = "rgb(89, 62, 255)"
             cor_botao_texto = "#FFFFFF"
             tamanho_fonte_footer = "12px"
-            primeiro_nome = ui.campo_nome.text().split()[0]
+            try:
+                primeiro_nome = ui.campo_nome.text().split()[0]
+            except:
+                primeiro_nome = ""
 
             match tipo_mensagem:
 
@@ -1861,7 +2050,8 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                     
                 case 'RENOVAÇÃO':
                     # Ajustando o caminho correto com base na estrutura apresentada
-                    ref_link_venda = db.reference(f"/Usuario/{ui.campo_usuario.text()}/Dados/Certificados/{ui.campo_lista_versao_certificado.currentText()}/LINK VENDA")
+                    
+                    ref_link_venda = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}/LINK VENDA")
                     certificado = ref_link_venda.get()
                     link_venda = f'{certificado}{ui.campo_cod_rev.text()}'
                     mensagem_inicial = self.determinar_hora(datetime.datetime.now().time())
@@ -1975,7 +2165,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
 
-            ref_link_venda = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+            ref_link_venda = db.reference(f"Configuracoes/Certificados")
 
             lista_certificados = ref_link_venda.get()
             range_validacao = ui.campo_dias_renovacao.value()
@@ -2337,7 +2527,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
 
     def buscar_preco_certificado(self):
-        certificados = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+        certificados = db.reference(f"Configuracoes/Certificados")
         lista_certificados = certificados.get()
         certificado = ui.campo_lista_versao_certificado.currentText()
 
@@ -2387,7 +2577,9 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
 
 
-class AcoesBancoDeDados:
+
+
+class AcoesBancoDeDados():
     def __init__(self, ui):
         self.ui = ui
         
@@ -2548,6 +2740,7 @@ class AcoesBancoDeDados:
             fundo_cor = "rgb(60, 62, 84)"
             campo_texto_cor = "rgb(210, 210, 210)"
             campo_fundo_cor = "rgb(40, 45, 50)"
+            estilo_fonte = f"font-family: 'Calibri'; font-size: 14px;"
             
             botao_enviar_hover = "rgb(0, 122, 255)"
             botao_enviar_cor = "rgb(0, 102, 215)"
@@ -2557,9 +2750,6 @@ class AcoesBancoDeDados:
 
             janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor};")
 
-            janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor};")
-
-            
 
             layout = QVBoxLayout()
 
@@ -2567,40 +2757,49 @@ class AcoesBancoDeDados:
             input_destinatario = QLineEdit()
             input_destinatario.setText("agendamento@acbdigital.com.br")
             input_destinatario.setStyleSheet(
-                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;{estilo_fonte}"
             )
             layout.addWidget(label_destinatario)
             layout.addWidget(input_destinatario)
+
+            spacer = QSpacerItem(30, 200, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(spacer)
 
             label_assunto = QLabel("Assunto:")
             input_assunto = QLineEdit()
             input_assunto.setText(f"ENVIO DE {midia} - PEDIDO {self.ui.campo_pedido.text()}")
             input_assunto.setStyleSheet(
-                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;{estilo_fonte}"
             )
             layout.addWidget(label_assunto)
             layout.addWidget(input_assunto)
+
+            spacer = QSpacerItem(30, 200, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(spacer)
 
             label_endereco = QLabel("Endereço do cliente:")
             text_endereco = QTextEdit()
             text_endereco.setText(self.ui.campo_comentario.toPlainText())
             text_endereco.setStyleSheet(
-                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+                f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;{estilo_fonte}"
             )
             layout.addWidget(label_endereco)
             layout.addWidget(text_endereco)
 
+            spacer = QSpacerItem(30, 200, QSizePolicy.Minimum, QSizePolicy.Expanding)
+            layout.addItem(spacer)
+
             layout_botoes = QHBoxLayout()
             botao_enviar = QPushButton("Enviar E-mail")
             botao_enviar.setStyleSheet(
-                f"background-color: {botao_enviar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+                f"background-color: {botao_enviar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;{estilo_fonte}"
             )
             botao_enviar.clicked.connect(enviar_email)
             layout_botoes.addWidget(botao_enviar)
 
             botao_cancelar = QPushButton("Cancelar")
             botao_cancelar.setStyleSheet(
-                f"background-color: {botao_cancelar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;"
+                f"background-color: {botao_cancelar_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px;{estilo_fonte}"
             )
             botao_cancelar.clicked.connect(cancelar)
             layout_botoes.addWidget(botao_cancelar)
@@ -2614,7 +2813,7 @@ class AcoesBancoDeDados:
                     background-color: {botao_enviar_cor};
                     color: {campo_texto_cor};
                     padding: 5px;
-                    border-radius: 5px;
+                    border-radius: 5px;{estilo_fonte}
                 }}
                 QPushButton:hover {{
                     background-color: {botao_enviar_hover};
@@ -2628,7 +2827,7 @@ class AcoesBancoDeDados:
                     background-color: {botao_cancelar_cor};
                     color: {campo_texto_cor};
                     padding: 5px;
-                    border-radius: 5px;
+                    border-radius: 5px;{estilo_fonte}
                 }}
                 QPushButton:hover {{
                     background-color: {botao_cancelar_hover};
@@ -2714,7 +2913,7 @@ class AcoesBancoDeDados:
                 return
         try:
             #Dados pedido  
-            ui.tableWidget.horizontalHeader().setDefaultSectionSize(91)
+            ui.tableWidget.horizontalHeader().setDefaultSectionSize(96)
             ui.caminho_pasta.setText("")
             ui.campo_cnpj_municipio.setText("")
             ui.campo_comentario.setPlainText("")
@@ -3034,7 +3233,7 @@ class AcoesBancoDeDados:
             
             ui.tableWidget.horizontalHeader().setSectionResizeMode(QtWidgets.QHeaderView.Fixed) 
             for i in range(ui.tableWidget.columnCount()): 
-                ui.tableWidget.horizontalHeader().resizeSection(i, 91)
+                ui.tableWidget.horizontalHeader().resizeSection(i, 96)
 
             
         except Exception as e:
@@ -3100,12 +3299,10 @@ class AcoesBancoDeDados:
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
             
-            certificados_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Certificados")
+            certificados_ref = ref.child(f"Configuracoes/Certificados")
             certificados = certificados_ref.get()
 
-            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA") \
-                            .start_at(data_inicial) \
-                            .end_at(data_final)
+            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA").start_at(data_inicial).end_at(data_final)
             pedidos = pedidos_ref.get()
 
             for col in range(ui.tableWidget.columnCount()):
@@ -3353,6 +3550,232 @@ class AcoesBancoDeDados:
         return iso_str
 
 
+    def abrir_janela_cadastro_usuario(self):
+        def cancelar():
+            if janela.isVisible():
+                janela.close()
+                janela.deleteLater()
+
+        janela = QDialog(self.ui.centralwidget)
+        janela.setWindowTitle("Cadastro de Novo Usuário")
+        janela.setFixedSize(300, 320)
+
+        fundo_cor = "rgb(60, 62, 84)"
+        campo_texto_cor = "rgb(210, 210, 210)"
+        campo_fundo_cor = "rgb(40, 45, 50)"
+        
+        botao_confirmar_hover = "rgb(0, 122, 255)"
+        botao_confirmar_cor = "rgb(0, 102, 215)"
+        
+        botao_cancelar_hover = "rgb(255, 0, 0)"
+        botao_cancelar_cor = "rgb(215, 0, 0)"
+        
+        fonte_padrao = "Arial"  # Fonte padrão
+        tamanho_fonte = "12pt"  # Tamanho da fonte
+
+        janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor}; font-family: {fonte_padrao}; font-size: {tamanho_fonte};")
+
+        layout = QVBoxLayout()
+
+        layout_usuario = QHBoxLayout()
+        label_usuario = QLabel("Usuário:")
+        self.input_usuario = QLineEdit()
+        self.input_usuario.setStyleSheet(
+            f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px; font-family: {fonte_padrao}; font-size: {tamanho_fonte};"
+        )
+
+        self.label_status_usuario = QLabel("")  
+        self.label_status_usuario.setStyleSheet("color: rgb(255, 0, 0);")  
+
+        layout_usuario.addWidget(label_usuario)
+        layout_usuario.addWidget(self.label_status_usuario)
+        layout.addLayout(layout_usuario)
+
+        layout_usuario_input = QVBoxLayout()
+        layout_usuario_input.addWidget(self.input_usuario)
+        layout.addLayout(layout_usuario_input)
+
+        layout.addLayout(layout_usuario_input)
+
+                            
+        ref = db.reference("/Usuario")
+        usuarios_existentes = ref.get()
+
+        def verificar_usuario():
+            nome_digitado = self.input_usuario.text().strip()
+            if nome_digitado:
+                try:
+                    if usuarios_existentes and nome_digitado in usuarios_existentes:
+                        self.label_status_usuario.setText("Usuário já existe")
+                        self.label_status_usuario.setStyleSheet("color: rgb(255, 0, 0);")
+                    else:
+                        self.label_status_usuario.setText("Usuário disponível")
+                        self.label_status_usuario.setStyleSheet("color: rgb(0, 255, 0);")
+                except Exception as e:
+                    self.label_status_usuario.setText("Erro na verificação")
+                    self.label_status_usuario.setStyleSheet("color: rgb(255, 165, 0);")
+            else:
+                self.label_status_usuario.setText("")
+
+        self.input_usuario.textChanged.connect(verificar_usuario)
+
+        spacer = QSpacerItem(10, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        layout.addItem(spacer)
+        
+        label_nome_agente = QLabel("Nome Completo do Agente:")
+        self.input_nome = QLineEdit()
+        self.input_nome.setStyleSheet(
+            f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px; font-family: {fonte_padrao}; font-size: {tamanho_fonte};"
+        )
+        layout_nome_agente = QVBoxLayout()
+        layout_nome_agente.addWidget(label_nome_agente)
+        layout_nome_agente.addWidget(self.input_nome)
+        layout.addLayout(layout_nome_agente)
+
+        spacer = QSpacerItem(10, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        layout.addItem(spacer)
+
+        label_senha = QLabel("Senha:")
+        self.input_senha = QLineEdit()
+        self.input_senha.setEchoMode(QLineEdit.Password)
+        self.input_senha.setStyleSheet(
+            f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px; font-family: {fonte_padrao}; font-size: {tamanho_fonte};"
+        )
+        layout_senha = QVBoxLayout()
+        layout_senha.addWidget(label_senha)
+        layout_senha.addWidget(self.input_senha)
+        layout.addLayout(layout_senha)
+
+        spacer = QSpacerItem(10, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        layout.addItem(spacer)
+
+        label_privilegio = QLabel("Privilégio:")
+        self.input_privilegio = QComboBox()
+        self.input_privilegio.addItems(["user", "admin"])
+        self.input_privilegio.setStyleSheet(
+            f"background-color: {campo_fundo_cor}; color: {campo_texto_cor}; padding: 5px; border-radius: 5px; font-family: {fonte_padrao}; font-size: {tamanho_fonte};"
+        )
+        layout_privilegio = QVBoxLayout()
+        layout_privilegio.addWidget(label_privilegio)
+        layout_privilegio.addWidget(self.input_privilegio)
+        layout.addLayout(layout_privilegio)
+
+        spacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        layout.addItem(spacer)
+
+        layout_botoes = QHBoxLayout()
+        botao_confirmar = QPushButton("Confirmar")
+        botao_confirmar.setStyleSheet(
+            f"""
+            QPushButton {{
+                background-color: {botao_confirmar_cor};
+                color: {campo_texto_cor};
+                padding: 5px;
+                border-radius: 5px;
+                font-family: {fonte_padrao};
+                font-size: {tamanho_fonte};
+            }}
+            QPushButton:hover {{
+                background-color: {botao_confirmar_hover};
+            }}
+            """
+        )
+        layout_botoes.addWidget(botao_confirmar)
+
+        botao_cancelar = QPushButton("Cancelar")
+        botao_cancelar.setStyleSheet(
+            f"""
+            QPushButton {{
+                background-color: {botao_cancelar_cor};
+                color: {campo_texto_cor};
+                padding: 5px;
+                border-radius: 5px;
+                font-family: {fonte_padrao};
+                font-size: {tamanho_fonte};
+            }}
+            QPushButton:hover {{
+                background-color: {botao_cancelar_hover};
+            }}
+            """
+        )
+        botao_cancelar.clicked.connect(cancelar)
+        layout_botoes.addWidget(botao_cancelar)
+
+        layout.addLayout(layout_botoes)
+
+        def salvar_cadastro():
+            novo_usuario = self.input_usuario.text()
+            nome = self.input_nome.text().strip()
+            senha = self.input_senha.text().strip()
+            privilegio = self.input_privilegio.currentText()
+
+            if not nome or not novo_usuario or not senha or not senha:
+                QMessageBox.warning(janela, "Erro", "Todos os campos devem ser preenchidos!")
+                return
+
+            ref = db.reference("/Usuario")
+
+            usuarios_existentes = ref.get()
+
+            if usuarios_existentes:
+                for usuario_existente in usuarios_existentes:
+                    if usuario_existente == novo_usuario:
+                        QMessageBox.warning(janela, "Erro", "Esse nome de usuário já existe! Por favor, escolha outro.")
+                        return
+
+            dicionario_padrao = {
+                "Dados": {
+                    "Configuracoes": {
+                        "AGENTE": nome,
+                        "ALERTA": True,
+                        "CHECKBOX TRANSP": True,
+                        "COD REV": "",
+                        "DESCONTO TOTAL": 20,
+                        "DESCONTO VALIDACAO": 2.75,
+                        "DIRETORIO-RAIZ": "",
+                        "E-MAIL": "",
+                        "IMPOSTO VALIDACAO": 15,
+                        "MODO PASTA": "PEDIDO-NOME",
+                        "PORCENTAGEM": 15,
+                        "PORCENTAGEM VENDA": 10,
+                        "RNG RENOVACAO": 30,
+                        "SAC": "11 4003 5596 ou 0800 838 051",
+                        "SENHA": senha,
+                        "SENHA EMAIL": "",
+                        "VALOR TRANS": 10,
+                        "TELEFONE ALO PARCEIRO":"4003 5596"
+                    },
+                    "Metas": {
+                        "MENSAL": "4000",
+                        "SEMANAL": "800"
+                    },
+                    "Pedidos": {"1":"1"}
+                },
+                "Hora Login": "",
+                "Senha": senha,
+                "Privilegio":privilegio
+            }
+
+            try:
+                ref.child(novo_usuario).set(dicionario_padrao)
+                QMessageBox.information(janela, "Sucesso", "Usuario criado com sucesso!")
+                if janela.isVisible():
+                    janela.close()
+                    janela.deleteLater()
+
+                janela.deleteLater()
+            except Exception as e:
+                QMessageBox.information(janela, "Erro", f"Ocorreu um erro ao salvar o usuário: {str(e)}")
+                if janela.isVisible():
+                    janela.close()
+                    janela.deleteLater()
+
+        botao_confirmar.clicked.connect(salvar_cadastro)
+
+        janela.setLayout(layout)
+        janela.exec_()
+
+
 
 class JanelaOculta:
     def __init__(self, pai):
@@ -3494,6 +3917,7 @@ ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verifi
 ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
+ui.botao_criar_usuario.clicked.connect(lambda:banco_dados.abrir_janela_cadastro_usuario())
 ui.botao_agrupar_PDF_pasta_cliente.clicked.connect(lambda:funcoes_app.mesclar_pdf_pasta_cliente())
 ui.botao_excluir_dados_tabela.clicked.connect(lambda:funcoes_app.limpar_tabela())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
