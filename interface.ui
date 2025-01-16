@@ -3823,7 +3823,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>134</y>
+          <y>162</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -3854,7 +3854,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>412</y>
+          <y>440</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -3888,7 +3888,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>342</y>
+          <y>370</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -3919,7 +3919,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>204</y>
+          <y>232</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -3947,7 +3947,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>412</y>
+          <y>440</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -3975,7 +3975,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>274</y>
+          <y>302</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4003,7 +4003,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>64</y>
+          <y>92</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4034,7 +4034,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>134</y>
+          <y>162</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4062,7 +4062,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>342</y>
+          <y>370</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4090,7 +4090,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>274</y>
+          <y>302</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4121,7 +4121,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>64</y>
+          <y>92</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4149,7 +4149,7 @@ QTabBar::tab:Hover {
         <property name="geometry">
          <rect>
           <x>16</x>
-          <y>204</y>
+          <y>232</y>
           <width>547</width>
           <height>40</height>
          </rect>
@@ -4176,6 +4176,169 @@ QTabBar::tab:Hover {
          <string/>
         </property>
        </widget>
+       <widget class="QLabel" name="label_71">
+        <property name="geometry">
+         <rect>
+          <x>219</x>
+          <y>24</y>
+          <width>75</width>
+          <height>9</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+        </property>
+        <property name="text">
+         <string> META MÊS</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="campo_meta_semanal">
+        <property name="geometry">
+         <rect>
+          <x>117</x>
+          <y>30</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSpinBox {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QSpinBox:disabled, QSpinBox:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>100000</number>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_70">
+        <property name="geometry">
+         <rect>
+          <x>117</x>
+          <y>24</y>
+          <width>85</width>
+          <height>9</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Consolas</family>
+          <pointsize>8</pointsize>
+          <weight>50</weight>
+          <italic>false</italic>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:transparent;
+color:rgb(170,170,170)</string>
+        </property>
+        <property name="text">
+         <string> META SEMANA</string>
+        </property>
+       </widget>
+       <widget class="QSpinBox" name="campo_meta_mes">
+        <property name="geometry">
+         <rect>
+          <x>219</x>
+          <y>30</y>
+          <width>90</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>12</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">QSpinBox {
+    border: none;
+    border-bottom: 1px solid rgb(90, 54, 247);
+    border-radius: 0;
+    background-color: rgb(60, 62, 84);
+}
+
+QSpinBox:disabled, QSpinBox:!focus {
+    border-bottom: 1px solid rgb(120, 120, 120);
+}
+</string>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::NoButtons</enum>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>1000000</number>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="botao_atualizar_meta">
+        <property name="geometry">
+         <rect>
+          <x>347</x>
+          <y>30</y>
+          <width>111</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+          <weight>75</weight>
+          <italic>false</italic>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border-radius:10px;
+background-color:rgb(73, 218, 107);
+color:rgb(90,54,247);
+</string>
+        </property>
+        <property name="text">
+         <string>SALVAR META</string>
+        </property>
+       </widget>
        <zorder>barra_meta_semana_4</zorder>
        <zorder>barra_meta_semana_3</zorder>
        <zorder>barra_meta_semana_2</zorder>
@@ -4188,6 +4351,11 @@ QTabBar::tab:Hover {
        <zorder>label_meta2</zorder>
        <zorder>label_meta5</zorder>
        <zorder>label_meta1</zorder>
+       <zorder>campo_meta_semanal</zorder>
+       <zorder>label_70</zorder>
+       <zorder>campo_meta_mes</zorder>
+       <zorder>botao_atualizar_meta</zorder>
+       <zorder>label_71</zorder>
       </widget>
       <widget class="QWidget" name="tab_7">
        <attribute name="title">
@@ -4235,111 +4403,14 @@ QTabBar::tab:Hover {
        </widget>
       </widget>
      </widget>
-     <widget class="QPushButton" name="botao_atualizar_meta">
-      <property name="geometry">
-       <rect>
-        <x>419</x>
-        <y>35</y>
-        <width>111</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Segoe UI</family>
-        <pointsize>10</pointsize>
-        <weight>75</weight>
-        <italic>false</italic>
-        <bold>true</bold>
-       </font>
-      </property>
-      <property name="cursor">
-       <cursorShape>PointingHandCursor</cursorShape>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">border-radius:10px;
-background-color:rgb(73, 218, 107);
-color:rgb(90,54,247);
-</string>
-      </property>
-      <property name="text">
-       <string>SALVAR META</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_70">
-      <property name="geometry">
-       <rect>
-        <x>189</x>
-        <y>29</y>
-        <width>85</width>
-        <height>9</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-      </property>
-      <property name="text">
-       <string> META SEMANA</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="campo_meta_semanal">
-      <property name="geometry">
-       <rect>
-        <x>189</x>
-        <y>35</y>
-        <width>90</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Calibri</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QSpinBox {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QSpinBox:disabled, QSpinBox:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::NoButtons</enum>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>100000</number>
-      </property>
-     </widget>
      <widget class="QDateEdit" name="campo_data_meta">
       <property name="enabled">
        <bool>true</bool>
       </property>
       <property name="geometry">
        <rect>
-        <x>71</x>
-        <y>35</y>
+        <x>237</x>
+        <y>25</y>
         <width>103</width>
         <height>31</height>
        </rect>
@@ -4387,9 +4458,9 @@ QDateEdit::down-button {
      <widget class="QLabel" name="label_36">
       <property name="geometry">
        <rect>
-        <x>71</x>
-        <y>29</y>
-        <width>61</width>
+        <x>236</x>
+        <y>14</y>
+        <width>100</width>
         <height>8</height>
        </rect>
       </property>
@@ -4407,73 +4478,7 @@ QDateEdit::down-button {
 color:rgb(170,170,170)</string>
       </property>
       <property name="text">
-       <string> MÊS/ANO</string>
-      </property>
-     </widget>
-     <widget class="QLabel" name="label_71">
-      <property name="geometry">
-       <rect>
-        <x>291</x>
-        <y>29</y>
-        <width>75</width>
-        <height>9</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Consolas</family>
-        <pointsize>8</pointsize>
-        <weight>50</weight>
-        <italic>false</italic>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">background-color:transparent;
-color:rgb(170,170,170)</string>
-      </property>
-      <property name="text">
-       <string> META MÊS</string>
-      </property>
-     </widget>
-     <widget class="QSpinBox" name="campo_meta_mes">
-      <property name="geometry">
-       <rect>
-        <x>291</x>
-        <y>35</y>
-        <width>90</width>
-        <height>31</height>
-       </rect>
-      </property>
-      <property name="font">
-       <font>
-        <family>Calibri</family>
-        <pointsize>12</pointsize>
-        <weight>50</weight>
-        <bold>false</bold>
-       </font>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">QSpinBox {
-    border: none;
-    border-bottom: 1px solid rgb(90, 54, 247);
-    border-radius: 0;
-    background-color: rgb(60, 62, 84);
-}
-
-QSpinBox:disabled, QSpinBox:!focus {
-    border-bottom: 1px solid rgb(120, 120, 120);
-}
-</string>
-      </property>
-      <property name="buttonSymbols">
-       <enum>QAbstractSpinBox::NoButtons</enum>
-      </property>
-      <property name="minimum">
-       <number>1</number>
-      </property>
-      <property name="maximum">
-       <number>1000000</number>
+       <string>DATA REFERÊNCIA</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_62">
@@ -4500,15 +4505,6 @@ QSpinBox:disabled, QSpinBox:!focus {
        <string/>
       </property>
      </widget>
-     <zorder>tabWidget_2</zorder>
-     <zorder>botao_atualizar_meta</zorder>
-     <zorder>campo_meta_semanal</zorder>
-     <zorder>campo_data_meta</zorder>
-     <zorder>label_36</zorder>
-     <zorder>campo_meta_mes</zorder>
-     <zorder>label_62</zorder>
-     <zorder>label_70</zorder>
-     <zorder>label_71</zorder>
     </widget>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -7202,28 +7198,28 @@ color:rgb(220,220,220)</string>
   <tabstop>campo_lista_junta_comercial</tabstop>
   <tabstop>campo_cnpj_razao_social</tabstop>
   <tabstop>campo_cnpj_municipio</tabstop>
-  <tabstop>campo_comentario</tabstop>
   <tabstop>campo_data_de</tabstop>
   <tabstop>campo_data_ate</tabstop>
   <tabstop>campo_lista_status_2</tabstop>
+  <tabstop>campo_data_meta</tabstop>
   <tabstop>campo_usuario</tabstop>
   <tabstop>campo_senha_usuario</tabstop>
   <tabstop>campo_nome_agente</tabstop>
-  <tabstop>caminho_pasta_principal</tabstop>
+  <tabstop>campo_cod_rev</tabstop>
   <tabstop>campo_email_empresa</tabstop>
   <tabstop>campo_senha_email</tabstop>
+  <tabstop>caminho_pasta_principal</tabstop>
   <tabstop>campo_porcentagem_validacao</tabstop>
+  <tabstop>campo_porcentagem_venda</tabstop>
   <tabstop>campo_desconto</tabstop>
   <tabstop>campo_imposto_validacao</tabstop>
   <tabstop>campo_desconto_validacao</tabstop>
-  <tabstop>campo_dias_renovacao</tabstop>
-  <tabstop>campo_cod_rev</tabstop>
-  <tabstop>campo_verifica_tela_cheia</tabstop>
   <tabstop>caminho_pasta</tabstop>
   <tabstop>campo_lista_tipo_criar_pasta</tabstop>
-  <tabstop>botao_ocultar_senha</tabstop>
-  <tabstop>campo_certificados_semana_1</tabstop>
-  <tabstop>campo_email_enviado</tabstop>
+  <tabstop>campo_telefone_sac_cliente</tabstop>
+  <tabstop>campo_dias_renovacao</tabstop>
+  <tabstop>campo_porcentagem_transparencia</tabstop>
+  <tabstop>campo_telefone_alo_parceiro</tabstop>
   <tabstop>tableWidget</tabstop>
   <tabstop>campo_m5</tabstop>
   <tabstop>campo_m3</tabstop>
@@ -7247,6 +7243,16 @@ color:rgb(220,220,220)</string>
   <tabstop>campo_m10</tabstop>
   <tabstop>tabWidget</tabstop>
   <tabstop>campo_m8</tabstop>
+  <tabstop>tabWidget_2</tabstop>
+  <tabstop>botao_atualizar_meta</tabstop>
+  <tabstop>campo_comentario</tabstop>
+  <tabstop>campo_meta_semanal</tabstop>
+  <tabstop>campo_meta_mes</tabstop>
+  <tabstop>botao_ocultar_senha</tabstop>
+  <tabstop>campo_verifica_tela_cheia</tabstop>
+  <tabstop>campo_certificados_semana_1</tabstop>
+  <tabstop>checkBox_transparecer</tabstop>
+  <tabstop>campo_email_enviado</tabstop>
  </tabstops>
  <resources/>
  <connections/>

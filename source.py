@@ -67,6 +67,13 @@ from login import LoginWindow
 
 ref = db.reference("/")
 
+# Ativando suporte a escalonamento de DPI alto
+if hasattr(Qt, 'AA_EnableHighDpiScaling'):
+    QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
+
+if hasattr(Qt, 'AA_UseHighDpiPixmaps'):
+    QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
+
 
 
 class FuncoesPadrao:
@@ -76,11 +83,13 @@ class FuncoesPadrao:
         self.dicionario = None
         self.acoes = AcoesBancoDeDados(ui)
         
+            
+        
 
     def evento_ao_abrir(self,event):
   
         atualizar = Atualizar(parent=self.parent)
-        atualizar.verificar_atualizacao()
+        #atualizar.verificar_atualizacao()
         self.ui.label_versao.setText(atualizar.versao)
         hora_atual = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M")
         self.login = db.reference(f"Usuario/{ui.campo_usuario.text()}/Hora Login")
@@ -96,19 +105,21 @@ class FuncoesPadrao:
         banco_dados.contar_verificacao()
         
         self.privilegio = db.reference(f"Usuario/{ui.campo_usuario.text()}/Privilegio").get()
-
-        if self.privilegio != "admin":
-            ui.botao_criar_usuario.deleteLater()
-            ui.label_novo_usuario.deleteLater()
-
-
+        self.verificar_privilegio(self.privilegio)
+        
 
         dia_atual = datetime.datetime.now().day
         if 1 <= dia_atual <= 5:
             ui.tabWidget.setCurrentIndex(1)
             self.envio_em_massa()
             QApplication.processEvents() 
+
         
+    def verificar_privilegio(self,privilegio):
+        if privilegio != "admin":
+            ui.botao_criar_usuario.deleteLater()
+            ui.label_novo_usuario.deleteLater()
+
 
     def evento_ao_fechar(self,event):
 
@@ -302,8 +313,6 @@ class FuncoesPadrao:
     def atualizar_meta_clientes(self):
         try:
             # Zerar o QWidget `campo_grafico`
-            
-
             layout = ui.campo_grafico.layout()
             if layout:
                 for i in reversed(range(layout.count())):
@@ -706,11 +715,6 @@ class FuncoesPadrao:
 
         except Exception as e:
             print(f'Erro: {e}')
-
-
-
-
-
 
 
     def Atualizar_meta(self):
@@ -2340,6 +2344,21 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                         cor_botao_texto = "#FFFFFF"
                         tamanho_fonte_footer = "12px"
 
+                        if "CNPJ" in pedido_info["VERSAO"]:
+                            nome_botao = "Agendar Validação do meu e-CNPJ"
+                            # Mensagem para CNPJ
+                            mensagem_documentos = (
+                                "*IMPORTANTE"
+                                "%0APara que possamos agilizar o processo de validação, peço que anexe em resposta a esse e-mail uma foto (frente e verso) do seu documento de identificação e uma cópia do documento de constituição da empresa."
+                            )
+                        elif "CPF" in pedido_info["VERSAO"]:
+                            # Mensagem para CPF
+                            nome_botao = "Agendar Validação do meu e-CPF"
+                            mensagem_documentos = (
+                                "*IMPORTANTE"
+                                "%0APara que possamos agilizar o processo de validação, peço que anexe em resposta a esse e-mail uma foto (frente e verso) do seu documento de identificação."
+                            )
+
                         if diferenca > 0:
                             # CERTIFICADO VÁLIDO
                             corpo_html = (
@@ -2372,11 +2391,11 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                                 f"      <p>Fizemos a validação para seu certificado digital, modelo"
                                 f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
-                                f"      <p>Verifiquei que ele está próximo à data <b>vencimento</b> e entendemos a importância do certificado digital para seus negócios.</p>"
+                                f"      <p>Verifiquei que ele está próximo à data de <b>VENCIMENTO</b> e entendemos a importância do certificado digital para seus negócios.</p>"
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
-                                f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
+                                f"      <p>Caso queira fazer a vídeo conferência, contate-me através do botão abaixo:</p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=Agendamento%20de%20Validação&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:%0A%0A{mensagem_documentos}' class='btn'>AGENDAR VALIDAÇÃO</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
@@ -2426,7 +2445,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
-                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=VALIDAÇÃO%20CERTIFICADO%20DIGITAL&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:' class='btn'>{ui.campo_email_empresa.text()}</a></p>"
+                                f"      <p><a href='mailto:{ui.campo_email_empresa.text()}?subject=Agendamento%20de%20Validação&body=Olá%20{ui.campo_nome_agente.text().split()[0].capitalize()},%20gostaria%20de%20agendar%20a%20validação%20para%20meu%20certificado%20digital.%0A%0ACPF:%0AData:%0AHora:%0A%0A{mensagem_documentos}' class='btn'>AGENDAR VALIDAÇÃO</a></p>"
                                 f"      <p>Agradecemos pela confiança em nossos serviços e estamos à disposição para ajudá-lo!</p>"
                                 f"      <br>" 
                                 f"      <p>Atenciosamente,</p>"
@@ -2575,23 +2594,30 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
 
     def buscar_preco_certificado(self):
-        certificados = db.reference(f"Configuracoes/Certificados")
+        
+        if ui.campo_lista_versao_certificado.currentText() == "":
+            return
+        
+
+        certificados = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
+
         lista_certificados = certificados.get()
         certificado = ui.campo_lista_versao_certificado.currentText()
+        valor = lista_certificados["VALOR"]
 
-        if certificado in lista_certificados:
-            valor_do_certificado = float(lista_certificados[certificado]["VALOR"].replace(',', '.'))
-            ui.campo_preco_certificado_cheio.setText(f"{valor_do_certificado:,.2f}".replace('.', ',').replace(',', '.', 1))
+  
+        valor_do_certificado = float(valor.replace(',', '.'))
+        ui.campo_preco_certificado_cheio.setText(f"{valor_do_certificado:,.2f}".replace('.', ',').replace(',', '.', 1))
 
-            self.atualizar_campos_comissao()
+        self.atualizar_campos_comissao()
 
-            midias = ["cartão", "token"]
-            if any(midia in certificado.lower() for midia in midias):
-                ui.alerta_midia.setText("⚠️")
-                ui.alerta_midia.setToolTip("Certificado com Mídia\nLembre-se de pegar o endereço para envio")
-            else:
-                ui.alerta_midia.setText("")
-                ui.alerta_midia.setToolTip("")
+        midias = ["cartão", "token"]
+        if any(midia in certificado.lower() for midia in midias):
+            ui.alerta_midia.setText("⚠️")
+            ui.alerta_midia.setToolTip("Certificado com Mídia\nLembre-se de pegar o endereço para envio")
+        else:
+            ui.alerta_midia.setText("")
+            ui.alerta_midia.setToolTip("")
 
 
     def atualizar_campos_comissao(self):
@@ -2630,6 +2656,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 class AcoesBancoDeDados():
     def __init__(self, ui):
         self.ui = ui
+        self.certificados_ref = ref.child(f"Configuracoes/Certificados").get()
         
 
     def salvar_pedido(self):
@@ -2653,7 +2680,7 @@ class AcoesBancoDeDados():
             else:
                 self.salvar_temporario(novo_pedido_ref)
 
-            self.atualizar_ui(condic, pedido_existente)
+            self.atualizar_ui(condic)
 
         except Exception as e:
             print(e)
@@ -2887,7 +2914,7 @@ class AcoesBancoDeDados():
             janela.exec_()
 
 
-    def atualizar_ui(self, condic, pedido_existente):
+    def atualizar_ui(self, condic):
         if condic == 'DEFINITIVO':
             self.ui.campo_status_bd.setText("")
             self.ui.campo_status_bd.setToolTip("")
@@ -3000,8 +3027,6 @@ class AcoesBancoDeDados():
             self.limpar_labels()
             self.contar_verificacao()
             AlteracoesInterface.confirmar_label_excluir(self)
-
-
 
         except Exception as e:
             print(e)
@@ -3132,14 +3157,14 @@ class AcoesBancoDeDados():
 
 
     def carregar_dados(self):
-        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
-
+    
         try:
             num_pedido = ui.campo_pedido.text()
 
             if num_pedido == "":
                 return
 
+            self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
             pedido_ref = self.ref.child(num_pedido)
             pedido_data = pedido_ref.get()
 
@@ -3147,7 +3172,6 @@ class AcoesBancoDeDados():
 
                 self.preencher_dados(pedido_data)
 
-               
             else:  
                return 'Pedido nao existe'
 
@@ -3341,14 +3365,13 @@ class AcoesBancoDeDados():
         if hasattr(self, 'carregando_dados') and self.carregando_dados:
             return  # Se já estiver carregando, ignora o clique
 
-        
         try:
             self.carregando_dados = True
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
             
-            certificados_ref = ref.child(f"Configuracoes/Certificados")
-            certificados = certificados_ref.get()
+            #certificados_ref = ref.child(f"Configuracoes/Certificados")
+            certificados = self.certificados_ref
 
             pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA").start_at(data_inicial).end_at(data_final)
             pedidos = pedidos_ref.get()
@@ -3447,7 +3470,6 @@ class AcoesBancoDeDados():
                                             valor = certificados[versao]['VALOR']
                                             valor = float(valor.replace(',', '.')) 
                                             valor_venda += valor * (ui.campo_porcentagem_venda.value()/100)
-
 
                                 QApplication.processEvents()
                             except Exception as e:
@@ -3598,7 +3620,10 @@ class AcoesBancoDeDados():
         return iso_str
 
 
+    
+
     def abrir_janela_cadastro_usuario(self):
+        import re
         def cancelar():
             if janela.isVisible():
                 janela.close()
@@ -3606,7 +3631,7 @@ class AcoesBancoDeDados():
 
         janela = QDialog(self.ui.centralwidget)
         janela.setWindowTitle("Cadastro de Novo Usuário")
-        janela.setFixedSize(300, 320)
+        janela.setFixedSize(400, 420)
 
         fundo_cor = "rgb(60, 62, 84)"
         campo_texto_cor = "rgb(210, 210, 210)"
@@ -3618,7 +3643,8 @@ class AcoesBancoDeDados():
         botao_cancelar_hover = "rgb(255, 0, 0)"
         botao_cancelar_cor = "rgb(215, 0, 0)"
         
-        fonte_padrao = "Arial"  # Fonte padrão
+        fonte_padrao = "Arial" 
+        fonte_status =  "8pt"# Fonte padrão
         tamanho_fonte = "12pt"  # Tamanho da fonte
 
         janela.setStyleSheet(f"background-color: {fundo_cor}; color: {campo_texto_cor}; font-family: {fonte_padrao}; font-size: {tamanho_fonte};")
@@ -3645,23 +3671,35 @@ class AcoesBancoDeDados():
 
         layout.addLayout(layout_usuario_input)
 
-                            
         ref = db.reference("/Usuario")
         usuarios_existentes = ref.get()
 
         def verificar_usuario():
             nome_digitado = self.input_usuario.text().strip()
+            
+            # Verificando se o nome de usuário contém caracteres inválidos para o Firebase
+            if any(char in nome_digitado for char in ['.', '#', '$', '[', ']', '/']):
+                self.label_status_usuario.setText("Caractere inválido no nome de usuário.")
+                self.label_status_usuario.setStyleSheet(f"color: rgb(255, 0, 0); font-size: {fonte_status}")
+                return
+
+            # Verificando o formato do usuário (nome_sobrenome@aux)
+            if not re.match(r"^[a-zA-Z]+_[a-zA-Z]+@aux$", nome_digitado):
+                self.label_status_usuario.setText("Formato inválido. Exemplo: nome_sobrenome@aux")
+                self.label_status_usuario.setStyleSheet(f"color: rgb(255, 0, 0);font-size: {fonte_status}")
+                return
+
             if nome_digitado:
                 try:
                     if usuarios_existentes and nome_digitado in usuarios_existentes:
                         self.label_status_usuario.setText("Usuário já existe")
-                        self.label_status_usuario.setStyleSheet("color: rgb(255, 0, 0);")
+                        self.label_status_usuario.setStyleSheet(f"color: rgb(255, 0, 0);font-size: {fonte_status}")
                     else:
                         self.label_status_usuario.setText("Usuário disponível")
-                        self.label_status_usuario.setStyleSheet("color: rgb(0, 255, 0);")
+                        self.label_status_usuario.setStyleSheet(f"color: rgb(0, 255, 0);font-size: {fonte_status}")
                 except Exception as e:
                     self.label_status_usuario.setText("Erro na verificação")
-                    self.label_status_usuario.setStyleSheet("color: rgb(255, 165, 0);")
+                    self.label_status_usuario.setStyleSheet(f"color: rgb(255, 165, 0);font-size: {fonte_status}")
             else:
                 self.label_status_usuario.setText("")
 
@@ -3669,7 +3707,7 @@ class AcoesBancoDeDados():
 
         spacer = QSpacerItem(10, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(spacer)
-        
+
         label_nome_agente = QLabel("Nome Completo do Agente:")
         self.input_nome = QLineEdit()
         self.input_nome.setStyleSheet(
@@ -3822,6 +3860,7 @@ class AcoesBancoDeDados():
 
         janela.setLayout(layout)
         janela.exec_()
+
 
 
 
@@ -4112,6 +4151,9 @@ janela.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint)
 janela.move(x, y)
 janela.setWindowTitle("Auxiliar")
 janela.setFixedSize(151, 50)
+
+atualizar = Atualizar()
+atualizar.verificar_atualizacao()
 
 janelaLogin = LoginWindow(janela,ui)        
 janelaLogin.show()

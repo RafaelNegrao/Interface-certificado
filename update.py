@@ -8,7 +8,7 @@ from PyQt5.QtWidgets import QMessageBox, QProgressDialog
 class Atualizar:
     def __init__(self, parent=None):
         self.parent = parent
-        self.versao = "1.0.27" 
+        self.versao = "1.0.29" 
 
 
     def verificar_atualizacao(self):
@@ -33,6 +33,7 @@ class Atualizar:
 
 
     def mostrar_janela_confirmacao(self, ultima_versao, download_url):
+        
         msg_box = QMessageBox(self.parent)
         msg_box.setIcon(QMessageBox.Information)
         msg_box.setWindowTitle("Atualização disponível")
