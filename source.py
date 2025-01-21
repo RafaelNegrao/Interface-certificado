@@ -4547,8 +4547,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 # Atualizar o arquivo de atualização local
                 data_hora_atual = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 conteudo_atualizacao = {
-                    "DataHora": data_hora_atual,
-                    "UltimaAtualizacaoFirebase": data_hora_atual
+                    "DataHora": data_hora_atual
                 }
 
                 with open(caminho_atualizacao, "w", encoding="utf-8") as arquivo:

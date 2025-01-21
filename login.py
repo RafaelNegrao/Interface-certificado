@@ -455,7 +455,7 @@ class LoginWindow(QMainWindow):
             # Ler o arquivo local de atualização
             with open(caminho_atualizacao, "r", encoding="utf-8") as arquivo:
                 conteudo_local = json.load(arquivo)
-                ultima_atualizacao_local = conteudo_local.get("UltimaAtualizacaoFirebase")
+                ultima_atualizacao_local = conteudo_local.get("DataHora")
         except Exception as e:
             print(f"Erro ao ler o arquivo de atualização local: {e}")
             return False
