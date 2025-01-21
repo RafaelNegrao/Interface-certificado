@@ -1,4 +1,5 @@
 
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -2266,6 +2267,27 @@ class Ui_janela(object):
         self.campo_grafico_uf.setGeometry(QtCore.QRect(-40, -16, 644, 581))
         self.campo_grafico_uf.setObjectName("campo_grafico_uf")
         self.tabWidget_2.addTab(self.tab_10, "")
+        self.tab_12 = QtWidgets.QWidget()
+        self.tab_12.setObjectName("tab_12")
+        self.campo_grafico_clientes_recorrentes = QtWidgets.QWidget(self.tab_12)
+        self.campo_grafico_clientes_recorrentes.setGeometry(QtCore.QRect(0, -14, 595, 529))
+        self.campo_grafico_clientes_recorrentes.setObjectName("campo_grafico_clientes_recorrentes")
+        self.campo_comentario_6 = QtWidgets.QTextEdit(self.tab_12)
+        self.campo_comentario_6.setEnabled(False)
+        self.campo_comentario_6.setGeometry(QtCore.QRect(1, 506, 560, 42))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(9)
+        self.campo_comentario_6.setFont(font)
+        self.campo_comentario_6.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_comentario_6.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.campo_comentario_6.setStyleSheet("border-radius:7px;\n"
+"\n"
+"background-color:rgb(60,62, 84);\n"
+"color:rgb(230,230,230)")
+        self.campo_comentario_6.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.campo_comentario_6.setObjectName("campo_comentario_6")
+        self.tabWidget_2.addTab(self.tab_12, "")
         self.campo_data_meta = QtWidgets.QDateEdit(self.tab_2)
         self.campo_data_meta.setEnabled(True)
         self.campo_data_meta.setGeometry(QtCore.QRect(237, 25, 103, 31))
@@ -2313,17 +2335,6 @@ class Ui_janela(object):
         self.label_36.setStyleSheet("background-color:transparent;\n"
 "color:rgb(170,170,170)")
         self.label_36.setObjectName("label_36")
-        self.label_62 = QtWidgets.QLabel(self.tab_2)
-        self.label_62.setGeometry(QtCore.QRect(512, 69, 83, 21))
-        font = QtGui.QFont()
-        font.setFamily("Consolas")
-        font.setBold(False)
-        font.setWeight(50)
-        self.label_62.setFont(font)
-        self.label_62.setStyleSheet("background-color:rgb(40, 45, 50);\n"
-"")
-        self.label_62.setText("")
-        self.label_62.setObjectName("label_62")
         self.tabWidget.addTab(self.tab_2, "")
         self.tab = QtWidgets.QWidget()
         self.tab.setObjectName("tab")
@@ -2504,7 +2515,7 @@ class Ui_janela(object):
         self.label_42.setObjectName("label_42")
         self.campo_telefone_sac_cliente = QtWidgets.QLineEdit(self.groupBox_6)
         self.campo_telefone_sac_cliente.setEnabled(True)
-        self.campo_telefone_sac_cliente.setGeometry(QtCore.QRect(207, 77, 279, 24))
+        self.campo_telefone_sac_cliente.setGeometry(QtCore.QRect(207, 77, 200, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2564,7 +2575,7 @@ class Ui_janela(object):
         self.campo_dias_renovacao.setObjectName("campo_dias_renovacao")
         self.campo_verifica_tela_cheia = QtWidgets.QLineEdit(self.groupBox_6)
         self.campo_verifica_tela_cheia.setEnabled(True)
-        self.campo_verifica_tela_cheia.setGeometry(QtCore.QRect(108, 131, 58, 24))
+        self.campo_verifica_tela_cheia.setGeometry(QtCore.QRect(428, 78, 58, 24))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2599,7 +2610,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_41.setObjectName("label_41")
         self.label_9 = QtWidgets.QLabel(self.groupBox_6)
-        self.label_9.setGeometry(QtCore.QRect(108, 122, 61, 10))
+        self.label_9.setGeometry(QtCore.QRect(428, 69, 61, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
@@ -2611,7 +2622,7 @@ class Ui_janela(object):
 "color:rgb(170,170,170)")
         self.label_9.setObjectName("label_9")
         self.campo_porcentagem_transparencia = QtWidgets.QSpinBox(self.groupBox_6)
-        self.campo_porcentagem_transparencia.setGeometry(QtCore.QRect(184, 128, 86, 28))
+        self.campo_porcentagem_transparencia.setGeometry(QtCore.QRect(138, 128, 86, 28))
         font = QtGui.QFont()
         font.setFamily("Calibri")
         font.setPointSize(12)
@@ -2632,11 +2643,11 @@ class Ui_janela(object):
         self.campo_porcentagem_transparencia.setMaximum(100)
         self.campo_porcentagem_transparencia.setObjectName("campo_porcentagem_transparencia")
         self.checkBox_transparecer = QtWidgets.QCheckBox(self.groupBox_6)
-        self.checkBox_transparecer.setGeometry(QtCore.QRect(252, 134, 19, 17))
+        self.checkBox_transparecer.setGeometry(QtCore.QRect(206, 134, 19, 17))
         self.checkBox_transparecer.setText("")
         self.checkBox_transparecer.setObjectName("checkBox_transparecer")
         self.label_58 = QtWidgets.QLabel(self.groupBox_6)
-        self.label_58.setGeometry(QtCore.QRect(182, 122, 100, 10))
+        self.label_58.setGeometry(QtCore.QRect(136, 122, 100, 10))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setPointSize(7)
@@ -3656,7 +3667,7 @@ class Ui_janela(object):
         self.campo_m6.setObjectName("campo_m6")
         self.gridLayout.addWidget(self.campo_m6, 5, 0, 1, 1)
         self.label_versao = QtWidgets.QLabel(self.centralwidget)
-        self.label_versao.setGeometry(QtCore.QRect(508, 52, 84, 16))
+        self.label_versao.setGeometry(QtCore.QRect(508, 56, 84, 16))
         font = QtGui.QFont()
         font.setFamily("Segoe UI")
         font.setPointSize(8)
@@ -3913,8 +3924,14 @@ class Ui_janela(object):
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">Descrição do gráfico</span>:<br />Este gráfico exibe a porcentagem de pedidos que foram aprovados pelo agente, considerando todos os pedidos recebidos, tanto por vídeo conferência quanto presencial. A taxa de aprovação indica a probabilidade de sucesso na validação do pedido.</p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">O que isso significa</span>:<br />Por exemplo, se a taxa de aprovação for de 80%, isso significa que o cliente tem 80% de chance de seu pedido ser aprovado.</p></body></html>"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_9), _translate("janela", "Indice de Aprovação"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_10), _translate("janela", " UF"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_9), _translate("janela", "I. Aprovação"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_10), _translate("janela", "UF"))
+        self.campo_comentario_6.setHtml(_translate("janela", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Gráfico que apresenta a quantidade de pedidos <span style=\" font-weight:600;\">APROVADOS</span> agrupados por <span style=\" font-weight:600;\">CPF</span>, considerando todos os registros no banco de dados.</p></body></html>"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_12), _translate("janela", "Clientes Recorrentes"))
         self.campo_data_meta.setDisplayFormat(_translate("janela", "MM/yyyy"))
         self.label_36.setText(_translate("janela", "DATA REFERÊNCIA"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("janela", "Indicadores"))

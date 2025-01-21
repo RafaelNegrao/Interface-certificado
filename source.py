@@ -1100,6 +1100,96 @@ class FuncoesPadrao:
 
 #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+
+                try:
+                    layout_recorrente = ui.campo_grafico_clientes_recorrentes.layout()
+                    if layout_recorrente:
+                        # Remover widgets do layout atual
+                        for i in reversed(range(layout_recorrente.count())):
+                            widget = layout_recorrente.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        # Definir um novo layout vazio
+                        QtWidgets.QWidget().setLayout(layout_recorrente)
+
+                    # Configurações visuais
+                    cor_barras = "salmon"
+                    cor_fundo = (60 / 255, 62 / 255, 84 / 255)
+                    fonte_cor = "white"
+
+                    # Contagem de clientes recorrentes e mapeamento do primeiro nome
+                    clientes_recorrentes = defaultdict(int)
+                    cpf_para_nome = {}
+
+                    for pedido_info in Pedidos.values():
+                        if pedido_info.get('STATUS') == "APROVADO":
+                            cpf = pedido_info.get('CPF')
+                            nome = pedido_info.get('NOME', 'Desconhecido').strip().split()[0]  # Extrair apenas o primeiro nome
+                            if cpf and cpf != "XXX-XX":
+                                clientes_recorrentes[cpf] += 1
+                                if cpf not in cpf_para_nome:
+                                    cpf_para_nome[cpf] = nome  # Registrar o primeiro nome associado ao CPF
+
+                    # Ordenar e limitar aos 10 principais
+                    clientes_recorrentes = dict(sorted(clientes_recorrentes.items(), key=lambda x: x[1], reverse=True)[:10])
+
+                    # Dados para o gráfico
+                    nomes = [cpf_para_nome[cpf] for cpf in clientes_recorrentes.keys()]
+                    quantidades = list(clientes_recorrentes.values())
+                    cpfs = list(clientes_recorrentes.keys())
+
+                    # Reverter para exibição correta no gráfico horizontal
+                    nomes = nomes[::-1]
+                    quantidades = quantidades[::-1]
+                    cpfs = cpfs[::-1]
+
+                    # Criar o gráfico
+                    fig, ax = plt.subplots(figsize=(14, 8))
+                    fig.patch.set_facecolor(cor_fundo)
+                    ax.set_facecolor(cor_fundo)
+
+                    barras = ax.barh(nomes, quantidades, color=cor_barras)
+
+                    # Adicionar cursor para exibir informações detalhadas
+                    cursor = mplcursors.cursor(barras, hover=True)
+                    cursor.connect(
+                        "add",
+                        lambda sel: sel.annotation.set_text(
+                            f'Nome: {nomes[sel.index]}\nCPF: {cpfs[sel.index]}\nQuantidade: {quantidades[sel.index]}'
+                        )
+                    )
+
+                    # Configurações do gráfico
+                    ax.set_title(
+                        "TOP 10 CLIENTES RECORRENTES",
+                        fontsize=16,
+                        fontname="Segoe UI",
+                        fontweight="bold",
+                        color=fonte_cor,
+                    )
+                    ax.set_xlabel("Quantidade de Pedidos", fontsize=12, color=fonte_cor)
+                    ax.tick_params(axis='x', labelsize=10, colors=fonte_cor)
+                    ax.tick_params(axis='y', labelsize=7, colors=fonte_cor)
+
+                    # Adicionar gráfico ao layout
+                    new_layout = QtWidgets.QVBoxLayout()
+                    new_layout.addWidget(FigureCanvas(fig))
+                    ui.campo_grafico_clientes_recorrentes.setLayout(new_layout)
+                    ui.campo_grafico_clientes_recorrentes.lower()
+
+                except Exception as e:
+                    print(f"Erro ao plotar o gráfico de clientes recorrentes: {e}")
+
+
+
+
+
+
+
+
+
+
         except Exception as e:
             print(f"{e}")
 
@@ -1253,17 +1343,35 @@ class FuncoesPadrao:
         #transformei o texto em um diretório
         caminho_pasta = os.path.join(diretorio, nome_pasta)
         return os.path.exists(caminho_pasta)
-
+ 
 
     def abrir_pasta_cliente(self):
-        try:
-            QDesktopServices.openUrl(QUrl.fromLocalFile(ui.caminho_pasta.text()))
-            AlteracoesInterface.confirmar_label_criar_pasta(self)
+        caminho_pasta = ui.caminho_pasta.text()
 
+        try:
+            # Tenta abrir o caminho fornecido
+            QDesktopServices.openUrl(QUrl.fromLocalFile(caminho_pasta))
             
-        except:
-            AlteracoesInterface.negar_label_criar_pasta(self)
-            return
+            # Aqui tentamos listar o conteúdo da pasta para verificar se conseguimos realmente acessar
+            if not os.path.isdir(caminho_pasta):
+                raise FileNotFoundError(f"O caminho {caminho_pasta} não é acessível ou está incorreto.")
+            
+            AlteracoesInterface.confirmar_label_criar_pasta(self)
+        except Exception as e:
+            # Caso não consiga abrir a pasta ou ocorrer qualquer erro
+            # Irei criar a pasta novamente
+            pasta_principal = ui.caminho_pasta_principal.text()
+            nome_pasta = ui.caminho_pasta.text().split("\\")[-1]  # Pega o nome da pasta do caminho atual
+
+            novo_caminho = os.path.join(pasta_principal, nome_pasta)
+            if not os.path.exists(novo_caminho):
+                os.makedirs(novo_caminho)
+
+            ui.caminho_pasta.setText(novo_caminho)
+
+            AlteracoesInterface.confirmar_label_criar_pasta(self)
+            self.mensagem_alerta("Nova Pasta Criada", f"A nova pasta foi criada em: {novo_caminho}")
+            self.salvar_pedido()
 
 
     def criar_pasta_cliente(self):
@@ -1321,11 +1429,10 @@ class FuncoesPadrao:
                     return
                 nome_pasta = f'{str(ui.campo_pedido.text())}-{ui.campo_nome.text()}'
 
-            diretorio_padrão = ui.caminho_pasta_principal.text()
-            pasta_padrão = os.path.join(diretorio_padrão, nome_pasta)
+            pasta_padrão = os.path.join(pasta_principal, nome_pasta)
 
 
-            if not self.pasta_existe(diretorio_padrão, nome_pasta):
+            if not self.pasta_existe(pasta_principal, nome_pasta):
                 
                 os.mkdir(pasta_padrão)
                 pasta_padrão = pasta_padrão.replace("/", "\\")
@@ -1338,12 +1445,33 @@ class FuncoesPadrao:
                 else:
                     AlteracoesInterface.confirmar_label_criar_pasta(self)
 
-                self.acoes.salvar_pedido()
-            #Caso exista, abra
+                self.salvar_pedido()
+
+
+
+            elif self.pasta_existe(pasta_principal, nome_pasta):
+                try:
+                    # Testa acesso à pasta tentando listar o conteúdo
+                    self.abrir_pasta_cliente()
+                except:
+                    # Se houver erro de permissão, recria a pasta
+                    os.mkdir(pasta_padrão)
+                    pasta_padrão = pasta_padrão.replace("/", "\\")
+                    ui.caminho_pasta.setText("")
+                    ui.caminho_pasta.setText(pasta_padrão)
+
+                    status = self.alteracao_status()
+
+                    if status == "APROVADO" or status == "CANCELADO":
+                        AlteracoesInterface.zerar_label_criar_pasta(self)
+                    else:
+                        AlteracoesInterface.confirmar_label_criar_pasta(self)
+
+                    self.salvar_pedido()
             else:
                 self.abrir_pasta_cliente()
-        except Exception as e:
-            print(e)
+        except Exception as e:        
+            self.mensagem_alerta("Pasta não criada","O diretório da pasta raiz pode estar incorreto")
             AlteracoesInterface.negar_label_criar_pasta(self)
 
 
@@ -1637,6 +1765,38 @@ class FuncoesPadrao:
     def formatar_data_agendamento(self):
         data_agendamento = ui.campo_data_agendamento.date()
         data_atual = QDate.currentDate()
+
+        # Converter a string "01/01/2000" em um objeto QDate
+        data_referencia = QDate(2000, 1, 1)
+
+        if data_agendamento == data_referencia:
+            ui.campo_data_agendamento.setStyleSheet(
+                """
+                QDateEdit {
+                    border: none;
+                    border-bottom: 1px solid rgb(90, 54, 247);
+                    border-radius: 0;
+                    background-color: rgb(60, 62, 84);
+                    color: rgb(255,255,255)
+                }
+
+                QDateEdit:disabled, QDateEdit:!focus {
+                    border-bottom: 1px solid rgb(120, 120, 120);
+                }
+
+                QDateEdit::up-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+
+                QDateEdit::down-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+                """
+            )
 
         if data_agendamento < data_atual:
             ui.campo_data_agendamento.setStyleSheet(
@@ -1957,7 +2117,8 @@ class FuncoesPadrao:
             'campo_rg',
             'campo_nome_mae',
             'campo_nome',
-            'campo_pis'
+            'campo_pis',
+            'campo_funcional'
 
         ]
 
@@ -2679,7 +2840,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             return
 
         try:
-            if not self.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
+            if not self.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa para certificados que vencem entre:\n {datetime.date.today().strftime('%d/%m/%Y')}  e  {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
 
                 return
 
@@ -2692,12 +2853,31 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             ui.tableWidget.setColumnWidth(3, 115)
             ui.tableWidget.setColumnWidth(4, 187)  
 
-            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
-            pedidos = pedidos_ref.get()
 
-            ref_link_venda = db.reference(f"Configuracoes/Certificados")
+            # Tenho que adaptar o get do firebase para o json local
+            try:
+                caminho_arquivo = os.path.join(self.pasta_local, f"{ui.campo_usuario.currentText()}.json")
+                    
+                with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo_json:
+                    dados_json = json.load(arquivo_json)
+                    
+                    if "Dados" in dados_json and "Pedidos" in dados_json["Dados"]:
+                        pedidos_ref = dados_json["Dados"]["Pedidos"]
+                        pedidos = {key: value for key, value in pedidos_ref.items() if value.get("STATUS") == "APROVADO"}
+                    else:
+                        self.mensagem_alerta("Erro", "Estrutura de dados 'Dados > Pedidos' não encontrada no JSON.")
+                        return
+            except FileNotFoundError:
+                self.mensagem_alerta("Erro", "Arquivo JSON de pedidos não encontrado.")
+                return
+            except json.JSONDecodeError:
+                self.mensagem_alerta("Erro", "Erro ao decodificar o arquivo JSON de pedidos.")
+                return
 
-            lista_certificados = ref_link_venda.get()
+
+            #ref_link_venda = db.reference(f"Configuracoes/Certificados")
+
+            lista_certificados = self.certificados_ref
             range_validacao = ui.campo_dias_renovacao.value()
 
             if not pedidos:
@@ -2752,26 +2932,42 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 if not cliente_email:
                     motivo = "SEM EMAIL CADASTRADO"
                     ne += 1
+
                 elif not pedido_info.get("VERSAO"):
                     motivo = "SEM PRODUTO CADASTRADO"
                     ne += 1
+
                 elif pedido_info["STATUS"] != "APROVADO":
                     motivo = "PEDIDO NÃO APROVADO"
                     ne += 1
+
                 elif not (0 <= diferenca <= range_validacao):
                     motivo = "FORA DO PRAZO DE RENOVAÇÃO"
                     ne += 1
+
                 elif email_ja_enviado == "SIM":
                     motivo = "EMAIL JÁ ENVIADO"
                     ne += 1
+
                 else:
                     motivo = "ENVIADO COM SUCESSO"
                     enviado = "✅"
                     enviar_email = True
                     env += 1
 
+                    #NÃO ALTERE ESSA PARTE
                     ref.child(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos/").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
-
+                    # Atualiza o campo "EMAIL RENOVACAO" no pedido específico no JSON local
+                    if "Dados" in dados_json and "Pedidos" in dados_json["Dados"]:
+                        pedidos_ref = dados_json["Dados"]["Pedidos"]
+                        
+                        # Verifica se o pedido existe e faz a atualização
+                        if pedido_info["PEDIDO"] in pedidos_ref:
+                            pedidos_ref[pedido_info["PEDIDO"]]["EMAIL RENOVACAO"] = "SIM"
+                            
+                            # Salva o arquivo atualizado
+                            with open(caminho_arquivo, 'w', encoding='utf-8') as arquivo_json:
+                                json.dump(dados_json, arquivo_json, ensure_ascii=False, indent=4)
 
                 row_position = ui.tableWidget.rowCount()
                 ui.tableWidget.insertRow(row_position)
@@ -2798,7 +2994,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
                 QApplication.processEvents()
                 
-                # VERIFICA SE ENVIA OU NÃO O EMAIL
                 if not enviar_email or pedido_info["VERSAO"] not in lista_certificados:
                     progresso_atual += 1
                     ui.barra_progresso_consulta.setValue(progresso_atual)
@@ -2822,23 +3017,20 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                         cor_botao_texto = "#FFFFFF"
                         tamanho_fonte_footer = "12px"
 
-                        if "CNPJ" in pedido_info["VERSAO"]:
-                            nome_botao = "Agendar Validação do meu e-CNPJ"
-                            # Mensagem para CNPJ
+                        if "CNPJ" in pedido_info["VERSAO"]:                        
                             mensagem_documentos = (
                                 "*IMPORTANTE"
                                 "%0APara que possamos agilizar o processo de validação, peço que anexe em resposta a esse e-mail uma foto (frente e verso) do seu documento de identificação e uma cópia do documento de constituição da empresa."
                             )
+
                         elif "CPF" in pedido_info["VERSAO"]:
-                            # Mensagem para CPF
-                            nome_botao = "Agendar Validação do meu e-CPF"
                             mensagem_documentos = (
                                 "*IMPORTANTE"
                                 "%0APara que possamos agilizar o processo de validação, peço que anexe em resposta a esse e-mail uma foto (frente e verso) do seu documento de identificação."
                             )
 
-                        if diferenca > 0:
-                            # CERTIFICADO VÁLIDO
+                        if diferenca > 0 and diferenca:
+   
                             corpo_html = (
                                 f"<!DOCTYPE html>"
                                 f"<html lang='pt-BR'>"
@@ -2888,7 +3080,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                             )
                         
                         elif diferenca == 0:
-                            # VENCE HOJE
+                            
                             corpo_html = (
                                 f"<!DOCTYPE html>"
                                 f"<html lang='pt-BR'>"
@@ -2919,7 +3111,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 f"      <p>Sou {nome}, agente de Registro da ACB Digital.</p>"
                                 f"      <p>Fizemos a validação para seu certificado digital, modelo"
                                 f"      <p><b>{pedido_info['VERSAO']}</b> no dia <b>{data_formatada_validacao}</b>.</p>"
-                                f"      <p>Verifiquei que ele vence <b>Hoje</b> e entendemos a importância do certificado digital para seus negócios.</p>"
+                                f"      <p>Verifiquei que ele vence <b>HOJE</b> e entendemos a importância do certificado digital para seus negócios.</p>"
                                 f"      <p>Para agilizar o processo de renovação, oferecemos a opção de renovar clicando no botão abaixo.</p>"
                                 f"      <p><a href='{link_venda}' class='btn'>RENOVAR AGORA</a></p>"
                                 f"      <p>Caso queira fazer a vídeo conferência, contate-me através do email:</p>"
@@ -2950,9 +3142,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                                 smtp_server.login(remetente, senha)
                                 smtp_server.sendmail(remetente, destinatarios, msg.as_string())
 
-                            
-
-
                             progresso_atual += 1
                             ui.barra_progresso_consulta.setValue(progresso_atual)
                             QApplication.processEvents()  # Atualiza a barra de progresso
@@ -2960,10 +3149,12 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                         except smtplib.SMTPException as e:
                             ui.barra_progresso_consulta.setVisible(False)
                             QApplication.processEvents()  # Atualiza a barra de progresso
+            
             QApplication.processEvents() 
             ui.barra_progresso_consulta.setVisible(False)
             ui.campo_relatorio.setPlainText(f"Processo finalizado!\nEnviados: {env}\nNão enviado: {ne}\nErro: {erro}")  
-        except:
+        except Exception as e:
+            print(f'{e}')
             pass
 
 
@@ -3126,9 +3317,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
         ui.campo_preco_certificado.setToolTip(tooltip_text)
         
 
-
-
-
     def salvar_pedido(self):
         self.ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos")
         try:
@@ -3178,20 +3366,14 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
     def atualizar_hora_da_ultima_alteracao(self,data_hora):
         self.atualizacao = db.reference(f"Usuario/{ui.campo_usuario.currentText()}")
-
         nova_atualizacao = {"Ultima Atualizacao": data_hora}
         try:
-            # Tenta atualizar as metas no banco de dados
             self.atualizacao.update(nova_atualizacao)
-            print("Metas atualizadas com sucesso.")
         except Exception as e:
-            # Se ocorrer um erro, tenta adicionar as novas metas
             try:
                 self.atualizacao.set(nova_atualizacao)
-                print("Novas metas adicionadas com sucesso.")
             except Exception as e:
-                print(f"Erro ao atualizar ou adicionar metas: {e}")
-
+                pass
 
 
     def salvar_dados_localmente(self, num_pedido, data_hora):
@@ -3235,14 +3417,10 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             with open(caminho_atualizacao, 'w', encoding='utf-8') as arquivo_atualizacao:
                 json.dump(conteudo_atualizacao, arquivo_atualizacao, ensure_ascii=False, indent=4)
 
-            print("Dados salvos e arquivo de atualização atualizado.")
+            print("Dados salvos no Firebase e arquivo local atualizado.")
 
         except Exception as e:
             print(f"Erro ao salvar dados localmente: {e}")
-
-
-
-
 
 
     def baixar_banco_de_dados_firebase(self, pasta_local):
@@ -3272,6 +3450,8 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 print("Nenhum dado encontrado no Firebase para o usuário especificado.")
         except Exception as e:
             print(f"Erro ao baixar o banco de dados: {e}")
+
+            
 
 
     def verificar_midia(self):
@@ -3921,6 +4101,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                     self.ui.groupBox_status.findChild(QtWidgets.QRadioButton, "rb_cancelado").setChecked(True)
                     self.alteracao_status()
 
+            self.formatar_data_agendamento()
             AlteracoesInterface.label_status_bd_atualizado(self)
 
             
@@ -4488,35 +4669,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             print(f"Erro ao acessar o arquivo: {e}")
 
 
-    # def verificar_e_excluir_json(self):
-    #     try:
-    #         # Define a pasta de dados e o nome do arquivo do usuário atual
-    #         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
-    #         usuario = self.ui.campo_usuario.currentText().strip()
-    #         arquivo_usuario = f"{usuario}.json"
-
-    #         # Listar todos os arquivos na pasta
-    #         arquivos_existentes = [f for f in os.listdir(pasta_dados)]
-    #         arquivos_a_remover = [
-    #             os.path.join(pasta_dados, f)
-    #             for f in arquivos_existentes
-    #             if f.endswith(".json") and f != "login_data.json" and f != "ultima_atualizacao.json" and f != arquivo_usuario]
-    #         # Se houver arquivos a remover
-    #         if arquivos_a_remover:
-    #             for arquivo in arquivos_a_remover:
-    #                 os.remove(arquivo)  
-    #                 print(f"Arquivo {arquivo} removido.")
-
-    #             # Baixar o banco de dados correspondente ao usuário atual
-    #             self.baixar_banco_de_dados_firebase(pasta_dados)
-    #             print(f"Novo banco {arquivo_usuario} baixado.")
-    #         else:
-    #             print("Nenhum arquivo adicional encontrado. Prosseguindo sem baixar.")
-
-    #     except Exception as e:
-    #         print(f"Erro ao verificar ou excluir arquivos JSON: {e}")
-
-
     def verificar_e_excluir_json(self):
         try:
             # Define a pasta de dados e o nome do arquivo do usuário atual
@@ -4784,6 +4936,7 @@ ui.campo_nome.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_no
 ui.campo_pis.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_pis")
 ui.campo_telefone.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_telefone")
 ui.campo_funcional.mousePressEvent = lambda event: funcoes_app.copiar_campo("campo_funcional")
+
 ui.campo_preco_certificado.setReadOnly(False)
 ui.campo_preco_certificado_cheio.setReadOnly(False)
 ui.tabela_documentos.setEditTriggers(QTableWidget.NoEditTriggers)

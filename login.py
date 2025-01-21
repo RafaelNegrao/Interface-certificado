@@ -428,6 +428,8 @@ class LoginWindow(QMainWindow):
         except Exception as e:
             print(f"Erro ao baixar banco de dados: {e}")
 
+            
+
 
 
     def atualizar_hora_atualizacao(self,hora_atual):
