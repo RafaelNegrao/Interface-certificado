@@ -16,6 +16,7 @@ from firebase_admin import db
 from update import Atualizar
 import os
 import json
+import datetime
 
 ref = db.reference("/")
 
@@ -38,7 +39,7 @@ class LoginWindow(QMainWindow):
         self.cor_login = "rgb(210, 210, 210)"
 
         self.setWindowTitle("Login")
-        self.setFixedSize(350, 320)
+        self.setFixedSize(300, 320)
 
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
@@ -244,46 +245,230 @@ class LoginWindow(QMainWindow):
         self.animacao_botao.start()
 
     def mostrar_label_sucesso(self):
+        """Exibe a mensagem de sucesso ao fazer login e verifica o banco de dados local."""
         self.botao_login.hide()
         self.label_mensagem.setText("✅")
         self.label_mensagem.setStyleSheet("font-size: 30px; color: green; font-family: Calibri;")
         self.label_mensagem.setWindowOpacity(0)
         self.label_mensagem.show()
 
+        # Animação da label de sucesso
         self.animacao_label = QPropertyAnimation(self.label_mensagem, b"windowOpacity")
         self.animacao_label.setDuration(300)
         self.animacao_label.setStartValue(0)
         self.animacao_label.setEndValue(1)
-        self.animacao_label.finished.connect(self.abrir_proxima_janela)
+
+        # Conectar o fim da animação para verificar e abrir a próxima janela
+        self.animacao_label.finished.connect(self.verificar_banco_e_abrir_proxima_janela)
         self.animacao_label.start()
 
+
+
+
+
+
+    def verificar_banco_e_abrir_proxima_janela(self):
+        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+        usuario = self.campo_usuario.text().strip()
+        caminho_banco = os.path.join(pasta_dados, f"{usuario}.json")
+        caminho_atualizacao = os.path.join(pasta_dados, "ultima_atualizacao.json")
+        data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        try:
+            # Situação 1: A pasta não existe
+            if not os.path.exists(pasta_dados):
+                os.makedirs(pasta_dados)  # Cria a pasta
+                print("Pasta criada.")
+                self.baixar_banco_de_dados_firebase(pasta_dados, data_hora)  # Baixa o banco
+                self.criar_arquivo_ultima_atualizacao(caminho_atualizacao, data_hora)  # Cria o arquivo de atualização
+                print("Banco de dados baixado e arquivo de atualização criado.")
+            else:
+                # Situação 2: Verificar se é necessário atualizar o banco
+                
+                if not self.comparar_ultima_atualizacao(pasta_dados, caminho_banco, caminho_atualizacao):
+                    print("Banco de dados desatualizado. Atualizando...")
+                    self.baixar_banco_de_dados_firebase(pasta_dados, data_hora)
+                    self.criar_arquivo_ultima_atualizacao(caminho_atualizacao, data_hora)
+                    print("Banco de dados atualizado com sucesso.")
+                else:
+                    print("Banco de dados já está sincronizado. Nenhuma ação necessária.")
+        except Exception as e:
+            print(f"Erro ao verificar ou atualizar o banco de dados: {e}")
+
+        # Após verificar, abrir a próxima janela
+        self.abrir_proxima_janela()
+
+
+
+
+    def criar_arquivo_ultima_atualizacao(self, caminho, data_hora):
+        try:
+            ultima_atualizacao = self.atualizacao.get()
+            
+            conteudo = {"DataHora": data_hora}
+
+
+            self.atualizacao = db.reference(f"Usuario/{self.campo_usuario.text()}")
+
+            if ultima_atualizacao:
+                conteudo["UltimaAtualizacaoFirebase"] = ultima_atualizacao
+
+            with open(caminho, "w", encoding="utf-8") as arquivo:
+                json.dump(conteudo, arquivo, ensure_ascii=False, indent=4)
+            print("Arquivo de atualização criado com sucesso.")
+
+            self.atualizar_hora_atualizacao(data_hora)
+
+        except Exception as e:
+            print(f"Erro ao criar o arquivo de atualização: {e}")
+
+
+
+
+    def atualizar_banco_de_dados_local(self, pasta_local, caminho_banco):
+        """Atualiza o banco de dados local com os dados mais recentes do Firebase."""
+        usuario = self.campo_usuario.text().strip()
+        ref_banco = db.reference(f"Usuario/{usuario}")
+
+        try:
+            # Obtém os dados mais recentes do Firebase
+            dados_banco = ref_banco.get()
+            if dados_banco:
+                with open(caminho_banco, 'w', encoding='utf-8') as f:
+                    json.dump(dados_banco, f, ensure_ascii=False, indent=4)
+                print(f"Banco de dados {usuario}.json atualizado localmente.")
+            else:
+                print("Nenhum dado encontrado no Firebase para atualizar.")
+        except Exception as e:
+            print(f"Erro ao atualizar o banco de dados local: {e}")
+
+
+
+
+
+    def carregar_lista_usuario(self):
+        """Carrega a lista de usuários do Firebase e atualiza o campo de usuário."""
+        usuarios_ref = db.reference("Usuario")
+        usuarios = usuarios_ref.get()
+        nomes_usuarios = list(usuarios.keys()) if usuarios else []
+
+        self.ui.campo_usuario.clear()
+        for nome in nomes_usuarios:
+            self.ui.campo_usuario.addItem(nome)
+
+
+
+
     def abrir_proxima_janela(self):
-        """Fecha a janela de login e abre a próxima janela."""
-        self.ui.campo_usuario.setText(self.campo_usuario.text().strip())
+        """Carrega os dados do usuário e abre a próxima janela."""
+        self.carregar_lista_usuario()
+
+        self.ui.campo_usuario.setCurrentText(self.campo_usuario.text().strip())
         self.ui.campo_senha_usuario.setText(self.campo_senha.text().strip())
         self.close()
         self.janela.show()
 
+
+
     def salvar_dados(self, usuario, senha):
-        dados = {"usuario": usuario, "senha": senha}
-        caminho = os.path.join(os.environ['APPDATA'], 'login_data.json')
+        """Salva os dados de login no arquivo login_data.json dentro da pasta Dados."""
+        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+        if not os.path.exists(pasta_dados):
+            os.makedirs(pasta_dados)
+
+        caminho = os.path.join(pasta_dados, 'login_data.json')
         with open(caminho, 'w') as f:
-            json.dump(dados, f)
+            json.dump({"usuario": usuario, "senha": senha}, f)
+
+
+
 
     def carregar_dados_salvos(self):
-        caminho = os.path.join(os.environ['APPDATA'], 'login_data.json')
-        if os.path.exists(caminho):
-            with open(caminho, 'r') as f:
+        """Carrega os dados de login salvos."""
+        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+        caminho_login = os.path.join(pasta_dados, "login_data.json")
+
+        # Carrega dados de login, se existirem
+        if os.path.exists(caminho_login):
+            with open(caminho_login, 'r') as f:
                 dados = json.load(f)
                 self.campo_usuario.setText(dados.get("usuario", ""))
                 self.campo_senha.setText(dados.get("senha", ""))
                 self.checkbox_lembrar.setChecked(True)
 
+
+
+
     def atualizar_json(self):
         """Atualiza o JSON quando o checkbox for marcado/desmarcado."""
-        caminho = os.path.join(os.environ['APPDATA'], 'login_data.json')
+        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+        caminho = os.path.join(pasta_dados, 'login_data.json')
+
         if not self.checkbox_lembrar.isChecked():
             if os.path.exists(caminho):
                 os.remove(caminho)
+
+
+
+    def baixar_banco_de_dados_firebase(self, pasta_local,hora_data):
+        """Baixa o banco de dados do Firebase e salva localmente."""
+        usuario = self.campo_usuario.text().strip()
+        ref_banco = db.reference(f"Usuario/{self.campo_usuario.text()}")
+
+        try:
+            dados_banco = ref_banco.get()
+            if dados_banco:
+                caminho_banco_arquivo = os.path.join(pasta_local, f"{usuario}.json")
+                with open(caminho_banco_arquivo, 'w', encoding='utf-8') as f:
+                    json.dump(dados_banco, f, ensure_ascii=False, indent=4)
+
+                self.atualizar_hora_atualizacao(hora_data)
+
+                print("Banco de dados baixado com sucesso.")
+        except Exception as e:
+            print(f"Erro ao baixar banco de dados: {e}")
+
+
+
+    def atualizar_hora_atualizacao(self,hora_atual):
+        self.atualizacao = db.reference(f"Usuario/{self.campo_usuario.text()}/Ultima Atualizacao")
+        self.atualizacao.set(hora_atual)
+
+
+    def comparar_ultima_atualizacao(self, pasta_dados, caminho_banco, caminho_atualizacao):
+
+        usuario = self.campo_usuario.text().strip()
+        ref_atualizacao = db.reference(f"Usuario/{usuario}/Ultima Atualizacao")
+
+        # Obter a última atualização do Firebase
+        atualizacao_bd = ref_atualizacao.get()
+        if not atualizacao_bd:
+            print("Nenhuma data de atualização encontrada no Firebase.")
+            return False
+
+        # Verificar se o arquivo local de atualização existe
+        if not os.path.exists(caminho_atualizacao):
+            print("Arquivo de atualização local não encontrado. Atualização necessária.")
+            return False
+
+        try:
+            # Ler o arquivo local de atualização
+            with open(caminho_atualizacao, "r", encoding="utf-8") as arquivo:
+                conteudo_local = json.load(arquivo)
+                ultima_atualizacao_local = conteudo_local.get("UltimaAtualizacaoFirebase")
+        except Exception as e:
+            print(f"Erro ao ler o arquivo de atualização local: {e}")
+            return False
+
+        # Verificar se o banco de dados local existe
+        if not os.path.exists(caminho_banco):
+            print(f"Banco de dados local {caminho_banco} não encontrado. Atualização necessária.")
+            return False
+
+        # Comparar as datas de atualização
+        if ultima_atualizacao_local == atualizacao_bd:
+            print("As datas de atualização local e do Firebase estão sincronizadas.")
+            return True
         else:
-            pass
+            print("As datas de atualização local e do Firebase estão diferentes.")
+            return False

@@ -18,7 +18,12 @@ import mplcursors
 import calendar  
 import smtplib
 import locale
+import seaborn as sns
+import json
+from pathlib import Path
+from io import BytesIO
 import matplotlib.pyplot as plt
+import matplotlib.colors as mcolors
 from email.utils import formataddr
 from tkinter import filedialog
 from reportlab.lib.pagesizes import letter
@@ -51,7 +56,7 @@ QSpacerItem,
 QSizePolicy
 )
 from PyQt5.QtCore import QDate, QTime,QUrl, Qt,QTimer,QRect,QRegExp, QDateTime
-from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator
+from PyQt5.QtGui import QDesktopServices,QColor,QRegExpValidator,QPixmap
 from Interface import Ui_janela
 from firebase_admin import db
 from credenciaisBd import *
@@ -62,12 +67,13 @@ from collections import defaultdict
 from interfaceUpdates import AlteracoesInterface
 from update import Atualizar
 from login import LoginWindow
+import plotly.graph_objects as go
 
 
 
 ref = db.reference("/")
 
-# Ativando suporte a escalonamento de DPI alto
+
 if hasattr(Qt, 'AA_EnableHighDpiScaling'):
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
 
@@ -81,32 +87,27 @@ class FuncoesPadrao:
         self.ui = ui
         self.parent = parent
         self.dicionario = None
-        self.acoes = AcoesBancoDeDados(ui)
-        
-            
-        
+        self.certificados_ref = db.reference(f"Configuracoes/Certificados").get()
+        self.mensagens = db.reference(f"Configuracoes/Mensagens").get()
+        self.pasta_local = os.path.join(os.environ['APPDATA'], "Dados")
+
+
 
     def evento_ao_abrir(self,event):
   
         atualizar = Atualizar(parent=self.parent)
-        #atualizar.verificar_atualizacao()
         self.ui.label_versao.setText(atualizar.versao)
         hora_atual = datetime.datetime.now().strftime("%d/%m/%Y - %H:%M")
-        self.login = db.reference(f"Usuario/{ui.campo_usuario.text()}/Hora Login")
+        self.login = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Hora Login")
         self.login.set(hora_atual)
         
-        self.trazer_configuracoes()
+        self.trazer_configuracoes(0)
         self.trazer_metas()
         self.carregar_lista_certificados()
         
         ui.campo_data_meta.setDate(QDate.currentDate())
         AlteracoesInterface.apagar_label_status_bd(self)
-        self.ui.campo_status_bd.setToolTip("")
-        banco_dados.contar_verificacao()
-        
-        self.privilegio = db.reference(f"Usuario/{ui.campo_usuario.text()}/Privilegio").get()
-        self.verificar_privilegio(self.privilegio)
-        
+        self.ui.campo_status_bd.setToolTip("")     
 
         dia_atual = datetime.datetime.now().day
         if 1 <= dia_atual <= 5:
@@ -115,14 +116,20 @@ class FuncoesPadrao:
             QApplication.processEvents() 
 
         
-    def verificar_privilegio(self,privilegio):
-        if privilegio != "admin":
-            ui.botao_criar_usuario.deleteLater()
-            ui.label_novo_usuario.deleteLater()
+    def verificar_privilegio(self,origem):
+        
+        if origem == 0:
+            privilegio = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Privilegio")
+            privilegios = privilegio.get()
+
+            if privilegios != "admin":
+                ui.botao_criar_usuario.deleteLater()
+                ui.label_novo_usuario.deleteLater()
+
+                ui.campo_usuario.setEnabled(False)
 
 
     def evento_ao_fechar(self,event):
-
         
         result = QMessageBox.question(janela, "Confirmação", "Você realmente deseja sair?", QMessageBox.Yes | QMessageBox.No)
         
@@ -178,7 +185,7 @@ class FuncoesPadrao:
 
             # Define o texto e o estilo do label da meta mensal
             if soma >= meta_mensal:
-                ui.label_meta_mes.setStyleSheet('color: rgb(255,255,255); background-color: rgb(46, 214, 255); border: 1px solid rgb(120,120,120)')
+                ui.label_meta_mes.setStyleSheet('color: rgb(255,255,255); background-color: rgb(46, 150, 255); border: 1px solid rgb(120,120,120)')
                 ui.label_meta_mes.setText(f"Meta mensal atingida! - R${soma} / R${meta_mensal}")
             else:
                 ui.label_meta_mes.setStyleSheet('color: rgb(255,255,255); background-color: transparent; border: 1px solid rgb(120,120,120)')
@@ -188,16 +195,17 @@ class FuncoesPadrao:
             print(f"Erro: {e}")
 
 
-    def trazer_configuracoes(self):
+    def trazer_configuracoes(self,origem):
         #CORRIGIDO ------------------------------------------------------------------
         try:
-            ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Configuracoes")
+            ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Configuracoes")
+            senha = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Senha/")
+        
             # Faz uma solicitação GET para obter as configurações do banco de dados
             configs = ref.get()
 
             try:
                 # Carrega as configurações da interface com base nos dados obtidos
-
                 ui.caminho_pasta_principal.setText(configs['DIRETORIO-RAIZ'])
                 ui.campo_email_empresa.setText(configs['E-MAIL'])
                 ui.campo_porcentagem_validacao.setValue(int(configs['PORCENTAGEM']))
@@ -214,8 +222,16 @@ class FuncoesPadrao:
                 ui.campo_telefone_sac_cliente.setText(configs['SAC'])
                 ui.campo_porcentagem_venda.setValue(configs['PORCENTAGEM VENDA'])
                 ui.campo_telefone_alo_parceiro.setText(configs['TELEFONE ALO PARCEIRO'])
-               
-
+                ui.campo_senha_usuario.setText(senha.get())
+                self.trazer_metas()
+                self.verificar_privilegio(origem)
+                self.contar_verificacao()
+                self.apagar_campos_pedido(0)
+                if origem == 1:
+                    self.verificar_e_excluir_json()
+                self.limpar_tabela
+                
+                
 
             except Exception as e:
                 print(e)
@@ -233,7 +249,7 @@ class FuncoesPadrao:
         else:
             return
 
-        usuario = ui.campo_usuario.text()  # Obtém o nome do usuário
+        usuario = ui.campo_usuario.currentText()  # Obtém o nome do usuário
         ref_configuracoes = db.reference(f"Usuario/{usuario}/Dados/Configuracoes")  # Caminho para as configurações
         ref_senha = db.reference(f"Usuario/{usuario}/Senha")  # Caminho para a senha
 
@@ -300,7 +316,7 @@ class FuncoesPadrao:
 
     def trazer_metas(self):
         #CORRIGIDO ----------------------------------------------------------
-        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Metas")
+        ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Metas")
         Metas = ref.get()
     
         
@@ -318,20 +334,47 @@ class FuncoesPadrao:
                 for i in reversed(range(layout.count())):
                     widget = layout.itemAt(i).widget()
                     if widget is not None:
-                        widget.deleteLater()  
-                QtWidgets.QWidget().setLayout(layout)  
+                        widget.deleteLater()
+                QtWidgets.QWidget().setLayout(layout)
 
             if ui.tabWidget.currentIndex() == 2:
-                ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
-                
-                certificados_ref = db.reference(f"Configuracoes/Certificados")
-                certificados = certificados_ref.get()
+                usuario = self.ui.campo_usuario.currentText().strip()
+                caminho_arquivo = os.path.join(self.pasta_local, f"{usuario}.json")
 
-                mes_meta = ui.campo_data_meta.date().month()  # Pega o mês da data selecionada
+                if not os.path.exists(caminho_arquivo):
+                    print(f"Arquivo {caminho_arquivo} não encontrado.")
+                    return
+
+                try:
+                    with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
+                        dados = json.load(arquivo)
+
+                    Pedidos = dados.get("Dados", {}).get("Pedidos", {})
+
+                except json.JSONDecodeError as e:
+                    print(f"Erro ao ler o JSON: {e}")
+                    return
+
+                # Obter mês e ano selecionados no campo de data
+                mes_meta = ui.campo_data_meta.date().month()
                 ano_meta = ui.campo_data_meta.date().year()
 
-                Pedidos = ref.order_by_child("DATA").start_at(f"{ano_meta}-{mes_meta:02d}-01T00:00:00Z").end_at(f"{ano_meta}-{mes_meta:02d}-{calendar.monthrange(ano_meta, mes_meta)[1]}T23:59:59Z").get()
+                # Filtrar os pedidos com base no mês e ano
+                pedidos_filtrados_indice = {
+                    chave: pedido
+                    for chave, pedido in Pedidos.items()
+                    if 'DATA' in pedido and datetime.datetime.strptime(pedido['DATA'], "%Y-%m-%dT%H:%M:%SZ").month == mes_meta
+                    and datetime.datetime.strptime(pedido['DATA'], "%Y-%m-%dT%H:%M:%SZ").year == ano_meta
+                }
 
+                pedidos_filtrados = {
+                    chave: pedido
+                    for chave, pedido in Pedidos.items()
+                    if 'DATA' in pedido 
+                    and datetime.datetime.strptime(pedido['DATA'], "%Y-%m-%dT%H:%M:%SZ").month == mes_meta
+                    and datetime.datetime.strptime(pedido['DATA'], "%Y-%m-%dT%H:%M:%SZ").year == ano_meta   
+                }
+ 
                 semanas = [0, 0, 0, 0, 0]
 
                 mes_meta = ui.campo_data_meta.date().month()
@@ -363,7 +406,7 @@ class FuncoesPadrao:
                                                 semanas[semana_do_mes - 1] += preco_certificado * porcentagem_venda
                                             else:
                                                 versao = Pedidos[pedido_info].get('VERSAO', '')
-                                                valor = certificados[versao]['VALOR']
+                                                valor = self.certificados[versao]['VALOR']
                                                 valor = float(valor.replace(',', '.')) 
                                                 semanas[semana_do_mes - 1] += valor * (ui.campo_porcentagem_venda.value() / 100)
                                     except:
@@ -420,306 +463,650 @@ class FuncoesPadrao:
                                 categorias_por_dia["VENDAS"][dia] += 1
                                 valores_por_dia["VENDAS"][dia] += valor_com_desconto
 
-                cpf_counts = [categorias_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
-                cnpj_counts = [categorias_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
-                vendas_counts = [categorias_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
-
-                cpf_totals = [valores_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
-                cnpj_totals = [valores_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
-                vendas_totals = [valores_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
-
-                total_counts = [cpf_counts[i] + cnpj_counts[i] + vendas_counts[i] for i in range(len(dias_do_mes))]
-
-                dias_uteis = pd.bdate_range(start=f"{ano_meta}-{mes_meta:02d}-01", 
-                                            end=f"{ano_meta}-{mes_meta:02d}-{ultimo_dia:02d}").day.tolist()
-
-                media_cumulativa = np.cumsum([total_counts[i - 1] for i in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
-                media_cumulativa_cpf = np.cumsum([cpf_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
-                media_cumulativa_cnpj = np.cumsum([cnpj_counts[dia - 1] for dia in dias_uteis]) / np.arange(1, len(dias_uteis) + 1)
-
-                soma_maxima = max(total_counts)
-                max_y = max(soma_maxima, max(media_cumulativa)) + 2
-
-                fig, ax = plt.subplots(figsize=(14, 8))
-                fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
-
-                fig.patch.set_facecolor((60/255, 62/255, 84/255))
-                ax.set_facecolor((60/255, 62/255, 84/255))
-
-                bar_width = 0.6
-
-                ax.bar(dias_do_mes, cnpj_counts, width=bar_width, label="CNPJ", color="orange")
-                ax.bar(dias_do_mes, cpf_counts, width=bar_width, bottom=cnpj_counts, label="CPF", color="blue")
-                ax.bar(dias_do_mes, vendas_counts, width=bar_width, bottom=[cnpj_counts[i] + cpf_counts[i] for i in range(len(cnpj_counts))], label="Vendas", color="cyan")
-
-                ax.plot(dias_uteis, media_cumulativa, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
-                ax.plot(dias_uteis, media_cumulativa_cnpj, color="yellow", linestyle="-", linewidth=1, label="Média Acumulada CNPJ")
-                ax.plot(dias_uteis, media_cumulativa_cpf, color="blue", linestyle="-", linewidth=1, label="Média Acumulada CPF")
-
-                fonte_cor = (255/255, 255/255, 255/255)
-
-                ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
-                ax.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
-                ax.set_xticks(range(1, ultimo_dia + 1))
-                ax.set_ylim(0, max_y)
-                ax.set_yticks(range(0, int(max_y) + 1, 1))
-
-                for y in range(0, int(max_y)):
-                    ax.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
-
-                leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
-                leg.get_frame().set_facecolor((60/255, 62/255, 84/255))
-                leg.get_frame().set_edgecolor((60/255, 62/255, 84/255))
-
-                ax.tick_params(axis='x', labelsize=6, colors=fonte_cor)
-                ax.tick_params(axis='y', labelsize=6, colors=fonte_cor)
-
-                cursor = mplcursors.cursor(ax, hover=True)
-                cursor.connect("add", lambda sel: sel.annotation.set_text(
-                    f'Dia: {int(sel.target[0])}\n'
-                    f'CPF: {cpf_counts[int(sel.target[0]) - 1]}  Valor: R$ {cpf_totals[int(sel.target[0]) - 1]:,.2f}\n'
-                    f'CNPJ: {cnpj_counts[int(sel.target[0]) - 1]}  Valor: R$ {cnpj_totals[int(sel.target[0]) - 1]:,.2f}\n'
-                    f'Vendas: {vendas_counts[int(sel.target[0]) - 1]}\n'
-                    f'TOTAL: R$ {cpf_totals[int(sel.target[0]) - 1] + cnpj_totals[int(sel.target[0]) - 1] + vendas_totals[int(sel.target[0]) - 1]:,.2f}'
-                ))
-
-                cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
-
-                new_layout = QtWidgets.QVBoxLayout()
-                new_layout.addWidget(FigureCanvas(fig))
-                ui.campo_grafico.setLayout(new_layout)
 
 
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+# Definindo as listas de contagens e totais por categoria
+                try:
+                    cpf_counts = [categorias_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
+                    cnpj_counts = [categorias_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+                    vendas_counts = [categorias_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
+
+                    cpf_totals = [valores_por_dia["CPF"].get(dia, 0) for dia in dias_do_mes]
+                    cnpj_totals = [valores_por_dia["CNPJ"].get(dia, 0) for dia in dias_do_mes]
+                    vendas_totals = [valores_por_dia["VENDAS"].get(dia, 0) for dia in dias_do_mes]
+
+                    # Inicializando as variáveis para armazenar os totais acumulados e a quantidade de dias trabalhados
+                    totais_acumulados = 0
+                    totais_acumulados_valor = 0
+                    dias_trabalhados = 0
+
+                    # Inicializando as variáveis para as médias acumuladas de CNPJ e CPF
+                    totais_acumulados_cnpj = 0
+                    totais_acumulados_cpf = 0
+
+                    # Listas para armazenar as médias acumuladas de quantidade e valor
+                    media_cumulativa = []
+                    media_cumulativa_valor = []
+                    media_cumulativa_cnpj = []
+                    media_cumulativa_cpf = []
+
+                    # Loop para calcular as médias acumuladas de quantidade e valor
+                    for i, dia in enumerate(dias_do_mes):
+                        # Verificando se houve algum valor ou quantidade no dia
+                        if cpf_counts[i] > 0 or cnpj_counts[i] > 0 or vendas_counts[i] > 0:
+                            dias_trabalhados += 1  # Aumenta a quantidade de dias trabalhados
+
+                            # Atualizando os totais acumulados
+                            totais_acumulados += cpf_counts[i] + cnpj_counts[i] + vendas_counts[i]
+                            totais_acumulados_valor += cpf_totals[i] + cnpj_totals[i] + vendas_totals[i]
+                            
+                            # Atualizando os totais acumulados de CNPJ e CPF
+                            totais_acumulados_cnpj += cnpj_counts[i]
+                            totais_acumulados_cpf += cpf_counts[i]
+                            
+                            # Calculando a média acumulada de quantidade
+                            media_cumulativa.append(totais_acumulados / dias_trabalhados)
+
+                            # Calculando a média acumulada de valor
+                            media_cumulativa_valor.append(totais_acumulados_valor / dias_trabalhados)
+
+                            # Calculando as médias acumuladas de CNPJ e CPF
+                            media_cumulativa_cnpj.append(totais_acumulados_cnpj / dias_trabalhados)
+                            media_cumulativa_cpf.append(totais_acumulados_cpf / dias_trabalhados)
+                        else:
+                            # Se não houver atividade no dia, a média acumulada permanece igual ao valor anterior
+                            media_cumulativa.append(media_cumulativa[-1] if media_cumulativa else 0)
+                            media_cumulativa_valor.append(media_cumulativa_valor[-1] if media_cumulativa_valor else 0)
+                            media_cumulativa_cnpj.append(media_cumulativa_cnpj[-1] if media_cumulativa_cnpj else 0)
+                            media_cumulativa_cpf.append(media_cumulativa_cpf[-1] if media_cumulativa_cpf else 0)
+
+                    # Dias úteis
+                    dias_uteis = pd.bdate_range(start=f"{ano_meta}-{mes_meta:02d}-01", 
+                                                end=f"{ano_meta}-{mes_meta:02d}-{ultimo_dia:02d}").day.tolist()
+
+                    max_diario_quantidade = max(cnpj_counts) +  max(cpf_counts) + max(vendas_counts) + 2
+
+                    # Agora calculando a soma máxima para o gráfico de Quantidade
+                    soma_maxima_quantidade = max(max_diario_quantidade, max(media_cumulativa))
+
+                    fig, ax = plt.subplots(figsize=(14, 8))
+                    fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
+                    fig.patch.set_facecolor((60/255, 62/255, 84/255))
+                    ax.set_facecolor((60/255, 62/255, 84/255))
+
+                    bar_width = 0.8
+
+                    # Empilhando os valores de CNPJ, CPF e Vendas
+                    ax.bar(dias_do_mes, cnpj_counts, width=bar_width, label="CNPJ", color="orange")
+                    ax.bar(dias_do_mes, cpf_counts, width=bar_width, bottom=cnpj_counts, label="CPF", color="blue")
+                    ax.bar(dias_do_mes, vendas_counts, width=bar_width, bottom=[cnpj_counts[i] + cpf_counts[i] for i in range(len(cnpj_counts))], label="Vendas", color="cyan")
+
+                    # Plot da média acumulada
+                    ax.plot(dias_do_mes, media_cumulativa, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
+                    ax.plot(dias_do_mes, media_cumulativa_cnpj, color="yellow", linestyle="-", linewidth=1, label="Média Acumulada CNPJ")
+                    ax.plot(dias_do_mes, media_cumulativa_cpf, color="blue", linestyle="-", linewidth=1, label="Média Acumulada CPF")
+
+                    # Estilo do gráfico
+                    fonte_cor = (255/255, 255/255, 255/255)
+                    ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
+                    ax.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
+                    ax.set_xticks(range(1, ultimo_dia + 1))
+                    ax.set_ylim(0, soma_maxima_quantidade)
+                    ax.set_yticks(range(0, int(soma_maxima_quantidade) + 1, 1))
+
+                    for y in range(0, int(soma_maxima_quantidade)):
+                        ax.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
+
+                    leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
+                    leg.get_frame().set_facecolor((60/255, 62/255, 84/255))
+                    leg.get_frame().set_edgecolor((60/255, 62/255, 84/255))
+
+                    ax.tick_params(axis='x', labelsize=6, colors=fonte_cor)
+                    ax.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+
+                    cursor = mplcursors.cursor(ax, hover=True)
+                    cursor.connect("add", lambda sel: sel.annotation.set_text(
+                        f'Dia: {int(sel.target[0])}\n'
+                        f'CPF: {cpf_counts[int(sel.target[0]) - 1]}\n'
+                        f'CNPJ: {cnpj_counts[int(sel.target[0]) - 1]} \n'
+                        f'Vendas: {vendas_counts[int(sel.target[0]) - 1]}\n'
+                        f'Média Acumulada Total: {media_cumulativa[int(sel.target[0]) - 1]:.1f}'
+                    ))
+
+                    cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
+                
+                except Exception as e:
+                        pass
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////    
+                try:
+                    new_layout = QtWidgets.QVBoxLayout()
+                    new_layout.addWidget(FigureCanvas(fig))
+                    ui.campo_grafico.setLayout(new_layout)
+
+                    # Gráfico de Valores Totais
+                    layout_valor = ui.campo_grafico_valores.layout()
+                    if layout_valor:
+                        for i in reversed(range(layout_valor.count())):
+                            widget = layout_valor.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()  
+                        QtWidgets.QWidget().setLayout(layout_valor)
+
+                    # Cálculo dos totais
+                    total_totals = [cpf_totals[i] + cnpj_totals[i] + vendas_totals[i] for i in range(len(dias_do_mes))]
+
+                    # Calculando a média acumulada de valores
+                    totais_acumulados_valor = 0
+                    dias_trabalhados = 0
+                    media_cumulativa_valor = []
+
+                    for i, dia in enumerate(dias_do_mes):
+                        if cpf_totals[i] > 0 or cnpj_totals[i] > 0 or vendas_totals[i] > 0:
+                            dias_trabalhados += 1
+                            totais_acumulados_valor += total_totals[i]
+                            media_cumulativa_valor.append(totais_acumulados_valor / dias_trabalhados)
+                        else:
+                            media_cumulativa_valor.append(media_cumulativa_valor[-1] if media_cumulativa_valor else 0)
+
+                    # Ajustando o gráfico de valores
+                    max_y_valores = max(total_totals) + 50 - (max(total_totals) % 50)
+
+                    fig, ax = plt.subplots(figsize=(14, 8))
+                    fig.subplots_adjust(left=0.08, right=0.92, top=0.88, bottom=0.12)
+                    fig.patch.set_facecolor((60/255, 62/255, 84/255))
+                    ax.set_facecolor((60/255, 62/255, 84/255))
+
+                    bar_width = 0.8
+                    ax.bar(dias_do_mes, total_totals, width=bar_width, label="Total Diário", color="green")
+
+                    # Linha de média acumulada de valores
+                    ax.plot(dias_do_mes, media_cumulativa_valor, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
+
+                    ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
+                    ax.set_ylabel("Total de Valores (R$)", fontsize=7, color=fonte_cor)
+                    ax.set_xticks(range(1, len(dias_do_mes) + 1))
+                    ax.set_ylim(0, max_y_valores)
+                    ax.set_yticks(range(0, int(max_y_valores) + 1, 50))
+
+                    for y in range(0, int(max_y_valores), 50):
+                        ax.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
+
+                    leg = ax.legend(fontsize=6, labelcolor=fonte_cor)
+                    leg.get_frame().set_facecolor((60/255, 62/255, 84/255))
+                    leg.get_frame().set_edgecolor((60/255, 62/255, 84/255))
+
+                    ax.tick_params(axis='x', labelsize=6, colors=fonte_cor)
+                    ax.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+
+                    cursor = mplcursors.cursor(ax, hover=True)
+                    cursor.connect("add", lambda sel: sel.annotation.set_text(
+                        f'Dia: {int(sel.target[0])}\n'
+                        f'Total: R$ {total_totals[int(sel.target[0]) - 1]:,.2f}\n'
+                        f'Média acumulada: R$ {media_cumulativa_valor[int(sel.target[0]) - 1]:,.2f}'
+                    ))
+
+                    cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
+
+                    new_layout = QtWidgets.QVBoxLayout()
+                    new_layout.addWidget(FigureCanvas(fig))
+                    ui.campo_grafico_valores.setLayout(new_layout)
+                    ui.campo_grafico_valores.lower()
+                
+                except Exception as e:
+                    pass
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                try:
+                    layout_horario = ui.campo_grafico_horario.layout()
+                    if layout_horario:
+                        for i in reversed(range(layout_horario.count())):
+                            widget = layout_horario.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        QtWidgets.QWidget().setLayout(layout_horario)
+
+                    pedidos_por_intervalo = defaultdict(int)
+
+                    intervalos = [f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)]
+                    intervalo_map = {f"{h:02d}": f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)}
+
+                    for pedido_info in pedidos_filtrados:
+                        if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                            hora = Pedidos[pedido_info]['HORA'][:2]
+                            intervalo = intervalo_map.get(hora, None)
+
+                            if intervalo:
+                                pedidos_por_intervalo[intervalo] += 1
+
+                    horas = sorted(intervalos)
+                    pedidos_counts = [pedidos_por_intervalo.get(hora, 0) for hora in horas]
+
+                    data = np.array([pedidos_counts])
+
+                    # Dicionário para a paleta de cores
+                    cdict = {
+                        'red':   [(0.0, 60 / 255, 60 / 255),  
+                                (1.0, 0 / 255, 0 / 255)],    
+                        'green': [(0.0, 62 / 255, 62 / 255),  
+                                (1.0, 255 / 255, 0 / 255)],  
+                        'blue':  [(0.0, 84 / 255, 84 / 255),  
+                                (1.0, 0 / 255, 0 / 255)]     
+                    }
+
+                    cmap = mcolors.LinearSegmentedColormap('GreenScale', cdict)
+
+                    fig2, ax2 = plt.subplots(figsize=(14, 8))
+                    fig2.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)
+                    fig2.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))
+                    ax2.set_facecolor((60 / 255, 62 / 255, 84 / 255))
+
+                    sns.heatmap(data, annot=True, cmap=cmap, xticklabels=horas, yticklabels=[], cbar=False, ax=ax2)
+
+                    fonte_cor = (255 / 255, 255 / 255, 255 / 255)
+                    ax2.set_xlabel("Intervalos de Horário", fontsize=7, color=fonte_cor)
+                    ax2.set_ylabel("Total de Pedidos", fontsize=7, color=fonte_cor)
+                    ax2.set_xticklabels(horas, rotation=45, ha='right', fontsize=6, color=fonte_cor)
+                    ax2.tick_params(axis='x', labelsize=6, colors=fonte_cor)
+                    ax2.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+
+                    ax2.set_yticks([])  # Remove as linhas e rótulos do eixo Y
+
+                    new_layout_horario = QtWidgets.QVBoxLayout()
+                    new_layout_horario.addWidget(FigureCanvas(fig2))
+                    ui.campo_grafico_horario.setLayout(new_layout_horario)
+                    ui.campo_grafico_horario.lower()
+
+                except Exception as e:
+                    pass
+
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                # Criando gráficos com 4 indicadores
+                try:
+                    layout_tipo = ui.campo_grafico_tipo_certificado.layout()
+                    if layout_tipo:
+                        for i in reversed(range(layout_tipo.count())):
+                            widget = layout_tipo.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        QtWidgets.QWidget().setLayout(layout_tipo)
+
+                    total_cpf_aprovado = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'CPF' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    total_cnpj_aprovado = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'CNPJ' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    total_cpf_outros = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'CPF' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') != "APROVADO"
+                    )
+
+                    total_cnpj_outros = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'CNPJ' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') != "APROVADO"
+                    )
+
+                    total_a1 = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'no computador' in pedido_info.get('VERSAO', '').lower() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    total_a3 = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'no computador' not in pedido_info.get('VERSAO', '').lower() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    midia_cartao_leitora = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'cartão e leitora' in pedido_info.get('VERSAO', '').lower()
+                    )
+
+                    midia_cartao = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'cartão' in pedido_info.get('VERSAO', '').lower() and 'cartão e leitora' not in pedido_info.get('VERSAO', '').lower()
+                    )
+
+                    midia_token = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'token' in pedido_info.get('VERSAO', '').lower()
+                    )
+
+                    midia_cartao_leitora = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'cartão e leitora' in pedido_info.get('VERSAO', '').lower() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    midia_cartao = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'cartão' in pedido_info.get('VERSAO', '').lower() and 'cartão e leitora' not in pedido_info.get('VERSAO', '').lower() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    midia_token = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if 'token' in pedido_info.get('VERSAO', '').lower() and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    total_video = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if pedido_info.get('MODALIDADE', '').upper() == 'VIDEO' and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+                    total_presencial = sum(
+                        1 for pedido_info in pedidos_filtrados.values()
+                        if  pedido_info.get('MODALIDADE', '').upper() == 'PRESENCIAL' and pedido_info.get('STATUS') == "APROVADO"
+                    )
+
+
+
+
+
+                    fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  
+                    fig3.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
+                    fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  
+
+                    font_props = {'fontsize': 6, 'color': 'black'}
+                    fonte_titulo = {'fontsize': 10, 'color': 'white', 'fontname': 'Segoe UI', 'fontweight': 'bold'}
+
+                    def filtrar_dados(labels, valores):
+                        labels_filtrados = [label for label, valor in zip(labels, valores) if valor > 0]
+                        valores_filtrados = [valor for valor in valores if valor > 0]
+                        return labels_filtrados, valores_filtrados
+
+                    def adicionar_descricao(ax, labels, valores, colors, percentuais):
+                        # Adiciona os valores e as porcentagens dentro do gráfico
+                        total = sum(valores)
+                        for i, (label, valor, color) in enumerate(zip(labels, valores, colors)):
+                            percentual = (valor / total) * 100
+                            ax.text(0, 0.2 - (i * 0.2), f'{label} [{valor}] {percentual:.1f}%', ha='center', va='center', fontsize=8, color=color)
+
+                    # Gráfico Tipo de Certificado
+                    labels_certificado, valores_certificado = filtrar_dados(['CPF', 'CNPJ'], [total_cpf_aprovado, total_cnpj_aprovado])
+                    total_certificado = sum(valores_certificado)
+
+                    colors_certificado = ['PowderBlue', 'orange']
+                    axs3[0, 0].pie(
+                        valores_certificado,
+                        startangle=90,
+                        colors=colors_certificado,
+                        textprops=font_props,
+                        wedgeprops={'width': 0.2, 'edgecolor': 'none'}, 
+                        pctdistance=0.80, 
+                        labels=None 
+                    )
+                    axs3[0, 0].set_title('CERTIFICADO', fontdict=fonte_titulo)
+                    adicionar_descricao(axs3[0, 0], labels_certificado, valores_certificado, colors_certificado, [])
+
+                    # Gráfico Relação de modalidde de validação
+                    
+                    labels_validacao, valores_validacao = filtrar_dados(['Vídeo', 'Presencial'], [total_video, total_presencial])
+                    total_validacao = sum(valores_validacao)
+
+                    colors_validacao = ['skyblue', 'salmon']
+                    axs3[0, 1].pie(
+                        valores_validacao,
+                        startangle=90,
+                        colors=colors_validacao,
+                        textprops=font_props,
+                        wedgeprops={'width': 0.2, 'edgecolor': 'none'}, 
+                        pctdistance=0.80,  
+                        labels=None
+                    )
+                    axs3[0, 1].set_title('ATENDIMENTO', fontdict=fonte_titulo)
+                    adicionar_descricao(axs3[0, 1], labels_validacao, valores_validacao, colors_validacao, [])
+
+                    # Gráfico por Tipo de Versão
+                    labels_versao, valores_versao = filtrar_dados(['A1', 'A3'], [total_a1, total_a3])
+                    total_versao = sum(valores_versao)
+
+                    colors_versao = ['violet', 'Gold']
+                    axs3[1, 0].pie(
+                        valores_versao,
+                        startangle=90,
+                        colors=colors_versao,
+                        textprops=font_props,
+                        wedgeprops={'width': 0.2, 'edgecolor': 'none'}, 
+                        pctdistance=0.80,  
+                        labels=None
+                    )
+                    axs3[1, 0].set_title('VERSÃO', fontdict=fonte_titulo)
+                    adicionar_descricao(axs3[1, 0], labels_versao, valores_versao, colors_versao, [])
+
+                    # Gráfico por Mídia
+                    labels_midia, valores_midia = filtrar_dados(['C + L', 'Cartão', 'Token'], [midia_cartao_leitora, midia_cartao, midia_token])
+                    total_midia = sum(valores_midia)
+
+                    colors_midia = ['cyan', 'yellow', 'orangeRed']
+                    axs3[1, 1].pie(
+                        valores_midia,
+                        startangle=90,
+                        colors=colors_midia,
+                        textprops=font_props,
+                        wedgeprops={'width': 0.2, 'edgecolor': 'none'}, 
+                        pctdistance=0.80,  
+                        labels=None
+                    )
+                    axs3[1, 1].set_title('MÍDIA', fontdict=fonte_titulo)
+                    adicionar_descricao(axs3[1, 1], labels_midia, valores_midia, colors_midia, [])
+
+                    # Adiciona os gráficos ao layout
+                    new_layout_tipo_certificado = QtWidgets.QVBoxLayout()
+                    new_layout_tipo_certificado.addWidget(FigureCanvas(fig3))
+                    ui.campo_grafico_tipo_certificado.setLayout(new_layout_tipo_certificado)
+
+                except Exception as e:
+                    pass
+
+
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            # Criando Gráfico com ploty de taxa de aprovação
             
-            try:
-                # Remove o layout do campo de horário antes de adicionar o novo gráfico
-                layout_horario = ui.campo_grafico_horario.layout()
-                if layout_horario:
-                    for i in reversed(range(layout_horario.count())):
-                        widget = layout_horario.itemAt(i).widget()
-                        if widget is not None:
-                            widget.deleteLater()
-                    QtWidgets.QWidget().setLayout(layout_horario)
+                try:
+                    layout_indice = ui.campo_grafico_indice_aprovacao.layout()
+                    if layout_indice is None:
+                        # Cria um novo layout se não existir
+                        layout_indice = QVBoxLayout()
+                        ui.campo_grafico_indice_aprovacao.setLayout(layout_indice)
+                    else:
+                        # Limpa o layout existente
+                        while layout_indice.count():
+                            widget_indice = layout_indice.takeAt(0).widget()
+                            if widget_indice:
+                                widget_indice.deleteLater()
 
-                # Inicializa dicionários para pedidos por intervalo de hora
-                pedidos_por_intervalo_cpf = defaultdict(int)
-                pedidos_por_intervalo_cnpj = defaultdict(int)
+                    central_layout = QVBoxLayout()
+                    central_layout.setAlignment(Qt.AlignCenter)
 
-                # Define os intervalos de hora (08:00 às 19:00)
-                intervalos = [
-                    f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)
-                ]  # Intervalos de 08:00 às 19:00
-                intervalo_map = {f"{h:02d}": f"{h:02d}:00 - {h + 1:02d}:00" for h in range(8, 19)}
+                    # Calculando totais
+                    total_cpf_aprovado = sum(
+                        1 for pedido_info in pedidos_filtrados_indice.values()
+                        if 'CPF' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') == "APROVADO"
+                    )
 
-                for pedido_info in Pedidos:
-                    if Pedidos[pedido_info]['STATUS'] == "APROVADO":
-                        hora = Pedidos[pedido_info]['HORA'][:2]  # Pega somente a hora (hh:mm -> hh)
-                        intervalo = intervalo_map.get(hora, None)  # Mapeia para o intervalo correspondente
+                    total_cnpj_aprovado = sum(
+                        1 for pedido_info in pedidos_filtrados_indice.values()
+                        if 'CNPJ' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') == "APROVADO"
+                    )
 
-                        if intervalo:
-                            tipo_certificado = Pedidos[pedido_info]['VERSAO']
-                            if 'CPF' in tipo_certificado:
-                                pedidos_por_intervalo_cpf[intervalo] += 1
-                            elif 'CNPJ' in tipo_certificado:
-                                pedidos_por_intervalo_cnpj[intervalo] += 1
+                    total_cpf_outros = sum(
+                        1 for pedido_info in pedidos_filtrados_indice.values()
+                        if 'CPF' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') != "APROVADO"
+                    )
 
-                # Ordena os intervalos e prepara os dados
-                horas = sorted(intervalos)
-                pedidos_cpf_counts = [pedidos_por_intervalo_cpf.get(hora, 0) for hora in horas]
-                pedidos_cnpj_counts = [pedidos_por_intervalo_cnpj.get(hora, 0) for hora in horas]
+                    total_cnpj_outros = sum(
+                        1 for pedido_info in pedidos_filtrados_indice.values()
+                        if 'CNPJ' in pedido_info.get('VERSAO', '').upper() and pedido_info.get('STATUS') != "APROVADO"
+                    )
 
-                # Gráfico de barras
-                fig2, ax2 = plt.subplots(figsize=(14, 8))
-                fig2.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.2)  # Ajusta o espaço para os rótulos
-                fig2.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo geral
-                ax2.set_facecolor((60 / 255, 62 / 255, 84 / 255))  # Fundo do gráfico
+                    
+                    total_aprovados = total_cpf_aprovado + total_cnpj_aprovado
+                    total_outros = total_cpf_outros + total_cnpj_outros
+                    total_geral = total_aprovados + total_outros
 
-                ax2.bar(horas, pedidos_cpf_counts, width=0.4, label="CPF", color="blue", align='center')
-                ax2.bar(horas, pedidos_cnpj_counts, width=0.4, label="CNPJ", color="orange", bottom=pedidos_cpf_counts, align='center')
+                    # Calculando a porcentagem de aprovados
+                    if total_geral > 0:
+                        porcentagem_aprovada = (total_aprovados / total_geral) * 100
+                    else:
+                        porcentagem_aprovada = 0
 
-                fonte_cor = (255 / 255, 255 / 255, 255 / 255)  # Cor do texto (branco)
+                    # Determinando o status baseado na porcentagem
+                    status = ""
+                    if porcentagem_aprovada >= 80:
+                        status = "Excelente"
+                    elif porcentagem_aprovada >= 60:
+                        status = "Bom"
+                    elif porcentagem_aprovada >= 40:
+                        status = "Regular"
+                    elif porcentagem_aprovada >= 20:
+                        status = "Ruim"
+                    elif porcentagem_aprovada >= 0:
+                        status = "Péssimo"
 
-                ax2.set_xlabel("Intervalos de Horário", fontsize=7, color=fonte_cor)
-                ax2.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
-                ax2.set_xticks(range(len(horas)))
-                ax2.set_xticklabels(horas, rotation=45, ha='right', fontsize=6, color=fonte_cor)
+                    # Criando o gráfico de gauge
+                    fig = go.Figure(go.Indicator(
+                        mode="gauge+number",
+                        value=porcentagem_aprovada,
+                        number={
+                            'suffix': f"%\n- {status}",
+                            'font': {'size': 28},
+                        },
+                        gauge={
+                            'axis': {'range': [0, 100], 'tickwidth': 1, 'tickcolor': "white"},
+                            'bar': {'color': "rgba(0,0,0,0)"},  # Torna a barra transparente
+                            'bgcolor': "rgb(60,62,84)",
+                            'steps': [
+                                {'range': [0, 20], 'color': "rgba(255,0,0,0.6)"},
+                                {'range': [20, 40], 'color': "rgba(255,165,0,0.6)"},
+                                {'range': [40, 60], 'color': "rgba(255,255,0,0.6)"},
+                                {'range': [60, 80], 'color': "rgba(173,255,47,0.6)"},
+                                {'range': [80, 100], 'color': "rgba(0,255,0,0.6)"}
+                            ],
+                            'threshold': {
+                                'line': {'color': "midnightblue", 'width': 4},
+                                'thickness': 1,
+                                'value': porcentagem_aprovada  # Ajuste o valor do threshold conforme a necessidade
+                            }
+                        }
+                    ))
 
-                ax2.set_ylim(0, max(pedidos_cpf_counts[i] + pedidos_cnpj_counts[i] for i in range(len(horas))) + 1)
+                    # Atualizando o layout do gráfico
+                    fig.update_layout(
+                        paper_bgcolor="rgb(60,62,84)",
+                        font=dict(color="white"),
+                        margin=dict(t=100, b=0),
+                    )
 
-                for y in range(0, max(pedidos_cpf_counts[i] + pedidos_cnpj_counts[i] for i in range(len(horas))) + 1):
-                    ax2.axhline(y=y, color="gray", linestyle="-", alpha=0.3, linewidth=0.7)
+                    # Salvando o gráfico em memória (em buffer)
+                    buffer = BytesIO()
+                    fig.write_image(buffer, format='png')
+                    buffer.seek(0)
 
-                leg = ax2.legend(fontsize=6, labelcolor=fonte_cor)
-                leg.get_frame().set_facecolor((60 / 255, 62 / 255, 84 / 255))
-                leg.get_frame().set_edgecolor((60 / 255, 62 / 255, 84 / 255))
+                    # Fechar figuras abertas pelo matplotlib
+                    plt.close('all')
 
-                ax2.tick_params(axis='x', labelsize=6, colors=fonte_cor)
-                ax2.tick_params(axis='y', labelsize=6, colors=fonte_cor)
+                    # Carregando a imagem do gráfico no QLabel
+                    pixmap = QPixmap()
+                    pixmap.loadFromData(buffer.getvalue())
+                    label_grafico = QLabel()
+                    label_grafico.setPixmap(pixmap)
+                    label_grafico.setScaledContents(True)
 
-                new_layout_horario = QtWidgets.QVBoxLayout()
-                new_layout_horario.addWidget(FigureCanvas(fig2))
-                ui.campo_grafico_horario.setLayout(new_layout_horario)
+                    # Adicionando o gráfico ao layout
+                    central_layout.addWidget(label_grafico)
+                    layout_indice.addLayout(central_layout)
 
-            except Exception as e:
-                pass
+                    # Fechando o buffer após o uso
+                    buffer.close()
 
+                    ui.campo_grafico_indice_aprovacao.lower()
 
+                except Exception as e:
+                    pass
 
-            try:
-                layout_tipo = ui.campo_grafico_tipo_certificado.layout()
-                if layout_tipo:
-                    for i in reversed(range(layout_tipo.count())):
-                        widget = layout_tipo.itemAt(i).widget()
-                        if widget is not None:
-                            widget.deleteLater()
-                    QtWidgets.QWidget().setLayout(layout_tipo)
+    #/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                try:
+                    # Limpa o layout existente do campo de gráfico de UF
+                    layout_uf = ui.campo_grafico_uf.layout()
+                    if layout_uf:
+                        # Remover os widgets do layout atual
+                        for i in reversed(range(layout_uf.count())):
+                            widget = layout_uf.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        # Definir um novo layout vazio
+                        QtWidgets.QWidget().setLayout(layout_uf)
 
-                total_cpf_aprovado = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
-                total_cnpj_aprovado = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] == "APROVADO")
-                total_cpf_outros = sum(1 for pedido_info in Pedidos if 'CPF' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
-                total_cnpj_outros = sum(1 for pedido_info in Pedidos if 'CNPJ' in Pedidos[pedido_info]['VERSAO'] and Pedidos[pedido_info]['STATUS'] != "APROVADO")
+                    pedidos_por_uf = {}
+                    for pedido_info in pedidos_filtrados:
+                        # Filtra apenas os pedidos com status "APROVADO"
+                        if Pedidos[pedido_info].get('STATUS') == "APROVADO":
+                            uf = Pedidos[pedido_info].get('JUNTA')
+                            if uf:
+                                pedidos_por_uf[uf] = pedidos_por_uf.get(uf, 0) + 1
 
-                total_a1 = sum(
-                    1 for pedido_info in Pedidos
-                    if 'no computador' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
-                )
-                total_a3 = sum(
-                    1 for pedido_info in Pedidos
-                    if 'no computador' not in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
-                )
+                    ufs_brasil = [
+                        "AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB",
+                        "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"
+                    ]
 
-                midia_cartao_leitora = sum(1 for pedido_info in Pedidos if 'cartão e leitora' in Pedidos[pedido_info]['VERSAO'].lower())
-                midia_cartao = sum(1 for pedido_info in Pedidos if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower())
-                midia_token = sum(1 for pedido_info in Pedidos if 'token' in Pedidos[pedido_info]['VERSAO'].lower())
+                    pedidos_ufs = [pedidos_por_uf.get(uf, 0) for uf in ufs_brasil]
 
-                midia_cartao_leitora = sum(
-                    1 for pedido_info in Pedidos
-                    if 'cartão e leitora' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
-                )
-                midia_cartao = sum(
-                    1 for pedido_info in Pedidos
-                    if 'cartão' in Pedidos[pedido_info]['VERSAO'].lower() and 'cartão e leitora' not in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
-                )
-                midia_token = sum(
-                    1 for pedido_info in Pedidos
-                    if 'token' in Pedidos[pedido_info]['VERSAO'].lower() and Pedidos[pedido_info]['STATUS'] == "APROVADO"
-                )
+                    # Filtra os estados com pedidos
+                    filtered_ufs = [ufs_brasil[i] for i in range(len(pedidos_ufs)) if pedidos_ufs[i] > 0]
+                    filtered_pedidos_ufs = [pedidos_ufs[i] for i in range(len(pedidos_ufs)) if pedidos_ufs[i] > 0]
 
+                    sorted_ufs = [filtered_ufs[i] for i in sorted(range(len(filtered_pedidos_ufs)), key=lambda k: filtered_pedidos_ufs[k], reverse=True)]
+                    sorted_pedidos_ufs = sorted(filtered_pedidos_ufs, reverse=True)
 
-                fig3, axs3 = plt.subplots(2, 2, figsize=(12, 12))  
-                fig3.subplots_adjust(left=0.1, right=0.9, top=0.9, bottom=0.1, wspace=0.3, hspace=0.3)
-                fig3.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))  
+                    font_size = 10
 
-                font_props = {'fontsize': 6, 'color': 'black'}
-                fonte_titulo = {'fontsize': 10, 'color': 'white'}
+                    fig, ax = plt.subplots(figsize=(10, 8))
+                    fig.patch.set_facecolor("#3C3E54")
+                    ax.set_facecolor("#3C3E54")
 
-                def filtrar_dados(labels, valores):
-                    labels_filtrados = [label for label, valor in zip(labels, valores) if valor > 0]
-                    valores_filtrados = [valor for valor in valores if valor > 0]
-                    return labels_filtrados, valores_filtrados
+                    wedges, texts, autotexts = ax.pie(sorted_pedidos_ufs, labels=sorted_ufs, autopct='%1.1f%%', startangle=90, colors=plt.cm.Paired.colors)
 
-                def adicionar_descricao(ax, labels, valores, colors, percentuais):
-                    # Adiciona os valores e as porcentagens dentro do gráfico
-                    total = sum(valores)
-                    for i, (label, valor, color) in enumerate(zip(labels, valores, colors)):
-                        percentual = (valor / total) * 100
-                        ax.text(0, 0.2 - (i * 0.2), f'{label} [{valor}] {percentual:.1f}%', ha='center', va='center', fontsize=8, color=color)
+                    ax.set_title("DISTRIBUIÇÃO DE PEDIDOS PJ POR UF", color="white", fontsize=16, fontweight='bold', family="Segoe UI")
 
-                # Gráfico Tipo de Certificado
-                labels_certificado, valores_certificado = filtrar_dados(['CPF', 'CNPJ'], [total_cpf_aprovado, total_cnpj_aprovado])
-                total_certificado = sum(valores_certificado)
+                    # Alterando a cor do texto das UFs para branco
+                    for text in texts:
+                        text.set_color('white')
 
-                colors_certificado = ['PowderBlue', 'orange']
-                axs3[0, 0].pie(
-                    valores_certificado,
-                    startangle=90,
-                    colors=colors_certificado,
-                    textprops=font_props,
-                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
-                    pctdistance=0.80, 
-                    labels=None 
-                )
-                axs3[0, 0].set_title('Tipo de Certificado', fontdict=fonte_titulo)
-                adicionar_descricao(axs3[0, 0], labels_certificado, valores_certificado, colors_certificado, [])
+                    for autotext in autotexts:
+                        autotext.set_color('black')
 
-                # Gráfico Relação de Status
-                total_aprovados = total_cpf_aprovado + total_cnpj_aprovado
-                total_outros = total_cpf_outros + total_cnpj_outros
-                labels_status, valores_status = filtrar_dados(['Aprovados', 'Outros'], [total_aprovados, total_outros])
-                total_status = sum(valores_status)
+                    new_layout = QVBoxLayout()
+                    new_layout.addWidget(FigureCanvas(fig))
+                    ui.campo_grafico_uf.setLayout(new_layout)
+                    ui.campo_grafico_uf.lower()
 
-                colors_status = ['lightgreen', 'red']
-                axs3[0, 1].pie(
-                    valores_status,
-                    startangle=90,
-                    colors=colors_status,
-                    textprops=font_props,
-                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
-                    pctdistance=0.80,  
-                    labels=None
-                )
-                axs3[0, 1].set_title('Relação de Status', fontdict=fonte_titulo)
-                adicionar_descricao(axs3[0, 1], labels_status, valores_status, colors_status, [])
+                except Exception as e:
+                    layout_uf = ui.campo_grafico_uf.layout()
+                    if layout_uf:
+                        # Remover os widgets do layout atual
+                        for i in reversed(range(layout_uf.count())):
+                            widget = layout_uf.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        # Definir um novo layout vazio
+                        QtWidgets.QWidget().setLayout(layout_uf)
+                    print(f"Erro ao plotar o gráfico de pizza: {e}")
 
-                # Gráfico por Tipo de Versão
-                labels_versao, valores_versao = filtrar_dados(['A1', 'A3'], [total_a1, total_a3])
-                total_versao = sum(valores_versao)
-
-                colors_versao = ['violet', 'Gold']
-                axs3[1, 0].pie(
-                    valores_versao,
-                    startangle=90,
-                    colors=colors_versao,
-                    textprops=font_props,
-                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
-                    pctdistance=0.80,  
-                    labels=None
-                )
-                axs3[1, 0].set_title('Quantidade por Tipo de Versão', fontdict=fonte_titulo)
-                adicionar_descricao(axs3[1, 0], labels_versao, valores_versao, colors_versao, [])
-
-                # Gráfico por Mídia
-                labels_midia, valores_midia = filtrar_dados(['C + L', 'Cartão', 'Token'], [midia_cartao_leitora, midia_cartao, midia_token])
-                total_midia = sum(valores_midia)
-
-                colors_midia = ['cyan', 'yellow', 'orangeRed']
-                axs3[1, 1].pie(
-                    valores_midia,
-                    startangle=90,
-                    colors=colors_midia,
-                    textprops=font_props,
-                    wedgeprops={'width': 0.1, 'edgecolor': 'none'}, 
-                    pctdistance=0.80,  
-                    labels=None
-                )
-                axs3[1, 1].set_title('Quantidade por Tipo de Mídia', fontdict=fonte_titulo)
-                adicionar_descricao(axs3[1, 1], labels_midia, valores_midia, colors_midia, [])
-
-                # Adiciona os gráficos ao layout
-                new_layout_tipo_certificado = QtWidgets.QVBoxLayout()
-                new_layout_tipo_certificado.addWidget(FigureCanvas(fig3))
-                ui.campo_grafico_tipo_certificado.setLayout(new_layout_tipo_certificado)
-
-            except Exception as e:
-                pass
-
-
-
-
-
-
-
-
-
-
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
         except Exception as e:
-            print(f'Erro: {e}')
+            print(f"{e}")
 
 
     def Atualizar_meta(self):
         #CORRIGIDO
-        ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Metas")
+        ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Metas")
 
         # Obtém as metas da interface do usuário
         meta_semana = ui.campo_meta_semanal.text()
@@ -741,14 +1128,16 @@ class FuncoesPadrao:
                 print(f"Erro ao atualizar ou adicionar metas: {e}")
    
 
-    def atualizar_diretorio_raiz(self):
+    def atualizar_diretorio_raiz(self,origem):
         widget_pai = ui.centralwidget
-        # Abrir o explorer para selecionar a pasta raiz
-        resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Tem certeza que deseja atualizar a pasta raiz?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-        if not resposta == QMessageBox.Yes:
-            return
         
-        # Abre uma janela do Explorer para selecionar um novo diretório
+        if origem == 1:
+            # Abrir o explorer para selecionar a pasta raiz
+            resposta = QMessageBox.question(ui.centralwidget, "Confirmação", "Tem certeza que deseja atualizar a pasta raiz?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+            if not resposta == QMessageBox.Yes:
+                return
+        
+        # Abre uma janela do Explorer pra selecionar um novo diretório
         diretorio_selecionado = QFileDialog.getExistingDirectory(widget_pai , 'Selecione o diretório raiz')
 
         if diretorio_selecionado:
@@ -878,6 +1267,23 @@ class FuncoesPadrao:
 
 
     def criar_pasta_cliente(self):
+
+        pasta_principal = ui.caminho_pasta_principal.text()
+        if pasta_principal == "":
+            QMessageBox.information(janela, "Criar Pasta Raiz", "Pasta Principal criada na área de trabalho")
+            
+            caminho_desktop = os.path.join(os.path.expanduser("~"), "Desktop")
+            caminho_pasta = os.path.join(caminho_desktop, "Certificados_Certisign")
+            
+
+            os.makedirs(caminho_pasta, exist_ok=True)
+
+            ui.caminho_pasta_principal.setText(caminho_pasta)
+
+            nova_pasta = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Configuracoes")
+            nova_config = {"DIRETORIO-RAIZ": ui.caminho_pasta_principal.text()}
+            nova_pasta.update(nova_config)
+
         
         try:
             pedido = ui.campo_pedido.text()
@@ -925,7 +1331,7 @@ class FuncoesPadrao:
                 pasta_padrão = pasta_padrão.replace("/", "\\")
                 ui.caminho_pasta.setText(pasta_padrão)
                 
-                status = banco_dados.alteracao_status()
+                status = self.alteracao_status()
 
                 if status == "APROVADO" or status == "CANCELADO":
                     AlteracoesInterface.zerar_label_criar_pasta(self)
@@ -1209,6 +1615,8 @@ class FuncoesPadrao:
             cpf_formatado = f"{a}.{b}.{c}-{d}"
             ui.campo_cpf.clear()
             ui.campo_cpf.setText(cpf_formatado)
+            if not ui.campo_nome.text().strip() and ui.campo_data_nascimento.date() == QDate(2000, 1, 1):
+                self.buscar_dados_por_cpf()
             
         
     #digito_cpf =  cpf[-2:]
@@ -1231,9 +1639,61 @@ class FuncoesPadrao:
         data_atual = QDate.currentDate()
 
         if data_agendamento < data_atual:
-            ui.campo_data_agendamento.setStyleSheet("color: red")
+            ui.campo_data_agendamento.setStyleSheet(
+                """
+                QDateEdit {
+                    border: none;
+                    border-bottom: 1px solid rgb(90, 54, 247);
+                    border-radius: 0;
+                    background-color: rgb(60, 62, 84);
+                    color: rgb(255,0,0)
+                }
+
+                QDateEdit:disabled, QDateEdit:!focus {
+                    border-bottom: 1px solid rgb(120, 120, 120);
+                }
+
+                QDateEdit::up-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+
+                QDateEdit::down-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+                """
+            )
         else:
-            ui.campo_data_agendamento.setStyleSheet("color: black")
+            ui.campo_data_agendamento.setStyleSheet(
+                """
+                QDateEdit {
+                    border: none;
+                    border-bottom: 1px solid rgb(90, 54, 247);
+                    border-radius: 0;
+                    background-color: rgb(60, 62, 84);
+                    color: rgb(255,255,255)
+                }
+
+                QDateEdit:disabled, QDateEdit:!focus {
+                    border-bottom: 1px solid rgb(120, 120, 120);
+                }
+
+                QDateEdit::up-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+
+                QDateEdit::down-button {
+                    width: 0;
+                    height: 0;
+                    border: none;
+                }
+                """
+            )
 
 
     def formatar_cnpj(self):
@@ -1256,77 +1716,93 @@ class FuncoesPadrao:
 
     def exportar_excel(self):
         try:
-            data_inicial = banco_dados.data_para_iso(QDateTime(ui.campo_data_de.date()))
-            data_final = banco_dados.data_para_iso(QDateTime(ui.campo_data_ate.date()))
+            # Obter datas do intervalo
+            data_inicial = datetime.datetime.strptime(ui.campo_data_de.text(), "%d/%m/%Y")
+            data_final = datetime.datetime.strptime(ui.campo_data_ate.text(), "%d/%m/%Y")
 
-            # Consulte o banco de dados usando as datas no formato ISO
-            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("DATA") \
-                            .start_at(data_inicial) \
-                            .end_at(data_final)
-            req = pedidos_ref.get()
+            # Caminho do banco local
+            pasta_local = os.path.join(os.environ['APPDATA'], "Dados")
+            caminho_arquivo = os.path.join(pasta_local, f"{ui.campo_usuario.currentText()}.json")
 
-            numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
-            numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
+            if not os.path.exists(caminho_arquivo):
+                self.mensagem_alerta("Erro", "Banco de dados local não encontrado.")
+                return
+
+            # Carregar o banco de dados local
+            with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+                banco_local = json.load(f)
+
+            # Obter os pedidos
+            pedidos = banco_local.get("Dados", {}).get("Pedidos", {})
 
             dados_selecionados = []
-            x = 0
+            status_filtro = ui.campo_lista_status_2.currentText()
 
-            for cliente in req:
-                data_bd = datetime.datetime.strptime(req[cliente]['DATA'], "%Y-%m-%dT%H:%M:%SZ")
-                numero_inteiro_bd = data_bd.toordinal()
-                status_filtro = ui.campo_lista_status_2.currentText()
-                status_servidor = req[cliente]['STATUS']
+            for pedido_id, pedido_info in pedidos.items():
+                try:
+                    data_pedido = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
+                    status_pedido = pedido_info.get('STATUS', '')
 
-                if numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final:
-                    if status_filtro == status_servidor or status_filtro == "TODAS":
-                        x += 1
-                        pedido = req[cliente]['PEDIDO']
-                        data_agendamento = datetime.datetime.strptime(req[cliente]['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-                        versao = req[cliente].get('VERSAO', "")
-                        nome = req[cliente].get('NOME', "")
-                        telefone = req[cliente].get('TELEFONE', "")
-                        email = req[cliente].get('EMAIL', "")
-                        preco = req[cliente].get('PRECO', "").replace(',', '.')
-                        if status_servidor == "APROVADO":
-                            validade = datetime.datetime.strptime(req[cliente]["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-                        else:
-                            validade = "-"
+                    # Aplicar filtros de data e status
+                    if data_inicial <= data_pedido <= data_final:
+                        if status_filtro == "TODAS" or status_filtro == status_pedido:
+                            pedido = pedido_info.get('PEDIDO', '')
+                            data_agendamento = data_pedido.strftime("%d/%m/%Y")
+                            versao = pedido_info.get('VERSAO', '')
+                            nome = pedido_info.get('NOME', '')
+                            telefone = pedido_info.get('TELEFONE', '')
+                            email = pedido_info.get('EMAIL', '')
+                            preco = pedido_info.get('PRECO', '').replace(',', '.')
+                            validade = (
+                                datetime.datetime.strptime(pedido_info["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+                                if status_pedido == "APROVADO"
+                                else "-"
+                            )
+                            hora_agendamento = pedido_info.get('HORA', '')
+                            vendido = pedido_info.get('VENDA', '')
+                            modalidade = pedido_info.get('MODALIDADE', '')
 
-                        try:
-                            preco = float(preco)
-                        except ValueError:
-                            preco = 0.0
-                        hora_agendamento = req[cliente]['HORA']
-                        status_agendamento = req[cliente]['STATUS']
-                        vendido = req[cliente]['VENDA']
-                        modalidade = req[cliente]['MODALIDADE']
-                        if status_servidor == "APROVADO":
-                            validade = datetime.datetime.strptime(req[cliente]["VALIDO ATE"], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-                        else:
-                            validade = "-"
+                            try:
+                                preco = float(preco)
+                            except ValueError:
+                                preco = 0.0
 
-                        dados_selecionados.append((pedido, nome, telefone, email, data_agendamento, versao, hora_agendamento, status_agendamento, vendido, modalidade, preco,validade))
+                            dados_selecionados.append((
+                                pedido, nome, telefone, email, data_agendamento, versao,
+                                hora_agendamento, status_pedido, vendido, modalidade, preco, validade
+                            ))
+                except Exception:
+                    continue
 
-            if x > 0:
+            if dados_selecionados:
+                # Escolher diretório para salvar o arquivo
                 root = tk.Tk()
                 root.withdraw()
                 caminho_arquivo = filedialog.askdirectory()
                 if caminho_arquivo:
-                    df = pd.DataFrame(dados_selecionados, columns=['Pedido', 'Cliente', 'Telefone', 'E-mail', 'Data agendamento', 'Versão', 'Hora', 'Status Pedido', 'Vendido por mim?', 'Modalidade', 'Comissão','Válido até'])
+                    # Criar DataFrame e salvar como Excel
+                    df = pd.DataFrame(
+                        dados_selecionados,
+                        columns=[
+                            'Pedido', 'Cliente', 'Telefone', 'E-mail', 'Data agendamento', 'Versão', 
+                            'Hora', 'Status Pedido', 'Vendido por mim?', 'Modalidade', 'Comissão', 'Válido até'
+                        ]
+                    )
                     data_agora = datetime.datetime.now().strftime("%d-%m-%Y %H-%M-%S")
                     data_final_text = ui.campo_data_ate.text()
                     data_inicial_text = ui.campo_data_de.text()
-                    pasta_desktop = os.path.expanduser(f"{caminho_arquivo}")
-                    nome_arquivo = os.path.join(pasta_desktop, f"Certificados-emitidos-de {data_inicial_text.replace('/', '-')} a {data_final_text.replace('/', '-')}-gerado em {data_agora.replace('/','-')} .xlsx")
+                    nome_arquivo = os.path.join(
+                        caminho_arquivo, 
+                        f"Certificados-emitidos-de {data_inicial_text.replace('/', '-')} a {data_final_text.replace('/', '-')}-gerado em {data_agora}.xlsx"
+                    )
                     df.to_excel(nome_arquivo, index=False)
-                    self.mensagem_alerta("Arquivo salvo", "Arquivo excel gerado!")
+                    self.mensagem_alerta("Arquivo salvo", "Arquivo Excel gerado!")
                 else:
                     return
             else:
                 self.mensagem_alerta("Sem dados", "Sem dados para o período!")
         except Exception as e:
-            print(e)
-            self.mensagem_alerta("Arquivo não salvo", f"Arquivo não gerado!\nmotivo: {e}")
+            self.mensagem_alerta("Erro", f"Erro ao gerar o arquivo Excel: {e}")
 
 
     def copiar_pedido_tabela(self,event):
@@ -1563,10 +2039,8 @@ class FuncoesPadrao:
     
 
     def carregar_lista_certificados(self):
-       if ui.campo_lista_versao_certificado.currentText() == "":
-            ref = db.reference(f"Configuracoes/Certificados")
-            
-            certificados = ref.get()
+       if ui.campo_lista_versao_certificado.currentText() == "":   
+            certificados = self.certificados_ref
 
             ui.campo_lista_versao_certificado.clear()  
             ui.campo_lista_versao_certificado.addItem("")
@@ -1578,15 +2052,17 @@ class FuncoesPadrao:
 
     def pegar_link_venda(self):
         try:
-            ref = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
-            certificado = ref.get()
-            link_venda = certificado["LINK VENDA"]
+            certificado =  self.certificados_ref
+            versao = ui.campo_lista_versao_certificado.currentText()
+          
+            link_venda = certificado[f"{versao}"]["LINK VENDA"]
             rev = str(ui.campo_cod_rev.text())
 
             if certificado:
                 link = f"{link_venda}{rev}"
                 pyperclip.copy(str(link))
-        except:
+        except Exception as e:
+            print({e})
             pass
 
 
@@ -2102,6 +2578,8 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                     
                 case 'RENOVAÇÃO':
                     # Ajustando o caminho correto com base na estrutura apresentada
+
+                    
                     
                     ref_link_venda = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}/LINK VENDA")
                     certificado = ref_link_venda.get()
@@ -2201,7 +2679,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             return
 
         try:
-            if not banco_dados.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
+            if not self.mensagem_confirmacao("Confirmação", f"Enviar email de renovação em massa?\n\nDe: {datetime.date.today().strftime('%d/%m/%Y')} \nAté {(datetime.date.today() + datetime.timedelta(days=ui.campo_dias_renovacao.value())).strftime('%d/%m/%Y')}"):
 
                 return
 
@@ -2214,7 +2692,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             ui.tableWidget.setColumnWidth(3, 115)
             ui.tableWidget.setColumnWidth(4, 187)  
 
-            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
+            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos").order_by_child("STATUS").equal_to("APROVADO")
             pedidos = pedidos_ref.get()
 
             ref_link_venda = db.reference(f"Configuracoes/Certificados")
@@ -2255,7 +2733,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 data_atual = datetime.datetime.now()
                 diferenca = (data_validade - data_atual).days
                 cliente_email = pedido_info.get("EMAIL", "")
-                data_formatada_validacao = banco_dados.iso_para_data(pedido_info["DATA"]).toString("dd/MM/yyyy")
+                data_formatada_validacao = self.iso_para_data(pedido_info["DATA"]).toString("dd/MM/yyyy")
 
                 email_ja_enviado = pedido_info.get("EMAIL RENOVACAO")
 
@@ -2292,7 +2770,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                     enviar_email = True
                     env += 1
 
-                    ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
+                    ref.child(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos/").child(pedido_info["PEDIDO"]).update({"EMAIL RENOVACAO": "SIM"})
 
 
                 row_position = ui.tableWidget.rowCount()
@@ -2599,13 +3077,12 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             return
         
 
-        certificados = db.reference(f"Configuracoes/Certificados/{ui.campo_lista_versao_certificado.currentText()}")
+        certificados = self.certificados_ref
+        versao = ui.campo_lista_versao_certificado.currentText()
 
-        lista_certificados = certificados.get()
         certificado = ui.campo_lista_versao_certificado.currentText()
-        valor = lista_certificados["VALOR"]
+        valor = certificados[f"{versao}"]["VALOR"]
 
-  
         valor_do_certificado = float(valor.replace(',', '.'))
         ui.campo_preco_certificado_cheio.setText(f"{valor_do_certificado:,.2f}".replace('.', ',').replace(',', '.', 1))
 
@@ -2652,15 +3129,8 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
 
 
-
-class AcoesBancoDeDados():
-    def __init__(self, ui):
-        self.ui = ui
-        self.certificados_ref = ref.child(f"Configuracoes/Certificados").get()
-        
-
     def salvar_pedido(self):
-        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos")
+        self.ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos")
         try:
             if not self.analise_de_campos():
                 return
@@ -2670,30 +3140,138 @@ class AcoesBancoDeDados():
 
             # Verifica se o pedido já existe
             pedido_existente = novo_pedido_ref.get() is not None
+            
             condic = self.verificar_status()
+            data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-            if condic == 'DEFINITIVO' and not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {banco_dados.alteracao_status()}?"):
+            if condic == 'DEFINITIVO' and not self.mensagem_confirmacao("Confirmação", f"Salvar pedido como {self.alteracao_status()}?"):
                 return
 
             if condic == 'DEFINITIVO':
-                self.salvar_definitivo(novo_pedido_ref)
+
+                self.salvar_definitivo(novo_pedido_ref, data_hora)
             else:
-                self.salvar_temporario(novo_pedido_ref)
+                self.salvar_temporario(novo_pedido_ref, data_hora)
+
+            # Salvar dados localmente (em JSON)
+            self.salvar_dados_localmente(num_pedido, data_hora)
 
             self.atualizar_ui(condic)
 
         except Exception as e:
-            print(e)
+            print(f"Erro ao salvar pedido: {e}")
 
 
-    def salvar_temporario(self, novo_pedido_ref):
+    def salvar_temporario(self, novo_pedido_ref, data_hora):
+        
         novo_pedido_ref.update(self.dicionario_banco_de_dados())
+        self.atualizar_hora_da_ultima_alteracao(data_hora)
 
 
-    def salvar_definitivo(self, novo_pedido_ref):
+    def salvar_definitivo(self, novo_pedido_ref, data_hora):
+        
         self.forcar_fechamento_de_arquivo_e_deletar_pasta(self.ui.caminho_pasta.text())
         self.verificar_midia()
         novo_pedido_ref.set(self.dicionario_banco_de_dados())
+        self.atualizar_hora_da_ultima_alteracao(data_hora)
+
+
+    def atualizar_hora_da_ultima_alteracao(self,data_hora):
+        self.atualizacao = db.reference(f"Usuario/{ui.campo_usuario.currentText()}")
+
+        nova_atualizacao = {"Ultima Atualizacao": data_hora}
+        try:
+            # Tenta atualizar as metas no banco de dados
+            self.atualizacao.update(nova_atualizacao)
+            print("Metas atualizadas com sucesso.")
+        except Exception as e:
+            # Se ocorrer um erro, tenta adicionar as novas metas
+            try:
+                self.atualizacao.set(nova_atualizacao)
+                print("Novas metas adicionadas com sucesso.")
+            except Exception as e:
+                print(f"Erro ao atualizar ou adicionar metas: {e}")
+
+
+
+    def salvar_dados_localmente(self, num_pedido, data_hora):
+        """Salva dados localmente e atualiza a data de última atualização."""
+
+        if not os.path.exists(self.pasta_local):
+            try:
+                os.makedirs(self.pasta_local)
+            except Exception as e:
+                return
+
+        caminho_arquivo = os.path.join(self.pasta_local, f"{ui.campo_usuario.currentText()}.json")
+
+        if not os.path.exists(caminho_arquivo):
+            try:
+                self.baixar_banco_de_dados_firebase(self.pasta_local)
+            except Exception as e:
+                return
+
+        banco_local = {}
+        if os.path.exists(caminho_arquivo):
+            try:
+                with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+                    banco_local = json.load(f)
+            except Exception:
+                pass
+
+        dados_pedido = self.dicionario_banco_de_dados()
+        banco_local.setdefault("Dados", {}).setdefault("Pedidos", {})[num_pedido] = dados_pedido
+
+        try:
+            # Atualiza o banco de dados local com os novos dados
+            with open(caminho_arquivo, 'w', encoding='utf-8') as f:
+                json.dump(banco_local, f, ensure_ascii=False, indent=4)
+            
+            # Atualiza o arquivo de última atualização com a nova data e hora
+            caminho_atualizacao = os.path.join(self.pasta_local, "ultima_atualizacao.json")
+            conteudo_atualizacao = {"DataHora": data_hora}
+
+            # Salva a data e hora da última atualização no arquivo de atualização
+            with open(caminho_atualizacao, 'w', encoding='utf-8') as arquivo_atualizacao:
+                json.dump(conteudo_atualizacao, arquivo_atualizacao, ensure_ascii=False, indent=4)
+
+            print("Dados salvos e arquivo de atualização atualizado.")
+
+        except Exception as e:
+            print(f"Erro ao salvar dados localmente: {e}")
+
+
+
+
+
+
+    def baixar_banco_de_dados_firebase(self, pasta_local):
+        ref_banco = db.reference(f"Usuario/{ui.campo_usuario.currentText()}")
+
+        try:
+            # Obtém os dados do banco de dados no Firebase
+            dados_banco = ref_banco.get()
+            if dados_banco:
+                # Caminho para o arquivo JSON do banco de dados
+                caminho_banco_arquivo = os.path.join(pasta_local, f"{ui.campo_usuario.currentText()}.json")
+                
+                # Salva os dados do banco no arquivo
+                with open(caminho_banco_arquivo, 'w', encoding='utf-8') as f:
+                    json.dump(dados_banco, f, ensure_ascii=False, indent=4)
+                print(f"Banco de dados {ui.campo_usuario.currentText()}.json baixado com sucesso.")
+                
+                # Criar o arquivo de última atualização
+                caminho_atualizacao = os.path.join(pasta_local, "ultima_atualizacao.json")
+                data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                conteudo_atualizacao = {"DataHora": data_hora}
+
+                with open(caminho_atualizacao, 'w', encoding='utf-8') as f:
+                    json.dump(conteudo_atualizacao, f, ensure_ascii=False, indent=4)
+                print("Arquivo de última atualização criado com sucesso.")
+            else:
+                print("Nenhum dado encontrado no Firebase para o usuário especificado.")
+        except Exception as e:
+            print(f"Erro ao baixar o banco de dados: {e}")
 
 
     def verificar_midia(self):
@@ -2916,12 +3494,14 @@ class AcoesBancoDeDados():
 
     def atualizar_ui(self, condic):
         if condic == 'DEFINITIVO':
+            # Vou verificar aqui se tem uma nova atualização
             self.ui.campo_status_bd.setText("")
             self.ui.campo_status_bd.setToolTip("")
             self.apagar_campos_pedido(0)
             AlteracoesInterface.lixeira_label_criar_pasta(self)
 
         else:
+            # Vou verificar aqui se tem uma nova atualização
             AlteracoesInterface.label_status_bd_atualizado(self)
             self.ui.campo_status_bd.setToolTip("Pedido Atualizado")
 
@@ -3012,9 +3592,10 @@ class AcoesBancoDeDados():
             ui.campo_lista_modalidade.setCurrentText("")
             ui.campo_lista_versao_certificado.setCurrentText("")
             ui.campo_preco_certificado.setText("")
+            ui.campo_preco_certificado.setToolTip("")
             ui.campo_cnpj_razao_social.setText("")
             ui.campo_rg_orgao.setText("")
-            ui.campo_lista_junta_comercial.setCurrentText("SP")
+            ui.campo_lista_junta_comercial.setCurrentText("")
             ui.tabela_documentos.clearContents()
             ui.tabela_documentos.setRowCount(0)
             ui.campo_pis.setText("")
@@ -3024,12 +3605,15 @@ class AcoesBancoDeDados():
             ui.campo_email_enviado.setText("")
             ui.alerta_midia.setText("")
             ui.alerta_midia.setToolTip("")
+
             self.limpar_labels()
             self.contar_verificacao()
+            
             AlteracoesInterface.confirmar_label_excluir(self)
+            
 
         except Exception as e:
-            print(e)
+            pass
 
 
     def limpar_labels(self):
@@ -3046,17 +3630,9 @@ class AcoesBancoDeDados():
         ui.campo_comentario.setStyleSheet("border-radius:7px;border: 1px solid rgb(120,120,120);background-color:rgb(60,62, 84);color:orange")
         ui.label_confirmacao_excluir.setText("")
 
-       
-    def dicionario_banco_de_dados(self):
 
-
-        data_qdate = ui.campo_data_agendamento.date()  # Retorna um QDate
-        data_validacao = datetime.datetime(data_qdate.year(), data_qdate.month(), data_qdate.day())
-
-
-        versao_certificado = str(ui.campo_lista_versao_certificado.currentText()).strip()
-
-
+    def determinar_validade(self,versao_certificado):
+        
         if "12" in versao_certificado:
             dias_duracao = 365
         elif "18" in versao_certificado:
@@ -3068,6 +3644,17 @@ class AcoesBancoDeDados():
         else:
             dias_duracao = 0  
 
+        return dias_duracao
+       
+       
+    def dicionario_banco_de_dados(self):
+
+        data_qdate = ui.campo_data_agendamento.date()  # Retorna um QDate
+        data_validacao = datetime.datetime(data_qdate.year(), data_qdate.month(), data_qdate.day())
+
+        versao_certificado = str(ui.campo_lista_versao_certificado.currentText()).strip()
+
+        dias_duracao = self.determinar_validade(versao_certificado)
 
         duracao_certificado = data_validacao + datetime.timedelta(days=dias_duracao)
 
@@ -3103,14 +3690,15 @@ class AcoesBancoDeDados():
             "OAB": ui.campo_funcional.text(),
             "EMAIL RENOVACAO": renova,
             "PRECO CERTIFICADO":ui.campo_preco_certificado_cheio.text(),
-            "VALIDO ATE": self.data_para_iso(QDateTime.fromString(duracao_certificado.strftime('%Y-%m-%d %H:%M:%S'), 'yyyy-MM-dd HH:mm:ss'))  # Data ajustada com validade
+            "VALIDO ATE": self.data_para_iso(QDateTime.fromString(duracao_certificado.strftime('%Y-%m-%d %H:%M:%S'), 'yyyy-MM-dd HH:mm:ss')),
+            "JUNTA": ui.campo_lista_junta_comercial.currentText()
         }
 
         # Se o status for DEFINITIVO, adiciona a data de validade e limpa campos
         if self.verificar_status() == "DEFINITIVO":
             campos_para_limpar = [
-                "PASTA", "MUNICIPIO", "CODIGO DE SEG CNH", "RG", "CPF", "CNH", "MAE", 
-                "CNPJ", "NASCIMENTO", "RAZAO SOCIAL", "ORGAO RG", "PIS", "OAB"
+                "PASTA", "MUNICIPIO", "CODIGO DE SEG CNH", "RG", "CNH", "MAE", 
+                "CNPJ", "RAZAO SOCIAL", "ORGAO RG", "PIS", "OAB"
             ]
             novos_dados.update({campo: None for campo in campos_para_limpar})
 
@@ -3157,47 +3745,79 @@ class AcoesBancoDeDados():
 
 
     def carregar_dados(self):
-    
         try:
             num_pedido = ui.campo_pedido.text()
 
-            if num_pedido == "":
-                return
+            if not num_pedido:
+                return "Número do pedido não informado."
 
-            self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
-            pedido_ref = self.ref.child(num_pedido)
-            pedido_data = pedido_ref.get()
+            # Definindo o caminho do banco local
+            pasta_local = os.path.join(os.environ['APPDATA'], "Dados")
+            caminho_arquivo = os.path.join(pasta_local, f"{ui.campo_usuario.currentText()}.json")
+
+            pedido_data = None
+
+            # Tentativa de carregar os dados localmente
+            if os.path.exists(caminho_arquivo):
+                try:
+                    with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+                        banco_local = json.load(f)
+                        pedidos = banco_local.get("Dados", {}).get("Pedidos", {})
+                        pedido_data = pedidos.get(num_pedido)
+                        if pedido_data:
+                            print(f"Dados do pedido {num_pedido} carregados do banco local.")
+                except Exception as e:
+                    print(f"Erro ao carregar banco local: {e}")
+
+            
+            if not pedido_data:
+                print(f"Pedido {num_pedido} não encontrado localmente. Buscando no Firebase...")
+                self.ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos/")
+                pedido_ref = self.ref.child(num_pedido)
+                pedido_data = pedido_ref.get()
+
+                if pedido_data:
+                    print(f"Dados do pedido {num_pedido} carregados do Firebase.")
+                else:
+                    print(f"Pedido {num_pedido} não encontrado no Firebase.")
+                    return "Pedido não encontrado."
 
             if pedido_data:
-
                 self.preencher_dados(pedido_data)
-
-            else:  
-               return 'Pedido nao existe'
+            else:
+                print(f"Pedido {num_pedido} não encontrado em nenhum lugar.")
+                return "Pedido não encontrado."
 
         except Exception as e:
-            pass
+            print(f"Erro ao carregar os dados: {e}")
 
 
     def pegar_valor_tabela(self):
-        self.ref = db.reference(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/")
-   #evento disparado ao dar double click na tabela
+        pasta_local = os.path.join(os.environ['APPDATA'], "Dados")
+        caminho_arquivo = os.path.join(pasta_local, f"{ui.campo_usuario.currentText()}.json")
 
-        item = ui.tableWidget.currentItem() 
+        item = ui.tableWidget.currentItem()
+        if item is None:
+            return
+
         pedido = item.text()
-        try:
-            pedido_ref = self.ref.child(pedido)
-            pedido_data = pedido_ref.get()
-            if item is not None:
-                coluna = item.column()
-                if coluna == 1 :            
-                    ui.tabWidget.setCurrentIndex(0)  
-                    self.limpar_labels()
-                    self.preencher_dados(pedido_data)
-                    AlteracoesInterface.label_status_bd_atualizado(self)
 
-                    return             
-        except :
+        try:
+            if os.path.exists(caminho_arquivo):
+                with open(caminho_arquivo, 'r', encoding='utf-8') as f:
+                    banco_local = json.load(f)
+
+                pedido_data = banco_local.get("Dados", {}).get("Pedidos", {}).get(pedido)
+
+                if pedido_data:
+                    coluna = item.column()
+                    if coluna == 1:
+                        ui.tabWidget.setCurrentIndex(0)
+                        self.limpar_labels()
+                        self.preencher_dados(pedido_data)
+                        AlteracoesInterface.label_status_bd_atualizado(self)
+                        return
+        except Exception:
             pass
 
 
@@ -3221,7 +3841,7 @@ class AcoesBancoDeDados():
 
 
     def preencher_dados(self, pedido_data):
-        self.apagar_campos_pedido(0)  # Limpa os campos antes de começar a preencher
+        self.apagar_campos_pedido(0)   
 
         campos = [
             (ui.campo_nome, "NOME"),
@@ -3246,7 +3866,8 @@ class AcoesBancoDeDados():
             (ui.campo_telefone, "TELEFONE"),
             (ui.campo_funcional, "OAB"),
             (ui.campo_email_enviado, "EMAIL RENOVACAO"),
-            (ui.campo_preco_certificado_cheio,"PRECO CERTIFICADO")
+            (ui.campo_preco_certificado_cheio,"PRECO CERTIFICADO"),
+            (ui.campo_lista_junta_comercial,"JUNTA")
         ]
 
         for campo, chave in campos:
@@ -3311,198 +3932,188 @@ class AcoesBancoDeDados():
         except Exception as e:
             print(f"Erro ao atualizar o status: {e}")
 
-        # Atualizar o campo de confirmação de pasta
         try:
             if ui.caminho_pasta.text():
                 AlteracoesInterface.confirmar_label_criar_pasta(self)
         except Exception as e:
             print(f"Erro ao atualizar confirmação de pasta: {e}")
 
-
+    
     def contar_verificacao(self):
-        # Consulta no Firebase para pedidos com status "VERIFICAÇÃO"
-        pedidos_verificacao = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("STATUS").equal_to("VERIFICAÇÃO").get()
-        
-        # Consulta no Firebase para pedidos com status "VIDEO REALIZADA"
-        pedidos_videook = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos/").order_by_child("STATUS").equal_to("VIDEO REALIZADA").get()
 
-        quantidade_verificacao = 0  
-        quantidade_videook = 0 
-        verificacao_info = []  
-        videook_info = []  
+        try:
+            usuario = self.ui.campo_usuario.currentText().strip()
+            caminho_banco = os.path.join(self.pasta_local, f"{usuario}.json")
 
-        if pedidos_verificacao:
-            for pedido_info in pedidos_verificacao.values():
-                quantidade_verificacao += 1
-                data_pedido = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-                numero_pedido = pedido_info['PEDIDO']
-                verificacao_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+            if not os.path.exists(caminho_banco):
+                print("Arquivo JSON local não encontrado.")
+                return
 
-        if pedidos_videook:
-            for pedido_info in pedidos_videook.values():
-                quantidade_videook += 1
-                data_pedido = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
-                numero_pedido = pedido_info['PEDIDO']
-                videook_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+            with open(caminho_banco, 'r', encoding='utf-8') as f:
+                dados_usuario = json.load(f)
 
-        # Adiciona o setToolTip no ícone campo_status_bd_3
-        tooltip_verificacao = f"Quantidade de pedidos em verificação:\n\n"
-        tooltip_verificacao += '\n'.join(verificacao_info)
-        ui.campo_status_verificacao.setToolTip(f'<div style="color:white; background-color:black;">{tooltip_verificacao}</div>')
-        ui.campo_status_verificacao.setToolTip(tooltip_verificacao)
+            pedidos = dados_usuario.get("Dados", {}).get("Pedidos", {})
 
-        tooltip_videook = f"Quantidade de pedidos com vídeo realizada:\n\n"
-        tooltip_videook += '\n'.join(videook_info)
-        ui.campo_status_videook.setToolTip(f'<div style="color:white; background-color:black;">{tooltip_videook}</div>')
-        ui.campo_status_videook.setToolTip(tooltip_videook)
+            quantidade_verificacao = 0
+            quantidade_videook = 0
+            verificacao_info = []
+            videook_info = []
 
-        ui.campo_status_verificacao.setText(str(quantidade_verificacao))
-        ui.campo_status_videook.setText(str(quantidade_videook))
+            for pedido_id, pedido_info in pedidos.items():
+                status = pedido_info.get("STATUS", "")
+                data_pedido = pedido_info.get("DATA", "")
+                numero_pedido = pedido_info.get("PEDIDO", "")
+
+                # Converte a data para o formato desejado
+                if data_pedido:
+                    try:
+                        data_pedido = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+                    except ValueError:
+                        data_pedido = "Data inválida"
+
+                if status == "VERIFICAÇÃO":
+                    quantidade_verificacao += 1
+                    verificacao_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+
+                elif status == "VIDEO REALIZADA":
+                    quantidade_videook += 1
+                    videook_info.append(f"Pedido: {numero_pedido} / Data: {data_pedido}")
+
+            # Atualiza as tooltips e os campos de texto na interface
+            tooltip_verificacao = f"Quantidade de pedidos em verificação:\n\n"
+            tooltip_verificacao += '\n'.join(verificacao_info)
+            self.ui.campo_status_verificacao.setToolTip(tooltip_verificacao)
+
+            tooltip_videook = f"Quantidade de pedidos com vídeo realizada:\n\n"
+            tooltip_videook += '\n'.join(videook_info)
+            self.ui.campo_status_videook.setToolTip(tooltip_videook)
+
+            self.ui.campo_status_verificacao.setText(str(quantidade_verificacao))
+            self.ui.campo_status_videook.setText(str(quantidade_videook))
+
+        except Exception as e:
+            print(f"Erro ao processar os dados offline: {e}")
 
 
     def preencher_tabela(self):
-    #Evento disparado quando clico no botão procurar na aba 'Consulta'
         if hasattr(self, 'carregando_dados') and self.carregando_dados:
-            return  # Se já estiver carregando, ignora o clique
+            return  
 
         try:
             self.carregando_dados = True
+            
+            
             data_inicial = self.data_para_iso(QDateTime(ui.campo_data_de.date()))
             data_final = self.data_para_iso(QDateTime(ui.campo_data_ate.date()))
+            status_filtro = ui.campo_lista_status_2.currentText()
             
-            #certificados_ref = ref.child(f"Configuracoes/Certificados")
-            certificados = self.certificados_ref
-
-            pedidos_ref = ref.child(f"Usuario/{ui.campo_usuario.text()}/Dados/Pedidos").order_by_child("DATA").start_at(data_inicial).end_at(data_final)
-            pedidos = pedidos_ref.get()
-
-            for col in range(ui.tableWidget.columnCount()):
-                ui.tableWidget.setColumnHidden(col, False)
+            usuario = self.ui.campo_usuario.currentText().strip()
+            caminho_arquivo = os.path.join(self.pasta_local, f"{usuario}.json")
+            
+            if not os.path.exists(caminho_arquivo):
+                raise FileNotFoundError(f"Arquivo {caminho_arquivo} não encontrado.")
+            
+            with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
+                dados = json.load(arquivo)
+            
+            pedidos = dados.get("Dados", {}).get("Pedidos", {})
+            
+            pedidos_filtrados = []
+            for pedido_id, pedido_info in pedidos.items():
+                try:
+                    data_pedido = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
+                    if data_inicial <= pedido_info['DATA'] <= data_final:
+                        if status_filtro == pedido_info['STATUS'] or status_filtro == "TODAS":
+                            pedidos_filtrados.append(pedido_info)
+                except KeyError as e:
+                    print(f"Chave ausente no pedido {pedido_id}: {e}")
+                except ValueError as e:
+                    print(f"Erro ao processar a data no pedido {pedido_id}: {e}")
+            
+            pedidos_filtrados = sorted(
+                pedidos_filtrados,
+                key=lambda x: (
+                    datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"),
+                    datetime.datetime.strptime(x['HORA'], "%H:%M")
+                )
+            )
+            
             ui.tableWidget.setRowCount(0)
             ui.tableWidget.setColumnCount(6)
             ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
             
-            funcoes_app.ajuste_largura_col()
-
+            # Inicializando variáveis para os totais
             valor_estimado = 0
-            try:
-                pedidos = sorted(pedidos.values(), key=lambda x: (datetime.datetime.strptime(x['DATA'], "%Y-%m-%dT%H:%M:%SZ"), 
-                                                                datetime.datetime.strptime(x['HORA'], "%H:%M")))
-                numero_inteiro_inicial = datetime.datetime.strptime(data_inicial, "%Y-%m-%dT%H:%M:%SZ").toordinal()
-                numero_inteiro_final = datetime.datetime.strptime(data_final, "%Y-%m-%dT%H:%M:%SZ").toordinal()
+            valor_cnpj = 0
+            valor_cpf = 0
+            j = 0  # Contador de e-CNPJ
+            f = 0  # Contador de e-CPF
+            venda = 0  # Contador de vendas
+            total_pedidos = len(pedidos_filtrados)
+            valor_venda = 0
 
-                valor_cnpj = 0
-                valor_cpf = 0
-                x = 0
-                y = 0
-                j = 0
-                f = 0
-                venda = 0
-                total_pedidos = len(pedidos)
-                funcoes_app.ajuste_largura_col()
-                valor_venda = 0
-
-                ui.barra_progresso_consulta.setVisible(False)
+            for pedido_info in pedidos_filtrados:
+                row_position = ui.tableWidget.rowCount()
+                ui.tableWidget.insertRow(row_position)
+                for col, chave in enumerate(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"]):
+                    valor = pedido_info.get(chave, "-")
+                    if chave == "DATA":
+                        try:
+                            valor = datetime.datetime.strptime(valor, "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")
+                        except ValueError:
+                            valor = "-"
+                    ui.tableWidget.setItem(row_position, col, QTableWidgetItem(valor))
                 
-                # Configura a barra de progresso corretamente
-                ui.barra_progresso_consulta.setVisible(True)
-                ui.barra_progresso_consulta.setMaximum(total_pedidos)  # Máximo é o total de pedidos
-                ui.barra_progresso_consulta.setValue(0)
-                
-                status_filtro = ui.campo_lista_status_2.currentText()
-                
-                for pedido_info in pedidos:
-                    data_bd = datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ")
-                    numero_inteiro_bd = data_bd.toordinal()
-                    status_servidor = pedido_info['STATUS']
-                    
-                    if numero_inteiro_inicial <= numero_inteiro_bd <= numero_inteiro_final:
-                        if status_filtro == status_servidor or status_filtro == "TODAS":
-                            x += 1
-                            row_position = ui.tableWidget.rowCount()
-                            ui.tableWidget.insertRow(row_position)
+                # Atualizando os totais de acordo com as versões e preços
+                try:
+                    if 'PRECO' in pedido_info:
+                        preco = float(pedido_info['PRECO'])
+                        valor_estimado += preco
+
+                        if 'e-CNPJ' in pedido_info['VERSAO']:
+                            valor_cnpj += preco
+                            j += 1
+
+                        elif 'e-CPF' in pedido_info['VERSAO']:
+                            valor_cpf += preco
+                            f += 1
+                            
+                        if pedido_info['VENDA'] == "SIM":
+                            venda += 1
                             try:
-                                ui.tableWidget.setItem(row_position, 0, QTableWidgetItem(pedido_info['STATUS']))
+                                valor_venda += (float(pedido_info['PRECO CERTIFICADO'])) * (ui.campo_porcentagem_venda.value()/100)
                             except:
-                                ui.tableWidget.setItem(row_position, 0, QTableWidgetItem("-"))
-                            try:
-                                ui.tableWidget.setItem(row_position, 1, QTableWidgetItem(pedido_info['PEDIDO']))
-                            except:
-                                ui.tableWidget.setItem(row_position, 1, QTableWidgetItem("-"))
-                            try:
-                                ui.tableWidget.setItem(row_position, 2, QTableWidgetItem(datetime.datetime.strptime(pedido_info['DATA'], "%Y-%m-%dT%H:%M:%SZ").strftime("%d/%m/%Y")))
-                            except:
-                                ui.tableWidget.setItem(row_position, 2, QTableWidgetItem("-"))
-                            try:
-                                ui.tableWidget.setItem(row_position, 3, QTableWidgetItem(pedido_info['HORA']))
-                            except:
-                                ui.tableWidget.setItem(row_position, 3, QTableWidgetItem("-"))
-                            try:
-                                ui.tableWidget.setItem(row_position, 4, QTableWidgetItem(pedido_info['NOME']))
-                            except:
-                                ui.tableWidget.setItem(row_position, 4, QTableWidgetItem("-"))
-                            try:
-                                ui.tableWidget.setItem(row_position, 5, QTableWidgetItem(pedido_info['VERSAO']))
-                            except:
-                                ui.tableWidget.setItem(row_position, 5, QTableWidgetItem("-"))
+                                versao = pedido_info['VERSAO']
+                                valor = self.certificados_ref[versao]['VALOR']
+                                valor = float(valor.replace(',', '.')) 
+                                valor_venda += valor * (ui.campo_porcentagem_venda.value()/100)
 
-                            try:
-                                if 'PRECO' in pedido_info:
-                                    preco = float(pedido_info['PRECO'])
-                                    valor_estimado += preco
+                except Exception as e:
+                    print (e)
 
+                # Aplicação de cores com base no status
+                for col in range(ui.tableWidget.columnCount()):
+                    item = ui.tableWidget.item(row_position, col)
+                    status = ui.tableWidget.item(row_position, 0).text()
+                    if item is not None:
+                        match status:
+                            case 'DIGITAÇÃO':
+                                item.setForeground(QColor(170, 170, 170))
+                            case 'VIDEO REALIZADA':
+                                item.setForeground(QColor(25, 200, 255))
+                            case 'VERIFICAÇÃO':
+                                item.setForeground(QColor(255, 167, 91))
+                            case 'APROVADO':
+                                item.setForeground(QColor(173, 255, 47))
+                            case 'CANCELADO':
+                                item.setForeground(QColor(255, 30, 30))
 
+            # Totalização e exibição no campo relatorio
+            total_venda = valor_cnpj + valor_cpf
+            total_geral = (total_venda * (1 - float(ui.campo_desconto.text()) / 100)) + valor_venda
+            locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
 
-                                    if 'e-CNPJ' in pedido_info['VERSAO']:
-                                        valor_cnpj += preco
-                                        j += 1
-
-                                    elif 'e-CPF' in pedido_info['VERSAO']:
-                                        valor_cpf += preco
-                                        f += 1
-                                        
-                                    if pedido_info['VENDA'] == "SIM":
-                                        venda += 1
-                                        try:
-                                            valor_venda += (float(pedido_info['PRECO CERTIFICADO'])) * (ui.campo_porcentagem_venda.value()/100)
-                                        except:
-                                            versao = pedido_info['VERSAO']
-                                            valor = certificados[versao]['VALOR']
-                                            valor = float(valor.replace(',', '.')) 
-                                            valor_venda += valor * (ui.campo_porcentagem_venda.value()/100)
-
-                                QApplication.processEvents()
-                            except Exception as e:
-                                print (e)
-
-                            for col in range(ui.tableWidget.columnCount()):
-                                item = ui.tableWidget.item(row_position, col)
-                                status = ui.tableWidget.item(row_position, 0).text()
-                                if item is not None:
-                                    match status:
-                                        case 'DIGITAÇÃO':
-                                            item.setForeground(QColor(170, 170, 170))
-                                        case 'VIDEO REALIZADA':
-                                            item.setForeground(QColor(25, 200, 255))
-                                        case 'VERIFICAÇÃO':
-                                            item.setForeground(QColor(255, 167, 91))
-                                        case 'APROVADO':
-                                            item.setForeground(QColor(173, 255, 47))
-                                        case 'CANCELADO':
-                                            item.setForeground(QColor(255, 30, 30))
-
-                            y += 1
-                            ui.barra_progresso_consulta.setValue(y)
-                            QApplication.processEvents()
-
-                ui.barra_progresso_consulta.setValue(total_pedidos)  
-                self.contar_verificacao()
-
-                total_venda = valor_cnpj + valor_cpf
-                total_geral = (total_venda * (1 - float(ui.campo_desconto.text()) / 100)) + valor_venda
-                locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-
-                ui.campo_relatorio.setPlainText(f'''
+            ui.campo_relatorio.setPlainText(f'''
 (+)e-CNPJ [{j}]..................R$ {locale.format_string('%.2f', valor_cnpj, grouping=True) if valor_cnpj != 0 else "0,00"}
 (+)e-CPF [{f}]...................R$ {locale.format_string('%.2f', valor_cpf, grouping=True) if valor_cpf != 0 else "0,00"}
 (=)Total [{j+f}]...................R$ {locale.format_string('%.2f', total_venda, grouping=True) if total_venda != 0 else "0,00"}
@@ -3514,29 +4125,13 @@ class AcoesBancoDeDados():
 (=)Total Esperado + Vendas .....R$ {locale.format_string('%.2f', total_geral, grouping=True) if total_geral != 0 else "0,00"}
 ''')
 
-                ui.barra_progresso_consulta.setVisible(False)
-                ui.label_quantidade_bd.setText(f"{x} registro(s)")
-                ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-                
-            except Exception as e:
-                print(e)
-                ui.campo_relatorio.setPlainText("")
-                ui.tableWidget.setHorizontalHeaderLabels(["STATUS", "PEDIDO", "DATA", "HORA", "NOME", "VERSAO"])
-                
-                funcoes_app.ajuste_largura_col()
+            ui.label_quantidade_bd.setText(f"{total_pedidos} registro(s)")
 
-                ui.label_quantidade_bd.setText(f"{x} registro(s)")
-
-                ui.barra_progresso_consulta.setVisible(False)
-                self.contar_verificacao()
         except Exception as e:
             print(e)
-            pass
-
         finally:
-            # Marca como não carregando
             self.carregando_dados = False
- 
+
 
     def atualizar_documentos_tabela(self):
         # Limpar qualquer conteúdo existente na tabela
@@ -3619,8 +4214,6 @@ class AcoesBancoDeDados():
         iso_str = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
         return iso_str
 
-
-    
 
     def abrir_janela_cadastro_usuario(self):
         import re
@@ -3848,6 +4441,9 @@ class AcoesBancoDeDados():
                 if janela.isVisible():
                     janela.close()
                     janela.deleteLater()
+                
+                LoginWindow.carregar_lista_usuario(self)
+                
 
                 janela.deleteLater()
             except Exception as e:
@@ -3861,6 +4457,115 @@ class AcoesBancoDeDados():
         janela.setLayout(layout)
         janela.exec_()
 
+
+    def buscar_dados_por_cpf(self):
+        cpf = self.ui.campo_cpf.text()
+        
+        usuario = self.ui.campo_usuario.currentText().strip()
+        caminho_arquivo = os.path.join(self.pasta_local, f"{usuario}.json")
+
+        if not os.path.exists(caminho_arquivo):
+            print(f"Arquivo {caminho_arquivo} não encontrado.")
+            return
+        
+        try:
+            with open(caminho_arquivo, 'r', encoding='utf-8') as arquivo:
+                dados = json.load(arquivo)
+            
+            pedidos = dados.get("Dados", {}).get("Pedidos", {})
+            
+            for pedido_id, detalhes in pedidos.items():
+                if detalhes.get("CPF") == cpf:
+                    nascimento = detalhes.get("NASCIMENTO")
+                    if nascimento:
+                        ui.campo_data_nascimento.setDate(QDate.fromString(nascimento, "dd/MM/yyyy"))
+                    nome = detalhes.get("NOME")
+                    if nome:
+                        self.ui.campo_nome.setText(nome)
+                    return
+            print(f"CPF {cpf} não encontrado no banco de dados.")
+        except Exception as e:
+            print(f"Erro ao acessar o arquivo: {e}")
+
+
+    # def verificar_e_excluir_json(self):
+    #     try:
+    #         # Define a pasta de dados e o nome do arquivo do usuário atual
+    #         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+    #         usuario = self.ui.campo_usuario.currentText().strip()
+    #         arquivo_usuario = f"{usuario}.json"
+
+    #         # Listar todos os arquivos na pasta
+    #         arquivos_existentes = [f for f in os.listdir(pasta_dados)]
+    #         arquivos_a_remover = [
+    #             os.path.join(pasta_dados, f)
+    #             for f in arquivos_existentes
+    #             if f.endswith(".json") and f != "login_data.json" and f != "ultima_atualizacao.json" and f != arquivo_usuario]
+    #         # Se houver arquivos a remover
+    #         if arquivos_a_remover:
+    #             for arquivo in arquivos_a_remover:
+    #                 os.remove(arquivo)  
+    #                 print(f"Arquivo {arquivo} removido.")
+
+    #             # Baixar o banco de dados correspondente ao usuário atual
+    #             self.baixar_banco_de_dados_firebase(pasta_dados)
+    #             print(f"Novo banco {arquivo_usuario} baixado.")
+    #         else:
+    #             print("Nenhum arquivo adicional encontrado. Prosseguindo sem baixar.")
+
+    #     except Exception as e:
+    #         print(f"Erro ao verificar ou excluir arquivos JSON: {e}")
+
+
+    def verificar_e_excluir_json(self):
+        try:
+            # Define a pasta de dados e o nome do arquivo do usuário atual
+            pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+            usuario = self.ui.campo_usuario.currentText().strip()
+            arquivo_usuario = f"{usuario}.json"
+            caminho_atualizacao = os.path.join(pasta_dados, "ultima_atualizacao.json")
+            ref_atualizacao_firebase = db.reference(f"Usuario/{usuario}/Ultima Atualizacao")
+
+            # Listar todos os arquivos na pasta
+            arquivos_existentes = [f for f in os.listdir(pasta_dados)]
+            arquivos_a_remover = [
+                os.path.join(pasta_dados, f)
+                for f in arquivos_existentes
+                if f.endswith(".json") and f != "login_data.json" and f != "ultima_atualizacao.json" and f != arquivo_usuario
+            ]
+
+            # Se houver arquivos a remover
+            if arquivos_a_remover:
+                for arquivo in arquivos_a_remover:
+                    os.remove(arquivo)  # Remove os arquivos desnecessários
+                    print(f"Arquivo {arquivo} removido.")
+
+                # Baixar o banco de dados correspondente ao usuário atual
+                self.baixar_banco_de_dados_firebase(pasta_dados)
+                print(f"Novo banco {arquivo_usuario} baixado.")
+
+                # Atualizar o arquivo de atualização local
+                data_hora_atual = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                conteudo_atualizacao = {
+                    "DataHora": data_hora_atual,
+                    "UltimaAtualizacaoFirebase": data_hora_atual
+                }
+
+                with open(caminho_atualizacao, "w", encoding="utf-8") as arquivo:
+                    json.dump(conteudo_atualizacao, arquivo, ensure_ascii=False, indent=4)
+                print("Arquivo ultima_atualizacao.json atualizado localmente.")
+
+                # Atualizar o Firebase com a nova data/hora de atualização
+                ref_atualizacao_firebase.set(data_hora_atual)
+                print("Última atualização registrada no Firebase com sucesso.")
+            else:
+                print("Nenhum arquivo adicional encontrado. Prosseguindo sem baixar.")
+        except Exception as e:
+            print(f"Erro ao verificar ou excluir arquivos JSON: {e}")
+
+
+
+    
 
 
 
@@ -3960,7 +4665,6 @@ ui = Ui_janela()
 ui.setupUi(janela)
 
 helper = JanelaOculta(janela)
-banco_dados = AcoesBancoDeDados(ui)
 funcoes_app = FuncoesPadrao(ui)
 
 
@@ -3973,6 +4677,8 @@ janela.closeEvent = funcoes_app.evento_ao_fechar
 janela.showEvent = funcoes_app.evento_ao_abrir
 
 #Alterações nos campos
+
+ui.campo_usuario.currentIndexChanged.connect(lambda:funcoes_app.trazer_configuracoes(1))
 ui.campo_preco_certificado_cheio.editingFinished.connect(lambda:funcoes_app.valor_alterado(ui.campo_preco_certificado_cheio))
 ui.campo_rg_orgao.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_rg_orgao))
 ui.campo_nome.textChanged.connect(lambda:funcoes_app.valor_alterado(ui.campo_nome))
@@ -4004,19 +4710,19 @@ ui.rb_verificacao.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_verifi
 ui.rb_videook.toggled.connect(lambda:funcoes_app.valor_alterado(ui.rb_videook))
 
 #Campos botões
-ui.botao_criar_usuario.clicked.connect(lambda:banco_dados.abrir_janela_cadastro_usuario())
+ui.botao_criar_usuario.clicked.connect(lambda:funcoes_app.abrir_janela_cadastro_usuario())
 ui.botao_agrupar_PDF_pasta_cliente.clicked.connect(lambda:funcoes_app.mesclar_pdf_pasta_cliente())
 ui.botao_excluir_dados_tabela.clicked.connect(lambda:funcoes_app.limpar_tabela())
 ui.botao_atualizar_meta.clicked.connect(lambda:funcoes_app.Atualizar_meta())
 ui.botao_atualizar_configuracoes.clicked.connect(lambda:funcoes_app.atualizar_configuracoes())
-ui.botao_consultar.clicked.connect(lambda:banco_dados.preencher_tabela())
-ui.botao_excluir_dados.clicked.connect(lambda:banco_dados.apagar_campos_pedido(1))
+ui.botao_consultar.clicked.connect(lambda:funcoes_app.preencher_tabela())
+ui.botao_excluir_dados.clicked.connect(lambda:funcoes_app.apagar_campos_pedido(1))
 ui.botao_procurar.clicked.connect(lambda:funcoes_app.exportar_excel())
 ui.botao_consulta_cnpj.clicked.connect(lambda:funcoes_app.procurar_cnpj())
 ui.botao_consulta_cpf.clicked.connect(lambda:funcoes_app.procurar_cpf())
 ui.botao_consulta_cnh.clicked.connect(lambda:funcoes_app.procurar_cnh())
 ui.botao_consulta_rg.clicked.connect(lambda:funcoes_app.procurar_rg())
-ui.botao_salvar.clicked.connect(lambda:banco_dados.salvar_pedido())
+ui.botao_salvar.clicked.connect(lambda:funcoes_app.salvar_pedido())
 ui.botao_junta.clicked.connect(lambda:funcoes_app.procurar_junta())
 ui.botao_print_direto_na_pasta.clicked.connect(lambda:funcoes_app.print_tela())
 ui.botao_print_direto_na_pasta.setFlat(True)
@@ -4028,27 +4734,27 @@ ui.botao_converter.clicked.connect(lambda:funcoes_app.escolher_conversao())
 ui.botao_agrupar_PDF.setFlat(True)
 ui.botao_agrupar_PDF.clicked.connect(lambda:funcoes_app.mesclar_pdf())
 ui.botao_dados_cnpj.clicked.connect(lambda:funcoes_app.dados_cnpj())
-ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz())
+ui.botao_altera_pasta_principal.clicked.connect(lambda: funcoes_app.atualizar_diretorio_raiz(1))
 ui.botao_menagem.clicked.connect(lambda:funcoes_app.abrir_janela_mensagem())
 ui.botao_consulta_pis.clicked.connect(lambda:funcoes_app.procurar_pis())
 ui.botao_hoje.clicked.connect((lambda:funcoes_app.definir_hoje()))
 ui.botao_telefone.clicked.connect((lambda:funcoes_app.contato_telefone()))
 ui.botao_consulta_funcional.clicked.connect((lambda:funcoes_app.procurar_funcional()))
 ui.botao_enviar_email.clicked.connect((lambda:funcoes_app.envio_de_email()))
-ui.rb_aprovado.clicked.connect(lambda:banco_dados.alteracao_status())
-ui.rb_cancelado.clicked.connect(lambda:banco_dados.alteracao_status())
-ui.rb_videook.clicked.connect(lambda:banco_dados.alteracao_status())
-ui.rb_verificacao.clicked.connect(lambda:banco_dados.alteracao_status())
-ui.rb_digitacao.clicked.connect(lambda:banco_dados.alteracao_status())
+ui.rb_aprovado.clicked.connect(lambda:funcoes_app.alteracao_status())
+ui.rb_cancelado.clicked.connect(lambda:funcoes_app.alteracao_status())
+ui.rb_videook.clicked.connect(lambda:funcoes_app.alteracao_status())
+ui.rb_verificacao.clicked.connect(lambda:funcoes_app.alteracao_status())
+ui.rb_digitacao.clicked.connect(lambda:funcoes_app.alteracao_status())
 ui.botao_ocultar_senha.clicked.connect(lambda:funcoes_app.mostrar_senha())
 ui.botao_ocultar_senha_usuario.clicked.connect(lambda:funcoes_app.mostrar_senha_usuario())
 ui.botao_link_venda.clicked.connect(lambda:funcoes_app.pegar_link_venda())
 ui.botao_envio_massa.clicked.connect(lambda:funcoes_app.envio_em_massa())
 
 #Campos de formatação
+ui.campo_data_agendamento.editingFinished.connect(lambda:funcoes_app.formatar_data_agendamento())
 ui.tabela_documentos.setSelectionMode(QTableWidget.MultiSelection) 
 ui.campo_senha_usuario.setReadOnly(False) 
-ui.campo_usuario.setReadOnly(True) 
 ui.campo_comentario.setAcceptRichText(False)    
 ui.caminho_pasta_principal.setReadOnly(True)
 ui.campo_relatorio.setReadOnly(True)
@@ -4056,7 +4762,7 @@ ui.caminho_pasta.setReadOnly(True)
 ui.campo_verifica_tela_cheia.setReadOnly(True)
 ui.campo_cpf.editingFinished.connect(lambda:funcoes_app.formatar_cpf())
 ui.campo_rg_orgao.editingFinished.connect(lambda:funcoes_app.formatar_orgao_rg())
-ui.campo_pedido.editingFinished.connect(lambda:banco_dados.carregar_dados()) ##########################################################################
+ui.campo_pedido.editingFinished.connect(lambda:funcoes_app.carregar_dados()) ##########################################################################
 ui.campo_cnpj.editingFinished.connect (lambda:funcoes_app.formatar_cnpj())
 ui.campo_meta_semanal.editingFinished.connect(lambda:funcoes_app.atualizar_meta_clientes())
 ui.campo_meta_mes.editingFinished.connect(lambda:funcoes_app.atualizar_meta_clientes())
@@ -4130,7 +4836,7 @@ ui.campo_preco_certificado.setValidator(validator)
 #Eventos tabela
 ui.tabWidget.currentChanged.connect(lambda: funcoes_app.atualizar_aba())
 ui.tableWidget.setEditTriggers(QTableWidget.NoEditTriggers)
-ui.tableWidget.itemDoubleClicked.connect(lambda:banco_dados.pegar_valor_tabela())
+ui.tableWidget.itemDoubleClicked.connect(lambda:funcoes_app.pegar_valor_tabela())
 ui.tableWidget.itemClicked.connect(lambda:funcoes_app.copiar_pedido_tabela(None))
 ui.tabela_documentos.itemDoubleClicked.connect(lambda: funcoes_app.abrir_documento_para_edicao())
 
