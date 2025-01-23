@@ -79,7 +79,7 @@ class LoginWindow(QMainWindow):
         # Adicionando o checkbox "Lembrar-me"
         self.checkbox_lembrar = QCheckBox("Lembrar-me")
         self.checkbox_lembrar.setStyleSheet(f"color: gray; font-size: 14px; font-family: Calibri;")
-        self.checkbox_lembrar.stateChanged.connect(self.atualizar_json)
+        self.checkbox_lembrar.stateChanged.connect(self.atualizar_json_login)
         layout.addWidget(self.checkbox_lembrar)
 
         spacer_item = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Expanding)
@@ -119,7 +119,7 @@ class LoginWindow(QMainWindow):
         self.setStyleSheet(f"background-color: {self.fundo_cor}; font-family: Calibri;")
 
         # Tentar carregar dados salvos
-        self.carregar_dados_salvos()
+        self.carregar_dados_salvos_login()
 
     def toggle_senha_visivel(self):
         if self.campo_senha.echoMode() == QLineEdit.Password:
@@ -172,7 +172,7 @@ class LoginWindow(QMainWindow):
                     # Login bem-sucedido
                     self.iniciar_animacao_sucesso()
                     if self.checkbox_lembrar.isChecked():
-                        self.salvar_dados(usuario_campo, senha_campo)
+                        self.salvar_dados_login(usuario_campo, senha_campo)
                 else:
                     # Senha incorreta
                     self.campo_senha.clear()  # Zera o valor do campo
@@ -188,6 +188,7 @@ class LoginWindow(QMainWindow):
         # Reseta estilo quando o usuário clica no campo novamente
         self.campo_usuario.textChanged.connect(lambda: self.resetar_estilo(self.campo_usuario, "Usuário"))
         self.campo_senha.textChanged.connect(lambda: self.resetar_estilo(self.campo_senha, "Senha"))
+
 
     def exibir_erro(self, campo, mensagem):
         """Exibe o erro no campo de entrada: borda vermelha e placeholder com a mensagem de erro."""
@@ -208,6 +209,7 @@ class LoginWindow(QMainWindow):
             campo.clear()  # Zera o valor do campo para exibir o placeholder
         else:
             self.resetar_estilo(campo, "Usuário" if campo == self.campo_usuario else "Senha")
+
 
     def resetar_estilo(self, campo, placeholder):
         """Restaura o estilo normal do campo."""
@@ -244,6 +246,7 @@ class LoginWindow(QMainWindow):
         self.animacao_botao.finished.connect(self.mostrar_label_sucesso)
         self.animacao_botao.start()
 
+
     def mostrar_label_sucesso(self):
         """Exibe a mensagem de sucesso ao fazer login e verifica o banco de dados local."""
         self.botao_login.hide()
@@ -263,32 +266,42 @@ class LoginWindow(QMainWindow):
         self.animacao_label.start()
 
 
+    def abrir_proxima_janela(self):
+        """Carrega os dados do usuário e abre a próxima janela."""
+        self.carregar_lista_usuario()
 
-
+        self.ui.campo_usuario.setCurrentText(self.campo_usuario.text().strip())
+        self.ui.campo_senha_usuario.setText(self.campo_senha.text().strip())
+        self.close()
+        self.janela.show()
 
 
     def verificar_banco_e_abrir_proxima_janela(self):
+        """Verifica o banco de dados local e sincroniza com o Firebase, se necessário."""
         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
         usuario = self.campo_usuario.text().strip()
-        caminho_banco = os.path.join(pasta_dados, f"{usuario}.json")
-        caminho_atualizacao = os.path.join(pasta_dados, "ultima_atualizacao.json")
+        caminho_banco_local = os.path.join(pasta_dados, f"{usuario}.json")
         data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         try:
-            # Situação 1: A pasta não existe
+            # Situação 1: A pasta de dados não existe
             if not os.path.exists(pasta_dados):
                 os.makedirs(pasta_dados)  # Cria a pasta
                 print("Pasta criada.")
                 self.baixar_banco_de_dados_firebase(pasta_dados, data_hora)  # Baixa o banco
-                self.criar_arquivo_ultima_atualizacao(caminho_atualizacao, data_hora)  # Cria o arquivo de atualização
-                print("Banco de dados baixado e arquivo de atualização criado.")
+                # Atualiza a chave "Ultima Atualizacao" no banco local e Firebase
+                self.atualizar_hora_banco_local(pasta_dados, data_hora, usuario, caminho_banco_local)
+                self.atualizar_hora_firebase(data_hora)
+                print("Banco de dados baixado e arquivo local criado.")
+
             else:
                 # Situação 2: Verificar se é necessário atualizar o banco
-                
-                if not self.comparar_ultima_atualizacao(pasta_dados, caminho_banco, caminho_atualizacao):
+                if not self.comparar_ultima_atualizacao(caminho_banco_local):
                     print("Banco de dados desatualizado. Atualizando...")
                     self.baixar_banco_de_dados_firebase(pasta_dados, data_hora)
-                    self.criar_arquivo_ultima_atualizacao(caminho_atualizacao, data_hora)
+                    # Atualiza a chave "Ultima Atualizacao" no banco local e Firebase
+                    self.atualizar_hora_banco_local(pasta_dados, data_hora, usuario, caminho_banco_local)
+                    self.atualizar_hora_firebase(data_hora)
                     print("Banco de dados atualizado com sucesso.")
                 else:
                     print("Banco de dados já está sincronizado. Nenhuma ação necessária.")
@@ -300,47 +313,36 @@ class LoginWindow(QMainWindow):
 
 
 
+    def atualizar_hora_firebase(self,hora_atual):
+        self.atualizacao = db.reference(f"Usuario/{self.campo_usuario.text()}/Ultima Atualizacao")
+        self.atualizacao.set(hora_atual)
 
-    def criar_arquivo_ultima_atualizacao(self, caminho, data_hora):
+
+    def atualizar_hora_banco_local(self, pasta_local, hora_data, usuario, caminho_banco):
         try:
-            ultima_atualizacao = self.atualizacao.get()
-            
-            conteudo = {"DataHora": data_hora}
+            # Verifica se o caminho do arquivo existe
+            if not os.path.exists(caminho_banco):
+                raise FileNotFoundError(f"O arquivo {caminho_banco} não foi encontrado.")
 
+            # Abrir o arquivo JSON
+            with open(caminho_banco, "r", encoding="utf-8") as f:
+                dados_banco = json.load(f)  # Carrega o conteúdo do arquivo JSON
 
-            self.atualizacao = db.reference(f"Usuario/{self.campo_usuario.text()}")
-
-            if ultima_atualizacao:
-                conteudo["UltimaAtualizacaoFirebase"] = ultima_atualizacao
-
-            with open(caminho, "w", encoding="utf-8") as arquivo:
-                json.dump(conteudo, arquivo, ensure_ascii=False, indent=4)
-            print("Arquivo de atualização criado com sucesso.")
-
-            self.atualizar_hora_atualizacao(data_hora)
-
-        except Exception as e:
-            print(f"Erro ao criar o arquivo de atualização: {e}")
-
-
-
-
-    def atualizar_banco_de_dados_local(self, pasta_local, caminho_banco):
-        """Atualiza o banco de dados local com os dados mais recentes do Firebase."""
-        usuario = self.campo_usuario.text().strip()
-        ref_banco = db.reference(f"Usuario/{usuario}")
-
-        try:
-            # Obtém os dados mais recentes do Firebase
-            dados_banco = ref_banco.get()
             if dados_banco:
-                with open(caminho_banco, 'w', encoding='utf-8') as f:
+                # Adicionar a chave "Ultima Atualizacao" ao conteúdo baixado
+                dados_banco["Ultima Atualizacao"] = hora_data
+
+                # Caminho do arquivo local para salvar
+                caminho_banco_arquivo = os.path.join(pasta_local, f"{usuario}.json")
+                with open(caminho_banco_arquivo, "w", encoding="utf-8") as f:
                     json.dump(dados_banco, f, ensure_ascii=False, indent=4)
-                print(f"Banco de dados {usuario}.json atualizado localmente.")
+
+                print(f"Banco de dados local {usuario}.json atualizado com sucesso e data/hora registrada.")
             else:
-                print("Nenhum dado encontrado no Firebase para atualizar.")
+                print("Nenhum dado encontrado para atualizar.")
         except Exception as e:
             print(f"Erro ao atualizar o banco de dados local: {e}")
+
 
 
 
@@ -359,31 +361,74 @@ class LoginWindow(QMainWindow):
 
 
 
-    def abrir_proxima_janela(self):
-        """Carrega os dados do usuário e abre a próxima janela."""
-        self.carregar_lista_usuario()
 
-        self.ui.campo_usuario.setCurrentText(self.campo_usuario.text().strip())
-        self.ui.campo_senha_usuario.setText(self.campo_senha.text().strip())
-        self.close()
-        self.janela.show()
+    def baixar_banco_de_dados_firebase(self, pasta_local,hora_data):
+        """Baixa o banco de dados do Firebase e salva localmente."""
+        usuario = self.campo_usuario.text().strip()
+        ref_banco = db.reference(f"Usuario/{self.campo_usuario.text()}")
 
+        try:
+            dados_banco = ref_banco.get()
+            if dados_banco:
+                caminho_banco_arquivo = os.path.join(pasta_local, f"{usuario}.json")
+                with open(caminho_banco_arquivo, 'w', encoding='utf-8') as f:
+                    json.dump(dados_banco, f, ensure_ascii=False, indent=4)
 
+                self.atualizar_hora_firebase(hora_data)
 
-    def salvar_dados(self, usuario, senha):
-        """Salva os dados de login no arquivo login_data.json dentro da pasta Dados."""
-        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
-        if not os.path.exists(pasta_dados):
-            os.makedirs(pasta_dados)
-
-        caminho = os.path.join(pasta_dados, 'login_data.json')
-        with open(caminho, 'w') as f:
-            json.dump({"usuario": usuario, "senha": senha}, f)
+                print("Banco de dados baixado com sucesso.")
+        except Exception as e:
+            print(f"Erro ao baixar banco de dados: {e}")
 
 
 
 
-    def carregar_dados_salvos(self):
+
+
+    def comparar_ultima_atualizacao(self,caminho_banco_local):
+        """Compara a última atualização do Firebase com os dados locais armazenados em {usuario}.json."""
+
+        usuario = self.campo_usuario.text().strip()
+        ref_atualizacao = db.reference(f"Usuario/{usuario}/Ultima Atualizacao")
+
+        try:
+            # Obter a última atualização do Firebase
+            atualizacao_bd = ref_atualizacao.get()
+            if not atualizacao_bd:
+                print("Nenhuma data de atualização encontrada no Firebase.")
+                return False
+
+            # Verificar se o banco de dados local existe
+            if not os.path.exists(caminho_banco_local):
+                print(f"Banco de dados local {caminho_banco_local} não encontrado. Atualização necessária.")
+                return False
+
+            # Ler o arquivo local do banco de dados ({usuario}.json)
+            with open(caminho_banco_local, "r", encoding="utf-8") as arquivo:
+                conteudo_local = json.load(arquivo)
+                ultima_atualizacao_local = conteudo_local.get("Ultima Atualizacao")
+
+            # Verificar se a chave "Ultima Atualizacao" existe no arquivo local
+            if not ultima_atualizacao_local:
+                print("Chave 'Ultima Atualizacao' não encontrada no arquivo local. Atualização necessária.")
+                return False
+
+            # Comparar as datas de atualização
+            if ultima_atualizacao_local == atualizacao_bd:
+                print("As datas de atualização local e do Firebase estão sincronizadas.")
+                return True
+            else:
+                print("As datas de atualização local e do Firebase estão diferentes.")
+                return False
+
+        except Exception as e:
+            print(f"Erro ao comparar atualizações: {e}")
+            return False
+
+    
+
+
+    def carregar_dados_salvos_login(self):
         """Carrega os dados de login salvos."""
         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
         caminho_login = os.path.join(pasta_dados, "login_data.json")
@@ -399,7 +444,7 @@ class LoginWindow(QMainWindow):
 
 
 
-    def atualizar_json(self):
+    def atualizar_json_login(self):
         """Atualiza o JSON quando o checkbox for marcado/desmarcado."""
         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
         caminho = os.path.join(pasta_dados, 'login_data.json')
@@ -409,68 +454,17 @@ class LoginWindow(QMainWindow):
                 os.remove(caminho)
 
 
+    
+    def salvar_dados_login(self, usuario, senha):
+        """Salva os dados de login no arquivo login_data.json dentro da pasta Dados."""
+        pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
+        if not os.path.exists(pasta_dados):
+            os.makedirs(pasta_dados)
 
-    def baixar_banco_de_dados_firebase(self, pasta_local,hora_data):
-        """Baixa o banco de dados do Firebase e salva localmente."""
-        usuario = self.campo_usuario.text().strip()
-        ref_banco = db.reference(f"Usuario/{self.campo_usuario.text()}")
-
-        try:
-            dados_banco = ref_banco.get()
-            if dados_banco:
-                caminho_banco_arquivo = os.path.join(pasta_local, f"{usuario}.json")
-                with open(caminho_banco_arquivo, 'w', encoding='utf-8') as f:
-                    json.dump(dados_banco, f, ensure_ascii=False, indent=4)
-
-                self.atualizar_hora_atualizacao(hora_data)
-
-                print("Banco de dados baixado com sucesso.")
-        except Exception as e:
-            print(f"Erro ao baixar banco de dados: {e}")
-
-            
+        caminho = os.path.join(pasta_dados, 'login_data.json')
+        with open(caminho, 'w') as f:
+            json.dump({"usuario": usuario, "senha": senha}, f)
 
 
 
-    def atualizar_hora_atualizacao(self,hora_atual):
-        self.atualizacao = db.reference(f"Usuario/{self.campo_usuario.text()}/Ultima Atualizacao")
-        self.atualizacao.set(hora_atual)
-
-
-    def comparar_ultima_atualizacao(self, pasta_dados, caminho_banco, caminho_atualizacao):
-
-        usuario = self.campo_usuario.text().strip()
-        ref_atualizacao = db.reference(f"Usuario/{usuario}/Ultima Atualizacao")
-
-        # Obter a última atualização do Firebase
-        atualizacao_bd = ref_atualizacao.get()
-        if not atualizacao_bd:
-            print("Nenhuma data de atualização encontrada no Firebase.")
-            return False
-
-        # Verificar se o arquivo local de atualização existe
-        if not os.path.exists(caminho_atualizacao):
-            print("Arquivo de atualização local não encontrado. Atualização necessária.")
-            return False
-
-        try:
-            # Ler o arquivo local de atualização
-            with open(caminho_atualizacao, "r", encoding="utf-8") as arquivo:
-                conteudo_local = json.load(arquivo)
-                ultima_atualizacao_local = conteudo_local.get("DataHora")
-        except Exception as e:
-            print(f"Erro ao ler o arquivo de atualização local: {e}")
-            return False
-
-        # Verificar se o banco de dados local existe
-        if not os.path.exists(caminho_banco):
-            print(f"Banco de dados local {caminho_banco} não encontrado. Atualização necessária.")
-            return False
-
-        # Comparar as datas de atualização
-        if ultima_atualizacao_local == atualizacao_bd:
-            print("As datas de atualização local e do Firebase estão sincronizadas.")
-            return True
-        else:
-            print("As datas de atualização local e do Firebase estão diferentes.")
-            return False
+    

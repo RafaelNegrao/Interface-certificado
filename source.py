@@ -19,6 +19,7 @@ import calendar
 import smtplib
 import locale
 import seaborn as sns
+import matplotlib.ticker as mtick
 import json
 from pathlib import Path
 from io import BytesIO
@@ -90,6 +91,7 @@ class FuncoesPadrao:
         self.certificados_ref = db.reference(f"Configuracoes/Certificados").get()
         self.mensagens = db.reference(f"Configuracoes/Mensagens").get()
         self.pasta_local = os.path.join(os.environ['APPDATA'], "Dados")
+        self.atualizar = Atualizar()
 
 
 
@@ -550,7 +552,6 @@ class FuncoesPadrao:
                     # Estilo do gráfico
                     fonte_cor = (255/255, 255/255, 255/255)
                     ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
-                    ax.set_ylabel("Quantidade de Pedidos", fontsize=7, color=fonte_cor)
                     ax.set_xticks(range(1, ultimo_dia + 1))
                     ax.set_ylim(0, soma_maxima_quantidade)
                     ax.set_yticks(range(0, int(soma_maxima_quantidade) + 1, 1))
@@ -625,7 +626,6 @@ class FuncoesPadrao:
                     ax.plot(dias_do_mes, media_cumulativa_valor, color="red", linestyle="-", linewidth=1, label="Média Acumulada")
 
                     ax.set_xlabel("Dias do Mês", fontsize=7, color=fonte_cor)
-                    ax.set_ylabel("Total de Valores (R$)", fontsize=7, color=fonte_cor)
                     ax.set_xticks(range(1, len(dias_do_mes) + 1))
                     ax.set_ylim(0, max_y_valores)
                     ax.set_yticks(range(0, int(max_y_valores) + 1, 50))
@@ -706,7 +706,6 @@ class FuncoesPadrao:
 
                     fonte_cor = (255 / 255, 255 / 255, 255 / 255)
                     ax2.set_xlabel("Intervalos de Horário", fontsize=7, color=fonte_cor)
-                    ax2.set_ylabel("Total de Pedidos", fontsize=7, color=fonte_cor)
                     ax2.set_xticklabels(horas, rotation=45, ha='right', fontsize=6, color=fonte_cor)
                     ax2.tick_params(axis='x', labelsize=6, colors=fonte_cor)
                     ax2.tick_params(axis='y', labelsize=6, colors=fonte_cor)
@@ -1181,14 +1180,106 @@ class FuncoesPadrao:
                 except Exception as e:
                     print(f"Erro ao plotar o gráfico de clientes recorrentes: {e}")
 
+#/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+                try:
+                    layout_mensal = ui.campo_grafico_quantidade_anual.layout()
+                    if layout_mensal:
+                        # Remover widgets do layout atual
+                        for i in reversed(range(layout_mensal.count())):
+                            widget = layout_mensal.itemAt(i).widget()
+                            if widget is not None:
+                                widget.deleteLater()
+                        # Definir um novo layout vazio
+                        QtWidgets.QWidget().setLayout(layout_mensal)
 
+                    locale.setlocale(locale.LC_TIME, "pt_BR.UTF-8")
 
+                    fonte_eixos = 6
 
+                    data_atual = datetime.datetime.now()
+                    meses_anteriores = []
+                    valores_totais = []
 
+                    for i in reversed(range(0, 24)):  # Alterado para incluir o mês atual (0 representa o mês atual)
+                        # Calcular o ano e o mês
+                        mes = (data_atual.month - i - 1) % 12 + 1  # Ajuste aqui
+                        ano = data_atual.year + (data_atual.month - i - 1) // 12
 
+                        # Adicionar o mês no formato "Abr/2024" em português
+                        nome_mes = datetime.datetime(ano, mes, 1).strftime('%b/%Y')
+                        meses_anteriores.append(nome_mes)
 
+                        # Somar os valores do mês
+                        total_mes = 0
+                        for pedido_info in Pedidos:
+                            if Pedidos[pedido_info]['STATUS'] == "APROVADO":
+                                data_pedido = Pedidos[pedido_info]['DATA']
+                                data_formatada = datetime.datetime.strptime(data_pedido, "%Y-%m-%dT%H:%M:%SZ")
+                                if data_formatada.year == ano and data_formatada.month == mes:
+                                    preco = float(Pedidos[pedido_info]['PRECO'].replace(',', '.'))
+                                    desconto = 1 - (ui.campo_desconto.value() / 100)
+                                    total_mes += preco * desconto
 
+                        # Adicionar o valor total ao gráfico
+                        valores_totais.append(total_mes)
+
+                    # Filtrar meses sem valores
+                    meses_anteriores_filtrados = [mes.capitalize() for mes, valor in zip(meses_anteriores, valores_totais) if valor > 0]
+                    valores_totais_filtrados = [valor for valor in valores_totais if valor > 0]
+
+                    if not valores_totais_filtrados:
+                        print("Não há dados para exibir.")
+                    else:
+                        # Configuração do gráfico
+                        fig, ax = plt.subplots(figsize=(14, 8))
+                        fig.patch.set_facecolor((60 / 255, 62 / 255, 84 / 255))
+                        ax.set_facecolor((60 / 255, 62 / 255, 84 / 255))
+
+                        # Criar gráfico de barras
+                        bars = ax.bar(meses_anteriores_filtrados, valores_totais_filtrados, color="cyan", width=0.8)
+
+                        # Adicionar linha de tendência
+
+                        window_size = 3
+                        media_suavizada = np.convolve(valores_totais_filtrados, np.ones(window_size)/window_size, mode='valid')
+
+                        #Adicionar linha de média suavizada
+                        ax.plot(meses_anteriores_filtrados[window_size-1:], media_suavizada, color="red", linewidth=1, linestyle="-", label="Média Suavizada")
+
+                        ax.tick_params(axis='x', rotation=90, labelsize=fonte_eixos, colors="white")
+                        ax.tick_params(axis='y', labelsize=fonte_eixos, colors="white")
+                        ax.grid(axis='y', color="gray", linestyle="-", alpha=0.5)
+
+                        plt.legend(loc="upper left", fontsize=fonte_eixos, facecolor=(60 / 255, 62 / 255, 84 / 255), labelcolor="white")
+                        plt.tight_layout()
+                        plt.subplots_adjust(left=0.06, bottom=0.12)
+
+                        cursor = mplcursors.cursor(bars, hover=True)
+                        cursor.connect("add", lambda sel: sel.annotation.set_text(
+                            f'Mês: {meses_anteriores_filtrados[int(sel.index)]}\n'
+                            f'Total: {valores_totais_filtrados[int(sel.index)]:,.2f}'
+                        ))
+                        cursor.connect("add", lambda sel: sel.annotation.set_fontsize(7))
+
+                        #Exibir o gráfico no widget de destino (ui.campo_grafico_quantidade_anual)
+                        canvas = FigureCanvas(fig)
+                        layout = ui.campo_grafico_quantidade_anual.layout()
+                        if layout is None:
+                            layout = QtWidgets.QVBoxLayout(ui.campo_grafico_quantidade_anual)
+                            ui.campo_grafico_quantidade_anual.setLayout(layout)
+                        else:
+                            # Limpar widgets existentes no layout
+                            for i in reversed(range(layout.count())):
+                                widget = layout.itemAt(i).widget()
+                                if widget is not None:
+                                    widget.deleteLater()
+
+                        layout.addWidget(canvas)
+                        ui.campo_grafico_quantidade_anual.lower()
+
+                except Exception as e:
+                    print(f"Erro ao gerar o gráfico: {e}")
 
         except Exception as e:
             print(f"{e}")
@@ -1422,7 +1513,7 @@ class FuncoesPadrao:
                 nome_pasta = f'{ui.campo_pedido.text()}'
             
             elif tipo == "PEDIDO-NOME":
-                if ui.campo_nome.text() == "":
+                if ui.campo_nome.text() == '':
                     self.mensagem_alerta("Pasta não criada","Adicione o nome do cliente!")
                     AlteracoesInterface.negar_label_criar_pasta(self)
 
@@ -1543,7 +1634,7 @@ class FuncoesPadrao:
     def dados_cnpj(self):
         ui.campo_cnpj_municipio.setText("") 
         ui.campo_cnpj_razao_social.setText("")
-        ui.campo_nome.setText("") 
+
 
         cnpj = ''.join(filter(str.isdigit, ui.campo_cnpj.text()))
 
@@ -1572,12 +1663,11 @@ class FuncoesPadrao:
                 # Atualizar o campo da lista de Junta Comercial
                 ui.campo_lista_junta_comercial.setCurrentText(uf)
                 self.atualizar_documentos_tabela()
-
+                
                 # Verificar os nomes do QSA
                 if len(qsa) == 1:
                     nome = qsa[0]["nome"]
-                    if not ui.campo_nome.text():
-                        ui.campo_nome.setText(nome)
+                    ui.campo_nome.setText(nome)
                 elif len(qsa) > 1:
                     self.selecionar_nome_qsa(qsa)
                 else:
@@ -3318,6 +3408,8 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
         
 
     def salvar_pedido(self):
+        self.atualizar.verificar_atualizacao()
+
         self.ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos")
         try:
             if not self.analise_de_campos():
@@ -3403,24 +3495,24 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
         dados_pedido = self.dicionario_banco_de_dados()
         banco_local.setdefault("Dados", {}).setdefault("Pedidos", {})[num_pedido] = dados_pedido
-
+        
         try:
             # Atualiza o banco de dados local com os novos dados
             with open(caminho_arquivo, 'w', encoding='utf-8') as f:
                 json.dump(banco_local, f, ensure_ascii=False, indent=4)
-            
-            # Atualiza o arquivo de última atualização com a nova data e hora
-            caminho_atualizacao = os.path.join(self.pasta_local, "ultima_atualizacao.json")
-            conteudo_atualizacao = {"DataHora": data_hora}
 
-            # Salva a data e hora da última atualização no arquivo de atualização
-            with open(caminho_atualizacao, 'w', encoding='utf-8') as arquivo_atualizacao:
-                json.dump(conteudo_atualizacao, arquivo_atualizacao, ensure_ascii=False, indent=4)
+            # Atualiza a chave "Ultima Atualizacao" no arquivo JSON do usuário
+            banco_local["Ultima Atualizacao"] = data_hora  # Atualiza a chave com a data e hora
 
-            print("Dados salvos no Firebase e arquivo local atualizado.")
+            # Reabre o arquivo para salvar a atualização da chave
+            with open(caminho_arquivo, 'w', encoding='utf-8') as f:
+                json.dump(banco_local, f, ensure_ascii=False, indent=4)
+
+            print("Dados salvos no Firebase e arquivo local atualizado com a última atualização.")
 
         except Exception as e:
             print(f"Erro ao salvar dados localmente: {e}")
+
 
 
     def baixar_banco_de_dados_firebase(self, pasta_local):
@@ -3437,21 +3529,26 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 with open(caminho_banco_arquivo, 'w', encoding='utf-8') as f:
                     json.dump(dados_banco, f, ensure_ascii=False, indent=4)
                 print(f"Banco de dados {ui.campo_usuario.currentText()}.json baixado com sucesso.")
-                
-                # Criar o arquivo de última atualização
-                caminho_atualizacao = os.path.join(pasta_local, "ultima_atualizacao.json")
-                data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                conteudo_atualizacao = {"DataHora": data_hora}
 
-                with open(caminho_atualizacao, 'w', encoding='utf-8') as f:
-                    json.dump(conteudo_atualizacao, f, ensure_ascii=False, indent=4)
-                print("Arquivo de última atualização criado com sucesso.")
+                # Atualiza a chave "Ultima Atualizacao" no mesmo arquivo JSON
+                data_hora = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                
+                # Lê o conteúdo atual do arquivo JSON
+                with open(caminho_banco_arquivo, 'r+', encoding='utf-8') as f:
+                    banco_local = json.load(f)
+
+                    # Atualiza a chave "Ultima Atualizacao" com a nova data/hora
+                    banco_local.setdefault("Ultima Atualizacao", data_hora)
+
+                    # Regrava o arquivo com a nova data/hora
+                    f.seek(0)  # Volta para o início do arquivo
+                    json.dump(banco_local, f, ensure_ascii=False, indent=4)
+                    print("Chave 'Ultima Atualizacao' atualizada no arquivo do usuário.")
+
             else:
                 print("Nenhum dado encontrado no Firebase para o usuário especificado.")
         except Exception as e:
             print(f"Erro ao baixar o banco de dados: {e}")
-
-            
 
 
     def verificar_midia(self):
@@ -4675,7 +4772,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
             usuario = self.ui.campo_usuario.currentText().strip()
             arquivo_usuario = f"{usuario}.json"
-            caminho_atualizacao = os.path.join(pasta_dados, "ultima_atualizacao.json")
             ref_atualizacao_firebase = db.reference(f"Usuario/{usuario}/Ultima Atualizacao")
 
             # Listar todos os arquivos na pasta
@@ -4683,7 +4779,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             arquivos_a_remover = [
                 os.path.join(pasta_dados, f)
                 for f in arquivos_existentes
-                if f.endswith(".json") and f != "login_data.json" and f != "ultima_atualizacao.json" and f != arquivo_usuario
+                if f.endswith(".json") and f != "login_data.json" and f != arquivo_usuario
             ]
 
             # Se houver arquivos a remover
@@ -4698,13 +4794,21 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
                 # Atualizar o arquivo de atualização local
                 data_hora_atual = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                conteudo_atualizacao = {
-                    "DataHora": data_hora_atual
-                }
+                
+                # Caminho completo para o arquivo JSON do usuário
+                caminho_arquivo_usuario = os.path.join(pasta_dados, f"{usuario}.json")
+                
+                with open(caminho_arquivo_usuario, "r", encoding="utf-8") as f:
+                    dados_banco = json.load(f)  # Carrega o conteúdo do arquivo JSON
 
-                with open(caminho_atualizacao, "w", encoding="utf-8") as arquivo:
-                    json.dump(conteudo_atualizacao, arquivo, ensure_ascii=False, indent=4)
-                print("Arquivo ultima_atualizacao.json atualizado localmente.")
+                if dados_banco:
+                    # Adicionar a chave "Ultima Atualizacao" ao conteúdo baixado
+                    dados_banco["Ultima Atualizacao"] = data_hora_atual
+
+                    # Caminho do arquivo local para salvar
+                    caminho_banco_arquivo = os.path.join(pasta_dados, f"{usuario}.json")
+                    with open(caminho_banco_arquivo, "w", encoding="utf-8") as f:
+                        json.dump(dados_banco, f, ensure_ascii=False, indent=4)
 
                 # Atualizar o Firebase com a nova data/hora de atualização
                 ref_atualizacao_firebase.set(data_hora_atual)

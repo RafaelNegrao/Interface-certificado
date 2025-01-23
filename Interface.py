@@ -1,5 +1,4 @@
 
-
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
@@ -2267,6 +2266,27 @@ class Ui_janela(object):
         self.campo_grafico_uf.setGeometry(QtCore.QRect(-40, -16, 644, 581))
         self.campo_grafico_uf.setObjectName("campo_grafico_uf")
         self.tabWidget_2.addTab(self.tab_10, "")
+        self.tab_14 = QtWidgets.QWidget()
+        self.tab_14.setObjectName("tab_14")
+        self.campo_grafico_quantidade_anual = QtWidgets.QWidget(self.tab_14)
+        self.campo_grafico_quantidade_anual.setGeometry(QtCore.QRect(0, 2, 580, 512))
+        self.campo_grafico_quantidade_anual.setObjectName("campo_grafico_quantidade_anual")
+        self.campo_comentario_7 = QtWidgets.QTextEdit(self.tab_14)
+        self.campo_comentario_7.setEnabled(False)
+        self.campo_comentario_7.setGeometry(QtCore.QRect(-1, 504, 582, 37))
+        font = QtGui.QFont()
+        font.setFamily("Calibri")
+        font.setPointSize(9)
+        self.campo_comentario_7.setFont(font)
+        self.campo_comentario_7.viewport().setProperty("cursor", QtGui.QCursor(QtCore.Qt.IBeamCursor))
+        self.campo_comentario_7.setFocusPolicy(QtCore.Qt.StrongFocus)
+        self.campo_comentario_7.setStyleSheet("border-radius:7px;\n"
+"\n"
+"background-color:rgb(60,62, 84);\n"
+"color:rgb(230,230,230)")
+        self.campo_comentario_7.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.campo_comentario_7.setObjectName("campo_comentario_7")
+        self.tabWidget_2.addTab(self.tab_14, "")
         self.tab_12 = QtWidgets.QWidget()
         self.tab_12.setObjectName("tab_12")
         self.campo_grafico_clientes_recorrentes = QtWidgets.QWidget(self.tab_12)
@@ -3680,7 +3700,7 @@ class Ui_janela(object):
         self.label_versao.setAlignment(QtCore.Qt.AlignRight|QtCore.Qt.AlignTop|QtCore.Qt.AlignTrailing)
         self.label_versao.setObjectName("label_versao")
         self.label_60 = QtWidgets.QLabel(self.centralwidget)
-        self.label_60.setGeometry(QtCore.QRect(348, 50, 421, 23))
+        self.label_60.setGeometry(QtCore.QRect(350, 50, 419, 23))
         font = QtGui.QFont()
         font.setFamily("Consolas")
         font.setBold(False)
@@ -3903,7 +3923,7 @@ class Ui_janela(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Este gráfico mostra a quantidade de certificados APROVADOS e vendas realizadas na data referência. A média é (quantidade acumulada /quantidade de dias trabalhados)</p></body></html>"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_7), _translate("janela", "Quantidade"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_7), _translate("janela", "Quant Mês"))
         self.campo_comentario_5.setHtml(_translate("janela", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -3916,7 +3936,7 @@ class Ui_janela(object):
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">O gráfico exibe a quantidade de certificados APROVADOS em intervalos de hora durante o mês de referência. O objetivo é identificar os horários com maior pico de aprovação no período analisado</p></body></html>"))
         self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_4), _translate("janela", "Horários"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_8), _translate("janela", "Estatísticas"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_8), _translate("janela", "Estat"))
         self.label_73.setText(_translate("janela", "INDICE DE APROVAÇÃO"))
         self.campo_comentario_2.setHtml(_translate("janela", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
@@ -3924,14 +3944,20 @@ class Ui_janela(object):
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">Descrição do gráfico</span>:<br />Este gráfico exibe a porcentagem de pedidos que foram aprovados pelo agente, considerando todos os pedidos recebidos, tanto por vídeo conferência quanto presencial. A taxa de aprovação indica a probabilidade de sucesso na validação do pedido.</p>\n"
 "<p style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-weight:600;\">O que isso significa</span>:<br />Por exemplo, se a taxa de aprovação for de 80%, isso significa que o cliente tem 80% de chance de seu pedido ser aprovado.</p></body></html>"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_9), _translate("janela", "I. Aprovação"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_10), _translate("janela", "UF"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_9), _translate("janela", "Indíce"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_10), _translate("janela", "  UF "))
+        self.campo_comentario_7.setHtml(_translate("janela", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
+"<p align=\"center\" style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Este gráfico apresenta a quantidade de certificados <span style=\" font-weight:600;\">APROVADOS</span> ao longo dos últimos 24 meses, exibindo a distribuição mensal dos valores aprovados</p></body></html>"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_14), _translate("janela", "Quant Anual"))
         self.campo_comentario_6.setHtml(_translate("janela", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'Calibri\'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p align=\"center\" style=\" margin-top:12px; margin-bottom:12px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">Gráfico que apresenta a quantidade de pedidos <span style=\" font-weight:600;\">APROVADOS</span> agrupados por <span style=\" font-weight:600;\">CPF</span>, considerando todos os registros no banco de dados.</p></body></html>"))
-        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_12), _translate("janela", "Clientes Recorrentes"))
+        self.tabWidget_2.setTabText(self.tabWidget_2.indexOf(self.tab_12), _translate("janela", "Cli Recorrentes"))
         self.campo_data_meta.setDisplayFormat(_translate("janela", "MM/yyyy"))
         self.label_36.setText(_translate("janela", "DATA REFERÊNCIA"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("janela", "Indicadores"))
@@ -3976,5 +4002,4 @@ class Ui_janela(object):
         self.campo_status_bd_2.setText(_translate("janela", "🖥️"))
         self.botao_menagem.setText(_translate("janela", "💬"))
         self.campo_status_bd_3.setText(_translate("janela", "🚦"))
-
 
