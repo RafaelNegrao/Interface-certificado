@@ -1452,7 +1452,7 @@ class FuncoesPadrao:
             # Caso não consiga abrir a pasta ou ocorrer qualquer erro
             # Irei criar a pasta novamente
             pasta_principal = ui.caminho_pasta_principal.text()
-            nome_pasta = ui.caminho_pasta.text().split("\\")[-1]  # Pega o nome da pasta do caminho atual
+            nome_pasta = f'{ui.campo_pedido.text()}' 
 
             novo_caminho = os.path.join(pasta_principal, nome_pasta)
             if not os.path.exists(novo_caminho):
@@ -1626,9 +1626,25 @@ class FuncoesPadrao:
 
 
     def procurar_cnpj(self):
-        cnpj = ui.campo_cnpj.text()
-        url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
-        QDesktopServices.openUrl(url_receita)
+        
+        nome_pesquisa, ok = QInputDialog.getItem(ui.centralwidget, "Site pesquisa", "Escolha o site de pesquisa:", ["CNPJ", "MEI"], 0, False)
+
+        if not ok or not nome_pesquisa:
+            return
+
+        match nome_pesquisa:
+            case "CNPJ":
+                cnpj = ui.campo_cnpj.text()
+                url_receita = QUrl(f"https://solucoes.receita.fazenda.gov.br/servicos/cnpjreva/Cnpjreva_Solicitacao.asp?cnpj={cnpj}")
+                QDesktopServices.openUrl(url_receita)
+            
+            case "MEI":
+                url_receita = QUrl(f"https://mei.receita.economia.gov.br/certificado/consulta")
+                QDesktopServices.openUrl(url_receita)
+
+            
+
+        
 
 
     def dados_cnpj(self):
@@ -3408,7 +3424,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
         
 
     def salvar_pedido(self):
-        self.atualizar.verificar_atualizacao()
+        #self.atualizar.verificar_atualizacao()
 
         self.ref = db.reference(f"Usuario/{ui.campo_usuario.currentText()}/Dados/Pedidos")
         try:
@@ -3514,7 +3530,6 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
             print(f"Erro ao salvar dados localmente: {e}")
 
 
-
     def baixar_banco_de_dados_firebase(self, pasta_local):
         ref_banco = db.reference(f"Usuario/{ui.campo_usuario.currentText()}")
 
@@ -3571,6 +3586,7 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
                 "Esse pedido contém mídia.\nEnviar e-mail com os dados do cliente para envio de mídia."
             )
 
+
             janela = None
 
             # Função para enviar o e-mail
@@ -3582,6 +3598,9 @@ f'Para prosseguirmos com a validação, preciso que o senhor(a) entre em contato
 
                 remetente = self.ui.campo_email_empresa.text()
                 senha = self.ui.campo_senha_email.text()
+
+               
+
 
                 if not endereco.strip():
                     QMessageBox.warning(janela, "Erro", "O campo 'Endereço' está vazio. Preencha o endereço antes de enviar!")

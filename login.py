@@ -442,8 +442,6 @@ class LoginWindow(QMainWindow):
                 self.checkbox_lembrar.setChecked(True)
 
 
-
-
     def atualizar_json_login(self):
         """Atualiza o JSON quando o checkbox for marcado/desmarcado."""
         pasta_dados = os.path.join(os.environ['APPDATA'], 'Dados')
